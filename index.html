@@ -192,55 +192,87 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 .auth-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85em;margin:12px 0 6px}
 .auth-or::before,.auth-or::after{content:"";flex:1;height:1px;background:var(--line)}
 @media print{header.top,.toolbar{display:none}}
+/* ===== v2.0 cloud ===== */
+.chk{width:18px!important;height:18px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.rec-card.sel{border-color:var(--primary);background:var(--primary-soft)}
+.bulkbar{position:sticky;top:64px;z-index:15;display:flex;gap:.5em;align-items:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--primary);border-radius:14px;padding:.6em .9em;margin-bottom:12px;box-shadow:var(--shadow)}
+.star{border:none;background:none;font-size:1.15em;padding:0 .15em;opacity:.35;line-height:1}
+.star.on{opacity:1}
+.chat{border:1px solid var(--line);border-radius:12px;margin-top:1em;overflow:hidden}
+.chat-head{background:var(--primary-soft);padding:.55em .9em;font-weight:700;display:flex;align-items:center;gap:.5em}
+.chat-msgs{max-height:340px;overflow:auto;padding:.7em .9em;display:flex;flex-direction:column;gap:.5em}
+.msg{padding:.5em .8em;border-radius:12px;max-width:85%;white-space:pre-wrap;line-height:1.6}
+.msg.me{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;align-self:flex-start}
+.msg.bot{background:var(--bg);border:1px solid var(--line);align-self:flex-end}
+.chat form{display:flex;gap:.5em;padding:.6em .9em;border-top:1px solid var(--line)}
+.tbl{width:100%;border-collapse:collapse;font-size:.92em}
+.tbl th,.tbl td{padding:.45em .5em;border-bottom:1px solid var(--line);text-align:start;vertical-align:middle}
+.tbl th{color:var(--muted);font-weight:600;font-size:.88em}
+.tbl-wrap{overflow-x:auto}
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 .45em;font-size:.85em;background:var(--bg);font-family:monospace}
+.status-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:.35em}
+.status-dot.ok{background:var(--ok)} .status-dot.bad{background:var(--err)}
+.perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:.2em .8em}
+.perm-grid label{display:flex;align-items:center;gap:.4em;font-weight:500;margin:.25em 0}
+.set-nav{display:flex;gap:.35em;flex-wrap:wrap;margin-bottom:14px}
+.set-nav button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:.35em .9em;font-weight:600;color:var(--muted)}
+.set-nav button.active{background:var(--primary);color:#fff;border-color:transparent}
+#viewer{max-width:900px;margin:0 auto;padding:16px}
+.speed{width:auto!important;padding:.25em .5em!important;font-size:.9em}
+.pill-note{font-size:.8em;background:var(--primary-soft);color:var(--primary);border-radius:999px;padding:.1em .6em}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+
+<!-- ============ PUBLIC VIEWER (shared link) ============ -->
+<div id="viewer" class="hidden">
+  <div class="card">
+    <div class="row"><div class="logo" style="font-size:1.1em"><img src="icon-192.png" alt="" style="width:30px;height:30px;border-radius:8px"> תמלול פלוס</div><span class="grow"></span><span class="pill-note" id="vExp"></span></div>
+    <h2 id="vTitle" style="margin-top:.6em"></h2>
+    <div class="muted" id="vMeta"></div>
+    <audio id="vPlayer" controls preload="metadata" style="margin-top:.8em"></audio>
+    <div id="vSummary" class="summary hidden"></div>
+    <div id="vTranslations"></div>
+    <div id="vTranscript" class="transcript"></div>
+  </div>
+</div>
 
 <!-- ============ AUTH ============ -->
 <div id="auth" class="hidden">
   <div class="auth-card">
     <div class="auth-brand"><img src="icon-192.png" alt=""><div><div class="auth-name">תמלול פלוס</div><div class="auth-sub">תמלול הקלטות · עברית · יידיש · אנגלית</div></div></div>
 
-    <form id="setupForm" class="hidden" autocomplete="on">
-      <h2>ברוך הבא! 👋</h2>
-      <p class="auth-lead">הפעלה ראשונה – יוצרים את חשבון המנהל</p>
-      <div class="fg"><label for="setupEmail">מייל (משמש גם כשם משתמש)</label><input id="setupEmail" type="email" autocomplete="email" required></div>
-      <div class="fg"><label for="setupUser">שם לתצוגה</label><input id="setupUser" type="text" autocomplete="name" placeholder="למשל: אברהם" required></div>
-      <div class="fg"><label for="setupPass">סיסמה</label><input id="setupPass" type="password" autocomplete="new-password" required></div>
-      <div class="fg"><label for="setupPass2">אימות סיסמה</label><input id="setupPass2" type="password" autocomplete="new-password" required></div>
-      <button class="btn-auth" type="submit">יצירה וכניסה</button>
-    </form>
-
     <form id="loginForm" class="hidden" autocomplete="on">
       <h2 id="loginHello">שלום, טוב לראות אותך!</h2>
       <p class="auth-lead">כניסה למערכת התמלול</p>
-      <div class="fg"><label for="loginUser">שם משתמש (דוא"ל)</label><input id="loginUser" type="text" autocomplete="username" required></div>
+      <div id="gBtnWrap" style="display:flex;justify-content:center;margin-bottom:6px;min-height:44px"><div id="gBtn"></div></div>
+      <button class="btn-auth btn-auth-alt" type="button" id="codeLoginBtn">✉️ כניסה עם קוד למייל</button>
+      <div class="auth-or"><span>או עם סיסמה</span></div>
+      <div class="fg"><label for="loginUser">מייל</label><input id="loginUser" type="email" autocomplete="username" required></div>
       <div class="fg"><label for="loginPass">סיסמה</label>
         <div class="pass-wrap"><input id="loginPass" type="password" autocomplete="current-password" required><button type="button" class="eye" data-eye="loginPass" title="הצגת סיסמה">👁️</button></div></div>
-      <button class="btn-auth" type="submit">התחברות</button>
-      <div class="auth-or"><span>או</span></div>
-      <div id="gBtnWrap" class="hidden" style="display:flex;justify-content:center;margin-bottom:10px"><div id="gBtn"></div></div>
-      <button class="btn-auth btn-auth-alt" type="button" id="codeLoginBtn">✉️ כניסה עם קוד למייל</button>
-      <a class="auth-link" id="forgotBtn" href="#">שכחת סיסמה? לחץ כאן לשחזור</a>
+      <button class="btn-auth" type="submit" id="loginSubmit">התחברות</button>
+      <a class="auth-link" id="forgotBtn" href="#">שכחת סיסמה? / אין לך סיסמה? לחץ כאן</a>
     </form>
 
     <form id="forgotForm" class="hidden">
       <h2 id="forgotTitle">שחזור סיסמה</h2>
-      <p class="auth-lead">הזן את כתובת הדוא"ל שלך לקבלת קוד אימות בן 4 ספרות</p>
-      <div class="fg"><label for="forgotEmail">דוא"ל</label><input id="forgotEmail" type="email" autocomplete="email" required></div>
-      <button class="btn-auth" type="submit" id="sendCodeBtn">שלח קוד אימות למייל</button>
-      <a class="auth-link" href="#" data-back>חזרה להתחברות</a>
+      <p class="auth-lead" id="forgotLead">הזן את המייל שלך ונשלח אליך קוד בן 4 ספרות</p>
+      <div class="fg"><label for="forgotEmail">מייל</label><input id="forgotEmail" type="email" autocomplete="email" required></div>
+      <button class="btn-auth" type="submit" id="sendCodeBtn">שלח קוד למייל</button>
+      <a class="auth-link" href="#" data-back>חזרה</a>
     </form>
 
     <form id="resetForm" class="hidden">
       <h2 id="resetTitle">איפוס סיסמה</h2>
-      <p class="auth-lead" id="resetLead">הזן את 4 הספרות שנשלחו למייל והגדר סיסמה חדשה</p>
-      <div class="fg"><label>קוד אימות</label>
+      <p class="auth-lead" id="resetLead">הזן את 4 הספרות שנשלחו למייל</p>
+      <div class="fg"><label>קוד</label>
         <div class="otp" id="otp" dir="ltr">
           <input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="ספרה 1"><input inputmode="numeric" maxlength="1" aria-label="ספרה 2"><input inputmode="numeric" maxlength="1" aria-label="ספרה 3"><input inputmode="numeric" maxlength="1" aria-label="ספרה 4">
         </div>
         <input id="resetCode" type="hidden"></div>
-      <div class="fg" id="resetPassWrap"><label for="resetPass">סיסמה חדשה (אפשר גם מספרים בלבד)</label>
+      <div class="fg" id="resetPassWrap"><label for="resetPass">סיסמה חדשה (לפחות 6 תווים)</label>
         <div class="pass-wrap"><input id="resetPass" type="password" autocomplete="new-password"><button type="button" class="eye" data-eye="resetPass" title="הצגת סיסמה">👁️</button></div></div>
       <button class="btn-auth" type="submit" id="resetSubmit">עדכן סיסמה והתחבר</button>
       <div class="auth-links"><a class="auth-link" href="#" id="resendBtn">לא הגיע? שלח קוד חדש</a><a class="auth-link" href="#" data-back>ביטול</a></div>
@@ -259,12 +291,12 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
       <button data-page="home" class="active">🎙️ תמלול</button>
       <button data-page="library">📚 ספרייה</button>
       <button data-page="stats">📊 סטטיסטיקה</button>
-      <button data-page="settings" class="admin-only">⚙️ הגדרות</button>
+      <button data-page="settings" class="admin-only">⚙️ ניהול</button>
     </nav>
     <div class="top-actions">
-      <button class="btn small primary hidden" id="installBtn">📲 התקנה כאפליקציה</button>
+      <button class="btn small primary hidden" id="installBtn">📲 התקנה</button>
       <button class="icon-btn" id="darkBtn" title="מצב חושך">🌙</button>
-      <span class="muted" id="whoami" style="font-size:.9em"></span>
+      <button class="btn small" id="whoami" title="החשבון שלי"></button>
       <button class="icon-btn" id="logoutBtn" title="יציאה">⎋</button>
     </div>
   </header>
@@ -272,12 +304,11 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
   <main>
     <!-- HOME -->
     <section class="page active" id="page-home">
-      <div id="noKeyWarn" class="card hidden" style="border-color:var(--warn);margin-bottom:16px">
-        ⚠️ עדיין לא הוגדר מפתח Groq. <a href="#" data-goto="settings">עבור להגדרות</a> והדבק את המפתח כדי שהתמלול יעבוד.
-      </div>
       <div class="hero">
-        <div class="grow"><h1 id="heroHello">שלום 👋</h1><p>מקליטים, מעלים קובץ או תיקייה שלמה, והמערכת מתמללת.</p></div>
+        <div class="grow"><h1 id="heroHello">שלום 👋</h1><p>מקליטים, מעלים קובץ או תיקייה שלמה, והמערכת מתמללת. הכול נשמר בענן ונגיש מכל מחשב.</p></div>
       </div>
+      <div id="noTranscribe" class="card hidden" style="border-color:var(--warn);margin-bottom:16px">⚠️ אין לך הרשאה לתמלל הקלטות חדשות. אפשר לצפות בספרייה. לשינוי – פנה למנהל.</div>
+      <div id="transcribeArea">
       <div class="row" style="margin-bottom:14px">
         <span style="font-weight:700">שפת ההקלטה:</span>
         <div class="lang-pills" id="langPills">
@@ -288,11 +319,12 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         </div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> זיהוי דוברים</label>
         <select id="langSel" class="hidden">
-          <option value="he">עברית</option>
-          <option value="yi">יידיש</option>
-          <option value="en">אנגלית</option>
-          <option value="auto">זיהוי אוטומטי</option>
+          <option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option>
         </select>
+      </div>
+      <div class="row" style="margin-bottom:14px">
+        <span style="font-weight:700">לשמור בתיקייה:</span>
+        <select id="upFolder" style="width:auto;min-width:180px"></select>
       </div>
       <div class="home-grid">
         <div class="card">
@@ -317,6 +349,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           </div>
         </div>
       </div>
+      </div>
       <div class="card" style="margin-top:16px">
         <div class="row"><h3 class="grow" style="margin:0">תור תמלול</h3><span class="muted" id="queueCount"></span></div>
         <div id="queueList"><p class="muted">אין הקלטות בתור.</p></div>
@@ -333,13 +366,26 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
             <input type="text" id="newFolderName" placeholder="שם תיקייה חדשה" class="grow" style="width:auto">
             <button class="btn small" type="submit">➕ תיקייה</button>
           </form>
+          <div class="hint">👥 = תיקייה משותפת. בעל התיקייה יכול לשתף אותה עם משתמשים אחרים.</div>
         </div>
         <div>
           <div class="row" style="margin-bottom:12px">
-            <input type="search" id="searchBox" placeholder="🔍 חיפוש בתמלולים, שמות ותגיות…" class="grow" style="width:auto">
-            <button class="btn small" id="exportAllXlsx">⬇️ Excel לכל הרשימה</button>
+            <label class="row" style="margin:0;gap:.3em;font-weight:500" title="בחירת הכל"><input type="checkbox" class="chk" id="selAll"></label>
+            <input type="search" id="searchBox" placeholder="🔍 חיפוש בתמלולים, שמות ותגיות… (מקש /)" class="grow" style="width:auto">
+            <select id="sortSel" style="width:auto"><option value="new">החדשות קודם</option><option value="old">הישנות קודם</option><option value="name">לפי שם</option><option value="long">הארוכות קודם</option></select>
+            <button class="btn small" id="refreshBtn" title="רענון">🔄</button>
+          </div>
+          <div class="bulkbar hidden" id="bulkBar">
+            <b id="bulkCount"></b>
+            <select id="bulkMove" style="width:auto"></select>
+            <input type="text" id="bulkTag" placeholder="תגית + Enter" style="width:140px">
+            <button class="btn small perm-export" id="bulkXlsx">⬇️ Excel</button>
+            <button class="btn small danger perm-delete" id="bulkDel">🗑️ מחיקה</button>
+            <span class="grow"></span>
+            <button class="btn small" id="bulkClear">✕ ביטול בחירה</button>
           </div>
           <div id="recList"></div>
+          <div class="row" style="margin-top:8px"><button class="btn small perm-export" id="exportAllXlsx">⬇️ Excel לכל הרשימה</button></div>
         </div>
       </div>
     </section>
@@ -350,6 +396,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="row">
           <button class="btn small" id="backToLib">→ חזרה לספרייה</button>
           <span class="grow"></span>
+          <span class="badge" id="dOwner"></span>
           <span class="badge" id="dLang"></span>
           <span class="muted" id="dMeta"></span>
         </div>
@@ -358,6 +405,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <label style="margin:0">תיקייה:</label>
           <select id="dFolder" style="width:auto"></select>
           <span class="grow"></span>
+          <span class="pill-note hidden" id="dShared"></span>
         </div>
         <div class="row" style="margin-top:.6em">
           <label style="margin:0">תגיות:</label>
@@ -365,18 +413,25 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <input type="text" id="dTagInput" placeholder="תגית חדשה + Enter" style="width:180px">
         </div>
         <div id="waveWrap"><canvas id="wave"></canvas></div>
-        <audio id="player" controls preload="metadata"></audio>
+        <div class="row" style="flex-wrap:nowrap">
+          <audio id="player" controls preload="metadata" class="grow"></audio>
+          <select id="speedSel" class="speed" title="מהירות ניגון">
+            <option value="0.75">×0.75</option><option value="1" selected>×1</option><option value="1.25">×1.25</option><option value="1.5">×1.5</option><option value="1.75">×1.75</option><option value="2">×2</option>
+          </select>
+          <button class="btn small" id="kbdHelp" title="קיצורי מקלדת">⌨️</button>
+        </div>
         <div class="toolbar">
-          <button class="btn small primary" id="sumBtn">✨ סיכום אוטומטי</button>
-          <span class="row" style="gap:.25em"><select id="trLang" style="width:auto;padding:.25em .5em;font-size:.9em"><option value="he">לעברית</option><option value="en">לאנגלית</option><option value="yi">ליידיש</option></select><button class="btn small primary" id="trBtn">🌐 תרגום</button></span>
+          <button class="btn small primary perm-summarize" id="sumBtn">✨ סיכום</button>
+          <span class="row perm-translate" style="gap:.25em"><select id="trLang" style="width:auto;padding:.25em .5em;font-size:.9em"><option value="he">לעברית</option><option value="en">לאנגלית</option><option value="yi">ליידיש</option></select><button class="btn small primary" id="trBtn">🌐 תרגום</button></span>
           <button class="btn small" id="copyBtn">📋 העתקה</button>
-          <button class="btn small" id="editBtn">✏️ עריכת טקסט</button>
-          <button class="btn small" id="xlsxBtn">⬇️ Excel</button>
-          <button class="btn small" id="docxBtn">⬇️ Word</button>
-          <button class="btn small" id="pdfBtn">⬇️ PDF</button>
-          <button class="btn small" id="txtBtn">⬇️ TXT</button>
-          <button class="btn small" id="retryBtn">🔄 תמלול מחדש</button>
-          <button class="btn small danger" id="delBtn">🗑️ מחיקה</button>
+          <button class="btn small can-edit" id="editBtn">✏️ עריכה</button>
+          <button class="btn small perm-share can-edit" id="shareBtn">🔗 קישור שיתוף</button>
+          <button class="btn small perm-export" id="xlsxBtn">⬇️ Excel</button>
+          <button class="btn small perm-export" id="docxBtn">⬇️ Word</button>
+          <button class="btn small perm-export" id="pdfBtn">⬇️ PDF</button>
+          <button class="btn small perm-export" id="txtBtn">⬇️ TXT</button>
+          <button class="btn small perm-transcribe can-edit" id="retryBtn">🔄 תמלול מחדש</button>
+          <button class="btn small danger perm-delete can-edit" id="delBtn">🗑️ מחיקה</button>
         </div>
         <div id="dSummary" class="summary hidden"></div>
         <div id="dTranslations"></div>
@@ -390,6 +445,11 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
             <span class="hint">שים לב: עריכה ידנית מבטלת את הסימון לפי משפטים.</span>
           </div>
         </div>
+        <div class="chat perm-chat" id="chatBox">
+          <div class="chat-head">💬 שאל שאלה על ההקלטה <span class="grow"></span><button class="btn small" id="chatClear" title="ניקוי השיחה">🧹</button></div>
+          <div class="chat-msgs" id="chatMsgs"><div class="muted" style="font-size:.9em">לדוגמה: "מה הוחלט בסוף?", "מי הזכיר את התאריך?", "תן לי 3 ציטוטים חשובים".</div></div>
+          <form id="chatForm"><input type="text" id="chatInput" class="grow" placeholder="כתוב שאלה…" autocomplete="off" style="width:auto"><button class="btn primary" type="submit">שלח</button></form>
+        </div>
       </div>
     </section>
 
@@ -402,131 +462,107 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="card"><h3>לפי תיקייה</h3><div id="statFolder"></div></div>
       </div>
       <div class="card" style="margin-top:16px"><h3>דקות תמלול לפי חודש</h3><div id="statMonth"></div></div>
+      <div class="card admin-only" style="margin-top:16px"><h3>👥 לפי משתמש</h3><div id="statUsers"></div></div>
     </section>
 
-    <!-- SETTINGS -->
+    <!-- SETTINGS (ADMIN ONLY) -->
     <section class="page" id="page-settings">
-      <h2>הגדרות</h2>
-      <div class="card settings-sec admin-only">
-        <h3>Groq – מנוע התמלול</h3>
-        <label for="groqKey">מפתח API של Groq</label>
-        <div class="row">
-          <input type="password" id="groqKey" class="grow" style="width:auto" placeholder="gsk_..." autocomplete="off">
-          <button class="btn small" id="showKeyBtn" type="button">👁️</button>
-        </div>
-        <div class="hint">מקבלים מפתח חינם ב-<a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. המפתח נשמר רק במכשיר הזה.</div>
-        <label for="whisperModel">מודל תמלול</label>
-        <select id="whisperModel">
-          <option value="whisper-large-v3">whisper-large-v3 (הכי מדויק – מומלץ)</option>
-          <option value="whisper-large-v3-turbo">whisper-large-v3-turbo (מהיר יותר)</option>
-        </select>
-        <label for="defLang">שפת ברירת מחדל</label>
-        <select id="defLang">
-          <option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option>
-        </select>
-        <div class="row" style="margin-top:1em">
-          <button class="btn primary" id="saveGroqBtn">שמירה</button>
-          <button class="btn" id="testGroqBtn">בדיקת חיבור</button>
-          <span id="groqMsg"></span>
-        </div>
+      <h2>ניהול המערכת</h2>
+      <div class="set-nav" id="setNav">
+        <button data-sec="users" class="active">👥 משתמשים</button>
+        <button data-sec="log">📋 יומן כניסות</button>
+        <button data-sec="system">🟢 מצב ומנועים</button>
+        <button data-sec="security">🔒 אבטחה ודו"ח</button>
+        <button data-sec="dict">📖 מילון מונחים</button>
+        <button data-sec="trash">🗑️ סל מחזור</button>
+        <button data-sec="data">💾 גיבוי וייבוא</button>
       </div>
 
-      <div class="card settings-sec admin-only">
-        <h3>📜 Google Gemini – מנוע ליידיש</h3>
-        <div class="hint">Whisper (של Groq) חלש מאוד ביידיש. Gemini מבין יידיש הרבה יותר טוב. מפתח חינמי: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></div>
-        <label for="geminiKey">מפתח API של Gemini</label>
-        <div class="row">
-          <input type="password" id="geminiKey" class="grow" style="width:auto" placeholder="AIza..." autocomplete="off">
-          <button class="btn small" id="showGemBtn" type="button">👁️</button>
-        </div>
-        <label for="yiEngine">מנוע תמלול ליידיש</label>
-        <select id="yiEngine">
-          <option value="gemini">Gemini (מומלץ ליידיש)</option>
-          <option value="groq">Groq Whisper</option>
-        </select>
-        <label for="otherEngine">מנוע תמלול לעברית ולאנגלית</label>
-        <select id="otherEngine">
-          <option value="groq">Groq Whisper (מהיר, מומלץ)</option>
-          <option value="gemini">Gemini</option>
-        </select>
-        <div class="row" style="margin-top:1em">
-          <button class="btn primary" id="saveGemBtn">שמירה</button>
-          <button class="btn" id="testGemBtn">בדיקת חיבור</button>
-          <span id="gemMsg"></span>
-        </div>
-      </div>
-
-      <div class="card settings-sec">
-        <h3>חשבון</h3>
-        <div class="muted" id="accInfo"></div>
-        <label for="accEmail">מייל לשחזור סיסמה</label>
-        <input type="email" id="accEmail">
-        <label for="accOld">סיסמה נוכחית (לשינוי סיסמה)</label>
-        <input type="password" id="accOld" autocomplete="current-password">
-        <label for="accNew">סיסמה חדשה</label>
-        <input type="password" id="accNew" autocomplete="new-password">
-        <div class="row" style="margin-top:1em">
-          <button class="btn primary" id="saveAccBtn">שמירה</button>
-          <span id="accMsg"></span>
-        </div>
-      </div>
-
-      <div class="card settings-sec admin-only" id="usersSec">
-        <h3>👥 ניהול משתמשים</h3>
-        <div class="hint">רק מנהל רואה את האזור הזה. כל משתמש רואה רק את ההקלטות שלו, והמנהל רואה את כולן.</div>
-        <div id="usersList" style="margin-top:.6em"></div>
-        <h4 style="margin:1.2em 0 .2em">➕ הוספת משתמש</h4>
-        <form id="addUserForm" autocomplete="off">
+      <div class="card settings-sec" data-secbox="users">
+        <h3>👥 משתמשים</h3>
+        <div class="hint">רק מנהל רואה את האזור הזה, וכל פעולה נבדקת גם בשרת. כל משתמש רואה רק את ההקלטות שלו (ותיקיות ששיתפו איתו); מנהל רואה הכול.</div>
+        <div class="tbl-wrap" style="margin-top:.6em"><table class="tbl" id="usersTbl"></table></div>
+        <h4 style="margin:1.3em 0 .2em">✉️ הזמנת משתמש חדש</h4>
+        <form id="inviteForm" autocomplete="off">
           <div class="home-grid" style="gap:0 12px">
-            <div><label for="nuName">שם משתמש</label><input type="text" id="nuName" autocomplete="off"></div>
-            <div><label for="nuEmail">מייל (לשחזור סיסמה)</label><input type="email" id="nuEmail" autocomplete="off"></div>
-            <div><label for="nuPass">סיסמה ראשונית</label><input type="password" id="nuPass" autocomplete="new-password"></div>
-            <div><label for="nuRole">הרשאה</label><select id="nuRole"><option value="user">משתמש רגיל</option><option value="admin">מנהל</option></select></div>
+            <div><label for="nuName">שם</label><input type="text" id="nuName" autocomplete="off" placeholder="למשל: משה"></div>
+            <div><label for="nuEmail">מייל</label><input type="email" id="nuEmail" autocomplete="off" dir="ltr"></div>
+            <div><label for="nuRole">תפקיד</label><select id="nuRole"><option value="user">משתמש רגיל</option><option value="admin">מנהל</option></select></div>
+            <div><label for="nuPass">סיסמה ראשונית (לא חובה)</label><input type="password" id="nuPass" autocomplete="new-password" placeholder="אפשר להשאיר ריק"></div>
           </div>
-          <div class="row" style="margin-top:1em">
-            <button class="btn primary" type="submit">הוספת משתמש</button>
-            <span id="nuMsg"></span>
-          </div>
+          <label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="nuSend" checked style="width:auto"> לשלוח לו מייל הזמנה עם קישור למערכת</label>
+          <div class="row" style="margin-top:.6em"><button class="btn primary" type="submit">➕ הוספה והזמנה</button><span id="nuMsg"></span></div>
+          <div class="hint">המשתמש נכנס עם "כניסה עם Google" (אותו מייל), או עם "כניסה עם קוד למייל". אי אפשר להירשם לבד – רק מי שהמנהל הוסיף.</div>
         </form>
       </div>
 
-      <div class="card settings-sec admin-only">
-        <h3>שליחת מיילים (EmailJS)</h3>
-        <div class="hint">משמש לשליחת קוד שחזור הסיסמה. בדרך כלל אין צורך לשנות.</div>
-        <label for="ejService">Service ID</label><input type="text" id="ejService">
-        <label for="ejTemplate">Template ID</label><input type="text" id="ejTemplate">
-        <label for="ejKey">Public Key</label><input type="text" id="ejKey">
+      <div class="card settings-sec hidden" data-secbox="log">
+        <div class="row"><h3 class="grow">📋 יומן כניסות</h3><button class="btn small" id="logRefresh">🔄 רענון</button></div>
+        <div class="tbl-wrap"><table class="tbl" id="logTbl"></table></div>
+      </div>
+
+      <div class="card settings-sec hidden" data-secbox="system">
+        <h3>🟢 מצב המערכת</h3>
+        <div class="hint">המפתחות שמורים בשרת בלבד (לא בדפדפן), ולכן המערכת עובדת מכל מחשב בלי להגדיר כלום.</div>
+        <div id="keysStatus" style="margin:.6em 0"></div>
+        <div class="row">
+          <button class="btn" id="testGroqBtn">בדיקת Groq</button>
+          <button class="btn" id="testGemBtn">בדיקת Gemini</button>
+          <button class="btn" id="testMailBtn">שליחת מייל בדיקה אליי</button>
+          <span id="sysMsg"></span>
+        </div>
+        <h3 style="margin-top:1.2em">⚙️ מנועי תמלול</h3>
+        <div class="home-grid" style="gap:0 12px">
+          <div><label for="whisperModel">מודל Whisper</label>
+            <select id="whisperModel"><option value="whisper-large-v3">whisper-large-v3 (הכי מדויק)</option><option value="whisper-large-v3-turbo">whisper-large-v3-turbo (מהיר)</option></select></div>
+          <div><label for="defLang">שפת ברירת מחדל</label>
+            <select id="defLang"><option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option></select></div>
+          <div><label for="yiEngine">מנוע ליידיש</label>
+            <select id="yiEngine"><option value="gemini">Gemini (מומלץ ליידיש – חינם)</option><option value="groq">Groq Whisper</option></select></div>
+          <div><label for="otherEngine">מנוע לעברית ואנגלית</label>
+            <select id="otherEngine"><option value="groq">Groq Whisper (מהיר, מומלץ)</option><option value="gemini">Gemini</option></select></div>
+        </div>
+        <div class="row" style="margin-top:1em"><button class="btn primary" id="saveEnginesBtn">שמירה</button><span id="engMsg"></span></div>
+      </div>
+
+      <div class="card settings-sec hidden" data-secbox="security">
+        <h3>🔒 יציאה אוטומטית</h3>
+        <label for="idleMin">לנתק משתמש אחרי כמה דקות בלי פעילות? (0 = אף פעם)</label>
+        <div class="row"><input type="number" id="idleMin" min="0" max="1440" style="width:120px"><span class="muted">דקות</span></div>
+        <h3 style="margin-top:1.2em">📧 דו"ח שבועי</h3>
+        <label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="weeklyChk" style="width:auto"> לשלוח לי כל יום ראשון בבוקר דו"ח: כמה הקלטות וכמה דקות תומללו, לפי משתמש</label>
         <div class="row" style="margin-top:1em">
-          <button class="btn primary" id="saveEjBtn">שמירה</button>
-          <button class="btn" id="testEjBtn">שליחת מייל בדיקה</button>
-          <span id="ejMsg"></span>
+          <button class="btn primary" id="saveSecBtn">שמירה</button>
+          <button class="btn" id="weeklyNowBtn">📧 שלח לי דו"ח עכשיו</button>
+          <span id="secMsg"></span>
         </div>
       </div>
 
-      <div class="card settings-sec admin-only">
-        <h3>🔐 כניסה עם Google</h3>
-        <div class="hint">כשמוגדר מזהה לקוח (Client ID) של Google, במסך הכניסה מופיע כפתור "כניסה עם Google". נכנס רק מי שהמייל שלו רשום אצל משתמש במערכת.</div>
-        <label for="gClientId">Google Client ID</label>
-        <input type="text" id="gClientId" placeholder="xxxx.apps.googleusercontent.com" dir="ltr">
-        <div class="row" style="margin-top:1em"><button class="btn primary" id="saveGBtn">שמירה</button><span id="gMsg"></span></div>
+      <div class="card settings-sec hidden" data-secbox="dict">
+        <h3>📖 מילון מונחים</h3>
+        <div class="hint">שמות, מקומות ומילים מיוחדות שהתמלול טועה בהם. המערכת תכתוב אותם בדיוק כמו כאן (בכל התמלולים של כל המשתמשים).</div>
+        <form id="dictForm" class="row" style="margin-top:.6em"><input type="text" id="dictInput" class="grow" style="width:auto" placeholder="למשל: ויזניץ, רבי חיים, סאטמאר"><button class="btn primary" type="submit">➕ הוספה</button></form>
+        <div class="hint">אפשר להוסיף כמה ביחד, מופרדים בפסיק.</div>
+        <div id="dictList" style="margin-top:.6em"></div>
       </div>
 
-      <div class="card settings-sec admin-only">
-        <h3>גיבוי ונתונים</h3>
+      <div class="card settings-sec hidden" data-secbox="trash">
+        <div class="row"><h3 class="grow">🗑️ סל מחזור</h3><button class="btn small danger" id="emptyTrash">ריקון הסל</button></div>
+        <div class="hint">הקלטות שנמחקו נשמרות כאן 30 יום ואז נמחקות לצמיתות. רק מנהל יכול לשחזר.</div>
+        <div id="trashList" style="margin-top:.6em"></div>
+      </div>
+
+      <div class="card settings-sec hidden" data-secbox="data">
+        <h3>💾 גיבוי</h3>
         <div class="row">
-          <button class="btn" id="backupBtn">⬇️ גיבוי התמלולים (JSON)</button>
-          <button class="btn" id="restoreBtn">⬆️ שחזור מגיבוי</button>
+          <button class="btn" id="backupBtn">⬇️ גיבוי כל התמלולים (JSON)</button>
+          <button class="btn" id="restoreBtn">⬆️ ייבוא מקובץ גיבוי</button>
           <input type="file" id="restoreInput" accept=".json,application/json" class="hidden">
         </div>
-        <div class="hint">הגיבוי כולל את הטקסטים, התיקיות והתגיות (בלי קבצי השמע עצמם).</div>
-        <div class="muted" id="storageInfo" style="margin-top:.6em"></div>
-      </div>
-
-      <div class="card settings-sec">
-        <h3>התקנה בטלפון ושיתוף מוואטסאפ</h3>
-        <p><b>אנדרואיד (כרום):</b> פתח את האתר ← תפריט ⋮ ← "התקנת אפליקציה" / "הוספה למסך הבית". אחרי ההתקנה, בוואטסאפ לוחצים לחיצה ארוכה על הודעה קולית ← שיתוף ↗ ← "תמלול פלוס", וההקלטה נכנסת לתור אוטומטית.</p>
-        <p><b>אייפון (ספארי):</b> כפתור השיתוף ← "הוסף למסך הבית". בוואטסאפ: לחיצה ארוכה על ההודעה הקולית ← העבר/שתף ← "שמירה בקבצים", ואז באפליקציה "בחירת קבצים".</p>
-        <p class="hint">גרסה 1.6.1</p>
+        <h3 style="margin-top:1.2em">📥 העברת הקלטות מהגרסה הקודמת</h3>
+        <div class="hint">בגרסה הקודמת ההקלטות נשמרו רק בדפדפן. הכפתור הזה מעלה לענן את כל ההקלטות שנשמרו בדפדפן הזה (כולל קובצי השמע).</div>
+        <div class="row" style="margin-top:.6em"><button class="btn primary" id="importOldBtn">📥 העברה לענן</button><span id="importMsg"></span></div>
+        <div class="muted" id="storageInfo" style="margin-top:.8em"></div>
       </div>
     </section>
   </main>
@@ -534,30 +570,26 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 
 <div id="toast"></div>
 <div id="modalRoot"></div>
-
 <script>
 'use strict';
 /* =========================================================
-   תמלול פלוס – מערכת תמלול הקלטות
+   תמלול פלוס 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '1.6.1';
-const DEFAULTS = {
-  emailjsService: 'service_tplus',
-  emailjsTemplate: 'template_gzcqacc',
-  emailjsKey: '6G0YaH5dH_TKKk_hu',
-  googleClientId: '178659008979-7qgk5ejgokmi3nrajp2nhm70iopqb489.apps.googleusercontent.com',
-  whisperModel: 'whisper-large-v3',
-  defLang: 'he'
-};
+const APP_VERSION = '2.0.0';
+const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
+const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
+const API = SB_URL + '/functions/v1/api';
+const GOOGLE_CLIENT_ID = '178659008979-7qgk5ejgokmi3nrajp2nhm70iopqb489.apps.googleusercontent.com';
 const LANGS = { he: 'עברית', yi: 'יידיש', en: 'אנגלית', auto: 'אוטומטי' };
-const GROQ = 'https://api.groq.com/openai/v1';
-const MAX_DIRECT = 24 * 1024 * 1024;   // Groq free tier limit is 25MB
-const CHUNK_SEC = 600;                  // 10 min chunks for long files
+const MAX_DIRECT = 20 * 1024 * 1024;   // שליחה ישירה ל-Whisper עד 20MB
+const CHUNK_SEC = 300;                  // חלקים של 5 דקות לקבצים ארוכים
+const STORAGE_MAX = 50 * 1024 * 1024;   // גודל קובץ מקסימלי לשמירה בענן
+const PERM_NAMES = { transcribe: 'תמלול', export: 'הורדת קבצים', delete: 'מחיקה', translate: 'תרגום', summarize: 'סיכום', chat: 'צ\'אט עם הקלטה', share: 'קישור שיתוף' };
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function fmtTime(sec) {
   sec = Math.max(0, Math.round(sec || 0));
@@ -566,162 +598,219 @@ function fmtTime(sec) {
   return h ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
 }
 function fmtDate(ts) {
+  if (!ts) return '';
   const d = new Date(ts);
   return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 }
-function fmtMinutes(sec) {
-  const m = (sec || 0) / 60;
-  return m < 10 ? m.toFixed(1) : Math.round(m).toString();
-}
+function fmtMinutes(sec) { const m = (sec || 0) / 60; return m < 10 ? m.toFixed(1) : Math.round(m).toString(); }
 function toast(msg, ms = 3000) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms);
 }
-function modal(html, { onOk, okText = 'אישור', cancelText = 'ביטול', danger = false } = {}) {
+function modal(html, { onOk, okText = 'אישור', cancelText = 'ביטול', danger = false, wide = false } = {}) {
   return new Promise((resolve) => {
     const bg = document.createElement('div');
     bg.className = 'modal-bg';
-    bg.innerHTML = `<div class="modal">${html}<div class="row" style="margin-top:1.2em;justify-content:flex-start">
-      <button class="btn ${danger ? 'danger' : 'primary'}" data-ok>${okText}</button>
+    bg.innerHTML = `<div class="modal" ${wide ? 'style="max-width:620px"' : ''}>${html}<div class="row" style="margin-top:1.2em;justify-content:flex-start">
+      ${okText ? `<button class="btn ${danger ? 'danger' : 'primary'}" data-ok>${okText}</button>` : ''}
       ${cancelText ? `<button class="btn" data-cancel>${cancelText}</button>` : ''}</div></div>`;
     $('#modalRoot').appendChild(bg);
     const close = (v) => { bg.remove(); resolve(v); };
-    bg.querySelector('[data-ok]').onclick = () => { if (onOk) onOk(bg); close(true); };
+    const ok = bg.querySelector('[data-ok]');
+    if (ok) ok.onclick = async () => { if (onOk) { const r = await onOk(bg); if (r === false) return; } close(true); };
     const c = bg.querySelector('[data-cancel]'); if (c) c.onclick = () => close(false);
     bg.addEventListener('click', (e) => { if (e.target === bg) close(false); });
+    const first = bg.querySelector('input,select,textarea'); if (first) setTimeout(() => first.focus(), 50);
   });
 }
-const confirmBox = (text) => modal(`<p>${esc(text)}</p>`, { okText: 'כן, למחוק', danger: true });
+const confirmBox = (text, okText = 'כן, למחוק') => modal(`<p>${esc(text)}</p>`, { okText, danger: true });
 
-/* ---------------- Settings (localStorage) ---------------- */
+/* ---------------- local prefs ---------------- */
 const LS = {
   get(k, d) { try { const v = localStorage.getItem('tplus_' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('tplus_' + k, JSON.stringify(v)); } catch (e) {} },
   del(k) { try { localStorage.removeItem('tplus_' + k); } catch (e) {} }
 };
-const OLD_VALUES = { emailjsService: ['service_nybca58'], emailjsTemplate: ['template_9e88gji'] };
-function setting(k) { const s = LS.get('settings', {}); const v = s[k]; return v !== undefined && v !== '' && !(OLD_VALUES[k] || []).includes(v) ? v : DEFAULTS[k]; }
-function saveSettings(obj) { LS.set('settings', Object.assign(LS.get('settings', {}), obj)); }
 
-/* ---------------- IndexedDB ---------------- */
-const DB = {
+/* ---------------- local audio cache (IndexedDB) ---------------- */
+const Cache = {
   db: null,
   open() {
     if (this.db) return Promise.resolve(this.db);
     return new Promise((res, rej) => {
-      const r = indexedDB.open('tamlul-plus', 1);
-      r.onupgradeneeded = () => {
-        const db = r.result;
-        if (!db.objectStoreNames.contains('recs')) db.createObjectStore('recs', { keyPath: 'id' });
-        if (!db.objectStoreNames.contains('audio')) db.createObjectStore('audio');
-        if (!db.objectStoreNames.contains('folders')) db.createObjectStore('folders', { keyPath: 'id' });
-      };
+      const r = indexedDB.open('tamlul-plus-cloud', 1);
+      r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains('audio')) r.result.createObjectStore('audio'); };
       r.onsuccess = () => { this.db = r.result; res(this.db); };
       r.onerror = () => rej(r.error);
     });
   },
-  async tx(store, mode, fn) {
+  async op(mode, fn) {
     const db = await this.open();
     return new Promise((res, rej) => {
-      const t = db.transaction(store, mode);
-      const st = t.objectStore(store);
-      let out;
-      const req = fn(st);
-      if (req) req.onsuccess = () => { out = req.result; };
-      t.oncomplete = () => res(out);
-      t.onerror = () => rej(t.error);
-      t.onabort = () => rej(t.error || new Error('נכשלה שמירה במאגר המקומי'));
+      const t = db.transaction('audio', mode); let out;
+      const req = fn(t.objectStore('audio')); if (req) req.onsuccess = () => { out = req.result; };
+      t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
     });
   },
-  all(store) { return this.tx(store, 'readonly', (s) => s.getAll()); },
-  get(store, key) { return this.tx(store, 'readonly', (s) => s.get(key)); },
-  put(store, val, key) { return this.tx(store, 'readwrite', (s) => key === undefined ? s.put(val) : s.put(val, key)); },
-  del(store, key) { return this.tx(store, 'readwrite', (s) => s.delete(key)); }
+  get(id) { return this.op('readonly', (s) => s.get(id)).catch(() => null); },
+  put(id, blob) { return this.op('readwrite', (s) => s.put(blob, id)).catch(() => {}); },
+  del(id) { return this.op('readwrite', (s) => s.delete(id)).catch(() => {}); }
 };
 
-async function myRecs() {
-  const all = await DB.all('recs'), me = Auth.current();
-  if (!me) return [];
-  return me.role === 'admin' ? all : all.filter((r) => r.owner === me.id);
-}
-function ownerName(id) { const u = Auth.users().find((x) => x.id === id); return u ? u.username : ''; }
+/* =========================================================
+   CLOUD
+   ========================================================= */
+if (!window.supabase) document.write('<div style="padding:30px;font-family:sans-serif;text-align:center">לא הצלחתי לטעון את המערכת. בדוק את החיבור לאינטרנט ורענן את הדף.</div>');
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'tplus-cloud-auth' } });
+let ME = null;           // הפרופיל שלי
+let SETTINGS = {};       // הגדרות כלליות (app_settings)
+let PEOPLE = {};         // id -> שם
+let DICT = [];           // מילון מונחים
+const isAdmin = () => !!(ME && ME.role === 'admin');
+const perm = (k) => isAdmin() || !(ME && ME.perms && ME.perms[k] === false);
+const S = (k, d) => (SETTINGS[k] !== undefined && SETTINGS[k] !== null ? SETTINGS[k] : d);
 
-/* ---------------- Crypto helpers ---------------- */
-async function sha256(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+async function accessToken() { const { data } = await sb.auth.getSession(); return data && data.session ? data.session.access_token : null; }
+async function api(action, data = {}, { timeout = 170000 } = {}) {
+  const t = await accessToken();
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), timeout);
+  let r;
+  try {
+    r = await fetch(API, { method: 'POST', signal: ctl.signal, headers: Object.assign({ 'Content-Type': 'application/json', apikey: SB_KEY }, t ? { Authorization: 'Bearer ' + t } : {}), body: JSON.stringify(Object.assign({ action }, data)) });
+  } catch (e) { const err = new Error(e.name === 'AbortError' ? 'השרת לא ענה בזמן (timeout)' : 'שגיאת רשת – בדוק חיבור לאינטרנט'); err.status = e.name === 'AbortError' ? 504 : 0; throw err; }
+  finally { clearTimeout(to); }
+  return parseApi(r);
 }
-async function hashPass(pass, salt) { return sha256(salt + '|' + pass + '|tamlul-plus'); }
+async function parseApi(r) {
+  const txt = await r.text(); let j;
+  try { j = JSON.parse(txt); } catch (e) { j = { error: txt.slice(0, 300) || ('שגיאה ' + r.status) }; }
+  if (!r.ok || (j && j.error)) {
+    const e = j && j.error; const msg = typeof e === 'string' ? e : (e && e.message) || ('שגיאה ' + r.status);
+    const err = new Error(msg); err.status = r.status; throw err;
+  }
+  return j;
+}
+function dbErr(error) { if (error) { const e = new Error(error.message || String(error)); e.code = error.code; throw e; } }
+
+/* ---------------- records ---------------- */
+const RECS = new Map();
+let FOLDERS = [];
+const COLS = { title: 'title', fileName: 'file_name', filePath: 'file_path', mime: 'mime', size: 'size', lang: 'lang', yiOut: 'yi_out', outLang: 'out_lang', status: 'status', progress: 'progress', error: 'error', duration: 'duration', text: 'text', segments: 'segments', summary: 'summary', translations: 'translations', tags: 'tags', folderId: 'folder_id', starred: 'starred', edited: 'edited', peaks: 'peaks', shareToken: 'share_token', shareExpires: 'share_expires' };
+const LIST_COLS = 'id,owner,title,file_name,file_path,mime,size,lang,yi_out,out_lang,status,progress,error,duration,text,summary,translations,tags,folder_id,starred,edited,share_token,share_expires,created_at,updated_at,deleted_at';
+function fromRow(r, prev) {
+  const o = prev || {};
+  Object.assign(o, { id: r.id, owner: r.owner, createdAt: new Date(r.created_at).getTime(), updatedAt: r.updated_at ? new Date(r.updated_at).getTime() : 0, deletedAt: r.deleted_at });
+  for (const [k, c] of Object.entries(COLS)) if (c in r) o[k] = r[c];
+  o.tags = o.tags || []; o.translations = o.translations || {}; o.text = o.text || ''; o.duration = o.duration || 0;
+  if (!('segments' in r) && !o.segments) o.segments = null;
+  return o;
+}
+async function saveRec(rec, fields) {
+  const patch = { updated_at: new Date().toISOString() };
+  for (const f of fields) patch[COLS[f]] = rec[f] === undefined ? null : rec[f];
+  const { error } = await sb.from('recordings').update(patch).eq('id', rec.id);
+  dbErr(error);
+}
+async function loadRecs() {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await sb.from('recordings').select(LIST_COLS).is('deleted_at', null).order('created_at', { ascending: false }).range(from, from + 999);
+    dbErr(error); out.push(...data); if (data.length < 1000) break;
+  }
+  const seen = new Set();
+  out.forEach((r) => { seen.add(r.id); RECS.set(r.id, fromRow(r, RECS.get(r.id))); });
+  [...RECS.keys()].forEach((id) => { if (!seen.has(id) && !Queue.items.includes(id)) RECS.delete(id); });
+}
+async function fullRec(id) {
+  const { data, error } = await sb.from('recordings').select('*').eq('id', id).maybeSingle();
+  dbErr(error); if (!data) return null;
+  return fromRow(data, RECS.get(id) || (RECS.set(id, {}), RECS.get(id)));
+}
+const recsList = () => [...RECS.values()].filter((r) => !r.deletedAt);
+async function loadFolders() { const { data, error } = await sb.from('folders').select('*'); dbErr(error); FOLDERS = data.sort((a, b) => a.name.localeCompare(b.name, 'he')); }
+async function loadPeople() {
+  PEOPLE = {};
+  const { data } = await sb.rpc('list_people'); (data || []).forEach((p) => { PEOPLE[p.id] = p.display_name; });
+  if (ME) PEOPLE[ME.id] = ME.display_name || PEOPLE[ME.id];
+}
+async function loadSettings() { const { data } = await sb.from('app_settings').select('*'); SETTINGS = {}; (data || []).forEach((r) => { SETTINGS[r.key] = r.value; }); }
+async function loadDict() { const { data } = await sb.from('dictionary').select('*').order('term'); DICT = data || []; }
+const personName = (id) => PEOPLE[id] || '';
 
 /* =========================================================
    AUTH
    ========================================================= */
-const Auth = {
-  /* users: [{id, username, email, salt, hash, role:'admin'|'user', created}] */
-  users() {
-    let list = LS.get('users', null);
-    if (!list) {                                   // migrate from single-user version
-      const a = LS.get('auth', null);
-      list = a ? [Object.assign({ id: uid(), role: 'admin' }, a)] : [];
-      if (a) { LS.set('users', list); LS.del('auth'); }
-    }
-    return list;
-  },
-  saveUsers(list) { LS.set('users', list); },
-  byName(name) { const n = String(name || '').trim().toLowerCase(); return this.users().find((u) => u.username.toLowerCase() === n) || this.users().find((u) => (u.email || '').toLowerCase() === n); },
-  byEmail(em) { const n = String(em || '').trim().toLowerCase(); return this.users().filter((u) => (u.email || '').toLowerCase() === n); },
-  current() {
-    const s = LS.get('session', null);
-    if (!s || s.exp < Date.now()) return null;
-    return this.users().find((u) => u.id === s.id || u.username === s.user) || null;
-  },
-  user() { return this.current(); },
-  isAdmin() { const c = this.current(); return !!(c && c.role === 'admin'); },
-  loggedIn() { return !!this.current(); },
-  startSession(u) { LS.set('session', { id: u.id, user: u.username, exp: Date.now() + 30 * 864e5 }); LS.set('lastUser', { name: u.display || u.username, login: u.email || u.username }); },
-  update(u) { const list = this.users().map((x) => x.id === u.id ? u : x); this.saveUsers(list); },
-  logout() { LS.del('session'); location.reload(); }
-};
 function authMsg(text, cls = '') { const m = $('#authMsg'); m.className = 'auth-msg ' + cls; m.textContent = text; }
 function showAuthForm(id) {
-  ['setupForm', 'loginForm', 'forgotForm', 'resetForm'].forEach((f) => $('#' + f).classList.toggle('hidden', f !== id));
+  ['loginForm', 'forgotForm', 'resetForm'].forEach((f) => $('#' + f).classList.toggle('hidden', f !== id));
   authMsg('');
-  const first = $('#' + id + ' input'); if (first) setTimeout(() => first.focus(), 50);
 }
-function showAuth() {
-  $('#app').classList.add('hidden'); $('#auth').classList.remove('hidden');
+function showAuth(msg) {
+  $('#app').classList.add('hidden'); $('#viewer').classList.add('hidden'); $('#auth').classList.remove('hidden');
   const last = LS.get('lastUser', null);
-  if (last) { $('#loginHello').textContent = `שלום ${last.name}, טוב לראות אותך!`; $('#loginUser').value = last.login; }
-  showAuthForm(Auth.users().length ? 'loginForm' : 'setupForm');
+  if (last) { $('#loginHello').textContent = `שלום ${last.name}, טוב לראות אותך!`; $('#loginUser').value = last.email || ''; }
+  showAuthForm('loginForm');
+  if (msg) authMsg(msg, 'err-text');
   initGoogleButton();
-  if (last && Auth.users().length) setTimeout(() => $('#loginPass').focus(), 60);
 }
-/* ---------- Sign in with Google (Google Identity Services) ---------- */
-function b64urlJson(part) { const b = part.replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4))))); }
-function onGoogleCredential(resp) {
+function authError(err) {
+  const m = (err && (err.message || err.error_description)) || String(err);
+  if (/Invalid login credentials/i.test(m)) return 'מייל או סיסמה שגויים. אין לך סיסמה? לחץ "כניסה עם קוד למייל".';
+  if (/banned/i.test(m)) return 'המשתמש הזה מושבת. פנה למנהל.';
+  if (/Database error saving new user|signup_not_allowed|Signups not allowed/i.test(m)) return 'המייל הזה לא רשום במערכת. בקש מהמנהל להוסיף אותך.';
+  if (/Email not confirmed/i.test(m)) return 'המייל עוד לא אושר. היכנס עם "כניסה עם קוד למייל".';
+  if (/Password should be at least/i.test(m)) return 'הסיסמה קצרה מדי (לפחות 6 תווים)';
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'אין חיבור לשרת – בדוק את האינטרנט';
+  return m;
+}
+async function logLogin(method) {
   try {
-    const p = b64urlJson(resp.credential.split('.')[1]);
-    const cid = setting('googleClientId');
-    if (p.aud !== cid || !/accounts\.google\.com$/.test(p.iss) || p.exp * 1000 < Date.now()) return authMsg('אימות Google נכשל – נסה שוב', 'err-text');
-    if (!p.email_verified) return authMsg('חשבון Google לא מאומת', 'err-text');
-    const u = Auth.byEmail(p.email)[0];
-    if (!u) return authMsg(`המייל ${p.email} לא רשום במערכת. בקש מהמנהל להוסיף אותך.`, 'err-text');
-    if (!u.display && p.name) { u.display = p.name; Auth.update(u); }
-    Auth.startSession(u); toast('✅ נכנסת עם Google'); enterApp();
-  } catch (e) { console.error(e); authMsg('אימות Google נכשל: ' + e.message, 'err-text'); }
+    const { data } = await sb.auth.getUser();
+    if (data && data.user) await sb.from('login_log').insert({ user_id: data.user.id, email: data.user.email, method, user_agent: navigator.userAgent.slice(0, 300) });
+  } catch (e) { console.warn('login log', e); }
 }
-let gisLoaded = false;
+async function afterSignIn(method) {
+  LS.set('lastAct', Date.now());
+  const ok = await loadMe();
+  if (!ok) return;
+  logLogin(method);
+  enterApp();
+}
+async function loadMe() {
+  const { data } = await sb.auth.getUser();
+  if (!data || !data.user) { showAuth(); return false; }
+  const { data: prof, error } = await sb.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+  if (error || !prof) { await sb.auth.signOut(); showAuth('המשתמש לא נמצא במערכת. פנה למנהל.'); return false; }
+  if (prof.disabled) { await sb.auth.signOut(); showAuth('המשתמש הזה מושבת. פנה למנהל.'); return false; }
+  ME = prof;
+  LS.set('lastUser', { name: prof.display_name || prof.email, email: prof.email });
+  return true;
+}
+
+/* ---------- Sign in with Google ---------- */
+let gisLoaded = false, gNonce = null;
 async function initGoogleButton() {
-  const cid = setting('googleClientId');
-  $('#gBtnWrap').classList.toggle('hidden', !cid);
-  if (!cid) return;
   try {
     if (!gisLoaded) { await loadScript('https://accounts.google.com/gsi/client'); gisLoaded = true; }
-    google.accounts.id.initialize({ client_id: cid, callback: onGoogleCredential, auto_select: false, ux_mode: 'popup' });
-    google.accounts.id.renderButton($('#gBtn'), { theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill', locale: 'he', width: 320 });
-  } catch (e) { console.warn('Google sign-in unavailable', e); $('#gBtnWrap').classList.add('hidden'); }
+    gNonce = [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const hashed = await sha256(gNonce);
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: false, ux_mode: 'popup', nonce: hashed, use_fedcm_for_prompt: true });
+    google.accounts.id.renderButton($('#gBtn'), { theme: 'filled_blue', size: 'large', text: 'signin_with', shape: 'pill', locale: 'he', width: 320 });
+  } catch (e) { console.warn('Google sign-in unavailable', e); $('#gBtnWrap').innerHTML = '<span class="muted" style="font-size:.85em">כניסה עם Google לא זמינה כרגע</span>'; }
+}
+async function onGoogleCredential(resp) {
+  authMsg('נכנס…');
+  const { error } = await sb.auth.signInWithIdToken({ provider: 'google', token: resp.credential, nonce: gNonce });
+  if (error) { authMsg(authError(error), 'err-text'); initGoogleButton(); return; }
+  toast('✅ נכנסת עם Google');
+  afterSignIn('Google');
+}
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 $$('[data-eye]').forEach((b) => b.onclick = () => { const i = $('#' + b.dataset.eye); i.type = i.type === 'password' ? 'text' : 'password'; });
+
 /* 4-digit code boxes */
 (function initOtp() {
   const boxes = $$('#otp input');
@@ -735,119 +824,103 @@ $$('[data-eye]').forEach((b) => b.onclick = () => { const i = $('#' + b.dataset.
       if ($('#resetCode').value.length === 4) { if (otpMode === 'login') $('#resetSubmit').click(); else $('#resetPass').focus(); }
     });
     b.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].focus(); boxes[i - 1].value = ''; sync(); } });
-    b.addEventListener('paste', (e) => { const t = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 4); if (t) { e.preventDefault(); t.split('').forEach((c, k) => { if (boxes[k]) boxes[k].value = c; }); sync(); (t.length === 4 ? $('#resetPass') : boxes[t.length]).focus(); } });
+    b.addEventListener('paste', (e) => { const t = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 4); if (t) { e.preventDefault(); t.split('').forEach((c, k) => { if (boxes[k]) boxes[k].value = c; }); sync(); if (t.length === 4 && otpMode === 'login') $('#resetSubmit').click(); else (t.length === 4 ? $('#resetPass') : boxes[t.length]).focus(); } });
   });
 })();
 function clearOtp() { $$('#otp input').forEach((b) => b.value = ''); $('#resetCode').value = ''; }
 const validEmail = (em) => /^\S+@\S+\.\S+$/.test(em);
 
-$('#setupForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (Auth.users().length) return showAuthForm('loginForm');
-  const d = $('#setupUser').value.trim(), em = $('#setupEmail').value.trim(), p = $('#setupPass').value, p2 = $('#setupPass2').value;
-  if (!validEmail(em)) return authMsg('כתובת המייל לא תקינה', 'err-text');
-  if (!p) return authMsg('יש להזין סיסמה', 'err-text');
-  if (p !== p2) return authMsg('הסיסמאות אינן תואמות', 'err-text');
-  const salt = uid();
-  const user = { id: uid(), username: em, display: d || em.split('@')[0], email: em, role: 'admin', salt, hash: await hashPass(p, salt), created: Date.now() };
-  Auth.saveUsers([user]);
-  Auth.startSession(user); enterApp();
-});
-
 $('#loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!Auth.users().length) return showAuthForm('setupForm');
-  const u = Auth.byName($('#loginUser').value), p = $('#loginPass').value;
-  if (!u || (await hashPass(p, u.salt)) !== u.hash) return authMsg('שם משתמש או סיסמה שגויים', 'err-text');
-  Auth.startSession(u); $('#loginPass').value = ''; enterApp();
+  const em = $('#loginUser').value.trim().toLowerCase(), p = $('#loginPass').value;
+  if (!validEmail(em)) return authMsg('הזן כתובת מייל תקינה', 'err-text');
+  $('#loginSubmit').disabled = true; authMsg('מתחבר…');
+  const { error } = await sb.auth.signInWithPassword({ email: em, password: p });
+  $('#loginSubmit').disabled = false;
+  if (error) return authMsg(authError(error), 'err-text');
+  $('#loginPass').value = '';
+  afterSignIn('סיסמה');
 });
 let otpMode = 'reset';
 function setOtpMode(m) {
   otpMode = m;
-  $('#forgotTitle').textContent = m === 'login' ? 'כניסה עם קוד למייל' : 'שחזור סיסמה';
-  $('#resetTitle').textContent = m === 'login' ? 'הזנת קוד כניסה' : 'איפוס סיסמה';
+  $('#forgotTitle').textContent = m === 'login' ? 'כניסה עם קוד למייל' : 'סיסמה חדשה';
+  $('#forgotLead').textContent = m === 'login' ? 'הזן את המייל שלך ונשלח אליך קוד כניסה בן 4 ספרות' : 'הזן את המייל שלך, נשלח קוד בן 4 ספרות ותוכל לקבוע סיסמה חדשה';
+  $('#resetTitle').textContent = m === 'login' ? 'הזנת קוד כניסה' : 'קביעת סיסמה חדשה';
   $('#resetPassWrap').classList.toggle('hidden', m === 'login');
-  $('#resetSubmit').textContent = m === 'login' ? 'כניסה' : 'עדכן סיסמה והתחבר';
+  $('#resetSubmit').textContent = m === 'login' ? 'כניסה' : 'שמירת הסיסמה וכניסה';
 }
-$('#codeLoginBtn').onclick = (e) => { e.preventDefault(); setOtpMode('login'); showAuthForm('forgotForm'); const v = $('#loginUser').value.trim(); const u = v && Auth.byName(v); if (u && u.email) $('#forgotEmail').value = u.email; else if (validEmail(v)) $('#forgotEmail').value = v; };
-$('#forgotBtn').onclick = (e) => { e.preventDefault(); setOtpMode('reset'); showAuthForm('forgotForm'); const v = $('#loginUser').value.trim(); const u = v && Auth.byName(v); if (u && u.email) $('#forgotEmail').value = u.email; else if (validEmail(v)) $('#forgotEmail').value = v; };
+function prefillForgot() { const v = $('#loginUser').value.trim(); if (validEmail(v)) $('#forgotEmail').value = v; }
+$('#codeLoginBtn').onclick = (e) => { e.preventDefault(); setOtpMode('login'); showAuthForm('forgotForm'); prefillForgot(); $('#forgotEmail').focus(); };
+$('#forgotBtn').onclick = (e) => { e.preventDefault(); setOtpMode('reset'); showAuthForm('forgotForm'); prefillForgot(); $('#forgotEmail').focus(); };
 $$('[data-back]').forEach((b) => b.onclick = (e) => { e.preventDefault(); setOtpMode('reset'); showAuthForm('loginForm'); });
 
-async function sendEmail(toEmail, subject, message, toName) {
-  const body = {
-    service_id: setting('emailjsService'),
-    template_id: setting('emailjsTemplate'),
-    user_id: setting('emailjsKey'),
-    template_params: { to_email: toEmail, email: toEmail, subject, title: subject, message, passcode: message, code: message, name: toName || '', to_name: toName || '', from_name: 'מוצלח' }
-  };
-  const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  });
-  const t = await r.text();
-  if (!r.ok) throw new Error(`EmailJS ${r.status}: ${t}`);
-  return t;
-}
-
-async function sendResetCode() {
-  const users = Auth.users();
-  const prev = LS.get('reset', {}) || {};
-  const em = ($('#forgotEmail').value.trim() || prev.email || '').toLowerCase();
-  if (!users.length) return authMsg('עדיין לא הוגדר משתמש במכשיר הזה', 'err-text');
-  if (!validEmail(em)) return authMsg('הזן כתובת דוא"ל תקינה', 'err-text');
-  const matches = Auth.byEmail(em);
-  if (!matches.length) return authMsg('כתובת הדוא"ל הזו לא רשומה במערכת', 'err-text');
-  const a = matches[0];
-  const code = String(Math.floor(1000 + Math.random() * 9000));
-  const salt = uid();
-  LS.set('reset', { userId: a.id, email: a.email, salt, hash: await sha256(salt + code), exp: Date.now() + 15 * 60 * 1000, tries: 0 });
-  authMsg('שולח קוד…');
-  $('#sendCodeBtn').disabled = true;
+let codeEmail = '';
+async function sendCode() {
+  const em = ($('#forgotEmail').value.trim() || codeEmail).toLowerCase();
+  if (!validEmail(em)) return authMsg('הזן כתובת מייל תקינה', 'err-text');
+  authMsg('שולח קוד…'); $('#sendCodeBtn').disabled = true;
   try {
-    await sendEmail(a.email, otpMode === 'login' ? 'קוד כניסה – מוצלח' : 'קוד אימות – מוצלח', code, a.display || a.username);
+    await api('send-code', { email: em, purpose: otpMode === 'login' ? 'login' : 'reset' }, { timeout: 30000 });
+    codeEmail = em;
     showAuthForm('resetForm'); clearOtp();
-    $('#resetLead').textContent = otpMode === 'login' ? `שלחנו קוד בן 4 ספרות אל ${a.email}. הזן אותו כדי להיכנס.` : `שלחנו קוד בן 4 ספרות אל ${a.email}. הזן אותו והגדר סיסמה חדשה.`;
+    $('#resetLead').textContent = otpMode === 'login' ? `שלחנו קוד בן 4 ספרות אל ${em}. הזן אותו כדי להיכנס.` : `שלחנו קוד בן 4 ספרות אל ${em}. הזן אותו וקבע סיסמה חדשה.`;
     authMsg('✅ הקוד נשלח למייל', 'ok-text');
     setTimeout(() => $('#otp input').focus(), 80);
-  } catch (err) {
-    console.error(err);
-    authMsg('שליחת המייל נכשלה: ' + err.message, 'err-text');
-  } finally { $('#sendCodeBtn').disabled = false; }
+  } catch (err) { authMsg(err.message, 'err-text'); }
+  finally { $('#sendCodeBtn').disabled = false; }
 }
-$('#forgotForm').addEventListener('submit', (e) => { e.preventDefault(); sendResetCode(); });
-$('#resendBtn').onclick = (e) => { e.preventDefault(); sendResetCode(); };
-
+$('#forgotForm').addEventListener('submit', (e) => { e.preventDefault(); sendCode(); });
+$('#resendBtn').onclick = (e) => { e.preventDefault(); $('#forgotEmail').value = codeEmail; sendCode(); };
 $('#resetForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const r = LS.get('reset', null);
-  const a = r && Auth.users().find((u) => u.id === r.userId);
   const code = $('#resetCode').value.trim(), p = $('#resetPass').value;
-  if (!r || !a) return authMsg('אין בקשה פעילה – שלח קוד מחדש', 'err-text');
-  if (Date.now() > r.exp) return authMsg('תוקף הקוד פג – שלח קוד חדש', 'err-text');
-  if (r.tries >= 5) return authMsg('יותר מדי ניסיונות – שלח קוד חדש', 'err-text');
   if (code.length !== 4) return authMsg('הזן את 4 הספרות מהמייל', 'err-text');
-  if ((await sha256(r.salt + code)) !== r.hash) {
-    r.tries++; LS.set('reset', r); clearOtp(); $('#otp input').focus();
-    return authMsg(`קוד האימות שגוי (נשארו ${Math.max(0, 5 - r.tries)} ניסיונות)`, 'err-text');
-  }
-  if (otpMode === 'login') {
-    LS.del('reset'); clearOtp();
-    toast('✅ נכנסת בהצלחה');
-    Auth.startSession(a); return enterApp();
-  }
-  if (!p) return authMsg('יש להזין סיסמה חדשה', 'err-text');
-  a.salt = uid(); a.hash = await hashPass(p, a.salt);
-  Auth.update(a); LS.del('reset');
-  $('#resetPass').value = ''; clearOtp();
-  toast('✅ הסיסמה עודכנה בהצלחה');
-  Auth.startSession(a); enterApp();
+  if (otpMode !== 'login' && p.length < 6) return authMsg('הסיסמה צריכה להיות לפחות 6 תווים', 'err-text');
+  $('#resetSubmit').disabled = true; authMsg('בודק…');
+  try {
+    const res = await api('verify-code', { email: codeEmail, code, purpose: otpMode === 'login' ? 'login' : 'reset', password: otpMode === 'login' ? undefined : p }, { timeout: 30000 });
+    const { error } = await sb.auth.verifyOtp({ token_hash: res.token_hash, type: 'magiclink' });
+    if (error) throw error;
+    clearOtp(); $('#resetPass').value = '';
+    toast(otpMode === 'login' ? '✅ נכנסת בהצלחה' : '✅ הסיסמה נשמרה');
+    afterSignIn(otpMode === 'login' ? 'קוד למייל' : 'איפוס סיסמה');
+  } catch (err) { clearOtp(); $('#otp input').focus(); authMsg(authError(err), 'err-text'); }
+  finally { $('#resetSubmit').disabled = false; }
 });
+
+async function logout(msg) {
+  try { if (Rec.mr && Rec.mr.state === 'recording') Rec.stop(); } catch (e) {}
+  await sb.auth.signOut().catch(() => {});
+  ME = null; RECS.clear();
+  if (msg) LS.set('logoutMsg', msg);
+  location.reload();
+}
+
+/* ---------- idle auto-logout ---------- */
+const Idle = {
+  timer: null,
+  bump() { const now = Date.now(); if (now - (Idle.last || 0) > 15000) { Idle.last = now; LS.set('lastAct', now); } },
+  start() {
+    ['mousemove', 'keydown', 'click', 'touchstart', 'scroll', 'wheel'].forEach((ev) => window.addEventListener(ev, Idle.bump, { passive: true }));
+    Idle.bump(); clearInterval(Idle.timer);
+    Idle.timer = setInterval(Idle.check, 30000);
+  },
+  check() {
+    const min = +S('idle_minutes', 0) || 0;
+    if (!min || !ME) return;
+    if (Queue.running || (Rec.mr && Rec.mr.state === 'recording')) { Idle.bump(); return; }
+    const last = Math.max(LS.get('lastAct', 0) || 0, Idle.last || 0);
+    if (Date.now() - last > min * 60000) logout(`נותקת אוטומטית אחרי ${min} דקות בלי פעילות. היכנס שוב.`);
+  }
+};
 
 /* =========================================================
    NAVIGATION / THEME
    ========================================================= */
 let currentPage = 'home';
 function go(page) {
-  if (page === 'settings' && !Auth.isAdmin()) page = 'home';
+  if (page === 'settings' && !isAdmin()) page = 'home';
   currentPage = page;
   $$('section.page').forEach((s) => s.classList.toggle('active', s.id === 'page-' + page));
   $$('#tabs button').forEach((b) => b.classList.toggle('active', b.dataset.page === page || (page === 'detail' && b.dataset.page === 'library')));
@@ -859,7 +932,6 @@ function go(page) {
 }
 $$('#tabs button').forEach((b) => b.onclick = () => go(b.dataset.page));
 document.addEventListener('click', (e) => { const g = e.target.closest('[data-goto]'); if (g) { e.preventDefault(); go(g.dataset.goto); } });
-
 function applyTheme() {
   const dark = LS.get('dark', false);
   document.body.classList.toggle('dark', dark);
@@ -869,7 +941,13 @@ function applyTheme() {
   if (currentPage === 'detail') drawWave();
 }
 $('#darkBtn').onclick = () => { LS.set('dark', !LS.get('dark', false)); applyTheme(); };
-$('#logoutBtn').onclick = () => Auth.logout();
+$('#logoutBtn').onclick = () => logout();
+function applyPerms() {
+  document.body.classList.toggle('is-admin', isAdmin());
+  Object.keys(PERM_NAMES).forEach((k) => $$('.perm-' + k).forEach((el) => el.classList.toggle('hidden', !perm(k))));
+  $('#transcribeArea').classList.toggle('hidden', !perm('transcribe'));
+  $('#noTranscribe').classList.toggle('hidden', perm('transcribe'));
+}
 
 /* =========================================================
    AUDIO HELPERS
@@ -884,7 +962,7 @@ function guessExt(blob, name) {
   };
   const t = (blob.type || '').split(';')[0];
   let ext = m ? m[1] : (byType[t] || 'ogg');
-  if (ext === 'opus' || ext === 'oga') ext = 'ogg';           // WhatsApp voice notes are ogg/opus
+  if (ext === 'opus' || ext === 'oga') ext = 'ogg';
   if (!['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'wav', 'webm'].includes(ext)) ext = byType[t] || 'ogg';
   return ext;
 }
@@ -896,7 +974,7 @@ async function decodeAudio(blob) {
 }
 async function resampleMono16k(audioBuf, start, end) {
   const rate = 16000;
-  const len = Math.ceil((end - start) * rate);
+  const len = Math.max(1, Math.ceil((end - start) * rate));
   const off = new OfflineAudioContext(1, len, rate);
   const src = off.createBufferSource();
   src.buffer = audioBuf; src.connect(off.destination);
@@ -929,51 +1007,60 @@ function computePeaks(audioBuf, n = 1200) {
 }
 
 /* =========================================================
-   GROQ
+   ENGINES (all calls go through our server – keys never reach the browser)
    ========================================================= */
-function groqKey() { return (LS.get('settings', {}).groqKey || '').trim(); }
-async function groqFetch(path, opts = {}, attempt = 0) {
-  const key = groqKey();
-  if (!key) throw new Error('לא הוגדר מפתח Groq – היכנס להגדרות והדבק את המפתח');
-  const r = await fetch(GROQ + path, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + key }, opts.headers || {}) }));
-  if (r.status === 429 && attempt < 4) {
-    let wait = parseFloat(r.headers.get('retry-after')) || 0;
-    const txt = await r.text();
-    const m = txt.match(/try again in ([\d.]+)(ms|s|m)/i);
-    if (m) wait = m[2] === 'ms' ? +m[1] / 1000 : m[2] === 'm' ? +m[1] * 60 : +m[1];
-    wait = Math.min(Math.max(wait, 3), 120);
-    await sleep(wait * 1000 + 500);
-    return groqFetch(path, opts, attempt + 1);
-  }
-  if (!r.ok) {
-    let msg = await r.text();
-    try { msg = JSON.parse(msg).error.message; } catch (e) {}
-    const err = new Error(`Groq ${r.status}: ${msg}`); err.status = r.status; throw err;
-  }
-  return r.json();
+function retryWait(err, attempt) {
+  let wait = 0; const m = String(err.message).match(/(?:try again|retry) in ([\d.]+)\s*(ms|s|m)?/i);
+  if (m) wait = m[2] === 'ms' ? +m[1] / 1000 : m[2] === 'm' ? +m[1] * 60 : +m[1];
+  return Math.min(Math.max(wait, 4 * (attempt + 1)), 90);
 }
-async function whisper(blob, fileName, lang) {
+async function groqChat(kind, payload, attempt = 0) {
+  try { return await api('groq-chat', { kind, payload }); }
+  catch (err) {
+    if (err.status === 429 && attempt < 4) { await sleep(retryWait(err, attempt) * 1000 + 500); return groqChat(kind, payload, attempt + 1); }
+    throw new Error(err.status === 403 ? err.message : 'Groq: ' + err.message);
+  }
+}
+function dictTerms(max = 400) { let s = ''; for (const d of DICT) { if ((s + d.term).length > max) break; s += (s ? ', ' : '') + d.term; } return s; }
+async function whisper(blob, fileName, lang, seconds, attempt = 0) {
   const fd = new FormData();
   fd.append('file', blob, fileName);
-  fd.append('model', setting('whisperModel'));
+  fd.append('model', S('whisper_model', 'whisper-large-v3'));
   fd.append('response_format', 'verbose_json');
   fd.append('temperature', '0');
   if (lang && lang !== 'auto') fd.append('language', lang);
-  if (lang === 'he') fd.append('prompt', 'תמלול מדויק בעברית, עם סימני פיסוק.');
-  if (lang === 'en') fd.append('prompt', 'Accurate English transcription with punctuation.');
-  return groqFetch('/audio/transcriptions', { method: 'POST', body: fd });
+  const terms = dictTerms(300);
+  let prompt = lang === 'he' ? 'תמלול מדויק בעברית, עם סימני פיסוק.' : lang === 'en' ? 'Accurate English transcription with punctuation.' : '';
+  if (terms) prompt += (prompt ? ' ' : '') + terms + '.';
+  if (prompt) fd.append('prompt', prompt);
+  fd.append('x_seconds', String(Math.round(seconds || 0)));
+  const t = await accessToken();
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 170000);
+  let r;
+  try { r = await fetch(API, { method: 'POST', body: fd, signal: ctl.signal, headers: { apikey: SB_KEY, Authorization: 'Bearer ' + t } }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'השרת לא ענה בזמן' : 'שגיאת רשת – בדוק חיבור לאינטרנט'); }
+  finally { clearTimeout(to); }
+  try { return await parseApi(r); }
+  catch (err) {
+    if (err.status === 429 && attempt < 4) { await sleep(retryWait(err, attempt) * 1000 + 500); return whisper(blob, fileName, lang, seconds, attempt + 1); }
+    if (err.status !== 403) err.message = 'Whisper: ' + err.message;
+    throw err;
+  }
+}
+function engineFor(lang) {
+  const e = lang === 'yi' ? S('yi_engine', 'gemini') : S('other_engine', 'groq');
+  return e === 'gemini' ? 'gemini' : 'groq';
 }
 async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
   if (engineFor(lang) === 'gemini') return geminiTranscribe(blob, name, lang, onProgress, opts);
   const ext = guessExt(blob, name);
-  const tryDirect = blob.size <= MAX_DIRECT;
-  if (tryDirect) {
+  if (blob.size <= MAX_DIRECT) {
     try {
       onProgress && onProgress('שולח לתמלול…');
-      const res = await whisper(blob, 'audio.' + ext, lang);
+      const res = await whisper(blob, 'audio.' + ext, lang, opts.seconds);
       return { text: (res.text || '').trim(), segments: (res.segments || []).map((s) => ({ start: s.start, end: s.end, text: (s.text || '').trim() })), duration: res.duration, language: res.language };
     } catch (err) {
-      if (err.status !== 400 && err.status !== 413) throw err;   // only format/size problems fall through to conversion
+      if (err.status !== 400 && err.status !== 413 && err.status !== 546) throw err;
       console.warn('Direct upload failed, converting to WAV', err);
     }
   }
@@ -986,7 +1073,7 @@ async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
     const st = i * CHUNK_SEC, en = Math.min(total, st + CHUNK_SEC);
     onProgress && onProgress(parts > 1 ? `מתמלל חלק ${i + 1} מתוך ${parts}…` : 'שולח לתמלול…');
     const wav = encodeWav(await resampleMono16k(audio, st, en));
-    const res = await whisper(wav, 'audio.wav', lang);
+    const res = await whisper(wav, 'audio.wav', lang, en - st);
     out.text += (out.text ? ' ' : '') + (res.text || '').trim();
     (res.segments || []).forEach((s) => out.segments.push({ start: s.start + st, end: s.end + st, text: (s.text || '').trim() }));
     if (res.language) out.language = res.language;
@@ -994,36 +1081,18 @@ async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
   return out;
 }
 
-
-/* =========================================================
-   GEMINI (Yiddish engine)
-   ========================================================= */
-const GEM = 'https://generativelanguage.googleapis.com/v1beta';
-function geminiKey() { return (LS.get('settings', {}).geminiKey || '').trim(); }
-function engineFor(lang) {
-  const s = LS.get('settings', {});
-  const e = lang === 'yi' ? (s.yiEngine || 'gemini') : (s.otherEngine || 'groq');
-  return e === 'gemini' && geminiKey() ? 'gemini' : 'groq';
-}
-async function gemFetch(path, opts = {}, attempt = 0) {
-  const key = geminiKey();
-  if (!key) throw new Error('לא הוגדר מפתח Gemini – היכנס להגדרות והדבק את המפתח');
-  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 240000);
-  let r;
-  try { r = await fetch(GEM + path, Object.assign({}, opts, { signal: ctl.signal, headers: Object.assign({ 'x-goog-api-key': key }, opts.headers || {}) })); }
-  catch (e) { throw new Error(e.name === 'AbortError' ? 'Gemini לא ענה בזמן (timeout)' : 'שגיאת רשת מול Gemini: ' + e.message); }
-  finally { clearTimeout(to); }
-  if ((r.status === 429 && attempt < 4) || ((r.status === 503 || r.status === 500) && attempt < 1)) {
-    const txt = await r.text(); let wait = 8 * (attempt + 1);
-    const m = txt.match(/retry in ([\d.]+)s/i) || txt.match(/"retryDelay":\s*"(\d+)s"/); if (m) wait = Math.min(90, +m[1] + 1);
-    await sleep(wait * 1000);
-    return gemFetch(path, opts, attempt + 1);
+/* ---------------- Gemini (Yiddish engine) ---------------- */
+async function gemFetch(path, payload, kind, seconds, attempt = 0) {
+  try { return await api('gemini', { path, payload, kind, seconds }); }
+  catch (err) {
+    if ((err.status === 429 && attempt < 4) || ((err.status === 503 || err.status === 500) && attempt < 1)) {
+      let wait = 8 * (attempt + 1); const m = String(err.message).match(/retry in ([\d.]+)s/i); if (m) wait = Math.min(90, +m[1] + 1);
+      await sleep(wait * 1000);
+      return gemFetch(path, payload, kind, seconds, attempt + 1);
+    }
+    if (err.status !== 403) err.message = 'Gemini: ' + err.message;
+    throw err;
   }
-  if (!r.ok) {
-    let msg = await r.text(); try { msg = JSON.parse(msg).error.message; } catch (e) {}
-    const err = new Error(`Gemini ${r.status}: ${msg}`); err.status = r.status; throw err;
-  }
-  return r.json();
 }
 let gemModelCache = null;
 const GEM_PREFER = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
@@ -1038,7 +1107,6 @@ async function geminiModels() {
   gemModelCache = list;
   return list;
 }
-async function pickGeminiModel() { return (await geminiModels())[0]; }
 function blobToB64(blob) {
   return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = () => rej(fr.error); fr.readAsDataURL(blob); });
 }
@@ -1051,6 +1119,8 @@ const GEM_LANG_PROMPT = {
 function gemPrompt(lang, opts = {}) {
   let p = GEM_LANG_PROMPT[lang] || GEM_LANG_PROMPT.auto;
   if (lang === 'yi' && opts.out === 'he') p = 'Listen carefully to this Yiddish (Hasidic Yiddish) audio. Write an accurate, fluent HEBREW translation of everything that is said, sentence by sentence, in modern Hebrew without nikud. Do not skip anything, do not summarize, do not add anything that was not said. Keep names of people and places.';
+  const terms = dictTerms(1500);
+  if (terms) p += ` Names and special terms that may appear (write them exactly with this spelling): ${terms}.`;
   if (opts.speakers !== false) p += ' If more than one person speaks, begin each line (right after the time) with the speaker label: use the person\'s name if it is mentioned in the conversation, otherwise "דובר 1:", "דובר 2:" etc. If only one person speaks, do not add labels.';
   return p + ' Put each sentence on its own line, starting with its start time in the format [mm:ss]. Cover the whole recording from beginning to end. Output only the transcript lines.';
 }
@@ -1059,15 +1129,15 @@ async function geminiTranslateText(text, target) {
   const parts = splitText(text, 6000), out = [];
   for (const part of parts) {
     let done = null, lastErr;
-    for (const model of models.slice(0, 5)) {
+    for (const model of models.slice(0, 4)) {
       try {
-        const res = await gemFetch(`/models/${model}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        const res = await gemFetch(`/models/${model}:generateContent`, {
           contents: [{ role: 'user', parts: [{ text: `Translate the following speech transcript into ${LANG_EN[target]}. It may be Hasidic Yiddish, Hebrew or English and may contain recognition errors – translate the intended meaning faithfully. Keep line breaks and speaker labels, and translate the labels too (e.g. "דובר 1:"). Keep the [mm:ss] times if present. Output ONLY the translation.\n\n${part}` }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 20000 } }) });
+          generationConfig: { temperature: 0.2, maxOutputTokens: 20000 } }, 'translate');
         const c = res.candidates && res.candidates[0];
         done = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
         if (done) break;
-      } catch (err) { lastErr = err; }
+      } catch (err) { lastErr = err; if (err.status === 403) throw err; }
     }
     if (!done) throw lastErr || new Error('Gemini לא החזיר תרגום');
     out.push(done);
@@ -1093,31 +1163,24 @@ async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
   const b64 = await blobToB64(blob);
   let lastErr;
   const tries = [];
-  models.slice(0, 7).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
+  models.slice(0, 5).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
   for (const model of tries) {
     try {
-      const body = {
-        contents: [{ role: 'user', parts: [
-          { inline_data: { mime_type: mime, data: b64 } },
-          { text: gemPrompt(lang, opts) }
-        ] }],
-        generationConfig: { temperature: 0, maxOutputTokens: 30000 }
-      };
-      const res = await gemFetch(`/models/${model}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const body = { contents: [{ role: 'user', parts: [{ inline_data: { mime_type: mime, data: b64 } }, { text: gemPrompt(lang, opts) }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } };
+      const res = await gemFetch(`/models/${model}:generateContent`, body, 'transcribe', dur);
       const cand = res.candidates && res.candidates[0];
       const txt = cand && cand.content && (cand.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
       if (!txt) throw new Error('Gemini לא החזיר טקסט' + (res.promptFeedback && res.promptFeedback.blockReason ? ` (${res.promptFeedback.blockReason})` : cand && cand.finishReason ? ` (${cand.finishReason})` : ''));
-      if (models[0] !== model) { gemModelCache = [model].concat(models.filter((x) => x !== model)); }
+      if (models[0] !== model) gemModelCache = [model].concat(models.filter((x) => x !== model));
       return parseTimedLines(txt, dur);
     } catch (err) {
       lastErr = err; console.warn('Gemini model failed', model, err.message);
-      if (err.status === 400 && /API key|permission|PERMISSION/i.test(err.message)) throw err;
+      if (err.status === 403 || (err.status === 400 && /API key|permission|PERMISSION/i.test(err.message))) throw err;
     }
   }
   throw lastErr || new Error('Gemini נכשל');
 }
 const GEM_CHUNK_CACHE = new Map();
-/* When Gemini refuses a chunk (e.g. singing/music), split it to 1-minute pieces; pieces Gemini still refuses go to Whisper */
 async function geminiSubChunks(audio, st, en, lang, onProgress, opts = {}) {
   const out = [];
   for (let t = st, k = 1; t < en; t += 60, k++) {
@@ -1128,7 +1191,7 @@ async function geminiSubChunks(audio, st, en, lang, onProgress, opts = {}) {
     try { segs = await geminiTranscribeOne(wav, 'audio/wav', lang, e - t, opts); } catch (err) { console.warn('sub-chunk gemini failed', err.message); }
     if (!segs || !segs.length) {
       try {
-        const res = await whisper(wav, 'audio.wav', lang);
+        const res = await whisper(wav, 'audio.wav', lang, e - t);
         segs = (res.segments || []).map((x) => ({ start: x.start, end: x.end, text: (x.text || '').trim() }));
         if (!segs.length && res.text) segs = [{ start: 0, end: e - t, text: res.text.trim() }];
         if (segs.length) segs[0].text = '⚠️ ' + segs[0].text;
@@ -1138,27 +1201,31 @@ async function geminiSubChunks(audio, st, en, lang, onProgress, opts = {}) {
   }
   return out;
 }
-const GEM_MAX_INLINE = 13 * 1024 * 1024;
-const GEM_CHUNK_SEC = 300;
+const GEM_MAX_INLINE = 5 * 1024 * 1024;
+const GEM_CHUNK_SEC = 120;   // השרת החינמי מוגבל ל-150 שניות לבקשה – לכן חלקים של 2 דקות
 async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   const ext = guessExt(blob, name);
   const mimeByExt = { ogg: 'audio/ogg', webm: 'audio/webm', mp3: 'audio/mp3', m4a: 'audio/aac', mp4: 'audio/mp4', wav: 'audio/wav', flac: 'audio/flac', mpeg: 'audio/mpeg', mpga: 'audio/mpeg' };
   let audio = null;
   try { audio = await decodeAudio(blob); } catch (e) {}
-  const total = audio ? audio.duration : 0;
-  // Short enough: send the original file as-is
-  if (blob.size <= GEM_MAX_INLINE && (!total || total <= 12 * 60)) {
-    onProgress && onProgress('Gemini מתמלל…');
-    let segs;
+  const total = audio ? audio.duration : (opts.seconds || 0);
+  const retrying = async (fn, label) => {
     for (let round = 0; ; round++) {
-      try { segs = await geminiTranscribeOne(blob, mimeByExt[ext] || blob.type || 'audio/ogg', lang, total, opts); break; }
+      try { return await fn(); }
       catch (err) {
-        if (round >= 3 || (err.status && ![429, 500, 503].includes(err.status) && !/לא החזיר|timeout/.test(err.message))) throw err;
+        if (/לא החזיר/.test(err.message)) throw err;
+        if (round >= 3 || err.status === 403 || (err.status && ![429, 500, 502, 503, 504, 546].includes(err.status) && !/timeout|בזמן/.test(err.message))) throw err;
         const wait = 20 * (round + 1);
-        onProgress && onProgress(`Gemini עמוס – מנסה שוב בעוד ${wait} שניות…`);
+        onProgress && onProgress(`Gemini עמוס – מנסה שוב${label} בעוד ${wait} שניות…`);
         await sleep(wait * 1000);
       }
     }
+  };
+  if (blob.size <= GEM_MAX_INLINE && total && total <= 150) {
+    onProgress && onProgress('Gemini מתמלל…');
+    let segs;
+    try { segs = await retrying(() => geminiTranscribeOne(blob, mimeByExt[ext] || blob.type || 'audio/ogg', lang, total, opts), ''); }
+    catch (err) { if (!/לא החזיר/.test(err.message) || !audio) throw err; segs = await geminiSubChunks(audio, 0, total, lang, onProgress, opts); }
     return { text: segs.map((s) => s.text).join(' '), segments: segs, duration: total || (segs.length ? segs[segs.length - 1].end : 0), language: lang };
   }
   if (!audio) throw new Error('לא הצלחתי לפענח את קובץ השמע (פורמט לא נתמך)');
@@ -1171,15 +1238,10 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     let segs = GEM_CHUNK_CACHE.get(cacheKey);
     if (!segs) {
       const wav = encodeWav(await resampleMono16k(audio, st, en));
-      for (let round = 0; ; round++) {
-        try { segs = await geminiTranscribeOne(wav, 'audio/wav', lang, en - st, opts); break; }
-        catch (err) {
-          if (/לא החזיר/.test(err.message)) { segs = await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts); segs = segs.map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st })); break; }
-          if (round >= 3 || (err.status && ![429, 500, 503].includes(err.status) && !/timeout/.test(err.message))) throw err;
-          const wait = 20 * (round + 1);
-          onProgress && onProgress(`Gemini עמוס – מנסה שוב חלק ${i + 1} בעוד ${wait} שניות…`);
-          await sleep(wait * 1000);
-        }
+      try { segs = await retrying(() => geminiTranscribeOne(wav, 'audio/wav', lang, en - st, opts), ` חלק ${i + 1}`); }
+      catch (err) {
+        if (!/לא החזיר/.test(err.message)) throw err;
+        segs = (await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st }));
       }
       GEM_CHUNK_CACHE.set(cacheKey, segs);
     }
@@ -1189,40 +1251,43 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   return out;
 }
 
+/* ---------------- Groq chat helpers ---------------- */
 let chatModelCache = null;
 async function pickChatModel() {
   if (chatModelCache) return chatModelCache;
-  const list = await groqFetch('/models');
+  const list = await api('groq-models');
   const ids = (list.data || []).filter((m) => m.active !== false).map((m) => m.id);
   const prefer = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct-0905', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b',
-    'meta-llama/llama-4-maverick-17b-128e-instruct', 'meta-llama/llama-4-scout-17b-16e-instruct', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
+    'meta-llama/llama-4-maverick-17b-128e-instruct', 'meta-llama/llama-4-scout-17b-16e-instruct', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
   let pick = prefer.find((p) => ids.includes(p));
   if (!pick) pick = ids.find((id) => !/whisper|guard|tts|orpheus|playai|distil|compound|prompt-guard|safeguard/i.test(id));
   if (!pick) throw new Error('לא נמצא מודל צ\'אט זמין בחשבון Groq');
   chatModelCache = { pick, ids };
   return chatModelCache;
 }
-async function summarize(text) {
+async function chatComplete(kind, messages, { maxTokens = 1200, temperature = 0.3 } = {}) {
   const { pick } = await pickChatModel();
-  const clipped = text.length > 24000 ? text.slice(0, 24000) + '…' : text;
-  const body = {
-    model: pick,
-    temperature: 0.3,
-    max_tokens: 1200,
-    messages: [
-      { role: 'system', content: 'אתה עוזר שמסכם תמלולי הקלטות. ענה תמיד בעברית בלבד, גם אם התמלול ביידיש או באנגלית. אל תמציא פרטים שלא נאמרו.' },
-      { role: 'user', content: `סכם את התמלול הבא בעברית, בפורמט הזה:\nנושא: (שורה אחת)\nנקודות עיקריות:\n• ...\n• ...\nמשימות / החלטות (אם יש):\n• ...\n\nהתמלול:\n"""${clipped}"""` }
-    ]
-  };
+  const body = { model: pick, temperature, max_tokens: maxTokens, messages };
   if (/gpt-oss/.test(pick)) body.reasoning_effort = 'low';
   if (/qwen3/.test(pick)) body.reasoning_format = 'hidden';
-  const res = await groqFetch('/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  let out = (res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content || '').trim();
-  out = out.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/\*\*/g, '').trim();
+  const res = await groqChat(kind, body);
+  const out = ((res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content) || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   if (!out) throw new Error('המודל החזיר תשובה ריקה');
-  return { summary: out, model: pick };
+  return { out, model: pick };
 }
-
+async function summarize(text) {
+  const clipped = text.length > 24000 ? text.slice(0, 24000) + '…' : text;
+  const { out, model } = await chatComplete('summary', [
+    { role: 'system', content: 'אתה עוזר שמסכם תמלולי הקלטות. ענה תמיד בעברית בלבד, גם אם התמלול ביידיש או באנגלית. אל תמציא פרטים שלא נאמרו.' },
+    { role: 'user', content: `סכם את התמלול הבא בעברית, בפורמט הזה:\nנושא: (שורה אחת)\nנקודות עיקריות:\n• ...\n• ...\nמשימות / החלטות (אם יש):\n• ...\n\nהתמלול:\n"""${clipped}"""` }]);
+  return { summary: out.replace(/\*\*/g, ''), model };
+}
+async function autoTitle(text) {
+  const { out } = await chatComplete('title', [
+    { role: 'system', content: 'אתה נותן כותרות קצרות להקלטות. ענה בעברית בלבד, רק הכותרת – עד 6 מילים, בלי מרכאות ובלי נקודה.' },
+    { role: 'user', content: `תן כותרת קצרה וברורה להקלטה לפי התמלול:\n"""${text.slice(0, 3000)}"""` }], { maxTokens: 300, temperature: 0.2 });
+  return out.split('\n')[0].replace(/^["'״׳«»\s]+|["'״׳«»\s.]+$/g, '').replace(/^כותרת\s*:\s*/, '').slice(0, 80);
+}
 const LANG_EN = { he: 'Hebrew', yi: 'Yiddish (in Hebrew letters, standard YIVO spelling)', en: 'English' };
 function splitText(text, max = 5000) {
   const parts = []; let cur = '';
@@ -1233,42 +1298,57 @@ function splitText(text, max = 5000) {
   return parts;
 }
 async function translateText(text, target, onProgress) {
-  const { pick } = await pickChatModel();
   const parts = splitText(text);
   const out = [];
   for (let i = 0; i < parts.length; i++) {
     onProgress && onProgress(parts.length > 1 ? `מתרגם ${i + 1}/${parts.length}…` : 'מתרגם…');
-    const body = { model: pick, temperature: 0.2, max_tokens: 4000, messages: [
+    const { out: t } = await chatComplete('translate', [
       { role: 'system', content: `You are a professional translator. Translate the user's text into ${LANG_EN[target]}. The source may be Hebrew, Yiddish or English (it is a speech transcript and may contain recognition errors – translate the intended meaning). Keep names as they are. Output ONLY the translation, with no notes, no quotes and no explanations.` },
-      { role: 'user', content: parts[i] }] };
-    if (/gpt-oss/.test(pick)) body.reasoning_effort = 'low';
-    if (/qwen3/.test(pick)) body.reasoning_format = 'hidden';
-    const res = await groqFetch('/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    out.push(((res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content) || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim());
+      { role: 'user', content: parts[i] }], { maxTokens: 4000, temperature: 0.2 });
+    out.push(t);
   }
-  const t = out.join('\n').trim();
-  if (!t) throw new Error('המודל החזיר תרגום ריק');
-  return t;
+  return out.join('\n').trim();
 }
+const looksDefaultTitle = (r) => !r.title || r.title === (r.fileName || '').replace(/\.[^.]+$/, '') || /^(הקלטה|recording|AUD|PTT|WhatsApp|audio|VID|voice|\d)/i.test(r.title);
 
 /* =========================================================
    QUEUE
    ========================================================= */
 const Queue = {
   running: false,
-  items: [], // rec ids
+  items: [],
+  progress: {},
   async add(blob, name, lang, title) {
-    const id = uid();
+    const id = uuid();
+    const ext = guessExt(blob, name);
     const rec = {
-      id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
-      owner: (Auth.current() || {}).id || null, lang, yiOut: lang === 'yi' ? (LS.get('yiOut', 'both')) : undefined, createdAt: Date.now(), duration: 0, folderId: null, tags: [], text: '', segments: [], summary: '', status: 'queued', progress: '', error: ''
+      id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
+      lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: $('#upFolder').value || null, tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null
     };
-    await DB.put('audio', blob, id);
-    await DB.put('recs', rec);
+    const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued' });
+    dbErr(error);
+    RECS.set(id, rec);
+    await Cache.put(id, blob);
     this.items.push(id);
+    queueShown.add(id);
     renderQueue();
+    if (blob.size <= STORAGE_MAX) {
+      const path = `${ME.id}/${id}.${ext}`;
+      rec.uploading = sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true })
+        .then(async ({ error: ue }) => { if (ue) throw ue; rec.filePath = path; await saveRec(rec, ['filePath']); })
+        .catch((e) => { console.warn('upload failed', e); toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + (e.message || e), 6000); });
+    } else toast('⚠️ הקובץ גדול מ-50MB – התמלול יישמר בענן, אבל קובץ השמע יישאר רק במחשב הזה', 7000);
     this.run();
     return id;
+  },
+  async getBlob(rec) {
+    let blob = await Cache.get(rec.id);
+    if (blob) return blob;
+    if (rec.filePath) {
+      const { data, error } = await sb.storage.from('audio').download(rec.filePath);
+      if (!error && data) return data;
+    }
+    return null;
   },
   async run() {
     if (this.running) return;
@@ -1276,35 +1356,44 @@ const Queue = {
     try {
       while (this.items.length) {
         const id = this.items[0];
-        const rec = await DB.get('recs', id);
+        const rec = RECS.get(id);
         if (!rec) { this.items.shift(); continue; }
-        const blob = await DB.get('audio', id);
-        rec.status = 'processing'; rec.progress = 'מתחיל…'; rec.error = '';
-        await DB.put('recs', rec); renderQueue();
+        const prog = (p) => { this.progress[id] = p; renderQueue(); if (currentPage === 'detail' && Detail.id === id) Detail.renderTranscript(); };
         try {
-          const prog = async (p) => { rec.progress = p; await DB.put('recs', rec); renderQueue(); };
-          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' ? 'he' : undefined, speakers: LS.get('speakers', true) };
+          const blob = await this.getBlob(rec);
+          if (!blob) throw new Error('קובץ השמע לא נמצא (אולי הועלה ממחשב אחר ולא נשמר בענן)');
+          rec.status = 'processing'; rec.error = ''; prog('מתחיל…');
+          await saveRec(rec, ['status', 'error']).catch(() => {});
+          let seconds = rec.duration || 0;
+          if (!seconds) { try { seconds = (await decodeAudio(blob)).duration; } catch (e) {} }
+          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' ? 'he' : undefined, speakers: LS.get('speakers', true), seconds };
           const res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
-          rec.text = res.text; rec.segments = res.segments; rec.duration = res.duration || rec.duration;
-          rec.outLang = opts.out || rec.lang;
-          if (rec.lang === 'yi' && rec.yiOut === 'both' && res.text) {
-            await prog('מתרגם לעברית…');
+          rec.text = res.text; rec.segments = res.segments; rec.duration = res.duration || seconds || rec.duration;
+          rec.outLang = opts.out || rec.lang; rec.edited = false;
+          if (rec.lang === 'yi' && rec.yiOut === 'both' && res.text && perm('translate')) {
+            prog('מתרגם לעברית…');
             try {
               const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
-              const he = geminiKey() ? await geminiTranslateText(src, 'he').catch(() => translateText(src, 'he')) : await translateText(src, 'he');
+              const he = await geminiTranslateText(src, 'he').catch(() => translateText(src, 'he'));
               rec.translations = Object.assign({}, rec.translations, { he });
             } catch (e) { console.warn('auto translate failed', e); }
           }
-          if (!rec.duration) { try { rec.duration = (await decodeAudio(blob)).duration; } catch (e) {} }
+          if (res.text && looksDefaultTitle(rec)) {
+            prog('נותן כותרת…');
+            try { const t = await autoTitle(rec.translations && rec.translations.he || res.text); if (t) rec.title = t; } catch (e) { console.warn('auto title failed', e); }
+          }
           rec.status = res.text ? 'done' : 'error';
           rec.error = res.text ? '' : 'לא זוהה דיבור בהקלטה';
-          rec.progress = '';
         } catch (err) {
           console.error(err);
-          rec.status = 'error'; rec.error = err.message || String(err); rec.progress = '';
+          rec.status = 'error'; rec.error = err.message || String(err);
         }
-        rec.updatedAt = Date.now();
-        await DB.put('recs', rec);
+        delete this.progress[id];
+        try {
+          await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited']);
+        } catch (e) { rec.status = 'error'; rec.error = 'שמירה בענן נכשלה: ' + e.message; }
+        if (rec.uploading) await rec.uploading;
+        if (rec.status === 'done' && rec.filePath) Cache.del(id);
         this.items.shift();
         renderQueue();
         if (currentPage === 'library') renderLibrary();
@@ -1314,30 +1403,29 @@ const Queue = {
       }
     } finally { this.running = false; }
   },
-  async resume() {
-    const recs = await DB.all('recs');
-    recs.filter((r) => r.status === 'queued' || r.status === 'processing').sort((a, b) => a.createdAt - b.createdAt).forEach((r) => { if (!this.items.includes(r.id)) this.items.push(r.id); });
+  resume() {
+    recsList().filter((r) => r.owner === ME.id && (r.status === 'queued' || r.status === 'processing')).sort((a, b) => a.createdAt - b.createdAt)
+      .forEach((r) => { if (!this.items.includes(r.id)) { this.items.push(r.id); queueShown.add(r.id); } });
     if (this.items.length) this.run();
   }
 };
 let queueShown = new Set();
-async function renderQueue() {
-  const recs = await myRecs();
-  const active = recs.filter((r) => r.status === 'queued' || r.status === 'processing');
-  active.forEach((r) => queueShown.add(r.id));
-  const shown = recs.filter((r) => queueShown.has(r.id)).sort((a, b) => a.createdAt - b.createdAt);
+function renderQueue() {
+  const shown = [...queueShown].map((id) => RECS.get(id)).filter(Boolean).sort((a, b) => a.createdAt - b.createdAt);
+  const active = shown.filter((r) => r.status === 'queued' || r.status === 'processing');
   $('#queueCount').textContent = active.length ? `${active.length} בתהליך` : '';
   if (!shown.length) { $('#queueList').innerHTML = '<p class="muted">אין הקלטות בתור.</p>'; return; }
   $('#queueList').innerHTML = shown.map((r) => {
     let st;
-    if (r.status === 'queued') st = '<span class="badge warn">ממתין</span>';
-    else if (r.status === 'processing') st = `<span class="spinner"></span><span class="badge">${esc(r.progress || 'מתמלל…')}</span>`;
+    const p = Queue.progress[r.id];
+    if (p) st = `<span class="spinner"></span><span class="badge">${esc(p)}</span>`;
+    else if (r.status === 'queued' || r.status === 'processing') st = '<span class="badge warn">ממתין</span>';
     else if (r.status === 'done') st = '<span class="badge ok">הושלם ✓</span>';
     else st = `<span class="badge err" title="${esc(r.error)}">נכשל</span>`;
     return `<div class="queue-item">
       <div class="grow"><div><b>${esc(r.title)}</b> <span class="muted" style="font-size:.85em">· ${LANGS[r.lang] || ''}${r.duration ? ' · ' + fmtTime(r.duration) : ''}</span></div>
       ${r.status === 'error' ? `<div class="err-text" style="font-size:.85em">${esc(r.error)}</div>` : ''}
-      ${r.status === 'done' ? `<div class="muted" style="font-size:.88em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw">${esc(r.text.slice(0, 140))}</div>` : ''}</div>
+      ${r.status === 'done' ? `<div class="muted" style="font-size:.88em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw">${esc((r.text || '').slice(0, 140))}</div>` : ''}</div>
       ${st}
       ${r.status === 'done' || r.status === 'error' ? `<button class="btn small" data-open="${r.id}">פתיחה</button>` : ''}
       ${r.status === 'error' ? `<button class="btn small" data-retry="${r.id}">🔄 שוב</button>` : ''}
@@ -1349,8 +1437,9 @@ $('#queueList').addEventListener('click', async (e) => {
   const r = e.target.closest('[data-retry]'); if (r) return retryRec(r.dataset.retry);
 });
 async function retryRec(id) {
-  const rec = await DB.get('recs', id); if (!rec) return;
-  rec.status = 'queued'; rec.error = ''; await DB.put('recs', rec);
+  const rec = RECS.get(id); if (!rec) return;
+  rec.status = 'queued'; rec.error = ''; rec.edited = false;
+  await saveRec(rec, ['status', 'error', 'edited']).catch(() => {});
   queueShown.add(id);
   if (!Queue.items.includes(id)) Queue.items.push(id);
   renderQueue(); Queue.run();
@@ -1365,27 +1454,26 @@ function syncLangPills() {
 }
 $('#yiOutPills').addEventListener('click', (e) => { const b = e.target.closest('[data-yiout]'); if (!b) return; LS.set('yiOut', b.dataset.yiout); syncLangPills(); });
 $('#speakersChk').addEventListener('change', () => LS.set('speakers', $('#speakersChk').checked));
-$('#langPills').addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (!b) return; $('#langSel').value = b.dataset.lang; syncLangPills(); });
+$('#langPills').addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (!b) return; $('#langSel').value = b.dataset.lang; LS.set('lastLang', b.dataset.lang); syncLangPills(); });
 
 /* ---------------- Upload ---------------- */
 const AUDIO_EXT = /\.(opus|ogg|oga|m4a|mp3|wav|aac|amr|webm|mp4|3gp|flac|mpeg|mpga|wma|mov)$/i;
 const isAudioFile = (f) => f && f.size && ((f.type || '').startsWith('audio/') || (f.type || '').startsWith('video/') || AUDIO_EXT.test(f.name || '') || /^(AUD|PTT)-/i.test(f.name || ''));
 function addFiles(files, fromFolder = false) {
+  if (!perm('transcribe')) return toast('אין לך הרשאה לתמלל');
   const all = [...files].filter((f) => f && f.size);
   const list = all.filter(isAudioFile);
   if (fromFolder && all.length > list.length) toast(`דילגתי על ${all.length - list.length} קבצים שאינם הקלטות`, 4000);
   if (!list.length) { if (all.length) toast('לא נמצאו קבצי שמע'); return; }
   list.sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name, 'he', { numeric: true }));
-  if (!groqKey()) toast('⚠️ הקבצים נוספו לתור, אבל חסר מפתח Groq בהגדרות', 5000);
   const lang = $('#langSel').value;
-  (async () => { for (const f of list) await Queue.add(f, f.name, lang); })();
+  (async () => { for (const f of list) { try { await Queue.add(f, f.name, lang); } catch (e) { toast('❌ ' + f.name + ': ' + e.message, 6000); } } })();
   toast(`נוספו ${list.length} הקלטות לתור`);
 }
 $('#pickBtn').onclick = () => $('#fileInput').click();
 $('#fileInput').onchange = (e) => { addFiles(e.target.files); e.target.value = ''; };
 $('#pickDirBtn').onclick = () => $('#dirInput').click();
 $('#dirInput').onchange = (e) => { addFiles(e.target.files, true); e.target.value = ''; };
-/* drag & drop – supports whole folders (recursively) */
 async function filesFromDataTransfer(dt) {
   const items = [...(dt.items || [])].map((i) => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
   if (!items.length) return { files: [...dt.files], folder: false };
@@ -1406,18 +1494,15 @@ const drop = $('#drop');
 ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
 drop.addEventListener('drop', (e) => { e.stopPropagation(); handleDrop(e.dataTransfer); });
 document.addEventListener('dragover', (e) => e.preventDefault());
-document.addEventListener('drop', (e) => { e.preventDefault(); if (currentPage === 'home' && !drop.contains(e.target)) handleDrop(e.dataTransfer); });
+document.addEventListener('drop', (e) => { e.preventDefault(); if (currentPage === 'home' && !drop.contains(e.target) && ME) handleDrop(e.dataTransfer); });
 
 /* ---------------- Recorder ---------------- */
 const Rec = {
   mr: null, chunks: [], stream: null, t0: 0, timer: null, ctx: null, raf: null,
   async toggle() { this.mr && this.mr.state === 'recording' ? this.stop() : this.start(); },
   async start() {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-    } catch (err) {
-      toast('אין גישה למיקרופון: ' + (err.message || err.name), 6000); return;
-    }
+    try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (err) { toast('אין גישה למיקרופון: ' + (err.message || err.name), 6000); return; }
     const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
     const type = types.find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
     this.mr = new MediaRecorder(this.stream, type ? { mimeType: type } : undefined);
@@ -1459,9 +1544,11 @@ const Rec = {
     const ext = blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm';
     const d = new Date();
     const title = `הקלטה ${d.toLocaleDateString('he-IL')} ${d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`;
-    const id = await Queue.add(blob, `recording.${ext}`, $('#langSel').value, title);
-    const r = await DB.get('recs', id); if (r) { r.duration = secs; await DB.put('recs', r); }
-    toast('ההקלטה נוספה לתור התמלול');
+    try {
+      const id = await Queue.add(blob, `recording.${ext}`, $('#langSel').value, title);
+      const r = RECS.get(id); if (r) r.duration = secs;
+      toast('ההקלטה נוספה לתור התמלול');
+    } catch (e) { toast('❌ ' + e.message, 6000); }
   }
 };
 $('#recBtn').onclick = () => Rec.toggle();
@@ -1470,10 +1557,13 @@ $('#recBtn').onclick = () => Rec.toggle();
    LIBRARY
    ========================================================= */
 let libFolder = 'all';
-async function folders() { return (await DB.all('folders')).sort((a, b) => a.name.localeCompare(b.name, 'he')); }
-function folderOptions(list, sel) {
-  return `<option value="">ללא תיקייה</option>` + list.map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${esc(f.name)}</option>`).join('');
+const SEL = new Set();
+const folderName = (id) => { const f = FOLDERS.find((x) => x.id === id); return f ? f.name : ''; };
+const canManageFolder = (f) => f && (f.owner === ME.id || isAdmin());
+function folderOptions(sel, emptyLabel = 'ללא תיקייה') {
+  return `<option value="">${emptyLabel}</option>` + FOLDERS.map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${f.owner !== ME.id ? '👥 ' : ''}${esc(f.name)}</option>`).join('');
 }
+function fillUpFolder() { const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בלי תיקייה —'); }
 function highlight(text, q) {
   const t = esc(text);
   if (!q) return t;
@@ -1487,115 +1577,225 @@ function snippetFor(text, q) {
   const s = Math.max(0, i - 80);
   return (s ? '…' : '') + text.slice(s, i + 140);
 }
-async function renderLibrary() {
-  const [recs, fl] = await Promise.all([myRecs(), folders()]);
-  const count = (fid) => recs.filter((r) => fid === 'all' ? true : fid === 'none' ? !r.folderId : r.folderId === fid).length;
-  $('#folderList').innerHTML =
-    [['all', '📂 הכל'], ['none', '📄 ללא תיקייה'], ...fl.map((f) => [f.id, '📁 ' + f.name])].map(([id, name]) =>
-      `<div class="row" style="gap:.2em;flex-wrap:nowrap"><button class="f ${libFolder === id ? 'active' : ''}" data-folder="${id}"><span>${esc(name)}</span><span class="muted">${count(id)}</span></button>
-      ${id !== 'all' && id !== 'none' ? `<button class="btn small" title="מחיקת התיקייה" data-delfolder="${id}" style="padding:.1em .45em">✕</button>` : ''}</div>`).join('');
+function currentList() {
   const q = $('#searchBox').value.trim();
-  let list = recs.filter((r) => libFolder === 'all' ? true : libFolder === 'none' ? !r.folderId : r.folderId === libFolder);
+  let list = recsList().filter((r) => libFolder === 'all' ? true : libFolder === 'none' ? !r.folderId : libFolder === 'star' ? r.starred : libFolder === 'mine' ? r.owner === ME.id : r.folderId === libFolder);
   if (q) {
     const ql = q.toLowerCase();
-    list = list.filter((r) => [r.title, r.text, r.summary, (r.tags || []).join(' ')].join(' ').toLowerCase().includes(ql));
+    list = list.filter((r) => [r.title, r.text, r.summary, (r.tags || []).join(' '), Object.values(r.translations || {}).join(' ')].join(' ').toLowerCase().includes(ql));
   }
-  list.sort((a, b) => b.createdAt - a.createdAt);
-  const fmap = Object.fromEntries(fl.map((f) => [f.id, f.name]));
-  const showOwner = Auth.isAdmin() && Auth.users().length > 1;
+  const s = $('#sortSel').value;
+  list.sort(s === 'old' ? (a, b) => a.createdAt - b.createdAt : s === 'name' ? (a, b) => (a.title || '').localeCompare(b.title || '', 'he') : s === 'long' ? (a, b) => (b.duration || 0) - (a.duration || 0) : (a, b) => b.createdAt - a.createdAt);
+  return list;
+}
+function renderLibrary() {
+  const recs = recsList();
+  const count = (fid) => recs.filter((r) => fid === 'all' ? true : fid === 'none' ? !r.folderId : fid === 'star' ? r.starred : fid === 'mine' ? r.owner === ME.id : r.folderId === fid).length;
+  const base = [['all', '📂 הכל'], ['star', '⭐ מסומנות'], ['none', '📄 ללא תיקייה']];
+  if (isAdmin()) base.splice(1, 0, ['mine', '👤 שלי בלבד']);
+  $('#folderList').innerHTML = [...base, ...FOLDERS.map((f) => [f.id, (f.shared_with && f.shared_with.length ? '👥 ' : '📁 ') + f.name + (f.owner !== ME.id ? ` (${personName(f.owner) || 'משותף'})` : '')])].map(([id, name]) => {
+    const f = FOLDERS.find((x) => x.id === id);
+    return `<div class="row" style="gap:.2em;flex-wrap:nowrap"><button class="f ${libFolder === id ? 'active' : ''}" data-folder="${id}"><span>${esc(name)}</span><span class="muted">${count(id)}</span></button>
+      ${f && canManageFolder(f) ? `<button class="btn small" title="שיתוף התיקייה" data-sharefolder="${id}" style="padding:.1em .4em">👥</button><button class="btn small" title="מחיקת התיקייה" data-delfolder="${id}" style="padding:.1em .45em">✕</button>` : ''}</div>`;
+  }).join('');
+  const q = $('#searchBox').value.trim();
+  const list = currentList();
+  const showOwner = isAdmin() || FOLDERS.some((f) => f.owner !== ME.id || (f.shared_with || []).length);
   $('#recList').innerHTML = list.length ? list.map((r) => `
-    <div class="rec-card" data-rec="${r.id}">
-      <div class="row"><span class="title grow">${highlight(r.title, q)}</span>
+    <div class="rec-card ${SEL.has(r.id) ? 'sel' : ''}" data-rec="${r.id}">
+      <div class="row" style="flex-wrap:nowrap">
+        <input type="checkbox" class="chk" data-sel="${r.id}" ${SEL.has(r.id) ? 'checked' : ''} title="בחירה">
+        <button class="star ${r.starred ? 'on' : ''}" data-star="${r.id}" title="סימון בכוכב">⭐</button>
+        <span class="title grow">${highlight(r.title, q)}</span>
         ${r.status === 'done' ? '' : r.status === 'error' ? '<span class="badge err">נכשל</span>' : '<span class="badge warn">בתור</span>'}
+        ${r.shareToken ? '<span class="badge" title="יש קישור שיתוף פעיל">🔗</span>' : ''}
         <span class="badge">${LANGS[r.lang] || ''}</span></div>
-      <div class="muted" style="font-size:.85em">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)}${r.folderId && fmap[r.folderId] ? ' · 📁 ' + esc(fmap[r.folderId]) : ''}${showOwner && r.owner ? ' · 👤 ' + esc(ownerName(r.owner)) : ''}</div>
+      <div class="muted" style="font-size:.85em">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)}${r.folderId && folderName(r.folderId) ? ' · 📁 ' + esc(folderName(r.folderId)) : ''}${showOwner && r.owner !== ME.id ? ' · 👤 ' + esc(personName(r.owner)) : ''}</div>
       <div>${(r.tags || []).map((t) => `<span class="tag">#${highlight(t, q)}</span>`).join('')}</div>
       <div class="snippet">${highlight(snippetFor(r.text || r.error || '', q), q)}</div>
-      <div class="row" style="margin-top:.4em" onclick="event.stopPropagation()">
-        <select data-move="${r.id}" style="width:auto;padding:.25em .5em;font-size:.9em">${folderOptions(fl, r.folderId)}</select>
-      </div>
     </div>`).join('') : `<div class="card muted">${q ? 'לא נמצאו תוצאות לחיפוש.' : 'אין עדיין הקלטות כאן.'}</div>`;
+  $('#selAll').checked = list.length > 0 && list.every((r) => SEL.has(r.id));
+  renderBulk();
+}
+function renderBulk() {
+  [...SEL].forEach((id) => { if (!RECS.has(id)) SEL.delete(id); });
+  $('#bulkBar').classList.toggle('hidden', !SEL.size);
+  $('#bulkCount').textContent = `נבחרו ${SEL.size}`;
+  $('#bulkMove').innerHTML = '<option value="__">📁 העברה לתיקייה…</option>' + folderOptions('', 'ללא תיקייה');
+  $('#bulkMove').value = '__';
 }
 $('#folderList').addEventListener('click', async (e) => {
   const d = e.target.closest('[data-delfolder]');
   if (d) {
-    const f = (await DB.all('folders')).find((x) => x.id === d.dataset.delfolder);
+    const f = FOLDERS.find((x) => x.id === d.dataset.delfolder);
     if (!(await confirmBox(`למחוק את התיקייה "${f ? f.name : ''}"? ההקלטות שבה לא יימחקו (הן יעברו ל"ללא תיקייה").`))) return;
-    const recs = await DB.all('recs');
-    for (const r of recs) if (r.folderId === d.dataset.delfolder) { r.folderId = null; await DB.put('recs', r); }
-    await DB.del('folders', d.dataset.delfolder);
+    const { error } = await sb.from('folders').delete().eq('id', d.dataset.delfolder);
+    if (error) return toast('❌ ' + error.message, 5000);
+    recsList().forEach((r) => { if (r.folderId === d.dataset.delfolder) r.folderId = null; });
     if (libFolder === d.dataset.delfolder) libFolder = 'all';
-    return renderLibrary();
+    await loadFolders(); fillUpFolder(); return renderLibrary();
   }
-  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; renderLibrary(); }
+  const sh = e.target.closest('[data-sharefolder]');
+  if (sh) return shareFolder(sh.dataset.sharefolder);
+  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; SEL.clear(); renderLibrary(); }
 });
+async function shareFolder(id) {
+  const f = FOLDERS.find((x) => x.id === id); if (!f) return;
+  await loadPeople();
+  const others = Object.entries(PEOPLE).filter(([pid]) => pid !== f.owner);
+  if (!others.length) return toast('אין עוד משתמשים במערכת לשתף איתם');
+  let chosen = null;
+  const ok = await modal(`<h3>👥 שיתוף התיקייה "${esc(f.name)}"</h3><p class="hint">מי שתסמן יראה את כל ההקלטות שבתיקייה (גם חדשות), ויוכל להוסיף אליה הקלטות. רק הבעלים והמנהל יכולים לערוך ולמחוק.</p>
+    <div class="perm-grid">${others.map(([pid, name]) => `<label><input type="checkbox" class="chk" value="${pid}" ${(f.shared_with || []).includes(pid) ? 'checked' : ''}> ${esc(name)}</label>`).join('')}</div>`,
+  { okText: 'שמירה', onOk: (bg) => { chosen = $$('input[type=checkbox]', bg).filter((c) => c.checked).map((c) => c.value); } });
+  if (!ok) return;
+  const { error } = await sb.from('folders').update({ shared_with: chosen }).eq('id', id);
+  if (error) return toast('❌ ' + error.message, 5000);
+  toast(chosen.length ? `התיקייה משותפת עם ${chosen.length} משתמשים ✓` : 'השיתוף בוטל');
+  await loadFolders(); renderLibrary();
+}
 $('#newFolderForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = $('#newFolderName').value.trim(); if (!name) return;
-  const exists = (await DB.all('folders')).find((f) => f.name === name);
-  if (exists) { toast('כבר יש תיקייה בשם הזה'); return; }
-  await DB.put('folders', { id: uid(), name, createdAt: Date.now() });
-  $('#newFolderName').value = ''; toast('התיקייה "' + name + '" נוצרה'); renderLibrary();
+  if (FOLDERS.find((f) => f.name === name && f.owner === ME.id)) { toast('כבר יש לך תיקייה בשם הזה'); return; }
+  const { error } = await sb.from('folders').insert({ name, owner: ME.id });
+  if (error) return toast('❌ ' + error.message, 5000);
+  $('#newFolderName').value = ''; toast('התיקייה "' + name + '" נוצרה');
+  await loadFolders(); fillUpFolder(); renderLibrary();
 });
-$('#recList').addEventListener('click', (e) => { const c = e.target.closest('[data-rec]'); if (c && !e.target.closest('select')) Detail.open(c.dataset.rec); });
-$('#recList').addEventListener('change', async (e) => {
-  const s = e.target.closest('[data-move]'); if (!s) return;
-  const r = await DB.get('recs', s.dataset.move); r.folderId = s.value || null; await DB.put('recs', r);
-  toast('ההקלטה הועברה'); renderLibrary();
+$('#recList').addEventListener('click', async (e) => {
+  const st = e.target.closest('[data-star]');
+  if (st) {
+    const r = RECS.get(st.dataset.star); if (!r) return;
+    if (r.owner !== ME.id && !isAdmin()) return toast('רק הבעלים יכול לסמן');
+    r.starred = !r.starred; st.classList.toggle('on', r.starred);
+    saveRec(r, ['starred']).catch((er) => toast('❌ ' + er.message));
+    return;
+  }
+  const c = e.target.closest('[data-sel]');
+  if (c) { c.checked ? SEL.add(c.dataset.sel) : SEL.delete(c.dataset.sel); c.closest('.rec-card').classList.toggle('sel', c.checked); renderBulk(); return; }
+  const card = e.target.closest('[data-rec]');
+  if (card) { if (SEL.size) { const id = card.dataset.rec; SEL.has(id) ? SEL.delete(id) : SEL.add(id); renderLibrary(); } else Detail.open(card.dataset.rec); }
 });
+$('#selAll').addEventListener('change', () => { const list = currentList(); if ($('#selAll').checked) list.forEach((r) => SEL.add(r.id)); else SEL.clear(); renderLibrary(); });
+$('#bulkClear').onclick = () => { SEL.clear(); renderLibrary(); };
+const selRecs = () => [...SEL].map((id) => RECS.get(id)).filter(Boolean);
+const editable = (r) => r.owner === ME.id || isAdmin();
+$('#bulkMove').addEventListener('change', async () => {
+  const v = $('#bulkMove').value; if (v === '__') return;
+  const list = selRecs().filter(editable);
+  const ids = list.map((r) => r.id);
+  if (!ids.length) return toast('אין הרשאה להעביר את ההקלטות שנבחרו');
+  const { error } = await sb.from('recordings').update({ folder_id: v || null, updated_at: new Date().toISOString() }).in('id', ids);
+  if (error) return toast('❌ ' + error.message, 5000);
+  list.forEach((r) => r.folderId = v || null);
+  toast(`${ids.length} הקלטות הועברו ✓`); SEL.clear(); renderLibrary();
+});
+$('#bulkTag').addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter') return; e.preventDefault();
+  const t = $('#bulkTag').value.trim().replace(/^#/, ''); if (!t) return;
+  let n = 0;
+  for (const r of selRecs().filter(editable)) { if (!(r.tags || []).includes(t)) { r.tags = [...(r.tags || []), t]; await saveRec(r, ['tags']).catch(() => {}); n++; } }
+  $('#bulkTag').value = ''; toast(`התגית נוספה ל-${n} הקלטות ✓`); renderLibrary();
+});
+$('#bulkXlsx').onclick = (e) => runExport(e.currentTarget, () => exportXlsx(selRecs(), 'תמלולים_נבחרים.xlsx', true));
+$('#bulkDel').onclick = async () => {
+  const ids = selRecs().filter(editable).map((r) => r.id);
+  if (!ids.length) return toast('אין הרשאה למחוק את ההקלטות שנבחרו');
+  if (!(await confirmBox(`להעביר ${ids.length} הקלטות לסל המחזור?`))) return;
+  const { error } = await sb.rpc('trash_recordings', { ids });
+  if (error) return toast('❌ ' + error.message, 5000);
+  ids.forEach((id) => { RECS.delete(id); queueShown.delete(id); });
+  toast(`${ids.length} הקלטות הועברו לסל המחזור`); SEL.clear(); renderLibrary(); renderQueue();
+};
 let searchT; $('#searchBox').addEventListener('input', () => { clearTimeout(searchT); searchT = setTimeout(renderLibrary, 150); });
+$('#sortSel').addEventListener('change', () => { LS.set('sort', $('#sortSel').value); renderLibrary(); });
+$('#refreshBtn').onclick = async () => { await Promise.all([loadRecs(), loadFolders(), loadPeople()]); renderLibrary(); toast('עודכן ✓'); };
 
 /* =========================================================
    DETAIL
    ========================================================= */
 const Detail = {
-  id: null, rec: null, url: null, peaks: null, activeSeg: -1,
+  id: null, rec: null, url: null, peaks: null, activeSeg: -1, chat: [],
+  canEdit() { return this.rec && (this.rec.owner === ME.id || isAdmin()); },
   async open(id) {
-    const rec = await DB.get('recs', id); if (!rec) return;
+    let rec;
+    try { rec = await fullRec(id); } catch (e) { rec = RECS.get(id); }
+    if (!rec) return toast('ההקלטה לא נמצאה');
     const sameRec = this.id === id;
     this.id = id; this.rec = rec;
+    if (!sameRec) this.chat = [];
     go('detail');
-    $('#dTitle').value = rec.title;
+    const ce = this.canEdit();
+    $('#dTitle').value = rec.title; $('#dTitle').disabled = !ce;
+    $('#dFolder').disabled = !ce; $('#dTagInput').classList.toggle('hidden', !ce);
+    $('#dOwner').textContent = rec.owner !== ME.id ? '👤 ' + (personName(rec.owner) || 'משתמש אחר') : '';
+    $('#dOwner').classList.toggle('hidden', rec.owner === ME.id);
     $('#dLang').textContent = (LANGS[rec.lang] || '') + (rec.lang === 'yi' && rec.outLang === 'he' ? ' ← עברית' : '');
     $('#dMeta').textContent = fmtDate(rec.createdAt) + ' · ' + fmtTime(rec.duration);
-    $('#dFolder').innerHTML = folderOptions(await folders(), rec.folderId);
+    $('#dFolder').innerHTML = folderOptions(rec.folderId);
+    $$('#page-detail .toolbar > *').forEach((el) => {
+      const pk = [...el.classList].find((c) => c.startsWith('perm-'));
+      const hide = (pk && !perm(pk.slice(5))) || (el.classList.contains('can-edit') && !ce);
+      el.classList.toggle('hidden', !!hide);
+    });
+    $('#chatBox').classList.toggle('hidden', !perm('chat'));
+    this.renderShared();
     this.renderTags();
-    const blob = await DB.get('audio', id);
-    const player = $('#player');
-    if (!sameRec || !player.src) {
-      if (this.url) URL.revokeObjectURL(this.url);
-      this.url = blob ? URL.createObjectURL(blob) : '';
-      player.src = this.url;
-      this.peaks = rec.peaks || null;
-      drawWave();
-      if (!this.peaks && blob) {
-        decodeAudio(blob).then(async (ab) => {
-          if (this.id !== id) return;
-          this.peaks = computePeaks(ab); drawWave();
-          const r2 = await DB.get('recs', id); if (r2) { r2.peaks = this.peaks; if (!r2.duration) r2.duration = ab.duration; await DB.put('recs', r2); }
-        }).catch((e) => { console.warn('waveform decode failed', e); });
-      }
-    }
-    this.renderSummary();
-    this.renderTranslations();
-    this.renderTranscript();
+    if (!sameRec || !$('#player').src) await this.loadAudio();
+    $('#player').playbackRate = +LS.get('speed', 1) || 1; $('#speedSel').value = String(LS.get('speed', 1));
+    this.renderSummary(); this.renderTranslations(); this.renderTranscript(); this.renderChat();
     $('#dEdit').classList.add('hidden'); $('#dTranscript').classList.remove('hidden');
   },
+  async loadAudio() {
+    const rec = this.rec, id = rec.id, player = $('#player');
+    if (this.url && this.url.startsWith('blob:')) URL.revokeObjectURL(this.url);
+    this.url = ''; player.removeAttribute('src'); player.load();
+    this.peaks = rec.peaks || null; drawWave();
+    let blob = await Cache.get(id);
+    if (blob) this.url = URL.createObjectURL(blob);
+    else if (rec.filePath) {
+      const { data } = await sb.storage.from('audio').createSignedUrl(rec.filePath, 6 * 3600);
+      this.url = data ? data.signedUrl : '';
+    }
+    if (this.id !== id) return;
+    if (this.url) { player.src = this.url; player.playbackRate = +LS.get('speed', 1) || 1; }
+    else { this.peaks = null; drawWave('אין קובץ שמע שמור להקלטה הזו'); }
+    if (!this.peaks && this.url) {
+      (async () => {
+        try {
+          if (!blob) blob = await (await fetch(this.url)).blob();
+          const ab = await decodeAudio(blob);
+          if (this.id !== id) return;
+          this.peaks = computePeaks(ab); drawWave();
+          if (this.canEdit()) { rec.peaks = this.peaks; const f = ['peaks']; if (!rec.duration) { rec.duration = ab.duration; f.push('duration'); } saveRec(rec, f).catch(() => {}); }
+        } catch (e) { console.warn('waveform decode failed', e); }
+      })();
+    }
+  },
+  renderShared() {
+    const r = this.rec, el = $('#dShared');
+    const active = r.shareToken && (!r.shareExpires || new Date(r.shareExpires) > new Date());
+    el.classList.toggle('hidden', !active);
+    if (active) el.textContent = '🔗 קישור שיתוף פעיל' + (r.shareExpires ? ' עד ' + new Date(r.shareExpires).toLocaleDateString('he-IL') : '');
+  },
   renderTags() {
-    $('#dTags').innerHTML = (this.rec.tags || []).map((t, i) => `<span class="tag">#${esc(t)} <button data-deltag="${i}" title="הסרה">✕</button></span>`).join('');
+    const ce = this.canEdit();
+    $('#dTags').innerHTML = (this.rec.tags || []).map((t, i) => `<span class="tag">#${esc(t)} ${ce ? `<button data-deltag="${i}" title="הסרה">✕</button>` : ''}</span>`).join('');
   },
   renderSummary() {
     const s = $('#dSummary');
     if (this.rec.summary) { s.classList.remove('hidden'); s.innerHTML = '<b>✨ סיכום</b>\n' + esc(this.rec.summary); } else s.classList.add('hidden');
   },
   renderTranslations() {
-    const tr = this.rec.translations || {};
-    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button><button class="btn small" data-trdel="${k}">✕</button></div>${esc(tr[k])}</div>`).join('');
+    const tr = this.rec.translations || {}, ce = this.canEdit();
+    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
   },
   renderTranscript() {
     const r = this.rec;
     const st = $('#dStatus');
-    if (r.status === 'queued' || r.status === 'processing') st.innerHTML = `<p><span class="spinner"></span> ${esc(r.progress || 'ממתין לתמלול…')}</p>`;
+    const p = Queue.progress[r.id];
+    if (p || r.status === 'queued' || r.status === 'processing') st.innerHTML = `<p><span class="spinner"></span> ${esc(p || 'ממתין לתמלול…')}</p>`;
     else if (r.status === 'error') st.innerHTML = `<p class="err-text">❌ ${esc(r.error)}</p>`;
     else st.innerHTML = '';
     this.activeSeg = -1;
@@ -1605,41 +1805,79 @@ const Detail = {
       $('#dTranscript').innerHTML = esc(r.text || '').replace(/\n/g, '<br>');
     }
   },
-  async save() { this.rec.updatedAt = Date.now(); await DB.put('recs', this.rec); }
+  renderChat() {
+    const box = $('#chatMsgs');
+    if (!this.chat.length) { box.innerHTML = '<div class="muted" style="font-size:.9em">לדוגמה: "מה הוחלט בסוף?", "מי הזכיר את התאריך?", "תן לי 3 ציטוטים חשובים".</div>'; return; }
+    box.innerHTML = this.chat.map((m) => `<div class="msg ${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content)}</div>`).join('');
+    box.scrollTop = box.scrollHeight;
+  },
+  async save(fields) { await saveRec(this.rec, fields); const l = RECS.get(this.rec.id); if (l && l !== this.rec) fields.forEach((f) => l[f] = this.rec[f]); }
 };
 $('#backToLib').onclick = () => go('library');
-$('#dTitle').addEventListener('change', async () => { Detail.rec.title = $('#dTitle').value.trim() || 'הקלטה'; await Detail.save(); toast('השם נשמר'); });
-$('#dFolder').addEventListener('change', async () => { Detail.rec.folderId = $('#dFolder').value || null; await Detail.save(); toast('ההקלטה הועברה לתיקייה'); });
+$('#dTitle').addEventListener('change', async () => { Detail.rec.title = $('#dTitle').value.trim() || 'הקלטה'; await Detail.save(['title']); toast('השם נשמר'); });
+$('#dFolder').addEventListener('change', async () => { Detail.rec.folderId = $('#dFolder').value || null; await Detail.save(['folderId']); toast('ההקלטה הועברה לתיקייה'); });
 $('#dTagInput').addEventListener('keydown', async (e) => {
   if (e.key !== 'Enter') return;
   e.preventDefault();
   const t = $('#dTagInput').value.trim().replace(/^#/, ''); if (!t) return;
   Detail.rec.tags = Detail.rec.tags || [];
   if (!Detail.rec.tags.includes(t)) Detail.rec.tags.push(t);
-  $('#dTagInput').value = ''; await Detail.save(); Detail.renderTags(); toast('התגית נוספה');
+  $('#dTagInput').value = ''; await Detail.save(['tags']); Detail.renderTags(); toast('התגית נוספה');
 });
 $('#dTags').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-deltag]'); if (!b) return;
-  Detail.rec.tags.splice(+b.dataset.deltag, 1); await Detail.save(); Detail.renderTags();
+  Detail.rec.tags.splice(+b.dataset.deltag, 1); await Detail.save(['tags']); Detail.renderTags();
 });
 $('#dTranscript').addEventListener('click', (e) => {
   const s = e.target.closest('[data-seg]'); if (!s) return;
   const seg = Detail.rec.segments[+s.dataset.seg];
-  const p = $('#player'); p.currentTime = seg.start + 0.01; p.play().catch(() => {});
+  const p = $('#player'); if (!p.src) return toast('אין קובץ שמע להקלטה הזו');
+  p.currentTime = seg.start + 0.01; p.play().catch(() => {});
 });
 $('#player').addEventListener('timeupdate', () => {
   const p = $('#player'), segs = Detail.rec && Detail.rec.segments || [];
   drawWave();
   if (!segs.length || Detail.rec.edited) return;
   const t = p.currentTime;
-  let idx = segs.findIndex((s) => t >= s.start && t < s.end);
+  const idx = segs.findIndex((s) => t >= s.start && t < s.end);
   if (idx !== Detail.activeSeg) {
     $$('#dTranscript .seg.active').forEach((x) => x.classList.remove('active'));
     if (idx >= 0) { const el = $(`#dTranscript [data-seg="${idx}"]`); if (el) el.classList.add('active'); }
     Detail.activeSeg = idx;
   }
 });
-function drawWave() {
+$('#speedSel').addEventListener('change', () => { const v = +$('#speedSel').value; $('#player').playbackRate = v; LS.set('speed', v); });
+function stepSpeed(dir) {
+  const opts = [...$('#speedSel').options].map((o) => +o.value);
+  const cur = opts.indexOf(+$('#speedSel').value);
+  const nx = opts[Math.max(0, Math.min(opts.length - 1, cur + dir))];
+  $('#speedSel').value = String(nx); $('#player').playbackRate = nx; LS.set('speed', nx); toast('מהירות ×' + nx, 1200);
+}
+const KBD_HELP = `<h3>⌨️ קיצורי מקלדת</h3><table class="tbl">
+  <tr><td><span class="kbd">רווח</span></td><td>ניגון / עצירה</td></tr>
+  <tr><td><span class="kbd">←</span></td><td>קדימה 5 שניות</td></tr>
+  <tr><td><span class="kbd">→</span></td><td>אחורה 5 שניות</td></tr>
+  <tr><td><span class="kbd">+</span> / <span class="kbd">-</span></td><td>מהר יותר / לאט יותר</td></tr>
+  <tr><td><span class="kbd">/</span></td><td>חיפוש בספרייה</td></tr>
+  <tr><td><span class="kbd">Esc</span></td><td>חזרה לספרייה</td></tr>
+  <tr><td><span class="kbd">?</span></td><td>החלון הזה</td></tr></table>`;
+$('#kbdHelp').onclick = () => modal(KBD_HELP, { cancelText: '', okText: 'סגירה' });
+document.addEventListener('keydown', (e) => {
+  if (!ME || e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable || $('#modalRoot').children.length) return;
+  if (e.key === '/') { e.preventDefault(); if (currentPage !== 'library') go('library'); setTimeout(() => $('#searchBox').focus(), 30); return; }
+  if (e.key === '?') { e.preventDefault(); $('#kbdHelp').click(); return; }
+  if (currentPage !== 'detail') return;
+  const p = $('#player');
+  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); if (p.src) p.paused ? p.play().catch(() => {}) : p.pause(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); p.currentTime = Math.min((p.duration || 1e9), p.currentTime + 5); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); p.currentTime = Math.max(0, p.currentTime - 5); }
+  else if (e.key === '+' || e.key === '=') stepSpeed(1);
+  else if (e.key === '-') stepSpeed(-1);
+  else if (e.key === 'Escape') go('library');
+});
+function drawWave(msg) {
   const c = $('#wave'); if (!c) return;
   const w = c.clientWidth, h = c.clientHeight; if (!w) return;
   const dpr = window.devicePixelRatio || 1;
@@ -1648,8 +1886,8 @@ function drawWave() {
   const peaks = Detail.peaks;
   const cs = getComputedStyle(document.body);
   const col = cs.getPropertyValue('--primary').trim(), mut = cs.getPropertyValue('--muted').trim();
-  if (!peaks) { g.fillStyle = mut; g.font = '14px sans-serif'; g.textAlign = 'center'; g.fillText('טוען גל קול…', w / 2, h / 2 + 5); return; }
-  const p = $('#player'); const dur = p.duration || Detail.rec.duration || 1; const prog = Math.min(1, (p.currentTime || 0) / dur);
+  if (!peaks) { g.fillStyle = mut; g.font = '14px sans-serif'; g.textAlign = 'center'; g.fillText(typeof msg === 'string' ? msg : 'טוען גל קול…', w / 2, h / 2 + 5); return; }
+  const p = $('#player'); const dur = p.duration || (Detail.rec && Detail.rec.duration) || 1; const prog = Math.min(1, (p.currentTime || 0) / dur);
   const bars = Math.floor(w / 3), mid = h / 2;
   for (let i = 0; i < bars; i++) {
     const v = peaks[Math.floor(i / bars * peaks.length)] || 0;
@@ -1662,7 +1900,7 @@ function drawWave() {
 }
 $('#waveWrap').addEventListener('click', (e) => {
   const p = $('#player'); const r = e.currentTarget.getBoundingClientRect();
-  const dur = p.duration || Detail.rec.duration; if (!dur || !isFinite(dur)) return;
+  const dur = p.duration || Detail.rec.duration; if (!dur || !isFinite(dur) || !p.src) return;
   p.currentTime = ((e.clientX - r.left) / r.width) * dur; p.play().catch(() => {}); drawWave();
 });
 window.addEventListener('resize', () => { if (currentPage === 'detail') drawWave(); });
@@ -1671,45 +1909,96 @@ $('#sumBtn').onclick = async () => {
   const r = Detail.rec; if (!r.text) return toast('אין עדיין תמלול לסכם');
   const b = $('#sumBtn'); b.disabled = true; b.innerHTML = '<span class="spinner"></span> מסכם…';
   try {
-    const { summary, model } = await summarize(r.text);
-    r.summary = summary; r.summaryModel = model; await Detail.save(); Detail.renderSummary(); toast('הסיכום מוכן (' + model + ')');
+    const { summary } = await summarize(r.text);
+    r.summary = summary; if (Detail.canEdit()) await Detail.save(['summary']); Detail.renderSummary(); toast('הסיכום מוכן ✅');
   } catch (err) { console.error(err); toast('❌ הסיכום נכשל: ' + err.message, 7000); }
-  finally { b.disabled = false; b.textContent = '✨ סיכום אוטומטי'; }
+  finally { b.disabled = false; b.textContent = '✨ סיכום'; }
 };
 $('#trBtn').onclick = async () => {
   const r = Detail.rec; if (!r.text) return toast('אין עדיין תמלול לתרגם');
   const target = $('#trLang').value, b = $('#trBtn');
   b.disabled = true; b.innerHTML = '<span class="spinner"></span> מתרגם…';
   try {
-    const t = await translateText(r.text, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p);
-    r.translations = Object.assign({}, r.translations, { [target]: t }); await Detail.save(); Detail.renderTranslations(); toast('התרגום מוכן ✅');
+    const src = r.segments && r.segments.length && !r.edited ? r.segments.map((x) => x.text).join('\n') : r.text;
+    let t;
+    if (r.lang === 'yi' || target === 'yi') t = await geminiTranslateText(src, target).catch(() => translateText(src, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p));
+    else t = await translateText(src, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p);
+    r.translations = Object.assign({}, r.translations, { [target]: t });
+    if (Detail.canEdit()) await Detail.save(['translations']);
+    Detail.renderTranslations(); toast('התרגום מוכן ✅');
   } catch (err) { console.error(err); toast('❌ התרגום נכשל: ' + err.message, 7000); }
   finally { b.disabled = false; b.textContent = '🌐 תרגום'; }
 };
 $('#dTranslations').addEventListener('click', async (e) => {
   const c = e.target.closest('[data-trcopy]'), d = e.target.closest('[data-trdel]');
   if (c) { try { await navigator.clipboard.writeText(Detail.rec.translations[c.dataset.trcopy]); toast('התרגום הועתק'); } catch (er) { toast('ההעתקה נכשלה'); } }
-  if (d) { delete Detail.rec.translations[d.dataset.trdel]; await Detail.save(); Detail.renderTranslations(); }
+  if (d) { const tr = Object.assign({}, Detail.rec.translations); delete tr[d.dataset.trdel]; Detail.rec.translations = tr; await Detail.save(['translations']); Detail.renderTranslations(); }
 });
-$('#copyBtn').onclick = async () => {
-  try { await navigator.clipboard.writeText(Detail.rec.text || ''); toast('הטקסט הועתק'); } catch (e) { toast('ההעתקה נכשלה'); }
-};
+$('#copyBtn').onclick = async () => { try { await navigator.clipboard.writeText(Detail.rec.text || ''); toast('הטקסט הועתק'); } catch (e) { toast('ההעתקה נכשלה'); } };
 $('#editBtn').onclick = () => { $('#dEditText').value = Detail.rec.text || ''; $('#dEdit').classList.remove('hidden'); $('#dTranscript').classList.add('hidden'); };
 $('#cancelEditBtn').onclick = () => { $('#dEdit').classList.add('hidden'); $('#dTranscript').classList.remove('hidden'); };
 $('#saveEditBtn').onclick = async () => {
   const t = $('#dEditText').value;
-  if (t !== Detail.rec.text) { Detail.rec.text = t; Detail.rec.edited = true; await Detail.save(); }
+  if (t !== Detail.rec.text) { Detail.rec.text = t; Detail.rec.edited = true; await Detail.save(['text', 'edited']); }
   $('#dEdit').classList.add('hidden'); $('#dTranscript').classList.remove('hidden'); Detail.renderTranscript(); toast('נשמר');
 };
 $('#retryBtn').onclick = async () => {
-  const r = await DB.get('recs', Detail.id); r.edited = false; await DB.put('recs', r);
-  await retryRec(Detail.id); toast('נשלח לתמלול מחדש'); Detail.open(Detail.id);
+  const r = Detail.rec;
+  if (!(await Cache.get(r.id)) && !r.filePath) return toast('אין קובץ שמע שמור – אי אפשר לתמלל מחדש');
+  await retryRec(Detail.id); toast('נשלח לתמלול מחדש'); go('home');
 };
 $('#delBtn').onclick = async () => {
-  if (!(await confirmBox(`למחוק את "${Detail.rec.title}" לצמיתות (כולל קובץ השמע)?`))) return;
-  $('#player').pause(); await DB.del('recs', Detail.id); await DB.del('audio', Detail.id); queueShown.delete(Detail.id);
-  Detail.id = null; toast('נמחק'); go('library'); renderQueue();
+  if (!(await confirmBox(`להעביר את "${Detail.rec.title}" לסל המחזור? (אפשר לשחזר תוך 30 יום דרך המנהל)`, 'כן, למחוק'))) return;
+  $('#player').pause();
+  const { error } = await sb.rpc('trash_recordings', { ids: [Detail.id] });
+  if (error) return toast('❌ ' + error.message, 5000);
+  RECS.delete(Detail.id); queueShown.delete(Detail.id);
+  Detail.id = null; toast('הועבר לסל המחזור'); go('library'); renderQueue();
 };
+/* ---- share link with expiry ---- */
+const shareUrl = (token) => location.origin + location.pathname + '?view=' + token;
+$('#shareBtn').onclick = async () => {
+  const r = Detail.rec;
+  const active = r.shareToken && (!r.shareExpires || new Date(r.shareExpires) > new Date());
+  let choice = null;
+  const ok = await modal(`<h3>🔗 קישור שיתוף</h3>
+    <p class="hint">כל מי שיקבל את הקישור יוכל לקרוא את התמלול ולשמוע את ההקלטה – בלי להיכנס למערכת. אפשר לבטל בכל רגע.</p>
+    ${active ? `<div class="card" style="padding:.7em;margin-bottom:.6em"><div class="row"><input type="text" readonly value="${esc(shareUrl(r.shareToken))}" dir="ltr" class="grow" style="width:auto" id="shareLink"><button class="btn small" id="copyShare">📋 העתקה</button></div>
+      <div class="hint">${r.shareExpires ? 'בתוקף עד ' + fmtDate(r.shareExpires) : 'ללא תאריך תפוגה'}</div></div>` : ''}
+    <label for="shareExp">${active ? 'ליצור קישור חדש, בתוקף ל:' : 'תוקף הקישור:'}</label>
+    <select id="shareExp"><option value="1">יום אחד</option><option value="7" selected>שבוע</option><option value="30">חודש</option><option value="0">ללא הגבלה</option></select>
+    ${active ? '<label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="shareStop" style="width:auto"> לבטל את השיתוף (הקישור יפסיק לעבוד)</label>' : ''}`,
+  { okText: active ? 'שמירה' : 'יצירת קישור', onOk: (bg) => { choice = { days: +bg.querySelector('#shareExp').value, stop: !!(bg.querySelector('#shareStop') || {}).checked }; } });
+  if (!ok || !choice) return;
+  if (choice.stop) { r.shareToken = null; r.shareExpires = null; await Detail.save(['shareToken', 'shareExpires']); Detail.renderShared(); return toast('השיתוף בוטל'); }
+  r.shareToken = [...crypto.getRandomValues(new Uint8Array(18))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  r.shareExpires = choice.days ? new Date(Date.now() + choice.days * 864e5).toISOString() : null;
+  await Detail.save(['shareToken', 'shareExpires']); Detail.renderShared();
+  const link = shareUrl(r.shareToken);
+  try { await navigator.clipboard.writeText(link); } catch (e) {}
+  modal(`<h3>✅ הקישור מוכן</h3><p>הקישור הועתק. אפשר להדביק אותו בוואטסאפ או במייל:</p><input type="text" readonly value="${esc(link)}" dir="ltr" onclick="this.select()">`, { cancelText: '', okText: 'סגירה' });
+};
+document.addEventListener('click', (e) => { if (e.target && e.target.id === 'copyShare') navigator.clipboard.writeText($('#shareLink').value).then(() => toast('הקישור הועתק ✓')).catch(() => {}); });
+/* ---- chat with the recording ---- */
+$('#chatForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const q = $('#chatInput').value.trim(); if (!q) return;
+  const r = Detail.rec; if (!r.text) return toast('אין עדיין תמלול');
+  Detail.chat.push({ role: 'user', content: q }); $('#chatInput').value = ''; Detail.renderChat();
+  const box = $('#chatMsgs'); box.insertAdjacentHTML('beforeend', '<div class="msg bot" id="chatWait"><span class="spinner"></span></div>'); box.scrollTop = box.scrollHeight;
+  try {
+    const src = (r.translations && r.translations.he && r.lang === 'yi') ? r.text + '\n\n[תרגום לעברית]\n' + r.translations.he : r.text;
+    const ctx = src.length > 22000 ? src.slice(0, 22000) + '…' : src;
+    const { out } = await chatComplete('chat', [
+      { role: 'system', content: 'אתה עוזר שעונה על שאלות לגבי תמלול של הקלטה. ענה בעברית, בקצרה ולעניין, רק לפי מה שכתוב בתמלול. אם התשובה לא מופיעה בתמלול – אמור זאת. אפשר לצטט משפטים מהתמלול.' },
+      { role: 'user', content: `זה התמלול:\n"""${ctx}"""` },
+      { role: 'assistant', content: 'קראתי את התמלול. מה תרצה לדעת?' },
+      ...Detail.chat.slice(-10)], { maxTokens: 1500 });
+    Detail.chat.push({ role: 'assistant', content: out.replace(/\*\*/g, '') });
+  } catch (err) { Detail.chat.push({ role: 'assistant', content: '❌ ' + err.message }); }
+  Detail.renderChat();
+});
+$('#chatClear').onclick = () => { Detail.chat = []; Detail.renderChat(); };
 
 /* =========================================================
    EXPORTS
@@ -1738,15 +2027,15 @@ async function exportXlsx(recs, fileName, asLibrary = false) {
     const data = [['שם', r.title], ['תאריך', fmtDate(r.createdAt)], ['משך', fmtTime(r.duration)], ['שפה', LANGS[r.lang] || ''], ['תגיות', (r.tags || []).join(', ')], [],
       ['התחלה', 'סוף', 'טקסט'], ...rowsFor(r)];
     if (r.summary) data.push([], ['סיכום', r.summary]);
+    Object.entries(r.translations || {}).forEach(([k, v]) => data.push([], ['תרגום ל' + LANGS[k], v]));
     const ws = XLSX.utils.aoa_to_sheet(data);
     ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 100 }];
     XLSX.utils.book_append_sheet(wb, ws, 'תמלול');
   } else {
-    const fl = Object.fromEntries((await folders()).map((f) => [f.id, f.name]));
-    const data = [['שם', 'תאריך', 'משך', 'שפה', 'תיקייה', 'תגיות', 'תמלול', 'סיכום'],
-      ...recs.map((r) => [r.title, fmtDate(r.createdAt), fmtTime(r.duration), LANGS[r.lang] || '', fl[r.folderId] || '', (r.tags || []).join(', '), r.text || '', r.summary || ''])];
+    const data = [['שם', 'תאריך', 'משך', 'שפה', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
+      ...recs.map((r) => [r.title, fmtDate(r.createdAt), fmtTime(r.duration), LANGS[r.lang] || '', folderName(r.folderId), (r.tags || []).join(', '), personName(r.owner), r.text || '', r.summary || '', (r.translations || {}).he || ''])];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 14 }, { wch: 18 }, { wch: 90 }, { wch: 60 }];
+    ws['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 90 }, { wch: 60 }, { wch: 60 }];
     XLSX.utils.book_append_sheet(wb, ws, 'ספרייה');
   }
   const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -1765,6 +2054,7 @@ async function exportDocx(r) {
   if (r.segments && r.segments.length && !r.edited) r.segments.forEach((s) => kids.push(new d.Paragraph({ bidirectional: true, alignment: d.AlignmentType.RIGHT, spacing: { after: 100 },
     children: [new d.TextRun({ text: `[${fmtTime(s.start)}] `, rightToLeft: true, font: 'Arial', size: 18, color: '888888' }), new d.TextRun({ text: s.text, rightToLeft: true, font: 'Arial', size: 24 })] })));
   else (r.text || '').split('\n').filter(Boolean).forEach((l) => kids.push(P(l)));
+  Object.entries(r.translations || {}).forEach(([k, v]) => { kids.push(P('תרגום ל' + LANGS[k], { size: 28, bold: true })); v.split('\n').filter(Boolean).forEach((l) => kids.push(P(l))); });
   const doc = new d.Document({ creator: 'תמלול פלוס', title: r.title, sections: [{ properties: {}, children: kids }] });
   download(await d.Packer.toBlob(doc), safeName(r.title) + '.docx');
 }
@@ -1779,7 +2069,8 @@ async function exportPdf(r) {
   el.innerHTML = `<h1 style="font-size:22px;margin:0 0 4px">${esc(r.title)}</h1>
     <div style="color:#777;font-size:12px;margin-bottom:14px">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)} · ${LANGS[r.lang] || ''} ${(r.tags || []).map((t) => '#' + esc(t)).join(' ')}</div>
     ${r.summary ? `<h2 style="font-size:17px;margin:10px 0 4px">סיכום</h2><div style="white-space:pre-wrap;background:#f1f1fb;padding:10px;border-radius:8px">${esc(r.summary)}</div>` : ''}
-    <h2 style="font-size:17px;margin:14px 0 6px">תמלול</h2>${body}`;
+    <h2 style="font-size:17px;margin:14px 0 6px">תמלול</h2>${body}
+    ${Object.entries(r.translations || {}).map(([k, v]) => `<h2 style="font-size:17px;margin:14px 0 6px">תרגום ל${LANGS[k]}</h2><div style="white-space:pre-wrap" dir="${k === 'en' ? 'ltr' : 'rtl'}">${esc(v)}</div>`).join('')}`;
   const holder = document.createElement('div');
   holder.style.cssText = 'position:fixed;left:-10000px;top:0;';
   holder.appendChild(el); document.body.appendChild(holder);
@@ -1798,9 +2089,9 @@ async function runExport(btn, fn) {
 $('#xlsxBtn').onclick = (e) => runExport(e.currentTarget, () => exportXlsx([Detail.rec], safeName(Detail.rec.title) + '.xlsx'));
 $('#docxBtn').onclick = (e) => runExport(e.currentTarget, () => exportDocx(Detail.rec));
 $('#pdfBtn').onclick = (e) => runExport(e.currentTarget, () => exportPdf(Detail.rec));
-$('#txtBtn').onclick = () => { download(new Blob(['\ufeff' + Detail.rec.title + '\n\n' + (Detail.rec.summary ? 'סיכום:\n' + Detail.rec.summary + '\n\n' : '') + (Detail.rec.text || '')], { type: 'text/plain;charset=utf-8' }), safeName(Detail.rec.title) + '.txt'); };
+$('#txtBtn').onclick = () => { const r = Detail.rec; download(new Blob(['\ufeff' + r.title + '\n\n' + (r.summary ? 'סיכום:\n' + r.summary + '\n\n' : '') + (r.text || '') + Object.entries(r.translations || {}).map(([k, v]) => `\n\nתרגום ל${LANGS[k]}:\n${v}`).join('')], { type: 'text/plain;charset=utf-8' }), safeName(r.title) + '.txt'); };
 $('#exportAllXlsx').onclick = (e) => runExport(e.currentTarget, async () => {
-  const recs = (await myRecs()).sort((a, b) => b.createdAt - a.createdAt);
+  const recs = currentList();
   if (!recs.length) throw new Error('אין הקלטות לייצוא');
   await exportXlsx(recs, 'ספריית_תמלולים.xlsx', true);
 });
@@ -1812,178 +2103,353 @@ function bars(el, entries, fmt) {
   const max = Math.max(1, ...entries.map((e) => e[1]));
   el.innerHTML = entries.length ? entries.map(([k, v]) => `<div class="bar-row"><span class="lbl">${esc(k)}</span><span class="bar"><div style="width:${(v / max) * 100}%"></div></span><span class="val">${fmt(v)}</span></div>`).join('') : '<p class="muted">אין נתונים עדיין</p>';
 }
-async function renderStats() {
-  const [recs, fl] = await Promise.all([myRecs(), folders()]);
+function renderStats() {
+  const recs = recsList();
   const done = recs.filter((r) => r.status === 'done');
   const totalSec = done.reduce((a, r) => a + (r.duration || 0), 0);
   const words = done.reduce((a, r) => a + (r.text ? r.text.split(/\s+/).filter(Boolean).length : 0), 0);
   const week = recs.filter((r) => r.createdAt > Date.now() - 7 * 864e5).length;
   const cards = [['הקלטות', recs.length], ['תומללו בהצלחה', done.length], ['דקות שתומללו', fmtMinutes(totalSec)], ['מילים', words.toLocaleString('he-IL')],
-    ['השבוע', week], ['תיקיות', fl.length], ['עם סיכום', recs.filter((r) => r.summary).length], ['נכשלו', recs.filter((r) => r.status === 'error').length]];
+    ['השבוע', week], ['תיקיות', FOLDERS.length], ['עם סיכום', recs.filter((r) => r.summary).length], ['נכשלו', recs.filter((r) => r.status === 'error').length]];
   $('#statCards').innerHTML = cards.map(([k, v]) => `<div class="card stat"><div class="num">${v}</div><div class="muted">${k}</div></div>`).join('');
   const byLang = {}; recs.forEach((r) => { const k = LANGS[r.lang] || 'אחר'; byLang[k] = (byLang[k] || 0) + 1; });
   bars($('#statLang'), Object.entries(byLang).sort((a, b) => b[1] - a[1]), (v) => v + ' הקלטות');
-  const fmap = Object.fromEntries(fl.map((f) => [f.id, f.name])); const byF = {};
-  recs.forEach((r) => { const k = r.folderId && fmap[r.folderId] ? fmap[r.folderId] : 'ללא תיקייה'; byF[k] = (byF[k] || 0) + 1; });
+  const byF = {};
+  recs.forEach((r) => { const k = folderName(r.folderId) || 'ללא תיקייה'; byF[k] = (byF[k] || 0) + 1; });
   bars($('#statFolder'), Object.entries(byF).sort((a, b) => b[1] - a[1]), (v) => v + ' הקלטות');
   const months = [];
   for (let i = 5; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); months.push([d.getFullYear() + '-' + d.getMonth(), d.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }), 0]); }
   done.forEach((r) => { const d = new Date(r.createdAt); const m = months.find((x) => x[0] === d.getFullYear() + '-' + d.getMonth()); if (m) m[2] += r.duration || 0; });
   bars($('#statMonth'), months.map((m) => [m[1], m[2]]), (v) => fmtMinutes(v) + ' דק׳');
+  if (isAdmin()) {
+    const byU = {}; done.forEach((r) => { const k = personName(r.owner) || '?'; byU[k] = (byU[k] || 0) + (r.duration || 0); });
+    bars($('#statUsers'), Object.entries(byU).sort((a, b) => b[1] - a[1]), (v) => fmtMinutes(v) + ' דק׳');
+  }
 }
 
 /* =========================================================
-   SETTINGS
+   ADMIN SETTINGS
    ========================================================= */
-async function renderSettings() {
-  const s = LS.get('settings', {}), a = Auth.user();
-  $('#groqKey').value = s.groqKey || '';
-  $('#geminiKey').value = s.geminiKey || '';
-  $('#yiEngine').value = s.yiEngine || 'gemini';
-  $('#otherEngine').value = s.otherEngine || 'groq';
-  $('#whisperModel').value = setting('whisperModel');
-  $('#defLang').value = setting('defLang');
-  $('#ejService').value = setting('emailjsService');
-  $('#ejTemplate').value = setting('emailjsTemplate');
-  $('#ejKey').value = setting('emailjsKey');
-  $('#gClientId').value = setting('googleClientId') || '';
-  $('#accInfo').textContent = a ? `משתמש: ${a.username} · ${a.role === 'admin' ? 'מנהל' : 'משתמש רגיל'}` : '';
-  if (Auth.isAdmin()) renderUsers();
-  $('#accEmail').value = a ? a.email : '';
-  try {
-    if (navigator.storage && navigator.storage.estimate) {
-      const e = await navigator.storage.estimate();
-      $('#storageInfo').textContent = `נפח בשימוש במכשיר: ${(e.usage / 1048576).toFixed(1)} MB מתוך ${(e.quota / 1073741824).toFixed(1)} GB`;
-    }
-  } catch (e) {}
+let setSec = 'users';
+$('#setNav').addEventListener('click', (e) => { const b = e.target.closest('[data-sec]'); if (!b) return; setSec = b.dataset.sec; renderSettings(); });
+function renderSettings() {
+  if (!isAdmin()) return go('home');
+  $$('#setNav button').forEach((b) => b.classList.toggle('active', b.dataset.sec === setSec));
+  $$('[data-secbox]').forEach((b) => b.classList.toggle('hidden', b.dataset.secbox !== setSec));
+  ({ users: renderUsers, log: renderLog, system: renderSystem, security: renderSecurity, dict: renderDict, trash: renderTrash, data: renderData })[setSec]();
 }
-
-/* ---------------- Users management (admin) ---------------- */
-function renderUsers() {
-  const me = Auth.current(), list = Auth.users();
-  $('#usersList').innerHTML = list.map((u) => `
-    <div class="user-row">
-      <div class="grow"><b>${esc(u.username)}</b> ${u.id === me.id ? '<span class="badge">אתה</span>' : ''}
-        <span class="badge ${u.role === 'admin' ? 'ok' : ''}">${u.role === 'admin' ? 'מנהל' : 'משתמש רגיל'}</span>
-        <div class="muted" style="font-size:.88em">${esc(u.email || '')} · נוצר ${new Date(u.created || Date.now()).toLocaleDateString('he-IL')}</div></div>
-      <button class="btn small" data-upass="${u.id}">🔑 סיסמה חדשה</button>
-      ${u.id !== me.id ? `<button class="btn small" data-urole="${u.id}">${u.role === 'admin' ? '⬇️ הפוך לרגיל' : '⬆️ הפוך למנהל'}</button>
-      <button class="btn small danger" data-udel="${u.id}">🗑️ מחיקה</button>` : ''}
-    </div>`).join('');
+/* ---- users ---- */
+let USERS = [];
+async function renderUsers() {
+  $('#usersTbl').innerHTML = '<tr><td><span class="spinner"></span></td></tr>';
+  const [{ data: profs, error }, { data: stats }] = await Promise.all([sb.from('profiles').select('*').order('created_at'), sb.rpc('admin_user_stats')]);
+  if (error) { $('#usersTbl').innerHTML = `<tr><td class="err-text">${esc(error.message)}</td></tr>`; return; }
+  USERS = profs;
+  const st = Object.fromEntries((stats || []).map((s) => [s.user_id, s]));
+  $('#usersTbl').innerHTML = `<tr><th>שם</th><th>מייל</th><th>תפקיד</th><th>הקלטות</th><th>דקות</th><th>נראה לאחרונה</th><th></th></tr>` + profs.map((u) => {
+    const s = st[u.id] || {};
+    const limited = Object.keys(PERM_NAMES).filter((k) => u.perms && u.perms[k] === false);
+    return `<tr style="${u.disabled ? 'opacity:.55' : ''}">
+      <td><b>${esc(u.display_name || '')}</b> ${u.id === ME.id ? '<span class="badge">אתה</span>' : ''}${u.disabled ? ' <span class="badge err">מושבת</span>' : ''}</td>
+      <td dir="ltr" style="text-align:end">${esc(u.email)}</td>
+      <td><span class="badge ${u.role === 'admin' ? 'ok' : ''}">${u.role === 'admin' ? 'מנהל' : 'משתמש'}</span>${limited.length ? ` <span class="badge warn" title="${esc(limited.map((k) => PERM_NAMES[k]).join(', '))}">🔒 ${limited.length}</span>` : ''}${u.minutes_limit != null ? ` <span class="badge warn">⏱ ${u.minutes_limit} דק׳/חודש</span>` : ''}</td>
+      <td>${s.recordings || 0}</td><td>${fmtMinutes(s.seconds || 0)}</td>
+      <td class="muted">${u.last_seen ? fmtDate(u.last_seen) : '—'}</td>
+      <td style="white-space:nowrap"><button class="btn small" data-uedit="${u.id}">✏️ הרשאות</button>
+        ${u.id !== ME.id ? `<button class="btn small" data-udis="${u.id}">${u.disabled ? '✅ הפעלה' : '⛔ השבתה'}</button><button class="btn small danger" data-udel="${u.id}">🗑️</button>` : ''}</td></tr>`;
+  }).join('');
 }
-$('#addUserForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!Auth.isAdmin()) return;
-  const name = $('#nuName').value.trim(), em = $('#nuEmail').value.trim(), p = $('#nuPass').value, role = $('#nuRole').value;
-  const msg = (t, ok) => $('#nuMsg').innerHTML = `<span class="${ok ? 'ok-text' : 'err-text'}">${esc(t)}</span>`;
-  if (!name) return msg('יש להזין שם משתמש');
-  if (Auth.byName(name)) return msg('כבר קיים משתמש בשם הזה');
-  if (Auth.byEmail(em).length) return msg('המייל הזה כבר רשום אצל משתמש אחר');
-  if (!validEmail(em)) return msg('כתובת המייל לא תקינה');
-  if (!p) return msg('יש להזין סיסמה ראשונית');
-  const salt = uid();
-  const list = Auth.users();
-  list.push({ id: uid(), username: name, display: name, email: em, role, salt, hash: await hashPass(p, salt), created: Date.now() });
-  Auth.saveUsers(list);
-  ['nuName', 'nuEmail', 'nuPass'].forEach((i) => $('#' + i).value = ''); $('#nuRole').value = 'user';
-  msg(`המשתמש "${name}" נוסף ✓`, true); renderUsers();
-});
-$('#usersList').addEventListener('click', async (e) => {
-  if (!Auth.isAdmin()) return;
-  const me = Auth.current();
-  const del = e.target.closest('[data-udel]'), role = e.target.closest('[data-urole]'), pass = e.target.closest('[data-upass]');
+$('#usersTbl').addEventListener('click', async (e) => {
+  const ed = e.target.closest('[data-uedit]'), dis = e.target.closest('[data-udis]'), del = e.target.closest('[data-udel]');
+  const id = (ed || dis || del || {}).dataset; if (!id) return;
+  const u = USERS.find((x) => x.id === (id.uedit || id.udis || id.udel)); if (!u) return;
+  if (ed) {
+    let patch = null;
+    const ok = await modal(`<h3>✏️ ${esc(u.display_name || u.email)}</h3>
+      <label>שם לתצוגה</label><input type="text" id="mName" value="${esc(u.display_name || '')}">
+      <label>תפקיד</label><select id="mRole" ${u.id === ME.id ? 'disabled' : ''}><option value="user" ${u.role === 'user' ? 'selected' : ''}>משתמש רגיל</option><option value="admin" ${u.role === 'admin' ? 'selected' : ''}>מנהל (רואה הכול ומנהל משתמשים)</option></select>
+      <label>מה מותר לו לעשות</label>
+      <div class="perm-grid">${Object.entries(PERM_NAMES).map(([k, n]) => `<label><input type="checkbox" class="chk" data-perm="${k}" ${!(u.perms && u.perms[k] === false) ? 'checked' : ''}> ${n}</label>`).join('')}</div>
+      <label>הגבלת דקות תמלול בחודש (ריק = בלי הגבלה)</label><input type="number" id="mLimit" min="0" value="${u.minutes_limit ?? ''}" style="width:140px">
+      <label>סיסמה חדשה (לא חובה, לפחות 6 תווים)</label><input type="password" id="mPass" autocomplete="new-password">`,
+    { okText: 'שמירה', wide: true, onOk: (bg) => {
+      const perms = {}; $$('[data-perm]', bg).forEach((c) => { perms[c.dataset.perm] = c.checked; });
+      const lim = bg.querySelector('#mLimit').value.trim();
+      const pass = bg.querySelector('#mPass').value;
+      if (pass && pass.length < 6) { toast('הסיסמה קצרה מדי (לפחות 6 תווים)'); return false; }
+      patch = { id: u.id, display_name: bg.querySelector('#mName').value.trim() || u.display_name, perms, minutes_limit: lim === '' ? null : Math.max(0, +lim) };
+      if (u.id !== ME.id) patch.role = bg.querySelector('#mRole').value;
+      if (pass) patch.password = pass;
+    } });
+    if (!ok || !patch) return;
+    try { await api('admin-update-user', patch, { timeout: 30000 }); toast('נשמר ✓'); } catch (err) { toast('❌ ' + err.message, 6000); }
+    return renderUsers();
+  }
+  if (dis) {
+    const to = !u.disabled;
+    if (to && !(await confirmBox(`להשבית את ${u.display_name || u.email}? הוא ינותק ולא יוכל להיכנס עד שתפעיל אותו מחדש. ההקלטות שלו נשמרות.`, 'כן, להשבית'))) return;
+    try { await api('admin-update-user', { id: u.id, disabled: to }, { timeout: 30000 }); toast(to ? 'המשתמש הושבת' : 'המשתמש הופעל ✓'); } catch (err) { toast('❌ ' + err.message, 6000); }
+    return renderUsers();
+  }
   if (del) {
-    const u = Auth.users().find((x) => x.id === del.dataset.udel); if (!u || u.id === me.id) return;
-    if (!(await confirmBox(`למחוק את המשתמש "${u.username}"? ההקלטות שלו לא יימחקו – הן יעברו אליך.`))) return;
-    Auth.saveUsers(Auth.users().filter((x) => x.id !== u.id));
-    for (const r of await DB.all('recs')) if (r.owner === u.id) { r.owner = me.id; await DB.put('recs', r); }
-    toast(`המשתמש "${u.username}" נמחק`); renderUsers();
-  } else if (role) {
-    const u = Auth.users().find((x) => x.id === role.dataset.urole); if (!u || u.id === me.id) return;
-    u.role = u.role === 'admin' ? 'user' : 'admin'; Auth.update(u);
-    toast(`${u.username} עכשיו ${u.role === 'admin' ? 'מנהל' : 'משתמש רגיל'}`); renderUsers();
-  } else if (pass) {
-    const u = Auth.users().find((x) => x.id === pass.dataset.upass); if (!u) return;
-    let val = '';
-    const ok = await modal(`<h3>סיסמה חדשה ל-${esc(u.username)}</h3><label for="mPass">סיסמה חדשה (לפחות 4 תווים)</label><input type="password" id="mPass" autocomplete="new-password">`,
-      { okText: 'שמירה', onOk: (bg) => { val = bg.querySelector('#mPass').value; } });
-    if (!ok) return;
-    if (!val) return toast('לא הוזנה סיסמה – לא נשמר');
-    u.salt = uid(); u.hash = await hashPass(val, u.salt); Auth.update(u);
-    toast(`הסיסמה של ${u.username} עודכנה ✓`);
+    if (!(await confirmBox(`למחוק לצמיתות את המשתמש ${u.display_name || u.email}? ההקלטות והתיקיות שלו לא יימחקו – הן יעברו אליך.`))) return;
+    try { await api('admin-delete-user', { id: u.id }, { timeout: 30000 }); toast('המשתמש נמחק'); await loadRecs(); } catch (err) { toast('❌ ' + err.message, 6000); }
+    return renderUsers();
   }
 });
-
-$('#showKeyBtn').onclick = () => { const i = $('#groqKey'); i.type = i.type === 'password' ? 'text' : 'password'; };
-$('#saveGroqBtn').onclick = () => {
-  saveSettings({ groqKey: $('#groqKey').value.trim(), whisperModel: $('#whisperModel').value, defLang: $('#defLang').value });
-  $('#langSel').value = setting('defLang'); syncLangPills(); chatModelCache = null; updateKeyWarn();
-  $('#groqMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
-};
-$('#showGemBtn').onclick = () => { const i = $('#geminiKey'); i.type = i.type === 'password' ? 'text' : 'password'; };
-$('#saveGemBtn').onclick = () => {
-  saveSettings({ geminiKey: $('#geminiKey').value.trim(), yiEngine: $('#yiEngine').value, otherEngine: $('#otherEngine').value });
-  gemModelCache = null; updateKeyWarn();
-  $('#gemMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
-};
-$('#testGemBtn').onclick = async () => {
-  saveSettings({ geminiKey: $('#geminiKey').value.trim() }); gemModelCache = null;
-  $('#gemMsg').innerHTML = '<span class="spinner"></span>';
-  try { const m = await pickGeminiModel(); $('#gemMsg').innerHTML = `<span class="ok-text">החיבור תקין ✓</span> <span class="hint">מודל: ${esc(m)}</span>`; }
-  catch (err) { $('#gemMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+$('#inviteForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = (t, ok) => $('#nuMsg').innerHTML = `<span class="${ok ? 'ok-text' : 'err-text'}">${esc(t)}</span>`;
+  const name = $('#nuName').value.trim(), email = $('#nuEmail').value.trim().toLowerCase(), pass = $('#nuPass').value;
+  if (!name) return msg('יש להזין שם');
+  if (!validEmail(email)) return msg('כתובת המייל לא תקינה');
+  if (pass && pass.length < 6) return msg('סיסמה – לפחות 6 תווים (או להשאיר ריק)');
+  $('#nuMsg').innerHTML = '<span class="spinner"></span>';
+  try {
+    await api('admin-invite', { name, email, role: $('#nuRole').value, password: pass || undefined, sendInvite: $('#nuSend').checked }, { timeout: 30000 });
+    ['nuName', 'nuEmail', 'nuPass'].forEach((i) => $('#' + i).value = ''); $('#nuRole').value = 'user';
+    msg(`${name} נוסף ✓${$('#nuSend').checked ? ' ונשלח אליו מייל הזמנה' : ''}`, true);
+    renderUsers(); loadPeople();
+  } catch (err) { msg(err.message); }
+});
+/* ---- login log ---- */
+async function renderLog() {
+  $('#logTbl').innerHTML = '<tr><td><span class="spinner"></span></td></tr>';
+  const { data, error } = await sb.from('login_log').select('*').order('created_at', { ascending: false }).limit(200);
+  if (error) { $('#logTbl').innerHTML = `<tr><td class="err-text">${esc(error.message)}</td></tr>`; return; }
+  const dev = (ua) => { ua = ua || ''; const os = /Android/i.test(ua) ? 'אנדרואיד' : /iPhone|iPad/i.test(ua) ? 'אייפון' : /Windows/i.test(ua) ? 'Windows' : /Mac/i.test(ua) ? 'Mac' : /Linux/i.test(ua) ? 'Linux' : ''; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : ''; return [os, br].filter(Boolean).join(' · '); };
+  $('#logTbl').innerHTML = '<tr><th>מתי</th><th>מי</th><th>איך</th><th>מכשיר</th></tr>' + (data.length ? data.map((l) => `<tr><td>${fmtDate(l.created_at)}</td><td>${esc(personName(l.user_id) || l.email)}<div class="muted" dir="ltr" style="font-size:.85em;text-align:end">${esc(l.email || '')}</div></td><td>${esc(l.method || '')}</td><td class="muted">${esc(dev(l.user_agent))}</td></tr>`).join('') : '<tr><td colspan="4" class="muted">אין עדיין כניסות</td></tr>');
+}
+$('#logRefresh').onclick = renderLog;
+/* ---- system ---- */
+async function renderSystem() {
+  $('#whisperModel').value = S('whisper_model', 'whisper-large-v3');
+  $('#defLang').value = S('def_lang', 'he');
+  $('#yiEngine').value = S('yi_engine', 'gemini');
+  $('#otherEngine').value = S('other_engine', 'groq');
+  $('#keysStatus').innerHTML = '<span class="spinner"></span>';
+  try {
+    const k = await api('admin-keys-status', {}, { timeout: 20000 });
+    const row = (ok, name, hint) => `<div><span class="status-dot ${ok ? 'ok' : 'bad'}"></span><b>${name}</b> – ${ok ? 'מחובר' : `<span class="err-text">חסר מפתח</span> <span class="hint">${hint}</span>`}</div>`;
+    $('#keysStatus').innerHTML = row(k.groq, 'Groq (תמלול עברית/אנגלית, סיכום, תרגום)', 'GROQ_API_KEY') + row(k.gemini, 'Gemini (יידיש)', 'GEMINI_API_KEY') + row(k.email, 'EmailJS (שליחת קודים ומיילים)', 'EMAILJS_PRIVATE_KEY');
+  } catch (err) { $('#keysStatus').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+}
+async function setSetting(key, value) { const { error } = await sb.from('app_settings').upsert({ key, value }); dbErr(error); SETTINGS[key] = value; }
+$('#saveEnginesBtn').onclick = async () => {
+  try {
+    await setSetting('whisper_model', $('#whisperModel').value); await setSetting('def_lang', $('#defLang').value);
+    await setSetting('yi_engine', $('#yiEngine').value); await setSetting('other_engine', $('#otherEngine').value);
+    $('#engMsg').innerHTML = '<span class="ok-text">נשמר ✓ (חל על כל המשתמשים)</span>';
+  } catch (err) { $('#engMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
 };
 $('#testGroqBtn').onclick = async () => {
-  saveSettings({ groqKey: $('#groqKey').value.trim() }); updateKeyWarn();
-  $('#groqMsg').innerHTML = '<span class="spinner"></span>';
+  $('#sysMsg').innerHTML = '<span class="spinner"></span>';
+  try { chatModelCache = null; const { pick, ids } = await pickChatModel(); $('#sysMsg').innerHTML = `<span class="ok-text">Groq תקין ✓</span> <span class="hint">מודל: ${esc(pick)}${ids.includes(S('whisper_model', 'whisper-large-v3')) ? '' : ' · ⚠️ מודל התמלול לא ברשימה'}</span>`; }
+  catch (err) { $('#sysMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+};
+$('#testGemBtn').onclick = async () => {
+  $('#sysMsg').innerHTML = '<span class="spinner"></span>';
+  try { gemModelCache = null; const m = (await geminiModels())[0]; $('#sysMsg').innerHTML = `<span class="ok-text">Gemini תקין ✓</span> <span class="hint">מודל: ${esc(m)}</span>`; }
+  catch (err) { $('#sysMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+};
+$('#testMailBtn').onclick = async () => {
+  $('#sysMsg').innerHTML = '<span class="spinner"></span>';
+  try { await api('admin-test-email', {}, { timeout: 30000 }); $('#sysMsg').innerHTML = `<span class="ok-text">נשלח ✓ בדוק את ${esc(ME.email)}</span>`; }
+  catch (err) { $('#sysMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+};
+/* ---- security ---- */
+function renderSecurity() { $('#idleMin').value = +S('idle_minutes', 30) || 0; $('#weeklyChk').checked = S('weekly_report', true) !== false; }
+$('#saveSecBtn').onclick = async () => {
   try {
-    chatModelCache = null;
-    const { pick, ids } = await pickChatModel();
-    const hasW = ids.includes(setting('whisperModel'));
-    $('#groqMsg').innerHTML = `<span class="ok-text">החיבור תקין ✓</span> <span class="hint">מודל סיכום: ${esc(pick)}${hasW ? '' : ' · ⚠️ מודל התמלול לא ברשימה'}</span>`;
-  } catch (err) { $('#groqMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+    await setSetting('idle_minutes', Math.max(0, Math.min(1440, +$('#idleMin').value || 0)));
+    await setSetting('weekly_report', $('#weeklyChk').checked);
+    LS.set('idleMinCache', +S('idle_minutes', 0) || 0);
+    $('#secMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
+  } catch (err) { $('#secMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
 };
-$('#saveAccBtn').onclick = async () => {
-  const a = Auth.user(); const em = $('#accEmail').value.trim(), old = $('#accOld').value, nw = $('#accNew').value;
-  if (!/^\S+@\S+\.\S+$/.test(em)) { $('#accMsg').innerHTML = '<span class="err-text">מייל לא תקין</span>'; return; }
-  a.email = em;
-  if (nw) {
-    if ((await hashPass(old, a.salt)) !== a.hash) { $('#accMsg').innerHTML = '<span class="err-text">הסיסמה הנוכחית שגויה</span>'; return; }
-
-    a.salt = uid(); a.hash = await hashPass(nw, a.salt);
+$('#weeklyNowBtn').onclick = async () => {
+  $('#secMsg').innerHTML = '<span class="spinner"></span>';
+  try { await api('admin-weekly-now', {}, { timeout: 60000 }); $('#secMsg').innerHTML = `<span class="ok-text">הדו"ח נשלח ✓ בדוק את ${esc(ME.email)}</span>`; }
+  catch (err) { $('#secMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
+};
+/* ---- dictionary ---- */
+async function renderDict() {
+  await loadDict();
+  $('#dictList').innerHTML = DICT.length ? DICT.map((d) => `<span class="tag" style="font-size:.95em">${esc(d.term)} <button data-deldict="${d.id}" title="מחיקה">✕</button></span>`).join('') : '<p class="muted">המילון ריק.</p>';
+}
+$('#dictForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const terms = $('#dictInput').value.split(/[,،\n]+/).map((t) => t.trim()).filter(Boolean);
+  if (!terms.length) return;
+  const { error } = await sb.from('dictionary').upsert(terms.map((term) => ({ term })), { onConflict: 'term', ignoreDuplicates: true });
+  if (error) return toast('❌ ' + error.message, 5000);
+  $('#dictInput').value = ''; toast(`נוספו ${terms.length} מונחים ✓`); renderDict();
+});
+$('#dictList').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-deldict]'); if (!b) return;
+  const { error } = await sb.from('dictionary').delete().eq('id', b.dataset.deldict);
+  if (error) return toast('❌ ' + error.message); renderDict();
+});
+/* ---- trash ---- */
+let TRASH = [];
+async function renderTrash() {
+  $('#trashList').innerHTML = '<span class="spinner"></span>';
+  const { data, error } = await sb.from('recordings').select('id,owner,title,duration,created_at,deleted_at,file_path').not('deleted_at', 'is', null).order('deleted_at', { ascending: false });
+  if (error) { $('#trashList').innerHTML = `<p class="err-text">${esc(error.message)}</p>`; return; }
+  TRASH = data;
+  $('#trashList').innerHTML = data.length ? data.map((r) => {
+    const left = Math.max(0, 30 - Math.floor((Date.now() - new Date(r.deleted_at).getTime()) / 864e5));
+    return `<div class="user-row"><div class="grow"><b>${esc(r.title)}</b><div class="muted" style="font-size:.86em">👤 ${esc(personName(r.owner))} · ${fmtTime(r.duration)} · נמחק ${fmtDate(r.deleted_at)} · יימחק לצמיתות בעוד ${left} ימים</div></div>
+      <button class="btn small" data-restore="${r.id}">♻️ שחזור</button><button class="btn small danger" data-purge="${r.id}">מחיקה לצמיתות</button></div>`;
+  }).join('') : '<p class="muted">סל המחזור ריק.</p>';
+}
+$('#trashList').addEventListener('click', async (e) => {
+  const rs = e.target.closest('[data-restore]'), pg = e.target.closest('[data-purge]');
+  if (rs) { const { error } = await sb.rpc('restore_recordings', { ids: [rs.dataset.restore] }); if (error) return toast('❌ ' + error.message); toast('שוחזר ✓'); await loadRecs(); return renderTrash(); }
+  if (pg) {
+    const r = TRASH.find((x) => x.id === pg.dataset.purge);
+    if (!(await confirmBox(`למחוק לצמיתות את "${r ? r.title : ''}"? אי אפשר יהיה לשחזר.`, 'כן, למחוק לצמיתות'))) return;
+    try { await api('admin-purge', { ids: [pg.dataset.purge] }); toast('נמחק לצמיתות'); } catch (err) { toast('❌ ' + err.message, 5000); }
+    renderTrash();
   }
-  Auth.update(a); $('#accOld').value = ''; $('#accNew').value = '';
-  $('#accMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
+});
+$('#emptyTrash').onclick = async () => {
+  if (!TRASH.length) return toast('הסל כבר ריק');
+  if (!(await confirmBox(`למחוק לצמיתות את כל ${TRASH.length} ההקלטות שבסל? אי אפשר יהיה לשחזר.`, 'כן, לרוקן'))) return;
+  try { const r = await api('admin-purge', { ids: TRASH.map((x) => x.id) }, { timeout: 60000 }); toast(`נמחקו ${r.purged} הקלטות`); } catch (err) { toast('❌ ' + err.message, 5000); }
+  renderTrash();
 };
-$('#saveGBtn').onclick = () => { saveSettings({ googleClientId: $('#gClientId').value.trim() }); $('#gMsg').innerHTML = '<span class="ok-text">נשמר ✓ (הכפתור יופיע במסך הכניסה)</span>'; };
-$('#saveEjBtn').onclick = () => {
-  saveSettings({ emailjsService: $('#ejService').value.trim(), emailjsTemplate: $('#ejTemplate').value.trim(), emailjsKey: $('#ejKey').value.trim() });
-  $('#ejMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
+/* ---- data / backup / migration ---- */
+async function renderData() {
+  try {
+    if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#storageInfo').textContent = `זיכרון מקומי בדפדפן: ${(e.usage / 1048576).toFixed(1)} MB`; }
+  } catch (e) {}
+  const old = await oldLocalData().catch(() => null);
+  $('#importOldBtn').disabled = !old || !old.recs.length;
+  $('#importMsg').innerHTML = old && old.recs.length ? `<span class="hint">נמצאו בדפדפן הזה ${old.recs.length} הקלטות מהגרסה הקודמת${LS.get('importedOld', []).length ? ` (${LS.get('importedOld', []).length} כבר הועברו)` : ''}</span>` : '<span class="hint">לא נמצאו בדפדפן הזה הקלטות מהגרסה הקודמת</span>';
+}
+function oldLocalData() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('tamlul-plus');
+    r.onupgradeneeded = () => { r.transaction.abort(); };
+    r.onerror = () => res(null);
+    r.onsuccess = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains('recs')) { db.close(); return res(null); }
+      const t = db.transaction(['recs', 'folders'], 'readonly'); const out = {};
+      t.objectStore('recs').getAll().onsuccess = (e) => { out.recs = e.target.result; };
+      t.objectStore('folders').getAll().onsuccess = (e) => { out.folders = e.target.result; };
+      t.oncomplete = () => { out.db = db; res(out); }; t.onerror = () => rej(t.error);
+    };
+  });
+}
+function oldAudio(db, id) { return new Promise((res) => { try { const q = db.transaction('audio', 'readonly').objectStore('audio').get(id); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }); }
+$('#importOldBtn').onclick = async () => {
+  const old = await oldLocalData(); if (!old) return;
+  const done = new Set(LS.get('importedOld', []));
+  const todo = old.recs.filter((r) => !done.has(r.id) && r.status === 'done');
+  if (!todo.length) return toast('כל ההקלטות כבר הועברו ✓');
+  if (!(await confirmBox(`להעביר ${todo.length} הקלטות מהדפדפן הזה לענן?`, 'כן, להעביר'))) return;
+  const fmap = {};
+  for (const f of old.folders || []) {
+    let cf = FOLDERS.find((x) => x.name === f.name && x.owner === ME.id);
+    if (!cf) { const { data } = await sb.from('folders').insert({ name: f.name, owner: ME.id }).select().single(); cf = data; }
+    if (cf) fmap[f.id] = cf.id;
+  }
+  let n = 0;
+  for (const r of todo) {
+    $('#importMsg').innerHTML = `<span class="spinner"></span> מעביר ${n + 1}/${todo.length}: ${esc(r.title)}`;
+    try {
+      const id = uuid(); let path = null;
+      const blob = await oldAudio(old.db, r.id);
+      if (blob && blob.size <= STORAGE_MAX) {
+        const ext = guessExt(blob, r.fileName); path = `${ME.id}/${id}.${ext}`;
+        const { error: ue } = await sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true });
+        if (ue) path = null;
+      }
+      const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: r.title, file_name: r.fileName, file_path: path, mime: r.mime, size: r.size, lang: r.lang || 'he', yi_out: r.yiOut || null, out_lang: r.outLang || null,
+        status: 'done', duration: r.duration || 0, text: r.text || '', segments: r.segments || [], summary: r.summary || null, translations: r.translations || {}, tags: r.tags || [], folder_id: fmap[r.folderId] || null,
+        edited: !!r.edited, peaks: r.peaks || null, created_at: new Date(r.createdAt || Date.now()).toISOString() });
+      dbErr(error);
+      done.add(r.id); LS.set('importedOld', [...done]); n++;
+    } catch (err) { console.warn('import failed', r.title, err); }
+  }
+  old.db.close();
+  $('#importMsg').innerHTML = `<span class="ok-text">הועברו ${n} הקלטות לענן ✓</span>`;
+  await Promise.all([loadRecs(), loadFolders()]); fillUpFolder();
 };
-$('#testEjBtn').onclick = async () => {
-  $('#ejMsg').innerHTML = '<span class="spinner"></span>';
-  try { await sendEmail(Auth.user().email, 'בדיקה – תמלול פלוס', 'זהו מייל בדיקה מ"תמלול פלוס". אם קיבלת אותו – שליחת המיילים עובדת ✅'); $('#ejMsg').innerHTML = '<span class="ok-text">נשלח ✓ בדוק את תיבת הדואר</span>'; }
-  catch (err) { $('#ejMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
-};
-$('#backupBtn').onclick = async () => {
-  const recs = (await myRecs()).map((r) => Object.assign({}, r, { peaks: undefined }));
-  const data = { app: 'tamlul-plus', version: APP_VERSION, exported: new Date().toISOString(), folders: await DB.all('folders'), recs };
+$('#backupBtn').onclick = (e) => runExport(e.currentTarget, async () => {
+  const all = [];
+  for (let from = 0; ; from += 500) {
+    const { data, error } = await sb.from('recordings').select('*').is('deleted_at', null).range(from, from + 499);
+    dbErr(error); all.push(...data.map((r) => Object.assign({}, r, { peaks: undefined }))); if (data.length < 500) break;
+  }
+  const data = { app: 'tamlul-plus', version: APP_VERSION, cloud: true, exported: new Date().toISOString(), folders: FOLDERS, recordings: all, dictionary: DICT };
   download(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }), `tamlul-plus-backup-${new Date().toISOString().slice(0, 10)}.json`);
-};
+});
 $('#restoreBtn').onclick = () => $('#restoreInput').click();
 $('#restoreInput').onchange = async (e) => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try {
     const data = JSON.parse(await f.text());
-    if (data.app !== 'tamlul-plus') throw new Error('זה לא קובץ גיבוי של תמלול');
-    for (const fo of data.folders || []) await DB.put('folders', fo);
+    if (data.app !== 'tamlul-plus') throw new Error('זה לא קובץ גיבוי של תמלול פלוס');
+    const rows = data.recordings || (data.recs || []).map((r) => ({ title: r.title, file_name: r.fileName, lang: r.lang, status: 'done', duration: r.duration, text: r.text, segments: r.segments, summary: r.summary, translations: r.translations, tags: r.tags, created_at: new Date(r.createdAt || Date.now()).toISOString(), _old: r.id }));
+    const have = new Set(recsList().map((r) => r.title + '|' + r.createdAt));
     let n = 0;
-    for (const r of data.recs || []) { if (!(await DB.get('recs', r.id))) { if (r.status !== 'done') r.status = r.text ? 'done' : 'error'; await DB.put('recs', r); n++; } }
-    toast(`שוחזרו ${n} הקלטות`);
+    for (const r of rows) {
+      if (have.has(r.title + '|' + new Date(r.created_at).getTime())) continue;
+      const { error } = await sb.from('recordings').insert({ id: uuid(), owner: ME.id, title: r.title, file_name: r.file_name, lang: r.lang || 'he', status: r.status === 'error' ? 'error' : 'done', duration: r.duration || 0, text: r.text || '', segments: r.segments || [], summary: r.summary || null, translations: r.translations || {}, tags: r.tags || [], created_at: r.created_at, error: r.error || null });
+      if (!error) n++;
+    }
+    toast(`יובאו ${n} הקלטות (בלי קובצי שמע)`); await loadRecs();
   } catch (err) { toast('❌ ' + err.message, 5000); }
 };
-function updateKeyWarn() {
-  $('#noKeyWarn').classList.toggle('hidden', !!groqKey());
-  if (!Auth.isAdmin()) $('#noKeyWarn').innerHTML = '⚠️ עדיין לא הוגדר מפתח Groq במכשיר הזה. בקש מהמנהל להיכנס להגדרות ולהדביק את המפתח.';
+
+/* =========================================================
+   MY ACCOUNT (every user)
+   ========================================================= */
+$('#whoami').onclick = async () => {
+  let res = null;
+  const ok = await modal(`<h3>👤 החשבון שלי</h3>
+    <div class="muted" dir="ltr" style="text-align:end">${esc(ME.email)}</div>
+    <div class="muted">${isAdmin() ? 'מנהל' : 'משתמש רגיל'}${ME.minutes_limit != null ? ` · מכסה: ${ME.minutes_limit} דקות בחודש` : ''}</div>
+    <label>שם לתצוגה</label><input type="text" id="aName" value="${esc(ME.display_name || '')}">
+    <label>סיסמה חדשה (לא חובה, לפחות 6 תווים)</label><input type="password" id="aPass" autocomplete="new-password">
+    <div class="hint" style="margin-top:1em"><b>📲 התקנה בטלפון:</b> אנדרואיד – תפריט ⋮ ← "התקנת אפליקציה". אייפון – כפתור השיתוף ← "הוסף למסך הבית". אחרי ההתקנה אפשר לשתף הודעה קולית מוואטסאפ ישר ל"תמלול פלוס".</div>
+    <div class="hint">⌨️ קיצורי מקלדת: לחץ <span class="kbd">?</span> בכל מקום. · גרסה ${APP_VERSION}</div>`,
+  { okText: 'שמירה', onOk: (bg) => { res = { name: bg.querySelector('#aName').value.trim(), pass: bg.querySelector('#aPass').value }; if (res.pass && res.pass.length < 6) { toast('הסיסמה קצרה מדי (לפחות 6 תווים)'); return false; } } });
+  if (!ok || !res) return;
+  try {
+    if (res.name && res.name !== ME.display_name) { const { error } = await sb.rpc('touch_me', { p_name: res.name }); dbErr(error); ME.display_name = res.name; PEOPLE[ME.id] = res.name; setHello(); }
+    if (res.pass) { const { error } = await sb.auth.updateUser({ password: res.pass }); if (error) throw error; }
+    toast('נשמר ✓');
+  } catch (err) { toast('❌ ' + authError(err), 6000); }
+};
+function setHello() {
+  const n = ME.display_name || ME.email.split('@')[0];
+  $('#heroHello').textContent = `שלום ${n} 👋`;
+  $('#whoami').textContent = '👤 ' + n;
+}
+
+/* =========================================================
+   PUBLIC VIEWER (?view=token)
+   ========================================================= */
+async function showViewer(token) {
+  $('#viewer').classList.remove('hidden');
+  $('#vTitle').textContent = 'טוען…';
+  try {
+    const r = await api('share-view', { token }, { timeout: 30000 });
+    document.title = r.title + ' – תמלול פלוס';
+    $('#vTitle').textContent = r.title;
+    $('#vMeta').textContent = fmtDate(r.created_at) + ' · ' + fmtTime(r.duration) + ' · ' + (LANGS[r.lang] || '');
+    $('#vExp').textContent = r.share_expires ? 'הקישור בתוקף עד ' + fmtDate(r.share_expires) : '';
+    if (r.audio) $('#vPlayer').src = r.audio; else $('#vPlayer').classList.add('hidden');
+    if (r.summary) { $('#vSummary').classList.remove('hidden'); $('#vSummary').innerHTML = '<b>✨ סיכום</b>\n' + esc(r.summary); }
+    $('#vTranslations').innerHTML = Object.entries(r.translations || {}).map(([k, v]) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]}</div>${esc(v)}</div>`).join('');
+    const segs = r.segments || [];
+    $('#vTranscript').innerHTML = segs.length ? segs.map((s, i) => `<span class="seg" data-vseg="${i}"><span class="seg-time">${fmtTime(s.start)}</span>${esc(s.text)}</span> `).join('') : esc(r.text || '').replace(/\n/g, '<br>');
+    $('#vTranscript').onclick = (e) => { const s = e.target.closest('[data-vseg]'); if (!s || !r.audio) return; const p = $('#vPlayer'); p.currentTime = segs[+s.dataset.vseg].start + 0.01; p.play().catch(() => {}); };
+  } catch (err) { $('#vTitle').textContent = '⚠️ ' + err.message; }
 }
 
 /* =========================================================
@@ -2005,7 +2471,6 @@ $('#installBtn').onclick = async () => {
   }
 };
 if (isIOS() && !isStandalone()) $('#installBtn').classList.remove('hidden');
-
 async function pickUpShared() {
   if (!('caches' in window)) return;
   try {
@@ -2020,14 +2485,11 @@ async function pickUpShared() {
       files.push(new File([blob], name, { type: blob.type }));
       await cache.delete(k);
     }
-    if (files.length) { $('#langSel').value = setting('defLang'); addFiles(files); go('home'); }
+    if (files.length) { addFiles(files); go('home'); }
   } catch (e) { console.warn(e); }
   if (location.search.includes('share=')) history.replaceState(null, '', location.pathname);
 }
-
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW registration failed', e));
-}
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW registration failed', e));
 
 /* =========================================================
    BOOT
@@ -2037,22 +2499,38 @@ async function enterApp() {
   $('#auth').classList.add('hidden'); $('#app').classList.remove('hidden');
   if (entered) return;
   entered = true;
-  document.body.classList.toggle('is-admin', Auth.isAdmin());
-  $('#heroHello').textContent = `שלום ${(Auth.current() || {}).display || ''} 👋`;
-  syncLangPills();
-  $('#whoami').textContent = '👤 ' + ((Auth.current() || {}).display || (Auth.current() || {}).username);
   applyTheme();
-  $('#langSel').value = setting('defLang');
-  updateKeyWarn();
-  await DB.open();
-  await Queue.resume();
-  await renderQueue();
+  setHello();
+  applyPerms();
+  $('#recList').innerHTML = '<div class="card muted"><span class="spinner"></span> טוען…</div>';
+  try {
+    await Promise.all([loadSettings(), loadFolders(), loadPeople(), loadDict()]);
+    await loadRecs();
+  } catch (err) { toast('❌ טעינת הנתונים נכשלה: ' + err.message, 8000); }
+  LS.set('idleMinCache', +S('idle_minutes', 0) || 0);
+  $('#langSel').value = LS.get('lastLang', S('def_lang', 'he'));
+  $('#sortSel').value = LS.get('sort', 'new');
+  syncLangPills(); fillUpFolder();
+  sb.rpc('touch_me', {}).then(() => {}, () => {});
+  Idle.start();
+  Queue.resume();
+  renderQueue();
   await pickUpShared();
-  if (!groqKey() && Auth.isAdmin()) go('settings');
+  if (currentPage === 'library') renderLibrary();
 }
-(function boot() {
+sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && entered) location.reload(); });
+window.addEventListener('focus', async () => { if (!entered || !ME) return; Idle.check(); try { await loadRecs(); if (currentPage === 'library') renderLibrary(); } catch (e) {} });
+(async function boot() {
   applyTheme();
-  if (Auth.loggedIn()) enterApp(); else showAuth();
+  const view = new URLSearchParams(location.search).get('view');
+  if (view) return showViewer(view);
+  const msg = LS.get('logoutMsg', null); if (msg) LS.del('logoutMsg');
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) {
+    const min = +LS.get('idleMinCache', 0) || 0, last = LS.get('lastAct', 0) || 0;
+    if (min && last && Date.now() - last > min * 60000) { await sb.auth.signOut(); return showAuth(`נותקת אוטומטית אחרי ${min} דקות בלי פעילות. היכנס שוב.`); }
+    if (await loadMe()) enterApp();
+  } else showAuth(msg);
 })();
 </script>
 </body>
