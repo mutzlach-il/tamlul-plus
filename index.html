@@ -195,6 +195,17 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 /* ===== v2.0 cloud ===== */
 .chk{width:18px!important;height:18px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
 .rec-card.sel{border-color:var(--primary);background:var(--primary-soft)}
+.heb-line{color:var(--primary);font-size:.86em;font-weight:600}
+.kind{display:inline-block;background:var(--primary-soft);color:var(--primary);border-radius:6px;padding:0 .45em;font-size:.82em;font-weight:700;margin-inline-start:.3em}
+.group-head{font-weight:800;font-size:1.05em;margin:1em 0 .5em;padding:.35em .7em;border-radius:10px;background:var(--primary-soft);color:var(--primary)}
+.parsha-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.8em}
+.parsha-grid button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:.3em .7em;font-weight:600;color:var(--text)}
+.parsha-grid button.has{border-color:var(--primary);color:var(--primary)}
+.parsha-grid button.empty{opacity:.45}
+.parsha-grid button b{font-size:.8em;margin-inline-start:.35em;background:var(--primary);color:#fff;border-radius:999px;padding:0 .45em}
+.book-title{font-weight:800;margin:.6em 0 .3em}
+.heb-row{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;margin-top:.6em}
+.heb-row input,.heb-row select{width:auto}
 .bulkbar{position:sticky;top:64px;z-index:15;display:flex;gap:.5em;align-items:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--primary);border-radius:14px;padding:.6em .9em;margin-bottom:12px;box-shadow:var(--shadow)}
 .star{border:none;background:none;font-size:1.15em;padding:0 .15em;opacity:.35;line-height:1}
 .star.on{opacity:1}
@@ -314,10 +325,17 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="lang-pills" id="langPills">
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
-        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em">
+        <div class="lang-pills hidden" id="yiOutPills" style="display:none!important;margin-inline-start:.4em">
           <button data-yiout="yi">📜 כתיבה ביידיש</button><button data-yiout="he">🇮🇱 ישר לעברית</button><button data-yiout="both">📜+🇮🇱 גם וגם</button>
         </div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> זיהוי דוברים</label>
+      </div>
+      <div class="row" style="margin-bottom:14px">
+        <span style="font-weight:700">הטקסט ייכתב ב:</span>
+        <div class="lang-pills" id="outPills">
+          <button data-out="same">🎙️ שפת ההקלטה</button><button data-out="he">🇮🇱 עברית</button><button data-out="yi">📜 יידיש</button><button data-out="en">🇺🇸 אנגלית</button>
+        </div>
+        <label class="row hidden" id="keepSrcWrap" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="keepSrcChk" style="width:auto"> לשמור גם את התמלול בשפת המקור</label>
         <select id="langSel" class="hidden">
           <option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option>
         </select>
@@ -372,7 +390,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <div class="row" style="margin-bottom:12px">
             <label class="row" style="margin:0;gap:.3em;font-weight:500" title="בחירת הכל"><input type="checkbox" class="chk" id="selAll"></label>
             <input type="search" id="searchBox" placeholder="🔍 חיפוש בתמלולים, שמות ותגיות… (מקש /)" class="grow" style="width:auto">
-            <select id="sortSel" style="width:auto"><option value="new">החדשות קודם</option><option value="old">הישנות קודם</option><option value="name">לפי שם</option><option value="long">הארוכות קודם</option></select>
+            <select id="sortSel" style="width:auto"><option value="new">החדשות קודם</option><option value="heb">לפי תאריך עברי (שבוע ופרשה)</option><option value="old">הישנות קודם</option><option value="name">לפי שם</option><option value="long">הארוכות קודם</option></select>
             <button class="btn small" id="refreshBtn" title="רענון">🔄</button>
           </div>
           <div class="bulkbar hidden" id="bulkBar">
@@ -406,6 +424,16 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <select id="dFolder" style="width:auto"></select>
           <span class="grow"></span>
           <span class="pill-note hidden" id="dShared"></span>
+        </div>
+        <div class="heb-row">
+          <label style="margin:0">📅 תאריך ההקלטה:</label>
+          <input type="date" id="dDate">
+          <span class="heb-line" id="dHeb"></span>
+          <label style="margin:0">פרשה:</label>
+          <select id="dParsha"></select>
+          <label style="margin:0">סוג:</label>
+          <input type="text" id="dKind" list="kindList" placeholder="תורה / שיחה…" style="width:130px">
+          <datalist id="kindList"><option value="תורה"><option value="שיחה"><option value="שיעור"><option value="טיש"><option value="דרשה"><option value="מכתב"></datalist>
         </div>
         <div class="row" style="margin-top:.6em">
           <label style="margin:0">תגיות:</label>
@@ -571,11 +599,161 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 <div id="toast"></div>
 <div id="modalRoot"></div>
 <script>
+/* ---------------- לוח עברי: תאריך, פרשה (מנהג ארץ ישראל), מועדים ---------------- */
+const HEB = (() => {
+  const EPOCH = -1373427;
+  const leap = (y) => ((7 * y + 1) % 19) < 7;
+  const elapsed = (y) => {
+    const m = Math.floor((235 * y - 234) / 19), parts = 12084 + 13753 * m, d = 29 * m + Math.floor(parts / 25920);
+    return ((3 * (d + 1)) % 7) < 3 ? d + 1 : d;
+  };
+  const corr = (y) => { const a = elapsed(y - 1), b = elapsed(y), c = elapsed(y + 1); return c - b === 356 ? 2 : b - a === 382 ? 1 : 0; };
+  const nyCache = new Map();
+  const newYear = (y) => { if (!nyCache.has(y)) nyCache.set(y, EPOCH + elapsed(y) + corr(y)); return nyCache.get(y); };
+  const yearDays = (y) => newYear(y + 1) - newYear(y);
+  const lastMonth = (y) => (leap(y) ? 13 : 12);
+  const monthDays = (m, y) => {
+    if ([2, 4, 6, 10, 13].includes(m)) return 29;
+    if (m === 12 && !leap(y)) return 29;
+    if (m === 8 && ![355, 385].includes(yearDays(y))) return 29;
+    if (m === 9 && [353, 383].includes(yearDays(y))) return 29;
+    return 30;
+  };
+  // חודשים: ניסן=1 ... אדר=12, אדר ב=13, תשרי=7
+  const toRD = (y, m, d) => {
+    let rd = newYear(y) + d - 1;
+    if (m < 7) { for (let i = 7; i <= lastMonth(y); i++) rd += monthDays(i, y); for (let i = 1; i < m; i++) rd += monthDays(i, y); }
+    else for (let i = 7; i < m; i++) rd += monthDays(i, y);
+    return rd;
+  };
+  const fromRD = (rd) => {
+    let y = Math.floor((rd - EPOCH) / (35975351 / 98496));
+    while (newYear(y + 1) <= rd) y++;
+    while (newYear(y) > rd) y--;
+    let m = rd < toRD(y, 1, 1) ? 7 : 1;
+    while (rd > toRD(y, m, monthDays(m, y))) m++;
+    return { y, m, d: rd - toRD(y, m, 1) + 1 };
+  };
+  // תאריך לועזי (שנה, חודש, יום) <-> RD
+  const gToRD = (Y, M, D) => Math.floor(Date.UTC(Y, M - 1, D) / 86400000) + 719163;
+  const rdToG = (rd) => { const t = new Date((rd - 719163) * 86400000); return { Y: t.getUTCFullYear(), M: t.getUTCMonth() + 1, D: t.getUTCDate() }; };
+  const dow = (rd) => ((rd % 7) + 7) % 7; // 0 = ראשון, 6 = שבת
+
+  const GEM = [[400, 'ת'], [300, 'ש'], [200, 'ר'], [100, 'ק'], [90, 'צ'], [80, 'פ'], [70, 'ע'], [60, 'ס'], [50, 'נ'], [40, 'מ'], [30, 'ל'], [20, 'כ'], [10, 'י'], [9, 'ט'], [8, 'ח'], [7, 'ז'], [6, 'ו'], [5, 'ה'], [4, 'ד'], [3, 'ג'], [2, 'ב'], [1, 'א']];
+  const gematria = (n) => {
+    let s = '';
+    n = n % 1000;
+    for (const [v, l] of GEM) while (n >= v) { if (n === 15 || n === 16) { s += n === 15 ? 'טו' : 'טז'; n = 0; break; } s += l; n -= v; }
+    return s.length > 1 ? s.slice(0, -1) + '״' + s.slice(-1) : s + '׳';
+  };
+  const yearName = (y) => gematria(y);
+  const MONTHS = { 1: 'ניסן', 2: 'אייר', 3: 'סיון', 4: 'תמוז', 5: 'אב', 6: 'אלול', 7: 'תשרי', 8: 'חשון', 9: 'כסלו', 10: 'טבת', 11: 'שבט', 12: 'אדר', 13: 'אדר ב׳' };
+  const monthName = (m, y) => (m === 12 && leap(y) ? 'אדר א׳' : MONTHS[m]);
+
+  const PARSHIOT = ['בראשית', 'נח', 'לך לך', 'וירא', 'חיי שרה', 'תולדות', 'ויצא', 'וישלח', 'וישב', 'מקץ', 'ויגש', 'ויחי',
+    'שמות', 'וארא', 'בא', 'בשלח', 'יתרו', 'משפטים', 'תרומה', 'תצוה', 'כי תשא', 'ויקהל', 'פקודי',
+    'ויקרא', 'צו', 'שמיני', 'תזריע', 'מצורע', 'אחרי מות', 'קדושים', 'אמור', 'בהר', 'בחוקותי',
+    'במדבר', 'נשא', 'בהעלותך', 'שלח', 'קרח', 'חוקת', 'בלק', 'פינחס', 'מטות', 'מסעי',
+    'דברים', 'ואתחנן', 'עקב', 'ראה', 'שופטים', 'כי תצא', 'כי תבוא', 'נצבים', 'וילך', 'האזינו', 'וזאת הברכה'];
+  const BOOKS = [['בראשית', 0, 12], ['שמות', 12, 23], ['ויקרא', 23, 33], ['במדבר', 33, 43], ['דברים', 43, 54]];
+  const P = (name) => PARSHIOT.indexOf(name);
+  const PAIRS = { VP: [P('ויקהל'), P('פקודי')], TM: [P('תזריע'), P('מצורע')], AK: [P('אחרי מות'), P('קדושים')], BB: [P('בהר'), P('בחוקותי')], CB: [P('חוקת'), P('בלק')], MM: [P('מטות'), P('מסעי')], NV: [P('נצבים'), P('וילך')] };
+
+  // מועדים שבהם אין קריאת פרשה בשבת (ארץ ישראל)
+  const noParsha = (y, m, d) => (m === 7 && (d === 1 || d === 2 || d === 10 || (d >= 15 && d <= 22))) || (m === 1 && d >= 15 && d <= 21) || (m === 3 && d === 6);
+  const holidayOf = (y, m, d) => {
+    const adar = leap(y) ? 13 : 12;
+    if (m === 7) { if (d <= 2) return 'ראש השנה'; if (d === 10) return 'יום כיפור'; if (d >= 15 && d <= 21) return 'סוכות'; if (d === 22) return 'שמחת תורה'; }
+    if (m === 1 && d >= 15 && d <= 21) return 'פסח';
+    if (m === 3 && d === 6) return 'שבועות';
+    if (m === 2 && d === 18) return 'ל״ג בעומר';
+    if (m === 11 && d === 15) return 'ט״ו בשבט';
+    if (m === adar && (d === 14 || d === 15)) return 'פורים';
+    if (m === 5 && (d === 9 || (d === 10 && dow(toRD(y, 5, 9)) === 6))) return 'תשעה באב';
+    const chan = toRD(y, 9, 25), rd = toRD(y, m, d);
+    if (rd >= chan && rd < chan + 8) return 'חנוכה';
+    return '';
+  };
+
+  // לוח פרשיות לשנה עברית: מפה RD של שבת -> שם הפרשה (או המועד)
+  const schedCache = new Map();
+  function schedule(y) {
+    if (schedCache.has(y)) return schedCache.get(y);
+    const map = new Map();
+    const sats = (from, to) => { const out = []; let r = from + ((6 - dow(from) + 7) % 7); for (; r <= to; r += 7) out.push(r); return out; };
+    const free = (r) => { const h = fromRD(r); return !noParsha(h.y, h.m, h.d); };
+    const ny = newYear(y), nny = newYear(y + 1);
+    // שבתות תשרי לפני סוכות (האזינו ואולי וילך)
+    const tishreiSats = sats(ny, toRD(y, 7, 14)).filter(free);
+    const prevNVsplit = tishreiSats.length === 2;
+    if (prevNVsplit) { map.set(tishreiSats[0], 'וילך'); map.set(tishreiSats[1], 'האזינו'); } else if (tishreiSats.length) map.set(tishreiSats[0], 'האזינו');
+    // האם בשנה הבאה וילך נקרא בנפרד (=> נצבים לבד בסוף השנה)
+    const nextTishrei = sats(nny, toRD(y + 1, 7, 14)).filter((r) => { const h = fromRD(r); return !noParsha(h.y, h.m, h.d); });
+    const nvSplitNext = nextTishrei.length === 2;
+    const lastSatBefore = (rd) => rd - 1 - ((dow(rd - 1) - 6 + 7) % 7);
+    const satOnOrBefore = (rd) => rd - ((dow(rd) - 6 + 7) % 7);
+    const fill = (fromRD_, toRD_, first, last, pairOrder) => {
+      const slots = sats(fromRD_, toRD_).filter(free);
+      let list = []; for (let i = first; i <= last; i++) list.push([i]);
+      let need = list.length - slots.length;
+      for (const key of pairOrder) {
+        if (need <= 0) break;
+        const [a, b] = PAIRS[key];
+        const ia = list.findIndex((g) => g.length === 1 && g[0] === a), ib = list.findIndex((g) => g.length === 1 && g[0] === b);
+        if (ia >= 0 && ib === ia + 1) { list.splice(ia, 2, [a, b]); need--; }
+      }
+      slots.forEach((r, i) => { if (list[i]) map.set(r, list[i].map((x) => PARSHIOT[x]).join('-')); });
+    };
+    const bereshit = toRD(y, 7, 23);
+    const pesach = toRD(y, 1, 15), shavuot = toRD(y, 3, 6), av9 = toRD(y, 5, 9);
+    const devarimSat = satOnOrBefore(av9);
+    if (!leap(y)) {
+      fill(bereshit, lastSatBefore(pesach), P('בראשית'), P('צו'), ['VP']);
+      fill(lastSatBefore(pesach) + 1, devarimSat, P('שמיני'), P('דברים'), ['TM', 'AK', 'MM', 'BB', 'CB']);
+    } else {
+      fill(bereshit, devarimSat, P('בראשית'), P('דברים'), ['MM', 'BB', 'AK', 'TM', 'CB']);
+    }
+    fill(devarimSat + 1, nny - 1, P('ואתחנן'), nvSplitNext ? P('נצבים') : P('וילך'), nvSplitNext ? [] : ['NV']);
+    // שבתות של מועד
+    sats(ny, nny - 1).forEach((r) => { if (!map.has(r)) { const h = fromRD(r); const hol = holidayOf(h.y, h.m, h.d); if (hol) map.set(r, hol); } });
+    schedCache.set(y, map);
+    return map;
+  }
+  // פרשת השבוע לתאריך (השבת הקרובה, או השבת עצמה)
+  function parshaFor(rd) {
+    const sat = rd + ((6 - dow(rd) + 7) % 7);
+    const h = fromRD(sat);
+    return schedule(h.y).get(sat) || '';
+  }
+  function info(dateStr) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr || ''); if (!m) return null;
+    const rd = gToRD(+m[1], +m[2], +m[3]);
+    const h = fromRD(rd);
+    const parsha = parshaFor(rd);
+    const holiday = holidayOf(h.y, h.m, h.d);
+    // שייכות לשנה: לפי שנת השבת של הפרשה
+    const sat = rd + ((6 - dow(rd) + 7) % 7);
+    const py = fromRD(sat).y;
+    return {
+      rd, y: h.y, m: h.m, d: h.d, dow: dow(rd),
+      yearName: yearName(h.y), parshaYear: py, parshaYearName: yearName(py),
+      text: `${gematria(h.d)} ${monthName(h.m, h.y)} ${yearName(h.y)}`,
+      monthName: monthName(h.m, h.y), parsha, holiday
+    };
+  }
+  const parshaBook = (name) => { const first = (name || '').split('-')[0]; const i = PARSHIOT.indexOf(first); if (i < 0) return 'מועדים'; const b = BOOKS.find(([, s, e]) => i >= s && i < e); return b ? b[0] : 'מועדים'; };
+  const parshaOrder = (name) => { const i = PARSHIOT.indexOf((name || '').split('-')[0]); return i < 0 ? 100 + ['ראש השנה', 'יום כיפור', 'סוכות', 'שמחת תורה', 'חנוכה', 'ט״ו בשבט', 'פורים', 'פסח', 'ל״ג בעומר', 'שבועות', 'תשעה באב'].indexOf(name) : i; };
+  const todayStr = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
+  return { info, schedule, parshaFor, gToRD, rdToG, fromRD, toRD, yearName, gematria, PARSHIOT, BOOKS, parshaBook, parshaOrder, todayStr, leap };
+})();
+
+</script>
+<script>
 'use strict';
 /* =========================================================
    תמלול פלוס 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '2.0.1';
+const APP_VERSION = '2.1.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -695,13 +873,13 @@ function dbErr(error) { if (error) { const e = new Error(error.message || String
 /* ---------------- records ---------------- */
 const RECS = new Map();
 let FOLDERS = [];
-const COLS = { title: 'title', fileName: 'file_name', filePath: 'file_path', mime: 'mime', size: 'size', lang: 'lang', yiOut: 'yi_out', outLang: 'out_lang', status: 'status', progress: 'progress', error: 'error', duration: 'duration', text: 'text', segments: 'segments', summary: 'summary', translations: 'translations', tags: 'tags', folderId: 'folder_id', starred: 'starred', edited: 'edited', peaks: 'peaks', shareToken: 'share_token', shareExpires: 'share_expires' };
-const LIST_COLS = 'id,owner,title,file_name,file_path,mime,size,lang,yi_out,out_lang,status,progress,error,duration,text,summary,translations,tags,folder_id,starred,edited,share_token,share_expires,created_at,updated_at,deleted_at';
+const COLS = { title: 'title', fileName: 'file_name', filePath: 'file_path', mime: 'mime', size: 'size', lang: 'lang', yiOut: 'yi_out', outLang: 'out_lang', status: 'status', progress: 'progress', error: 'error', duration: 'duration', text: 'text', segments: 'segments', summary: 'summary', translations: 'translations', tags: 'tags', folderId: 'folder_id', starred: 'starred', edited: 'edited', peaks: 'peaks', shareToken: 'share_token', shareExpires: 'share_expires', meta: 'meta' };
+const LIST_COLS = 'id,owner,title,file_name,file_path,mime,size,lang,yi_out,out_lang,status,progress,error,duration,text,summary,translations,tags,folder_id,starred,edited,share_token,share_expires,meta,created_at,updated_at,deleted_at';
 function fromRow(r, prev) {
   const o = prev || {};
   Object.assign(o, { id: r.id, owner: r.owner, createdAt: new Date(r.created_at).getTime(), updatedAt: r.updated_at ? new Date(r.updated_at).getTime() : 0, deletedAt: r.deleted_at });
   for (const [k, c] of Object.entries(COLS)) if (c in r) o[k] = r[c];
-  o.tags = o.tags || []; o.translations = o.translations || {}; o.text = o.text || ''; o.duration = o.duration || 0;
+  o.tags = o.tags || []; o.translations = o.translations || {}; o.text = o.text || ''; o.duration = o.duration || 0; o.meta = o.meta || {};
   if (!('segments' in r) && !o.segments) o.segments = null;
   return o;
 }
@@ -727,6 +905,37 @@ async function fullRec(id) {
   return fromRow(data, RECS.get(id) || (RECS.set(id, {}), RECS.get(id)));
 }
 const recsList = () => [...RECS.values()].filter((r) => !r.deletedAt);
+/* ---------------- תאריך עברי להקלטה ---------------- */
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function dateFromFile(file) {
+  const n = (file && file.name) || '';
+  const m = n.match(/(20\d{2})[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  if (file && file.lastModified && file.lastModified > 946684800000) return ymd(new Date(file.lastModified));
+  return ymd(new Date());
+}
+const recDate = (r) => (r.meta && r.meta.date) || ymd(new Date(r.createdAt || Date.now()));
+const HEB_CACHE = new Map();
+function hebOf(r) {
+  const d = recDate(r), key = d + '|' + ((r.meta && r.meta.parsha) || '');
+  if (!HEB_CACHE.has(key)) {
+    const i = HEB.info(d);
+    if (i && r.meta && r.meta.parsha) i.parsha = r.meta.parsha;
+    HEB_CACHE.set(key, i);
+  }
+  return HEB_CACHE.get(key);
+}
+const noQ = (s) => (s || '').replace(/["'״׳]/g, '');
+function hebLine(r) {
+  const h = hebOf(r); if (!h) return '';
+  const p = h.parsha ? (HEB.PARSHIOT.includes(h.parsha.split('-')[0]) ? 'פרשת ' + h.parsha : h.parsha) : '';
+  return `📅 ${h.text}${p ? ' · ' + p : ''}${h.holiday && h.holiday !== h.parsha ? ' · ' + h.holiday : ''}`;
+}
+function hebHay(r) {
+  const h = hebOf(r); if (!h) return '';
+  return [h.text, noQ(h.text), 'פרשת ' + h.parsha, h.parsha, (h.parsha || '').replace('-', ' '), h.holiday, h.yearName, noQ(h.yearName), h.parshaYearName, noQ(h.parshaYearName), h.monthName, r.meta && r.meta.kind].filter(Boolean).join(' ');
+}
+const inParsha = (r, name) => { const h = hebOf(r); return !!h && (((h.parsha || '').split('-').includes(name)) || h.holiday === name); };
 async function loadFolders() { const { data, error } = await sb.from('folders').select('*'); dbErr(error); FOLDERS = data.sort((a, b) => a.name.localeCompare(b.name, 'he')); }
 async function loadPeople() {
   PEOPLE = {};
@@ -1063,7 +1272,7 @@ function speechFrames(audio, frame = 0.1) {
   const sorted = Array.from(rms).sort((a, b) => a - b);
   const q = (p) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))] || 0;
   const thr = Math.max(q(0.2) * 2.5, q(0.95) * 0.12, 0.004);
-  return { frame, speech: Array.from(rms, (v) => v > thr) };
+  return { frame, rms, thr, speech: Array.from(rms, (v) => v > thr) };
 }
 function findGaps(audio, segs) {
   const { frame, speech } = speechFrames(audio);
@@ -1120,8 +1329,44 @@ async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
   try { onProgress && onProgress('בודק שלא חסר כלום…'); return await fillGaps(res, blob, lang, onProgress, opts); }
   catch (e) { console.warn('gap check failed', e); return res; }
 }
+/* Whisper בחלקים קצרים (עד 30 שניות, חיתוך בשקט) – מונע דילוג על קטעים */
+function cleanSegs(r, off = 0) {
+  let segs = (r.segments || []).filter((x) => !(x.no_speech_prob > 0.6 && x.avg_logprob < -1)).map((x) => ({ start: x.start + off, end: x.end + off, text: (x.text || '').trim() })).filter((x) => x.text);
+  if (!segs.length && r.text && r.text.trim() && !(r.segments || []).length) segs = [{ start: off, end: off + (r.duration || 0), text: r.text.trim() }];
+  return segs;
+}
+async function whisperChunked(audio, lang, onProgress) {
+  const total = audio.duration, { frame, rms, speech } = speechFrames(audio);
+  const chunks = []; let st = 0;
+  while (st < total - 0.3) {
+    if (total - st <= 30) { chunks.push([st, total]); break; }
+    const a = Math.floor((st + 18) / frame), b = Math.min(rms.length - 1, Math.floor((st + 28) / frame));
+    let best = a; for (let i = a; i <= b; i++) if (rms[i] < rms[best]) best = i;
+    const cut = (best + 0.5) * frame; chunks.push([st, cut]); st = cut;
+  }
+  const hasSpeech = ([a, b]) => { let n = 0; for (let i = Math.floor(a / frame); i < Math.min(speech.length, Math.ceil(b / frame)); i++) if (speech[i]) n++; return n * frame >= 0.4; };
+  const results = new Array(chunks.length); let done = 0, next = 0;
+  const worker = async () => {
+    while (next < chunks.length) {
+      const i = next++, [a, b] = chunks[i];
+      if (hasSpeech(chunks[i])) {
+        const wav = encodeWav(await resampleMono16k(audio, a, b));
+        const r = await whisper(wav, 'audio.wav', lang, b - a);
+        results[i] = { segs: cleanSegs(r, a), language: r.language };
+      } else results[i] = { segs: [] };
+      done++; onProgress && onProgress(chunks.length > 1 ? `מתמלל ${done}/${chunks.length}…` : 'מתמלל…');
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  const segs = results.flatMap((x) => x.segs);
+  const language = (results.find((x) => x.language) || {}).language || lang;
+  return { text: segs.map((x) => x.text).join(' '), segments: segs, duration: total, language };
+}
 async function transcribeRaw(blob, name, lang, onProgress, opts = {}) {
   if (engineFor(lang) === 'gemini') return geminiTranscribe(blob, name, lang, onProgress, opts);
+  let decoded = null;
+  try { onProgress && onProgress('מכין את הקובץ…'); decoded = await decodeAudio(blob); } catch (e) { decoded = null; }
+  if (decoded && decoded.duration) return whisperChunked(decoded, lang, onProgress);
   const ext = guessExt(blob, name);
   if (blob.size <= MAX_DIRECT) {
     try {
@@ -1357,7 +1602,7 @@ async function autoTitle(text) {
     { role: 'user', content: `תן כותרת קצרה וברורה להקלטה לפי התמלול:\n"""${text.slice(0, 3000)}"""` }], { maxTokens: 300, temperature: 0.2 });
   return out.split('\n')[0].replace(/^["'״׳«»\s]+|["'״׳«»\s.]+$/g, '').replace(/^כותרת\s*:\s*/, '').slice(0, 80);
 }
-const LANG_EN = { he: 'Hebrew', yi: 'Yiddish (in Hebrew letters, standard YIVO spelling)', en: 'English' };
+const LANG_EN = { he: 'Hebrew', yi: 'Hasidic Yiddish written in Hebrew letters the way it is written in Hasidic newspapers and books (not YIVO spelling), without nikud, keeping Hebrew/Aramaic words in their traditional spelling', en: 'English' };
 function splitText(text, max = 5000) {
   const parts = []; let cur = '';
   for (const sent of text.split(/(?<=[.!?։\n])\s+/)) {
@@ -1378,6 +1623,20 @@ async function translateText(text, target, onProgress) {
   }
   return out.join('\n').trim();
 }
+async function translateSegments(res, target) {
+  const segs = res.segments || [];
+  if (!segs.length) {
+    const t = await geminiTranslateText(res.text, target).catch(() => translateText(res.text, target));
+    return Object.assign({}, res, { text: t, segments: [] });
+  }
+  const lines = segs.map((s) => `[${fmtTime(s.start)}] ${s.text}`).join('\n');
+  let t;
+  try { t = await geminiTranslateText(lines, target); } catch (e) { t = await translateText(lines, target); }
+  let out = parseTimedLines(t, res.duration || (segs.length ? segs[segs.length - 1].end : 0));
+  if (out.length < Math.max(1, segs.length * 0.5)) return Object.assign({}, res, { text: t.replace(/^\[?\d{1,2}:\d{2}(?::\d{2})?\]?\s*/gm, ''), segments: [] });
+  return Object.assign({}, res, { segments: out, text: out.map((s) => s.text).join(' ') });
+}
+const LANGS_ALL = Object.assign({ src: 'שפת המקור' }, LANGS);
 const looksDefaultTitle = (r) => !r.title || r.title === (r.fileName || '').replace(/\.[^.]+$/, '') || /^(הקלטה|recording|AUD|PTT|WhatsApp|audio|VID|voice|\d)/i.test(r.title);
 
 /* =========================================================
@@ -1392,9 +1651,10 @@ const Queue = {
     const ext = guessExt(blob, name);
     const rec = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
-      lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: $('#upFolder').value || null, tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null
+      lang, yiOut: null, createdAt: Date.now(), duration: 0, folderId: $('#upFolder').value || null, tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
+      meta: { date: dateFromFile(blob), out: LS.get('outLang', 'same'), keep: LS.get('keepSrc', true) }
     };
-    const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued' });
+    const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: null, folder_id: rec.folderId, status: 'queued', meta: rec.meta });
     dbErr(error);
     RECS.set(id, rec);
     await Cache.put(id, blob);
@@ -1435,11 +1695,25 @@ const Queue = {
           await saveRec(rec, ['status', 'error']).catch(() => {});
           let seconds = rec.duration || 0;
           if (!seconds) { try { seconds = (await decodeAudio(blob)).duration; } catch (e) {} }
-          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' ? 'he' : undefined, speakers: LS.get('speakers', true), seconds };
-          const res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
+          const meta = rec.meta || {};
+          let want = meta.out || (rec.yiOut === 'he' ? 'he' : 'same');
+          if (want === rec.lang) want = 'same';
+          const keep = meta.keep !== false;
+          const direct = rec.lang === 'yi' && want === 'he' && !keep;   // Gemini מתרגם ישר מהשמע
+          const opts = { out: direct ? 'he' : undefined, speakers: LS.get('speakers', true), seconds };
+          let res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
+          const srcLang = rec.lang === 'auto' ? (({ hebrew: 'he', yiddish: 'yi', english: 'en', he: 'he', yi: 'yi', en: 'en' })[String(res.language || '').toLowerCase()] || 'auto') : rec.lang;
+          if (want !== 'same' && !direct && want !== srcLang && res.text) {
+            prog(`כותב ב${LANGS[want]}…`);
+            const orig = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
+            const tr = await translateSegments(res, want);
+            if (keep && srcLang !== 'auto') rec.translations = Object.assign({}, rec.translations, { [srcLang]: orig });
+            else if (keep) rec.translations = Object.assign({}, rec.translations, { src: orig });
+            res = tr;
+          }
           rec.text = res.text; rec.segments = res.segments; rec.duration = res.duration || seconds || rec.duration;
-          rec.outLang = opts.out || rec.lang; rec.edited = false;
-          if (rec.lang === 'yi' && rec.yiOut === 'both' && res.text && perm('translate')) {
+          rec.outLang = direct ? 'he' : (want !== 'same' ? want : rec.lang); rec.edited = false;
+          if (rec.lang === 'yi' && rec.yiOut === 'both' && !meta.out && res.text && perm('translate')) {
             prog('מתרגם לעברית…');
             try {
               const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
@@ -1523,6 +1797,14 @@ function syncLangPills() {
 }
 $('#yiOutPills').addEventListener('click', (e) => { const b = e.target.closest('[data-yiout]'); if (!b) return; LS.set('yiOut', b.dataset.yiout); syncLangPills(); });
 $('#speakersChk').addEventListener('change', () => LS.set('speakers', $('#speakersChk').checked));
+function syncOutPills() {
+  const o = LS.get('outLang', 'same');
+  $$('#outPills button').forEach((b) => b.classList.toggle('active', b.dataset.out === o));
+  $('#keepSrcWrap').classList.toggle('hidden', o === 'same');
+  $('#keepSrcChk').checked = LS.get('keepSrc', true);
+}
+$('#outPills').addEventListener('click', (e) => { const b = e.target.closest('[data-out]'); if (!b) return; LS.set('outLang', b.dataset.out); syncOutPills(); });
+$('#keepSrcChk').addEventListener('change', () => LS.set('keepSrc', $('#keepSrcChk').checked));
 $('#langPills').addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (!b) return; $('#langSel').value = b.dataset.lang; LS.set('lastLang', b.dataset.lang); syncLangPills(); });
 
 /* ---------------- Upload ---------------- */
@@ -1648,19 +1930,26 @@ function snippetFor(text, q) {
 }
 function currentList() {
   const q = $('#searchBox').value.trim();
-  let list = recsList().filter((r) => libFolder === 'all' ? true : libFolder === 'none' ? !r.folderId : libFolder === 'star' ? r.starred : libFolder === 'mine' ? r.owner === ME.id : r.folderId === libFolder);
+  let list = recsList().filter((r) => libFolder === 'all' || libFolder === 'heb' ? true : libFolder === 'none' ? !r.folderId : libFolder === 'star' ? r.starred : libFolder === 'mine' ? r.owner === ME.id : r.folderId === libFolder);
   if (q) {
     const ql = q.toLowerCase();
-    list = list.filter((r) => [r.title, r.text, r.summary, (r.tags || []).join(' '), Object.values(r.translations || {}).join(' ')].join(' ').toLowerCase().includes(ql));
+    const strict = /^פרשת\s+/.test(q);
+    const qn = noQ(ql).replace(/^פרשת\s+/, '').trim();
+    const pName = HEB.PARSHIOT.find((x) => noQ(x) === qn) || HOLIDAYS.find((x) => noQ(x) === qn);
+    list = list.filter((r) => (pName && inParsha(r, pName)) || (!strict && ([r.title, r.text, r.summary, (r.tags || []).join(' '), Object.values(r.translations || {}).join(' '), hebHay(r)].join(' ').toLowerCase().includes(ql) || noQ(hebHay(r)).toLowerCase().includes(noQ(ql)))));
+    if (pName) list.forEach((r) => { r._pm = inParsha(r, pName) ? 1 : 0; });
   }
+  if (libFolder === 'heb' && libParsha) list = list.filter((r) => inParsha(r, libParsha));
   const s = $('#sortSel').value;
-  list.sort(s === 'old' ? (a, b) => a.createdAt - b.createdAt : s === 'name' ? (a, b) => (a.title || '').localeCompare(b.title || '', 'he') : s === 'long' ? (a, b) => (b.duration || 0) - (a.duration || 0) : (a, b) => b.createdAt - a.createdAt);
+  const qp = q && (HEB.PARSHIOT.find((x) => noQ(x) === noQ(q).replace(/^פרשת\s+/, '').trim()) || HOLIDAYS.find((x) => noQ(x) === noQ(q).replace(/^פרשת\s+/, '').trim()));
+  if (qp) { list.sort((a, b) => (b._pm || 0) - (a._pm || 0) || ((hebOf(b) || {}).rd || 0) - ((hebOf(a) || {}).rd || 0)); return list; }
+  list.sort(s === 'heb' || libFolder === 'heb' ? (a, b) => (hebOf(b) ? hebOf(b).rd : 0) - (hebOf(a) ? hebOf(a).rd : 0) : s === 'old' ? (a, b) => a.createdAt - b.createdAt : s === 'name' ? (a, b) => (a.title || '').localeCompare(b.title || '', 'he') : s === 'long' ? (a, b) => (b.duration || 0) - (a.duration || 0) : (a, b) => b.createdAt - a.createdAt);
   return list;
 }
 function renderLibrary() {
   const recs = recsList();
-  const count = (fid) => recs.filter((r) => fid === 'all' ? true : fid === 'none' ? !r.folderId : fid === 'star' ? r.starred : fid === 'mine' ? r.owner === ME.id : r.folderId === fid).length;
-  const base = [['all', '📂 הכל'], ['star', '⭐ מסומנות'], ['none', '📄 ללא תיקייה']];
+  const count = (fid) => recs.filter((r) => fid === 'all' || fid === 'heb' ? true : fid === 'none' ? !r.folderId : fid === 'star' ? r.starred : fid === 'mine' ? r.owner === ME.id : r.folderId === fid).length;
+  const base = [['all', '📂 הכל'], ['heb', '📅 לוח עברי – לפי פרשה'], ['star', '⭐ מסומנות'], ['none', '📄 ללא תיקייה']];
   if (isAdmin()) base.splice(1, 0, ['mine', '👤 שלי בלבד']);
   $('#folderList').innerHTML = [...base, ...FOLDERS.map((f) => [f.id, (f.shared_with && f.shared_with.length ? '👥 ' : '📁 ') + f.name + (f.owner !== ME.id ? ` (${personName(f.owner) || 'משותף'})` : '')])].map(([id, name]) => {
     const f = FOLDERS.find((x) => x.id === id);
@@ -1670,7 +1959,18 @@ function renderLibrary() {
   const q = $('#searchBox').value.trim();
   const list = currentList();
   const showOwner = isAdmin() || FOLDERS.some((f) => f.owner !== ME.id || (f.shared_with || []).length);
-  $('#recList').innerHTML = list.length ? list.map((r) => `
+  if (libFolder === 'heb' && !libParsha && !q) { $('#recList').innerHTML = parshaIndex(recs); $('#selAll').checked = false; renderBulk(); return; }
+  const qn = noQ(q).replace(/^פרשת\s+/, '');
+  const grouped = libFolder === 'heb' || $('#sortSel').value === 'heb' || !!(HEB.PARSHIOT.find((x) => noQ(x) === qn) || HOLIDAYS.find((x) => noQ(x) === qn));
+  let lastGroup = null;
+  const groupHead = (r) => {
+    if (!grouped) return '';
+    const h = hebOf(r); const g = h ? `${h.parsha ? (HEB.PARSHIOT.includes(h.parsha.split('-')[0]) ? 'פרשת ' + h.parsha : h.parsha) : ''} ${h.parshaYearName}` : 'ללא תאריך';
+    if (g === lastGroup) return '';
+    lastGroup = g; return `<div class="group-head">📖 ${esc(g)}</div>`;
+  };
+  const back = libFolder === 'heb' && libParsha ? `<div class="row" style="margin-bottom:.6em"><button class="btn small" id="parshaBack">→ כל הפרשיות</button><b>${esc(HEB.PARSHIOT.includes(libParsha) ? 'פרשת ' + libParsha : libParsha)}</b><span class="muted">${list.length} הקלטות</span></div>` : '';
+  $('#recList').innerHTML = back + (list.length ? list.map((r) => groupHead(r) + `
     <div class="rec-card ${SEL.has(r.id) ? 'sel' : ''}" data-rec="${r.id}">
       <div class="row" style="flex-wrap:nowrap">
         <input type="checkbox" class="chk" data-sel="${r.id}" ${SEL.has(r.id) ? 'checked' : ''} title="בחירה">
@@ -1679,13 +1979,28 @@ function renderLibrary() {
         ${r.status === 'done' ? '' : r.status === 'error' ? '<span class="badge err">נכשל</span>' : '<span class="badge warn">בתור</span>'}
         ${r.shareToken ? '<span class="badge" title="יש קישור שיתוף פעיל">🔗</span>' : ''}
         <span class="badge">${LANGS[r.lang] || ''}</span></div>
+      <div class="heb-line">${esc(hebLine(r))}${r.meta && r.meta.kind ? `<span class="kind">${esc(r.meta.kind)}</span>` : ''}</div>
       <div class="muted" style="font-size:.85em">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)}${r.folderId && folderName(r.folderId) ? ' · 📁 ' + esc(folderName(r.folderId)) : ''}${showOwner && r.owner !== ME.id ? ' · 👤 ' + esc(personName(r.owner)) : ''}</div>
       <div>${(r.tags || []).map((t) => `<span class="tag">#${highlight(t, q)}</span>`).join('')}</div>
       <div class="snippet">${highlight(snippetFor(r.text || r.error || '', q), q)}</div>
-    </div>`).join('') : `<div class="card muted">${q ? 'לא נמצאו תוצאות לחיפוש.' : 'אין עדיין הקלטות כאן.'}</div>`;
+    </div>`).join('') : `<div class="card muted">${q ? 'לא נמצאו תוצאות לחיפוש.' : 'אין עדיין הקלטות כאן.'}</div>`);
   $('#selAll').checked = list.length > 0 && list.every((r) => SEL.has(r.id));
   renderBulk();
 }
+let libParsha = null;
+const HOLIDAYS = ['ראש השנה', 'יום כיפור', 'סוכות', 'שמחת תורה', 'חנוכה', 'ט״ו בשבט', 'פורים', 'פסח', 'ל״ג בעומר', 'שבועות', 'תשעה באב'];
+function parshaIndex(recs) {
+  const cnt = (name) => recs.filter((r) => inParsha(r, name)).length;
+  const btn = (name) => { const c = cnt(name); return `<button class="${c ? 'has' : 'empty'}" data-parsha="${esc(name)}">${esc(name)}${c ? `<b>${c}</b>` : ''}</button>`; };
+  return `<div class="card"><h3 style="margin-top:0">📅 לוח עברי – תורות ושיחות לפי פרשה</h3>
+    <p class="hint">לוחצים על פרשה ורואים את כל ההקלטות שלה מכל השנים, מסודרות לפי שנה (למשל בראשית תשפ״ז, בראשית תשפ״ח). אפשר גם לכתוב בחיפוש "בראשית" או "תשפ״ז". הפרשה נקבעת לפי תאריך ההקלטה (מנהג ארץ ישראל), ואפשר לשנות אותה בדף ההקלטה.</p>
+    ${HEB.BOOKS.map(([book, s, e]) => `<div class="book-title">${book}</div><div class="parsha-grid">${HEB.PARSHIOT.slice(s, e).map(btn).join('')}</div>`).join('')}
+    <div class="book-title">מועדים</div><div class="parsha-grid">${HOLIDAYS.map(btn).join('')}</div></div>`;
+}
+$('#recList').addEventListener('click', (e) => {
+  const p = e.target.closest('[data-parsha]'); if (p) { e.stopPropagation(); libParsha = p.dataset.parsha; renderLibrary(); return; }
+  if (e.target.closest('#parshaBack')) { e.stopPropagation(); libParsha = null; renderLibrary(); }
+}, true);
 function renderBulk() {
   [...SEL].forEach((id) => { if (!RECS.has(id)) SEL.delete(id); });
   $('#bulkBar').classList.toggle('hidden', !SEL.size);
@@ -1706,7 +2021,7 @@ $('#folderList').addEventListener('click', async (e) => {
   }
   const sh = e.target.closest('[data-sharefolder]');
   if (sh) return shareFolder(sh.dataset.sharefolder);
-  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; SEL.clear(); renderLibrary(); }
+  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; libParsha = null; SEL.clear(); renderLibrary(); }
 });
 async function shareFolder(id) {
   const f = FOLDERS.find((x) => x.id === id); if (!f) return;
@@ -1800,9 +2115,13 @@ const Detail = {
     $('#dFolder').disabled = !ce; $('#dTagInput').classList.toggle('hidden', !ce);
     $('#dOwner').textContent = rec.owner !== ME.id ? '👤 ' + (personName(rec.owner) || 'משתמש אחר') : '';
     $('#dOwner').classList.toggle('hidden', rec.owner === ME.id);
-    $('#dLang').textContent = (LANGS[rec.lang] || '') + (rec.lang === 'yi' && rec.outLang === 'he' ? ' ← עברית' : '');
+    $('#dLang').textContent = (LANGS[rec.lang] || '') + (rec.outLang && rec.outLang !== rec.lang && LANGS[rec.outLang] ? ' ← ' + LANGS[rec.outLang] : '');
     $('#dMeta').textContent = fmtDate(rec.createdAt) + ' · ' + fmtTime(rec.duration);
     $('#dFolder').innerHTML = folderOptions(rec.folderId);
+    rec.meta = rec.meta || {};
+    $('#dDate').value = recDate(rec); $('#dDate').disabled = !ce; $('#dParsha').disabled = !ce; $('#dKind').disabled = !ce;
+    $('#dKind').value = rec.meta.kind || '';
+    this.renderHeb();
     $$('#page-detail .toolbar > *').forEach((el) => {
       const pk = [...el.classList].find((c) => c.startsWith('perm-'));
       const hide = (pk && !perm(pk.slice(5))) || (el.classList.contains('can-edit') && !ce);
@@ -1842,6 +2161,12 @@ const Detail = {
       })();
     }
   },
+  renderHeb() {
+    const r = this.rec, auto = HEB.info(recDate(r));
+    $('#dHeb').textContent = hebLine(r).replace(/^📅 /, '');
+    const cur = (r.meta && r.meta.parsha) || '';
+    $('#dParsha').innerHTML = `<option value="">אוטומטי${auto && auto.parsha ? ' (' + esc(auto.parsha) + ')' : ''}</option>` + HEB.PARSHIOT.concat(HOLIDAYS).map((p) => `<option ${p === cur ? 'selected' : ''}>${esc(p)}</option>`).join('');
+  },
   renderShared() {
     const r = this.rec, el = $('#dShared');
     const active = r.shareToken && (!r.shareExpires || new Date(r.shareExpires) > new Date());
@@ -1858,7 +2183,7 @@ const Detail = {
   },
   renderTranslations() {
     const tr = this.rec.translations || {}, ce = this.canEdit();
-    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
+    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">${k === this.rec.lang || k === 'src' ? '🎙️ התמלול בשפת המקור (' + (LANGS_ALL[k] || k) + ')' : '🌐 תרגום ל' + (LANGS_ALL[k] || k)} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
   },
   renderTranscript() {
     const r = this.rec;
@@ -1884,6 +2209,14 @@ const Detail = {
 };
 $('#backToLib').onclick = () => go('library');
 $('#dTitle').addEventListener('change', async () => { Detail.rec.title = $('#dTitle').value.trim() || 'הקלטה'; await Detail.save(['title']); toast('השם נשמר'); });
+async function saveMeta(patch) {
+  const r = Detail.rec; r.meta = Object.assign({}, r.meta || {}, patch);
+  Object.keys(r.meta).forEach((k) => { if (r.meta[k] === '' || r.meta[k] === null) delete r.meta[k]; });
+  await Detail.save(['meta']); HEB_CACHE.clear(); Detail.renderHeb();
+}
+$('#dDate').addEventListener('change', async () => { if (!$('#dDate').value) return; await saveMeta({ date: $('#dDate').value }); toast('התאריך נשמר ✓'); });
+$('#dParsha').addEventListener('change', async () => { await saveMeta({ parsha: $('#dParsha').value }); toast('הפרשה נשמרה ✓'); });
+$('#dKind').addEventListener('change', async () => { await saveMeta({ kind: $('#dKind').value.trim() }); toast('נשמר ✓'); });
 $('#dFolder').addEventListener('change', async () => { Detail.rec.folderId = $('#dFolder').value || null; await Detail.save(['folderId']); toast('ההקלטה הועברה לתיקייה'); });
 $('#dTagInput').addEventListener('keydown', async (e) => {
   if (e.key !== 'Enter') return;
@@ -2014,6 +2347,16 @@ $('#saveEditBtn').onclick = async () => {
 $('#retryBtn').onclick = async () => {
   const r = Detail.rec;
   if (!(await Cache.get(r.id)) && !r.filePath) return toast('אין קובץ שמע שמור – אי אפשר לתמלל מחדש');
+  const cur = (r.meta && r.meta.out) || 'same';
+  let out = cur, keep = !(r.meta && r.meta.keep === false);
+  const ok = await modal(`<h3>🔄 תמלול מחדש</h3><p>שפת ההקלטה: <b>${esc(LANGS[r.lang] || '')}</b></p>
+    <label>הטקסט ייכתב ב:</label><select id="rtOut">${[['same', 'שפת ההקלטה'], ['he', 'עברית'], ['yi', 'יידיש'], ['en', 'אנגלית']].map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('')}</select>
+    <label class="row" style="margin-top:.6em;gap:.3em"><input type="checkbox" id="rtKeep" style="width:auto" ${keep ? 'checked' : ''}> לשמור גם את התמלול בשפת המקור</label>`,
+    { okText: 'לתמלל מחדש', onOk: (bg) => { out = $('#rtOut', bg).value; keep = $('#rtKeep', bg).checked; } });
+  if (!ok) return;
+  r.meta = Object.assign({}, r.meta || {}, { out, keep });
+  const l = RECS.get(r.id); if (l) l.meta = r.meta;
+  await saveRec(r, ['meta']).catch(() => {});
   await retryRec(Detail.id); toast('נשלח לתמלול מחדש'); go('home');
 };
 $('#delBtn').onclick = async () => {
@@ -2093,7 +2436,7 @@ async function exportXlsx(recs, fileName, asLibrary = false) {
   wb.Workbook = { Views: [{ RTL: true }] };
   if (!asLibrary) {
     const r = recs[0];
-    const data = [['שם', r.title], ['תאריך', fmtDate(r.createdAt)], ['משך', fmtTime(r.duration)], ['שפה', LANGS[r.lang] || ''], ['תגיות', (r.tags || []).join(', ')], [],
+    const data = [['שם', r.title], ['תאריך עברי', hebLine(r).replace(/^📅 /, '')], ['תאריך', fmtDate(r.createdAt)], ['משך', fmtTime(r.duration)], ['שפה', LANGS[r.lang] || ''], ['תגיות', (r.tags || []).join(', ')], [],
       ['התחלה', 'סוף', 'טקסט'], ...rowsFor(r)];
     if (r.summary) data.push([], ['סיכום', r.summary]);
     Object.entries(r.translations || {}).forEach(([k, v]) => data.push([], ['תרגום ל' + LANGS[k], v]));
@@ -2101,10 +2444,10 @@ async function exportXlsx(recs, fileName, asLibrary = false) {
     ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 100 }];
     XLSX.utils.book_append_sheet(wb, ws, 'תמלול');
   } else {
-    const data = [['שם', 'תאריך', 'משך', 'שפה', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
-      ...recs.map((r) => [r.title, fmtDate(r.createdAt), fmtTime(r.duration), LANGS[r.lang] || '', folderName(r.folderId), (r.tags || []).join(', '), personName(r.owner), r.text || '', r.summary || '', (r.translations || {}).he || ''])];
+    const data = [['שם', 'תאריך עברי', 'פרשה', 'סוג', 'תאריך', 'משך', 'שפה', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
+      ...recs.map((r) => [r.title, (hebOf(r) || {}).text || '', (hebOf(r) || {}).parsha || '', (r.meta && r.meta.kind) || '', recDate(r), fmtTime(r.duration), LANGS[r.lang] || '', folderName(r.folderId), (r.tags || []).join(', '), personName(r.owner), r.text || '', r.summary || '', (r.translations || {}).he || ''])];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 90 }, { wch: 60 }, { wch: 60 }];
+    ws['!cols'] = [{ wch: 28 }, { wch: 16 }, { wch: 14 }, { wch: 8 }, { wch: 12 }, { wch: 9 }, { wch: 9 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 90 }, { wch: 60 }, { wch: 60 }];
     XLSX.utils.book_append_sheet(wb, ws, 'ספרייה');
   }
   const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -2579,7 +2922,7 @@ async function enterApp() {
   LS.set('idleMinCache', +S('idle_minutes', 0) || 0);
   $('#langSel').value = LS.get('lastLang', S('def_lang', 'he'));
   $('#sortSel').value = LS.get('sort', 'new');
-  syncLangPills(); fillUpFolder();
+  syncLangPills(); syncOutPills(); fillUpFolder();
   sb.rpc('touch_me', {}).then(() => {}, () => {});
   Idle.start();
   Queue.resume();
