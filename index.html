@@ -575,7 +575,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 /* =========================================================
    תמלול פלוס 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -1051,7 +1051,76 @@ function engineFor(lang) {
   const e = lang === 'yi' ? S('yi_engine', 'gemini') : S('other_engine', 'groq');
   return e === 'gemini' ? 'gemini' : 'groq';
 }
+/* ---------- בדיקת כיסוי: מוצא קטעי דיבור שלא תומללו ומתמלל אותם שוב ---------- */
+function speechFrames(audio, frame = 0.1) {
+  const ch = audio.getChannelData(0), sr = audio.sampleRate, n = Math.floor(audio.duration / frame), step = Math.max(1, Math.floor(sr * frame / 400));
+  const rms = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const s = Math.floor(i * frame * sr), e = Math.min(ch.length, Math.floor((i + 1) * frame * sr));
+    let sum = 0, c = 0; for (let j = s; j < e; j += step) { sum += ch[j] * ch[j]; c++; }
+    rms[i] = c ? Math.sqrt(sum / c) : 0;
+  }
+  const sorted = Array.from(rms).sort((a, b) => a - b);
+  const q = (p) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))] || 0;
+  const thr = Math.max(q(0.2) * 2.5, q(0.95) * 0.12, 0.004);
+  return { frame, speech: Array.from(rms, (v) => v > thr) };
+}
+function findGaps(audio, segs) {
+  const { frame, speech } = speechFrames(audio);
+  const covered = new Uint8Array(speech.length);
+  (segs || []).forEach((s) => {
+    const txt = (s.text || '').replace(/^⚠️\s*/, '');
+    if (!txt || /^\[קטע/.test(txt)) return;
+    const effEnd = Math.min(s.end || s.start, s.start + 4 + txt.length * 0.15);
+    const a = Math.max(0, Math.floor((s.start - 0.6) / frame)), b = Math.min(speech.length, Math.ceil((Math.max(effEnd, s.start + 1) + 0.6) / frame));
+    for (let i = a; i < b; i++) covered[i] = 1;
+  });
+  const regions = []; let cur = null;
+  for (let i = 0; i < speech.length; i++) {
+    if (speech[i] && !covered[i]) {
+      if (cur && i - cur.last <= 15) { cur.last = i; cur.n++; }
+      else { if (cur) regions.push(cur); cur = { first: i, last: i, n: 1 }; }
+    }
+  }
+  if (cur) regions.push(cur);
+  const out = [];
+  regions.filter((r) => r.n * frame >= 1.5).forEach((r) => {
+    let a = Math.max(0, r.first * frame - 0.8); const b = Math.min(audio.duration, (r.last + 1) * frame + 0.8);
+    while (a < b - 0.5) { const e = Math.min(b, a + 100); out.push([a, e]); a = e; }
+  });
+  return out;
+}
+async function fillGaps(res, blob, lang, onProgress, opts = {}) {
+  let audio; try { audio = await decodeAudio(blob); } catch (e) { return res; }
+  if (!audio || !audio.duration) return res;
+  const gaps = findGaps(audio, res.segments);
+  if (!gaps.length) return res;
+  const segs = (res.segments || []).slice();
+  for (let g = 0; g < gaps.length; g++) {
+    const [a, b] = gaps[g];
+    onProgress && onProgress(`משלים קטע שחסר (${g + 1}/${gaps.length})…`);
+    const wav = encodeWav(await resampleMono16k(audio, a, b));
+    let add = [];
+    try {
+      if (engineFor(lang) === 'gemini') add = await geminiTranscribeOne(wav, 'audio/wav', lang, b - a, opts);
+      else { const r = await whisper(wav, 'audio.wav', lang, b - a); add = (r.segments || []).map((x) => ({ start: x.start, end: x.end, text: (x.text || '').trim() })); if (!add.length && r.text) add = [{ start: 0, end: b - a, text: r.text.trim() }]; }
+    } catch (err) {
+      console.warn('gap fill failed', err.message);
+      if (engineFor(lang) === 'gemini') { try { const r = await whisper(wav, 'audio.wav', lang, b - a); add = (r.segments || []).map((x) => ({ start: x.start, end: x.end, text: '⚠️ ' + (x.text || '').trim() })); } catch (e2) {} }
+    }
+    add = add.filter((x) => x.text && x.text.replace(/[\s.…,!?⚠️-]/g, ''));
+    if (!add.length) add = [{ start: 0, end: b - a, text: `[קטע שלא תומלל ${fmtTime(a)}–${fmtTime(b)} – אפשר ללחוץ "תמלול מחדש"]` }];
+    add.forEach((x) => segs.push({ start: Math.min(b, x.start + a), end: Math.min(b, x.end + a), text: x.text }));
+  }
+  segs.sort((x, y) => x.start - y.start);
+  return Object.assign({}, res, { segments: segs, text: segs.map((s) => s.text).join(' ') });
+}
 async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
+  const res = await transcribeRaw(blob, name, lang, onProgress, opts);
+  try { onProgress && onProgress('בודק שלא חסר כלום…'); return await fillGaps(res, blob, lang, onProgress, opts); }
+  catch (e) { console.warn('gap check failed', e); return res; }
+}
+async function transcribeRaw(blob, name, lang, onProgress, opts = {}) {
   if (engineFor(lang) === 'gemini') return geminiTranscribe(blob, name, lang, onProgress, opts);
   const ext = guessExt(blob, name);
   if (blob.size <= MAX_DIRECT) {
