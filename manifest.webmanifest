@@ -26,7 +26,7 @@
       "files": [
         {
           "name": "audio",
-          "accept": ["audio/*", "video/*", ".opus", ".ogg", ".oga", ".m4a", ".mp3", ".wav", ".aac", ".amr", ".webm", ".mp4", ".3gp"]
+          "accept": ["audio/*", "video/*", ".opus", ".ogg", ".oga", ".m4a", ".mp3", ".wav", ".aac", ".amr", ".webm", ".mp4", ".3gp", ".mov", ".mkv", ".avi", ".m4v"]
         }
       ]
     }

@@ -195,17 +195,6 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 /* ===== v2.0 cloud ===== */
 .chk{width:18px!important;height:18px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
 .rec-card.sel{border-color:var(--primary);background:var(--primary-soft)}
-.heb-line{color:var(--primary);font-size:.86em;font-weight:600}
-.kind{display:inline-block;background:var(--primary-soft);color:var(--primary);border-radius:6px;padding:0 .45em;font-size:.82em;font-weight:700;margin-inline-start:.3em}
-.group-head{font-weight:800;font-size:1.05em;margin:1em 0 .5em;padding:.35em .7em;border-radius:10px;background:var(--primary-soft);color:var(--primary)}
-.parsha-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.8em}
-.parsha-grid button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:.3em .7em;font-weight:600;color:var(--text)}
-.parsha-grid button.has{border-color:var(--primary);color:var(--primary)}
-.parsha-grid button.empty{opacity:.45}
-.parsha-grid button b{font-size:.8em;margin-inline-start:.35em;background:var(--primary);color:#fff;border-radius:999px;padding:0 .45em}
-.book-title{font-weight:800;margin:.6em 0 .3em}
-.heb-row{display:flex;flex-wrap:wrap;gap:.5em;align-items:center;margin-top:.6em}
-.heb-row input,.heb-row select{width:auto}
 .bulkbar{position:sticky;top:64px;z-index:15;display:flex;gap:.5em;align-items:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--primary);border-radius:14px;padding:.6em .9em;margin-bottom:12px;box-shadow:var(--shadow)}
 .star{border:none;background:none;font-size:1.15em;padding:0 .15em;opacity:.35;line-height:1}
 .star.on{opacity:1}
@@ -231,8 +220,69 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
 #viewer{max-width:900px;margin:0 auto;padding:16px}
 .speed{width:auto!important;padding:.25em .5em!important;font-size:.9em}
 .pill-note{font-size:.8em;background:var(--primary-soft);color:var(--primary);border-radius:999px;padding:.1em .6em}
+/* ===== v2.1 ===== */
+.metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.4em .8em;margin-top:.6em}
+.metagrid label{margin:.2em 0 .15em;font-size:.85em;color:var(--muted)}
+.metagrid input,.metagrid select{padding:.4em .6em}
+.hdate{color:var(--primary);font-weight:600}
+.filters{display:flex;gap:.4em;flex-wrap:wrap;margin-bottom:10px}
+.filters select{width:auto;padding:.3em .5em;font-size:.9em}
+.ai-bar{display:flex;gap:.35em;flex-wrap:wrap;margin:.4em 0;padding:.5em;border:1px dashed var(--line);border-radius:12px}
+.ai-out{border:1px solid var(--line);border-radius:12px;padding:.8em 1em;margin-top:.7em;white-space:pre-wrap;line-height:1.8;background:var(--card)}
+.ai-out .t-head{display:flex;gap:.5em;align-items:center;font-weight:700;margin-bottom:.3em;white-space:normal}
+.seg.hl{background:rgba(250,204,21,.35);border-radius:4px}
+.seg.found{outline:2px solid var(--warn)}
+.seg[contenteditable=true]{outline:2px solid var(--primary);background:var(--primary-soft)}
+.bm{display:flex;gap:.5em;align-items:center;padding:.3em 0;border-bottom:1px solid var(--line)}
+.bm:last-child{border-bottom:none}
+.fbar{display:flex;gap:.4em;align-items:center;flex-wrap:wrap;margin:.5em 0}
+.fbar input{width:auto}
+.transcript.big{font-size:1.35em;line-height:2.2}
+.transcript.huge{font-size:1.7em;line-height:2.3}
+.reading #page-detail .card > *:not(#dTranscript):not(.reading-keep){display:none!important}
+.reading header.top,.reading #miniPlayer{display:none!important}
+.reading #dTranscript{max-width:900px;margin:0 auto;font-size:1.6em;line-height:2.3}
+#readExit{position:fixed;top:12px;left:12px;z-index:70}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dh{font-weight:700;text-align:center;color:var(--muted);font-size:.9em;padding:.3em 0}
+.cal .day{min-height:92px;border:1px solid var(--line);border-radius:10px;padding:.3em .4em;background:var(--card);cursor:pointer;font-size:.85em;overflow:hidden}
+.cal .day.out{opacity:.4}
+.cal .day.today{border:2px solid var(--primary)}
+.cal .day .hd{font-weight:800;font-size:1.15em}
+.cal .day .gd{color:var(--muted);font-size:.8em}
+.cal .day .ev{color:var(--warn);font-size:.8em;line-height:1.3}
+.cal .day .pr{color:var(--primary);font-size:.8em;font-weight:600}
+.cal .day .cnt{display:inline-block;background:var(--primary);color:#fff;border-radius:999px;padding:0 .5em;font-size:.8em;margin-top:.2em}
+@media(max-width:700px){.cal .day{min-height:70px;font-size:.75em}}
+.parsha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.parsha-grid button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:.6em;text-align:start;display:flex;justify-content:space-between;align-items:center}
+.parsha-grid button:hover{border-color:var(--primary)}
+.parsha-grid button.has{border-color:var(--primary);background:var(--primary-soft);font-weight:700}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px}
+.fcard{border:1px solid var(--line);border-radius:14px;padding:.9em;background:var(--card);cursor:pointer;position:relative}
+.fcard:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.fcard .ic{font-size:2em}
+.fcard .nm{font-weight:700}
+#miniPlayer{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -4px 18px rgba(0,0,0,.08);padding:.4em 16px;display:flex;align-items:center;gap:.6em}
+#miniPlayer .ttl{font-weight:700;max-width:30vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+#miniPlayer input[type=range]{flex:1}
+body.has-mini main{padding-bottom:80px}
+.banner{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;padding:.6em 16px;text-align:center;font-weight:600}
+.help h3{margin-top:1.2em}
+.help li{margin:.25em 0}
+.help details{border:1px solid var(--line);border-radius:12px;padding:.6em .9em;margin:.5em 0;background:var(--card)}
+.help summary{font-weight:700;cursor:pointer}
+.up-row{border:1px solid var(--line);border-radius:12px;padding:.6em;margin:.5em 0}
+.up-row .metagrid{margin-top:.3em}
+.meter-big{height:14px;background:var(--line);border-radius:7px;overflow:hidden}
+.meter-big>div{height:100%;background:linear-gradient(90deg,var(--ok),var(--warn),var(--err))}
+.inline-ren{border:none;background:transparent;font-weight:700;font-size:1em;padding:0;width:100%}
+.inline-ren:focus{background:var(--card);outline:2px solid var(--primary);border-radius:6px}
+#notesBox{white-space:normal}
+.offline{position:fixed;top:0;left:0;right:0;background:var(--err);color:#fff;text-align:center;z-index:80;padding:.3em}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
 </head>
 <body>
 
@@ -301,7 +351,10 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
     <nav class="tabs" id="tabs">
       <button data-page="home" class="active">🎙️ תמלול</button>
       <button data-page="library">📚 ספרייה</button>
+      <button data-page="calendar">📅 לוח עברי</button>
+      <button data-page="parshiyot">📖 פרשיות</button>
       <button data-page="stats">📊 סטטיסטיקה</button>
+      <button data-page="help">❓ עזרה</button>
       <button data-page="settings" class="admin-only">⚙️ ניהול</button>
     </nav>
     <div class="top-actions">
@@ -312,6 +365,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
     </div>
   </header>
 
+  <div class="banner hidden" id="banner"></div>
   <main>
     <!-- HOME -->
     <section class="page active" id="page-home">
@@ -325,17 +379,10 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="lang-pills" id="langPills">
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
-        <div class="lang-pills hidden" id="yiOutPills" style="display:none!important;margin-inline-start:.4em">
+        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em">
           <button data-yiout="yi">📜 כתיבה ביידיש</button><button data-yiout="he">🇮🇱 ישר לעברית</button><button data-yiout="both">📜+🇮🇱 גם וגם</button>
         </div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> זיהוי דוברים</label>
-      </div>
-      <div class="row" style="margin-bottom:14px">
-        <span style="font-weight:700">הטקסט ייכתב ב:</span>
-        <div class="lang-pills" id="outPills">
-          <button data-out="same">🎙️ שפת ההקלטה</button><button data-out="he">🇮🇱 עברית</button><button data-out="yi">📜 יידיש</button><button data-out="en">🇺🇸 אנגלית</button>
-        </div>
-        <label class="row hidden" id="keepSrcWrap" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="keepSrcChk" style="width:auto"> לשמור גם את התמלול בשפת המקור</label>
         <select id="langSel" class="hidden">
           <option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option>
         </select>
@@ -350,6 +397,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <button class="rec-btn" id="recBtn" title="התחלת הקלטה">🎤</button>
           <div class="rec-time" id="recTime">00:00</div>
           <div class="meter"><div id="meterBar"></div></div>
+          <div class="row" style="justify-content:center"><button class="btn small hidden" id="recPause">⏸ השהיה</button></div>
           <p class="muted" style="text-align:center;margin:.3em 0" id="recHint">לחץ על המיקרופון כדי להתחיל, ושוב כדי לעצור ולתמלל.</p>
         </div>
         <div class="card">
@@ -357,14 +405,15 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <div class="drop" id="drop">
             <div style="font-size:2em">📁</div>
             <div>גרור לכאן קובץ, כמה קבצים או תיקייה שלמה</div>
-            <div class="muted" style="font-size:.9em">ווטסאפ (opus), mp3, m4a, wav, ogg, webm, mp4…</div>
+            <div class="muted" style="font-size:.9em">🎵 הקלטות: ווטסאפ, mp3, m4a, wav… · 🎬 סרטונים: mp4, mov, mkv, webm, avi…</div>
             <div class="row" style="margin-top:.8em;justify-content:center">
               <button class="btn primary" id="pickBtn">🎵 קובץ אחד או כמה</button>
               <button class="btn" id="pickDirBtn">📂 תיקייה שלמה</button>
             </div>
             <input type="file" id="dirInput" webkitdirectory directory multiple class="hidden">
-            <input type="file" id="fileInput" multiple accept="audio/*,video/*,.opus,.ogg,.oga,.m4a,.mp3,.wav,.aac,.amr,.webm,.mp4,.3gp,.flac" class="hidden">
+            <input type="file" id="fileInput" multiple accept="audio/*,video/*,.opus,.ogg,.oga,.m4a,.mp3,.wav,.aac,.amr,.webm,.mp4,.3gp,.flac,.mkv,.mov,.avi,.wmv,.m4v,.mpeg,.mpg" class="hidden">
           </div>
+          <label class="row" style="font-weight:500;gap:.4em;margin-top:.6em"><input type="checkbox" id="askMeta" style="width:auto"> לפני התמלול – לתת לכל קובץ שם, תיקייה ופרטים (דובר, פרשה, שנה…)</label>
         </div>
       </div>
       </div>
@@ -382,28 +431,41 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <div id="folderList"></div>
           <form id="newFolderForm" class="row" style="margin-top:.8em">
             <input type="text" id="newFolderName" placeholder="שם תיקייה חדשה" class="grow" style="width:auto">
+            <select id="newFolderParent" style="width:auto;max-width:130px" title="בתוך תיקייה"></select>
             <button class="btn small" type="submit">➕ תיקייה</button>
           </form>
           <div class="hint">👥 = תיקייה משותפת. בעל התיקייה יכול לשתף אותה עם משתמשים אחרים.</div>
         </div>
         <div>
+          <div class="row" style="margin-bottom:8px">
+            <div class="lang-pills" id="viewPills"><button data-view="list" class="active">☰ רשימה</button><button data-view="folders">🗂️ כל התיקיות</button></div>
+            <span class="grow"></span>
+            <button class="btn small" id="playAllBtn" title="לנגן את כל הרשימה ברצף">▶️ ניגון ברצף</button>
+          </div>
+          <div class="filters" id="filters">
+            <select id="fSpeaker"></select><select id="fCategory"></select><select id="fParasha"></select><select id="fYear"></select><select id="fLang"></select><select id="fTag"></select>
+            <button class="btn small" id="fClear">✕ ניקוי סינון</button>
+          </div>
+          <div id="folderGrid" class="fgrid hidden"></div>
           <div class="row" style="margin-bottom:12px">
             <label class="row" style="margin:0;gap:.3em;font-weight:500" title="בחירת הכל"><input type="checkbox" class="chk" id="selAll"></label>
             <input type="search" id="searchBox" placeholder="🔍 חיפוש בתמלולים, שמות ותגיות… (מקש /)" class="grow" style="width:auto">
-            <select id="sortSel" style="width:auto"><option value="new">החדשות קודם</option><option value="heb">לפי תאריך עברי (שבוע ופרשה)</option><option value="old">הישנות קודם</option><option value="name">לפי שם</option><option value="long">הארוכות קודם</option></select>
+            <select id="sortSel" style="width:auto"><option value="new">החדשות קודם</option><option value="old">הישנות קודם</option><option value="name">לפי שם</option><option value="long">הארוכות קודם</option><option value="parasha">לפי סדר הפרשות</option><option value="recdate">לפי תאריך ההקלטה</option></select>
             <button class="btn small" id="refreshBtn" title="רענון">🔄</button>
           </div>
           <div class="bulkbar hidden" id="bulkBar">
             <b id="bulkCount"></b>
             <select id="bulkMove" style="width:auto"></select>
             <input type="text" id="bulkTag" placeholder="תגית + Enter" style="width:140px">
+            <button class="btn small" id="bulkMeta">🏷️ פרטים לכולם</button>
+            <button class="btn small perm-export" id="bulkExport">⬇️ ייצוא</button>
             <button class="btn small perm-export" id="bulkXlsx">⬇️ Excel</button>
             <button class="btn small danger perm-delete" id="bulkDel">🗑️ מחיקה</button>
             <span class="grow"></span>
             <button class="btn small" id="bulkClear">✕ ביטול בחירה</button>
           </div>
           <div id="recList"></div>
-          <div class="row" style="margin-top:8px"><button class="btn small perm-export" id="exportAllXlsx">⬇️ Excel לכל הרשימה</button></div>
+          <div class="row" style="margin-top:8px"><button class="btn small perm-export" id="exportAllXlsx">⬇️ Excel לכל הרשימה</button><button class="btn small perm-export" id="exportBook">📕 כל הרשימה כספר Word</button></div>
         </div>
       </div>
     </section>
@@ -411,30 +473,30 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
     <!-- DETAIL -->
     <section class="page" id="page-detail">
       <div class="card">
-        <div class="row">
+        <div class="row reading-keep">
           <button class="btn small" id="backToLib">→ חזרה לספרייה</button>
           <span class="grow"></span>
           <span class="badge" id="dOwner"></span>
           <span class="badge" id="dLang"></span>
           <span class="muted" id="dMeta"></span>
         </div>
-        <input type="text" id="dTitle" style="font-size:1.3em;font-weight:700;margin-top:.7em">
+        <input type="text" id="dTitle" style="font-size:1.3em;font-weight:700;margin-top:.7em" title="שם ההקלטה – אפשר לשנות">
+        <div class="hdate" id="dHdate"></div>
         <div class="row" style="margin-top:.6em">
           <label style="margin:0">תיקייה:</label>
           <select id="dFolder" style="width:auto"></select>
           <span class="grow"></span>
           <span class="pill-note hidden" id="dShared"></span>
         </div>
-        <div class="heb-row">
-          <label style="margin:0">📅 תאריך ההקלטה:</label>
-          <input type="date" id="dDate">
-          <span class="heb-line" id="dHeb"></span>
-          <label style="margin:0">פרשה:</label>
-          <select id="dParsha"></select>
-          <label style="margin:0">סוג:</label>
-          <input type="text" id="dKind" list="kindList" placeholder="תורה / שיחה…" style="width:130px">
-          <datalist id="kindList"><option value="תורה"><option value="שיחה"><option value="שיעור"><option value="טיש"><option value="דרשה"><option value="מכתב"></datalist>
+        <div class="metagrid" id="dMetaGrid">
+          <div><label>👤 דובר / מגיד שיעור</label><input type="text" id="mSpeaker" list="speakersList" placeholder="למשל: האדמו״ר"></div>
+          <div><label>🏷️ סוג</label><select id="mCategory"></select></div>
+          <div><label>📖 פרשה</label><select id="mParasha"></select></div>
+          <div><label>🗓️ שנה</label><input type="text" id="mYear" placeholder="תשפ״ז"></div>
+          <div><label>🕯️ מועד / אירוע</label><input type="text" id="mOccasion" list="occasionsList" placeholder="למשל: שבת חנוכה"></div>
+          <div><label>📅 תאריך ההקלטה</label><input type="date" id="mDate"></div>
         </div>
+        <datalist id="speakersList"></datalist><datalist id="occasionsList"></datalist>
         <div class="row" style="margin-top:.6em">
           <label style="margin:0">תגיות:</label>
           <span id="dTags"></span>
@@ -446,23 +508,49 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <select id="speedSel" class="speed" title="מהירות ניגון">
             <option value="0.75">×0.75</option><option value="1" selected>×1</option><option value="1.25">×1.25</option><option value="1.5">×1.5</option><option value="1.75">×1.75</option><option value="2">×2</option>
           </select>
+          <button class="btn small" id="loopBtn" title="חזרה על המשפט הנוכחי">🔁</button>
+          <button class="btn small" id="bmAdd" title="סימנייה ברגע הזה">🔖</button>
           <button class="btn small" id="kbdHelp" title="קיצורי מקלדת">⌨️</button>
         </div>
         <div class="toolbar">
           <button class="btn small primary perm-summarize" id="sumBtn">✨ סיכום</button>
           <span class="row perm-translate" style="gap:.25em"><select id="trLang" style="width:auto;padding:.25em .5em;font-size:.9em"><option value="he">לעברית</option><option value="en">לאנגלית</option><option value="yi">ליידיש</option></select><button class="btn small primary" id="trBtn">🌐 תרגום</button></span>
+          <button class="btn small primary perm-export" id="exportBtn">⬇️ ייצוא (Word / PDF / Excel / PowerPoint…)</button>
           <button class="btn small" id="copyBtn">📋 העתקה</button>
-          <button class="btn small can-edit" id="editBtn">✏️ עריכה</button>
+          <button class="btn small" id="dlAudioBtn">🎵 הורדת ההקלטה</button>
+          <button class="btn small can-edit" id="editBtn">✏️ עריכה חופשית</button>
+          <button class="btn small can-edit" id="replaceBtn">🔁 החלפת מילים / דוברים</button>
           <button class="btn small perm-share can-edit" id="shareBtn">🔗 קישור שיתוף</button>
-          <button class="btn small perm-export" id="xlsxBtn">⬇️ Excel</button>
-          <button class="btn small perm-export" id="docxBtn">⬇️ Word</button>
-          <button class="btn small perm-export" id="pdfBtn">⬇️ PDF</button>
-          <button class="btn small perm-export" id="txtBtn">⬇️ TXT</button>
           <button class="btn small perm-transcribe can-edit" id="retryBtn">🔄 תמלול מחדש</button>
           <button class="btn small danger perm-delete can-edit" id="delBtn">🗑️ מחיקה</button>
         </div>
+        <div class="ai-bar perm-summarize" id="aiBar">
+          <b style="align-self:center">🤖 כלים חכמים:</b>
+          <button class="btn small" data-ai="chapters">📑 תוכן עניינים</button>
+          <button class="btn small" data-ai="sources">📚 מראי מקומות</button>
+          <button class="btn small" data-ai="quotes">💎 ציטוטים / ווארטים</button>
+          <button class="btn small" data-ai="article">📝 עיבוד למאמר</button>
+          <button class="btn small" data-ai="questions">❓ שאלות חזרה</button>
+          <button class="btn small" data-ai="keywords">🏷️ תגיות אוטומטיות</button>
+        </div>
         <div id="dSummary" class="summary hidden"></div>
+        <div id="dAi"></div>
         <div id="dTranslations"></div>
+        <details class="ai-out" id="notesBox"><summary style="font-weight:700;cursor:pointer">🗒️ הערות וסימניות <span class="muted" id="bmCount"></span></summary>
+          <div id="bmList" style="margin:.4em 0"></div>
+          <textarea id="dNotes" rows="4" placeholder="הערות אישיות על ההקלטה…"></textarea>
+        </details>
+        <div class="fbar reading-keep">
+          <input type="search" id="findInput" placeholder="🔍 חיפוש בתוך התמלול" style="width:200px">
+          <span class="muted" id="findCount"></span>
+          <button class="btn small" id="findPrev">▲</button><button class="btn small" id="findNext">▼</button>
+          <span class="grow"></span>
+          <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="followChk" style="width:auto" checked> גלילה עם השמע</label>
+          <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="timesChk" style="width:auto" checked> זמנים</label>
+          <button class="btn small" id="fontBtn" title="גודל כתב">🔠</button>
+          <button class="btn small" id="readBtn" title="מצב קריאה במסך מלא">📖 מצב קריאה</button>
+        </div>
+        <div class="hint can-edit">💡 לחיצה על משפט = ניגון מאותו רגע · לחיצה כפולה = עריכת המשפט · ⭐ ליד משפט = סימון כחשוב</div>
         <div id="dStatus"></div>
         <div id="dTranscript" class="transcript"></div>
         <div id="dEdit" class="hidden">
@@ -470,15 +558,36 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
           <div class="row" style="margin-top:.5em">
             <button class="btn small primary" id="saveEditBtn">שמירה</button>
             <button class="btn small" id="cancelEditBtn">ביטול</button>
-            <span class="hint">שים לב: עריכה ידנית מבטלת את הסימון לפי משפטים.</span>
+            <span class="hint">שים לב: עריכה חופשית מבטלת את החלוקה למשפטים עם זמנים. לתיקון קטן – לחיצה כפולה על משפט.</span>
           </div>
         </div>
         <div class="chat perm-chat" id="chatBox">
           <div class="chat-head">💬 שאל שאלה על ההקלטה <span class="grow"></span><button class="btn small" id="chatClear" title="ניקוי השיחה">🧹</button></div>
-          <div class="chat-msgs" id="chatMsgs"><div class="muted" style="font-size:.9em">לדוגמה: "מה הוחלט בסוף?", "מי הזכיר את התאריך?", "תן לי 3 ציטוטים חשובים".</div></div>
+          <div class="chat-msgs" id="chatMsgs"></div>
           <form id="chatForm"><input type="text" id="chatInput" class="grow" placeholder="כתוב שאלה…" autocomplete="off" style="width:auto"><button class="btn primary" type="submit">שלח</button></form>
         </div>
       </div>
+    </section>
+
+    <!-- HEBREW CALENDAR -->
+    <section class="page" id="page-calendar">
+      <div class="row" style="margin-bottom:12px">
+        <h2 class="grow" style="margin:0" id="calTitle">לוח עברי</h2>
+        <button class="btn small" id="calPrev">→ חודש קודם</button>
+        <button class="btn small" id="calToday">היום</button>
+        <button class="btn small" id="calNext">חודש הבא ←</button>
+      </div>
+      <div class="hint" id="calSub" style="margin-bottom:8px"></div>
+      <div class="cal" id="calGrid"></div>
+      <div class="card" style="margin-top:14px" id="calDay"><p class="muted">לחץ על יום כדי לראות את ההקלטות שלו.</p></div>
+    </section>
+
+    <!-- PARSHIYOT -->
+    <section class="page" id="page-parshiyot">
+      <div class="row"><h2 class="grow">📖 לוח פרשיות ומועדים</h2><select id="pYear" style="width:auto"></select></div>
+      <div class="hint">לחיצה על פרשה מראה את כל ההקלטות של אותה פרשה (מכל השנים, או רק מהשנה שנבחרה). פרשה עם הקלטות – מסומנת בצבע.</div>
+      <div id="parshaBoard" style="margin-top:10px"></div>
+      <div class="card" style="margin-top:14px" id="parshaRecs"><p class="muted">בחר פרשה.</p></div>
     </section>
 
     <!-- STATS -->
@@ -490,6 +599,10 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="card"><h3>לפי תיקייה</h3><div id="statFolder"></div></div>
       </div>
       <div class="card" style="margin-top:16px"><h3>דקות תמלול לפי חודש</h3><div id="statMonth"></div></div>
+      <div class="home-grid" style="margin-top:16px">
+        <div class="card"><h3>👤 לפי דובר</h3><div id="statSpeaker"></div></div>
+        <div class="card"><h3>🏷️ לפי סוג</h3><div id="statCat"></div></div>
+      </div>
       <div class="card admin-only" style="margin-top:16px"><h3>👥 לפי משתמש</h3><div id="statUsers"></div></div>
     </section>
 
@@ -509,6 +622,7 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
       <div class="card settings-sec" data-secbox="users">
         <h3>👥 משתמשים</h3>
         <div class="hint">רק מנהל רואה את האזור הזה, וכל פעולה נבדקת גם בשרת. כל משתמש רואה רק את ההקלטות שלו (ותיקיות ששיתפו איתו); מנהל רואה הכול.</div>
+        <div class="row" style="margin-top:.6em"><span class="grow"></span><button class="btn small" id="usersXlsx">⬇️ רשימת משתמשים ל-Excel</button></div>
         <div class="tbl-wrap" style="margin-top:.6em"><table class="tbl" id="usersTbl"></table></div>
         <h4 style="margin:1.3em 0 .2em">✉️ הזמנת משתמש חדש</h4>
         <form id="inviteForm" autocomplete="off">
@@ -557,6 +671,11 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <h3>🔒 יציאה אוטומטית</h3>
         <label for="idleMin">לנתק משתמש אחרי כמה דקות בלי פעילות? (0 = אף פעם)</label>
         <div class="row"><input type="number" id="idleMin" min="0" max="1440" style="width:120px"><span class="muted">דקות</span></div>
+        <h3 style="margin-top:1.2em">📢 הודעה לכל המשתמשים</h3>
+        <input type="text" id="annInput" placeholder="למשל: השיעור של פרשת בראשית עלה! (ריק = בלי הודעה)">
+        <h3 style="margin-top:1.2em">💽 נפח אחסון</h3>
+        <div class="meter-big"><div id="storBar" style="width:0"></div></div>
+        <div class="hint" id="storText"></div>
         <h3 style="margin-top:1.2em">📧 דו"ח שבועי</h3>
         <label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="weeklyChk" style="width:auto"> לשלוח לי כל יום ראשון בבוקר דו"ח: כמה הקלטות וכמה דקות תומללו, לפי משתמש</label>
         <div class="row" style="margin-top:1em">
@@ -593,161 +712,105 @@ nav.tabs button.active{background:var(--card);color:var(--primary);box-shadow:0 
         <div class="muted" id="storageInfo" style="margin-top:.8em"></div>
       </div>
     </section>
+    <!-- HELP -->
+    <section class="page help" id="page-help">
+      <div class="row"><h2 class="grow">❓ מדריך למשתמש</h2><input type="search" id="helpSearch" placeholder="🔍 חיפוש במדריך" style="width:220px"></div>
+      <div class="card">
+        <p><b>תמלול פלוס</b> הופך הקלטות וסרטונים לטקסט בעברית, יידיש ואנגלית – ושומר הכול בענן, מסודר לפי תיקיות, פרשיות, דוברים ותאריכים עבריים. הכול חינם.</p>
+        <details open><summary>🎙️ איך מתמללים?</summary><ol>
+          <li>בוחרים למעלה את <b>שפת ההקלטה</b> (עברית / יידיש / אנגלית / זיהוי אוטומטי). ביידיש אפשר לבחור: כתיבה ביידיש, ישר לעברית, או גם וגם.</li>
+          <li>מקליטים במיקרופון (🎤 – אפשר גם להשהות ⏸), <b>או</b> גוררים קבצים / תיקייה שלמה, <b>או</b> לוחצים "קובץ אחד או כמה".</li>
+          <li>גם <b>סרטונים</b> (mp4, mov, mkv…) – המערכת מוציאה מהם את הקול לבד.</li>
+          <li>מסמנים "לפני התמלול – לתת לכל קובץ שם, תיקייה ופרטים" כדי לרשום לכל קובץ: שם, תיקייה, דובר, סוג, פרשה, שנה ותאריך.</li>
+          <li>ההקלטות נכנסות ל<b>תור</b> ומתמללות אחת אחרי השנייה. כשמסתיים – מופיעה הודעה. אפשר להמשיך לעבוד בינתיים.</li>
+          <li>אחרי התמלול המערכת נותנת <b>כותרת אוטומטית</b> (אם לא נתתם שם).</li>
+        </ol></details>
+        <details><summary>📚 הספרייה – חיפוש, תיקיות וסינון</summary><ul>
+          <li><b>חיפוש</b> מחפש בכל הטקסטים, השמות, התגיות, הדוברים והפרשות. מקש <span class="kbd">/</span> קופץ לחיפוש.</li>
+          <li><b>סינון</b> לפי דובר, סוג, פרשה, שנה, שפה ותגית – למשל: "האדמו״ר" + "בראשית" + "תשפ״ז".</li>
+          <li><b>שינוי שם</b> – לוחצים על השם בכרטיס וכותבים. <b>העברה לתיקייה</b> – בתפריט שבכרטיס.</li>
+          <li><b>תיקיות ותתי-תיקיות</b> – יוצרים תיקייה, ואפשר לבחור "בתוך תיקייה". "🗂️ כל התיקיות" מראה את כולן ביחד.</li>
+          <li><b>בחירה מרובה</b> – מסמנים כמה הקלטות ← העברה, תגית, פרטים לכולם, ייצוא או מחיקה בבת אחת.</li>
+          <li>⭐ מסמן הקלטה מועדפת. "▶️ ניגון ברצף" מנגן את כל הרשימה אחת אחרי השנייה.</li>
+          <li><b>שיתוף תיקייה</b> (👥) – בעל התיקייה בוחר מי עוד יראה אותה.</li>
+        </ul></details>
+        <details><summary>📅 לוח עברי ופרשיות</summary><ul>
+          <li>בכל הקלטה רואים את <b>התאריך העברי</b>. בלשונית "לוח עברי" יש לוח חודשי עם תאריכים עבריים, פרשת השבוע, חגים – וכמה הקלטות יש בכל יום.</li>
+          <li>בלשונית "פרשיות" רואים את כל 54 הפרשות. לחיצה על פרשה = כל ההקלטות שלה. אפשר לבחור שנה (למשל תשפ״ז).</li>
+          <li>המערכת ממלאת <b>לבד</b> את הפרשה והשנה לפי תאריך ההקלטה – ואפשר לשנות.</li>
+        </ul></details>
+        <details><summary>🎧 דף ההקלטה – האזנה ועריכה</summary><ul>
+          <li>לחיצה על משפט מנגנת מאותו רגע. המשפט שמתנגן מסומן, והדף גולל איתו.</li>
+          <li><b>לחיצה כפולה על משפט</b> = תיקון המשפט (הזמנים נשמרים). ⭐ ליד משפט = סימון כחשוב.</li>
+          <li>🔁 חזרה על משפט · 🔖 סימנייה ברגע הזה · מהירות ניגון ×0.75 עד ×2 · 🔠 גודל כתב · 📖 מצב קריאה.</li>
+          <li><b>החלפת מילים / דוברים</b> – למשל להחליף "דובר 1" ב"הרב כהן" בכל התמלול.</li>
+          <li>חיפוש בתוך התמלול עם ▲▼ למעבר בין התוצאות.</li>
+          <li>הנגן הקטן למטה ממשיך לנגן גם כשעוברים לדף אחר, וזוכר איפה עצרתם.</li>
+          <li>🎵 הורדת ההקלטה – מוריד את קובץ השמע.</li>
+        </ul></details>
+        <details><summary>🤖 כלים חכמים (חינם)</summary><ul>
+          <li>✨ <b>סיכום</b> · 🌐 <b>תרגום</b> לעברית / אנגלית / יידיש · 💬 <b>צ'אט</b> – שואלים שאלות על ההקלטה.</li>
+          <li>📑 <b>תוכן עניינים</b> עם זמנים · 📚 <b>מראי מקומות</b> (פסוקים, גמרא, ספרים) · 💎 <b>ציטוטים / ווארטים</b>.</li>
+          <li>📝 <b>עיבוד למאמר</b> – הופך את הדיבור לטקסט ערוך ומסודר, מוכן לדפוס.</li>
+          <li>❓ <b>שאלות חזרה</b> על השיעור · 🏷️ <b>תגיות אוטומטיות</b>.</li>
+        </ul></details>
+        <details><summary>⬇️ ייצוא קבצים</summary><ul>
+          <li>"⬇️ ייצוא" מאפשר לבחור: <b>Word, PDF, Excel, PowerPoint</b>, טקסט, כתוביות לסרטון (SRT), דף אינטרנט.</li>
+          <li>אפשר לבחור <b>בלי זמנים</b> (רק טקסט נקי, בפסקאות) – או עם זמנים.</li>
+          <li>אפשר לצרף: סיכום, תרגום, תוכן עניינים, מראי מקומות, הערות, רק משפטים חשובים.</li>
+          <li>"📕 כל הרשימה כספר Word" – עושה ספר אחד עם תוכן עניינים מכל ההקלטות שברשימה (למשל כל השיעורים של פרשה).</li>
+          <li>בחירה מרובה ← "⬇️ ייצוא" – מוריד קובץ ZIP עם כל ההקלטות שנבחרו.</li>
+        </ul></details>
+        <details><summary>🔗 שיתוף</summary><ul>
+          <li>"🔗 קישור שיתוף" – יוצר קישור (לתקופה שבוחרים) שכל אחד יכול לפתוח בלי להיכנס למערכת. יש גם קוד QR וכפתור וואטסאפ. אפשר לבטל בכל רגע.</li>
+        </ul></details>
+        <details><summary>📲 טלפון וקיצורים</summary><ul>
+          <li>התקנה: אנדרואיד – תפריט ⋮ ← "התקנת אפליקציה". אייפון – שיתוף ← "הוסף למסך הבית".</li>
+          <li>מוואטסאפ: לחיצה ארוכה על הודעה קולית ← שיתוף ← "תמלול פלוס".</li>
+          <li>מקלדת: <span class="kbd">רווח</span> ניגון/עצירה · <span class="kbd">←</span>/<span class="kbd">→</span> 5 שניות · <span class="kbd">+</span>/<span class="kbd">-</span> מהירות · <span class="kbd">/</span> חיפוש · <span class="kbd">?</span> עזרה.</li>
+        </ul></details>
+        <details><summary>👤 החשבון שלי</summary><ul>
+          <li>לחיצה על השם שלך למעלה – שינוי שם תצוגה וסיסמה.</li>
+          <li>כניסה: עם Google, עם קוד למייל, או עם סיסמה. שכחת סיסמה? "שכחת סיסמה" ← קוד למייל.</li>
+          <li>אם לא פעלתם זמן מה – המערכת מנתקת לבד, לביטחון.</li>
+        </ul></details>
+      </div>
+      <h2 class="admin-only" style="margin-top:1.4em">🛡️ מדריך למנהל</h2>
+      <div class="card admin-only">
+        <p>רק מנהל רואה את החלק הזה ואת לשונית "⚙️ ניהול". כל הרשאה נבדקת גם בשרת – משתמש רגיל לא יכול לעקוף.</p>
+        <details><summary>👥 משתמשים והרשאות</summary><ul>
+          <li><b>הזמנה</b>: ניהול ← משתמשים ← שם + מייל ← "הוספה והזמנה". נשלח לו מייל עם קישור. אי אפשר להירשם לבד.</li>
+          <li><b>✏️ הרשאות</b>: מה מותר לכל משתמש – תמלול, הורדת קבצים, מחיקה, תרגום, סיכום, צ'אט, שיתוף; מכסת דקות לחודש; תפקיד מנהל; סיסמה חדשה.</li>
+          <li><b>⛔ השבתה</b> – מנתק ומונע כניסה (ההקלטות נשמרות). <b>🗑️ מחיקה</b> – ההקלטות שלו עוברות אליך.</li>
+          <li>"⬇️ רשימת משתמשים ל-Excel" – מוריד את כל המשתמשים והנתונים שלהם.</li>
+        </ul></details>
+        <details><summary>📋 יומן כניסות</summary><ul><li>מי נכנס, מתי, איך (Google / קוד / סיסמה) ומאיזה מכשיר – 200 הכניסות האחרונות.</li></ul></details>
+        <details><summary>🟢 מצב ומנועים</summary><ul>
+          <li>נקודות ירוקות = המפתחות מחוברים בשרת. כפתורי בדיקה לכל שירות + מייל בדיקה.</li>
+          <li>בחירת מנוע לכל שפה: Gemini (הכי טוב ליידיש), Groq Whisper (מהיר לעברית ואנגלית). חל על כל המשתמשים.</li>
+        </ul></details>
+        <details><summary>🔒 אבטחה, הודעות ודו"ח</summary><ul>
+          <li>יציאה אוטומטית אחרי X דקות בלי פעילות (0 = אף פעם).</li>
+          <li><b>הודעה לכל המשתמשים</b> – פס כתום למעלה (למשל "השיעור החדש עלה").</li>
+          <li>דו"ח שבועי במייל כל יום ראשון + "שלח עכשיו".</li>
+          <li><b>נפח אחסון</b> – כמה מתוך 1GB החינמי בשימוש.</li>
+        </ul></details>
+        <details><summary>📖 מילון, 🗑️ סל מחזור, 💾 גיבוי</summary><ul>
+          <li><b>מילון מונחים</b> – שמות ומילים שהתמלול טועה בהם (למשל שמות של רבנים וחסידויות). משפר את כל התמלולים.</li>
+          <li><b>סל מחזור</b> – מה שנמחק נשמר 30 יום. רק מנהל משחזר או מוחק לצמיתות.</li>
+          <li><b>גיבוי</b> – הורדת כל התמלולים לקובץ. "העברה לענן" – מעלה הקלטות מהגרסה הישנה שנשמרו בדפדפן.</li>
+        </ul></details>
+        <details><summary>ℹ️ מגבלות החינם</summary><ul>
+          <li>1GB לקובצי שמע (הקבצים נדחסים אוטומטית – בערך 60 שעות הקלטה). עד 3 שעות לקובץ.</li>
+          <li>אם אף אחד לא נכנס שבוע – השרת "נרדם". מעירים אותו בלוח הבקרה של Supabase (Restore).</li>
+        </ul></details>
+      </div>
+    </section>
   </main>
 </div>
 
 <div id="toast"></div>
 <div id="modalRoot"></div>
-<script>
-/* ---------------- לוח עברי: תאריך, פרשה (מנהג ארץ ישראל), מועדים ---------------- */
-const HEB = (() => {
-  const EPOCH = -1373427;
-  const leap = (y) => ((7 * y + 1) % 19) < 7;
-  const elapsed = (y) => {
-    const m = Math.floor((235 * y - 234) / 19), parts = 12084 + 13753 * m, d = 29 * m + Math.floor(parts / 25920);
-    return ((3 * (d + 1)) % 7) < 3 ? d + 1 : d;
-  };
-  const corr = (y) => { const a = elapsed(y - 1), b = elapsed(y), c = elapsed(y + 1); return c - b === 356 ? 2 : b - a === 382 ? 1 : 0; };
-  const nyCache = new Map();
-  const newYear = (y) => { if (!nyCache.has(y)) nyCache.set(y, EPOCH + elapsed(y) + corr(y)); return nyCache.get(y); };
-  const yearDays = (y) => newYear(y + 1) - newYear(y);
-  const lastMonth = (y) => (leap(y) ? 13 : 12);
-  const monthDays = (m, y) => {
-    if ([2, 4, 6, 10, 13].includes(m)) return 29;
-    if (m === 12 && !leap(y)) return 29;
-    if (m === 8 && ![355, 385].includes(yearDays(y))) return 29;
-    if (m === 9 && [353, 383].includes(yearDays(y))) return 29;
-    return 30;
-  };
-  // חודשים: ניסן=1 ... אדר=12, אדר ב=13, תשרי=7
-  const toRD = (y, m, d) => {
-    let rd = newYear(y) + d - 1;
-    if (m < 7) { for (let i = 7; i <= lastMonth(y); i++) rd += monthDays(i, y); for (let i = 1; i < m; i++) rd += monthDays(i, y); }
-    else for (let i = 7; i < m; i++) rd += monthDays(i, y);
-    return rd;
-  };
-  const fromRD = (rd) => {
-    let y = Math.floor((rd - EPOCH) / (35975351 / 98496));
-    while (newYear(y + 1) <= rd) y++;
-    while (newYear(y) > rd) y--;
-    let m = rd < toRD(y, 1, 1) ? 7 : 1;
-    while (rd > toRD(y, m, monthDays(m, y))) m++;
-    return { y, m, d: rd - toRD(y, m, 1) + 1 };
-  };
-  // תאריך לועזי (שנה, חודש, יום) <-> RD
-  const gToRD = (Y, M, D) => Math.floor(Date.UTC(Y, M - 1, D) / 86400000) + 719163;
-  const rdToG = (rd) => { const t = new Date((rd - 719163) * 86400000); return { Y: t.getUTCFullYear(), M: t.getUTCMonth() + 1, D: t.getUTCDate() }; };
-  const dow = (rd) => ((rd % 7) + 7) % 7; // 0 = ראשון, 6 = שבת
-
-  const GEM = [[400, 'ת'], [300, 'ש'], [200, 'ר'], [100, 'ק'], [90, 'צ'], [80, 'פ'], [70, 'ע'], [60, 'ס'], [50, 'נ'], [40, 'מ'], [30, 'ל'], [20, 'כ'], [10, 'י'], [9, 'ט'], [8, 'ח'], [7, 'ז'], [6, 'ו'], [5, 'ה'], [4, 'ד'], [3, 'ג'], [2, 'ב'], [1, 'א']];
-  const gematria = (n) => {
-    let s = '';
-    n = n % 1000;
-    for (const [v, l] of GEM) while (n >= v) { if (n === 15 || n === 16) { s += n === 15 ? 'טו' : 'טז'; n = 0; break; } s += l; n -= v; }
-    return s.length > 1 ? s.slice(0, -1) + '״' + s.slice(-1) : s + '׳';
-  };
-  const yearName = (y) => gematria(y);
-  const MONTHS = { 1: 'ניסן', 2: 'אייר', 3: 'סיון', 4: 'תמוז', 5: 'אב', 6: 'אלול', 7: 'תשרי', 8: 'חשון', 9: 'כסלו', 10: 'טבת', 11: 'שבט', 12: 'אדר', 13: 'אדר ב׳' };
-  const monthName = (m, y) => (m === 12 && leap(y) ? 'אדר א׳' : MONTHS[m]);
-
-  const PARSHIOT = ['בראשית', 'נח', 'לך לך', 'וירא', 'חיי שרה', 'תולדות', 'ויצא', 'וישלח', 'וישב', 'מקץ', 'ויגש', 'ויחי',
-    'שמות', 'וארא', 'בא', 'בשלח', 'יתרו', 'משפטים', 'תרומה', 'תצוה', 'כי תשא', 'ויקהל', 'פקודי',
-    'ויקרא', 'צו', 'שמיני', 'תזריע', 'מצורע', 'אחרי מות', 'קדושים', 'אמור', 'בהר', 'בחוקותי',
-    'במדבר', 'נשא', 'בהעלותך', 'שלח', 'קרח', 'חוקת', 'בלק', 'פינחס', 'מטות', 'מסעי',
-    'דברים', 'ואתחנן', 'עקב', 'ראה', 'שופטים', 'כי תצא', 'כי תבוא', 'נצבים', 'וילך', 'האזינו', 'וזאת הברכה'];
-  const BOOKS = [['בראשית', 0, 12], ['שמות', 12, 23], ['ויקרא', 23, 33], ['במדבר', 33, 43], ['דברים', 43, 54]];
-  const P = (name) => PARSHIOT.indexOf(name);
-  const PAIRS = { VP: [P('ויקהל'), P('פקודי')], TM: [P('תזריע'), P('מצורע')], AK: [P('אחרי מות'), P('קדושים')], BB: [P('בהר'), P('בחוקותי')], CB: [P('חוקת'), P('בלק')], MM: [P('מטות'), P('מסעי')], NV: [P('נצבים'), P('וילך')] };
-
-  // מועדים שבהם אין קריאת פרשה בשבת (ארץ ישראל)
-  const noParsha = (y, m, d) => (m === 7 && (d === 1 || d === 2 || d === 10 || (d >= 15 && d <= 22))) || (m === 1 && d >= 15 && d <= 21) || (m === 3 && d === 6);
-  const holidayOf = (y, m, d) => {
-    const adar = leap(y) ? 13 : 12;
-    if (m === 7) { if (d <= 2) return 'ראש השנה'; if (d === 10) return 'יום כיפור'; if (d >= 15 && d <= 21) return 'סוכות'; if (d === 22) return 'שמחת תורה'; }
-    if (m === 1 && d >= 15 && d <= 21) return 'פסח';
-    if (m === 3 && d === 6) return 'שבועות';
-    if (m === 2 && d === 18) return 'ל״ג בעומר';
-    if (m === 11 && d === 15) return 'ט״ו בשבט';
-    if (m === adar && (d === 14 || d === 15)) return 'פורים';
-    if (m === 5 && (d === 9 || (d === 10 && dow(toRD(y, 5, 9)) === 6))) return 'תשעה באב';
-    const chan = toRD(y, 9, 25), rd = toRD(y, m, d);
-    if (rd >= chan && rd < chan + 8) return 'חנוכה';
-    return '';
-  };
-
-  // לוח פרשיות לשנה עברית: מפה RD של שבת -> שם הפרשה (או המועד)
-  const schedCache = new Map();
-  function schedule(y) {
-    if (schedCache.has(y)) return schedCache.get(y);
-    const map = new Map();
-    const sats = (from, to) => { const out = []; let r = from + ((6 - dow(from) + 7) % 7); for (; r <= to; r += 7) out.push(r); return out; };
-    const free = (r) => { const h = fromRD(r); return !noParsha(h.y, h.m, h.d); };
-    const ny = newYear(y), nny = newYear(y + 1);
-    // שבתות תשרי לפני סוכות (האזינו ואולי וילך)
-    const tishreiSats = sats(ny, toRD(y, 7, 14)).filter(free);
-    const prevNVsplit = tishreiSats.length === 2;
-    if (prevNVsplit) { map.set(tishreiSats[0], 'וילך'); map.set(tishreiSats[1], 'האזינו'); } else if (tishreiSats.length) map.set(tishreiSats[0], 'האזינו');
-    // האם בשנה הבאה וילך נקרא בנפרד (=> נצבים לבד בסוף השנה)
-    const nextTishrei = sats(nny, toRD(y + 1, 7, 14)).filter((r) => { const h = fromRD(r); return !noParsha(h.y, h.m, h.d); });
-    const nvSplitNext = nextTishrei.length === 2;
-    const lastSatBefore = (rd) => rd - 1 - ((dow(rd - 1) - 6 + 7) % 7);
-    const satOnOrBefore = (rd) => rd - ((dow(rd) - 6 + 7) % 7);
-    const fill = (fromRD_, toRD_, first, last, pairOrder) => {
-      const slots = sats(fromRD_, toRD_).filter(free);
-      let list = []; for (let i = first; i <= last; i++) list.push([i]);
-      let need = list.length - slots.length;
-      for (const key of pairOrder) {
-        if (need <= 0) break;
-        const [a, b] = PAIRS[key];
-        const ia = list.findIndex((g) => g.length === 1 && g[0] === a), ib = list.findIndex((g) => g.length === 1 && g[0] === b);
-        if (ia >= 0 && ib === ia + 1) { list.splice(ia, 2, [a, b]); need--; }
-      }
-      slots.forEach((r, i) => { if (list[i]) map.set(r, list[i].map((x) => PARSHIOT[x]).join('-')); });
-    };
-    const bereshit = toRD(y, 7, 23);
-    const pesach = toRD(y, 1, 15), shavuot = toRD(y, 3, 6), av9 = toRD(y, 5, 9);
-    const devarimSat = satOnOrBefore(av9);
-    if (!leap(y)) {
-      fill(bereshit, lastSatBefore(pesach), P('בראשית'), P('צו'), ['VP']);
-      fill(lastSatBefore(pesach) + 1, devarimSat, P('שמיני'), P('דברים'), ['TM', 'AK', 'MM', 'BB', 'CB']);
-    } else {
-      fill(bereshit, devarimSat, P('בראשית'), P('דברים'), ['MM', 'BB', 'AK', 'TM', 'CB']);
-    }
-    fill(devarimSat + 1, nny - 1, P('ואתחנן'), nvSplitNext ? P('נצבים') : P('וילך'), nvSplitNext ? [] : ['NV']);
-    // שבתות של מועד
-    sats(ny, nny - 1).forEach((r) => { if (!map.has(r)) { const h = fromRD(r); const hol = holidayOf(h.y, h.m, h.d); if (hol) map.set(r, hol); } });
-    schedCache.set(y, map);
-    return map;
-  }
-  // פרשת השבוע לתאריך (השבת הקרובה, או השבת עצמה)
-  function parshaFor(rd) {
-    const sat = rd + ((6 - dow(rd) + 7) % 7);
-    const h = fromRD(sat);
-    return schedule(h.y).get(sat) || '';
-  }
-  function info(dateStr) {
-    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr || ''); if (!m) return null;
-    const rd = gToRD(+m[1], +m[2], +m[3]);
-    const h = fromRD(rd);
-    const parsha = parshaFor(rd);
-    const holiday = holidayOf(h.y, h.m, h.d);
-    // שייכות לשנה: לפי שנת השבת של הפרשה
-    const sat = rd + ((6 - dow(rd) + 7) % 7);
-    const py = fromRD(sat).y;
-    return {
-      rd, y: h.y, m: h.m, d: h.d, dow: dow(rd),
-      yearName: yearName(h.y), parshaYear: py, parshaYearName: yearName(py),
-      text: `${gematria(h.d)} ${monthName(h.m, h.y)} ${yearName(h.y)}`,
-      monthName: monthName(h.m, h.y), parsha, holiday
-    };
-  }
-  const parshaBook = (name) => { const first = (name || '').split('-')[0]; const i = PARSHIOT.indexOf(first); if (i < 0) return 'מועדים'; const b = BOOKS.find(([, s, e]) => i >= s && i < e); return b ? b[0] : 'מועדים'; };
-  const parshaOrder = (name) => { const i = PARSHIOT.indexOf((name || '').split('-')[0]); return i < 0 ? 100 + ['ראש השנה', 'יום כיפור', 'סוכות', 'שמחת תורה', 'חנוכה', 'ט״ו בשבט', 'פורים', 'פסח', 'ל״ג בעומר', 'שבועות', 'תשעה באב'].indexOf(name) : i; };
-  const todayStr = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
-  return { info, schedule, parshaFor, gToRD, rdToG, fromRD, toRD, yearName, gematria, PARSHIOT, BOOKS, parshaBook, parshaOrder, todayStr, leap };
-})();
-
-</script>
 <script>
 'use strict';
 /* =========================================================
@@ -873,13 +936,13 @@ function dbErr(error) { if (error) { const e = new Error(error.message || String
 /* ---------------- records ---------------- */
 const RECS = new Map();
 let FOLDERS = [];
-const COLS = { title: 'title', fileName: 'file_name', filePath: 'file_path', mime: 'mime', size: 'size', lang: 'lang', yiOut: 'yi_out', outLang: 'out_lang', status: 'status', progress: 'progress', error: 'error', duration: 'duration', text: 'text', segments: 'segments', summary: 'summary', translations: 'translations', tags: 'tags', folderId: 'folder_id', starred: 'starred', edited: 'edited', peaks: 'peaks', shareToken: 'share_token', shareExpires: 'share_expires', meta: 'meta' };
-const LIST_COLS = 'id,owner,title,file_name,file_path,mime,size,lang,yi_out,out_lang,status,progress,error,duration,text,summary,translations,tags,folder_id,starred,edited,share_token,share_expires,meta,created_at,updated_at,deleted_at';
+const COLS = { title: 'title', fileName: 'file_name', filePath: 'file_path', mime: 'mime', size: 'size', lang: 'lang', yiOut: 'yi_out', outLang: 'out_lang', status: 'status', progress: 'progress', error: 'error', duration: 'duration', text: 'text', segments: 'segments', summary: 'summary', translations: 'translations', tags: 'tags', folderId: 'folder_id', starred: 'starred', edited: 'edited', peaks: 'peaks', shareToken: 'share_token', shareExpires: 'share_expires', speaker: 'speaker', category: 'category', parasha: 'parasha', hyear: 'hyear', occasion: 'occasion', recDate: 'rec_date', notes: 'notes', extras: 'extras' };
+const LIST_COLS = 'id,owner,title,file_name,file_path,mime,size,lang,yi_out,out_lang,status,progress,error,duration,text,summary,translations,tags,folder_id,starred,edited,share_token,share_expires,created_at,updated_at,deleted_at,speaker,category,parasha,hyear,occasion,rec_date';
 function fromRow(r, prev) {
   const o = prev || {};
   Object.assign(o, { id: r.id, owner: r.owner, createdAt: new Date(r.created_at).getTime(), updatedAt: r.updated_at ? new Date(r.updated_at).getTime() : 0, deletedAt: r.deleted_at });
   for (const [k, c] of Object.entries(COLS)) if (c in r) o[k] = r[c];
-  o.tags = o.tags || []; o.translations = o.translations || {}; o.text = o.text || ''; o.duration = o.duration || 0; o.meta = o.meta || {};
+  o.tags = o.tags || []; o.translations = o.translations || {}; o.text = o.text || ''; o.duration = o.duration || 0;
   if (!('segments' in r) && !o.segments) o.segments = null;
   return o;
 }
@@ -905,37 +968,6 @@ async function fullRec(id) {
   return fromRow(data, RECS.get(id) || (RECS.set(id, {}), RECS.get(id)));
 }
 const recsList = () => [...RECS.values()].filter((r) => !r.deletedAt);
-/* ---------------- תאריך עברי להקלטה ---------------- */
-const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-function dateFromFile(file) {
-  const n = (file && file.name) || '';
-  const m = n.match(/(20\d{2})[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/);
-  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-  if (file && file.lastModified && file.lastModified > 946684800000) return ymd(new Date(file.lastModified));
-  return ymd(new Date());
-}
-const recDate = (r) => (r.meta && r.meta.date) || ymd(new Date(r.createdAt || Date.now()));
-const HEB_CACHE = new Map();
-function hebOf(r) {
-  const d = recDate(r), key = d + '|' + ((r.meta && r.meta.parsha) || '');
-  if (!HEB_CACHE.has(key)) {
-    const i = HEB.info(d);
-    if (i && r.meta && r.meta.parsha) i.parsha = r.meta.parsha;
-    HEB_CACHE.set(key, i);
-  }
-  return HEB_CACHE.get(key);
-}
-const noQ = (s) => (s || '').replace(/["'״׳]/g, '');
-function hebLine(r) {
-  const h = hebOf(r); if (!h) return '';
-  const p = h.parsha ? (HEB.PARSHIOT.includes(h.parsha.split('-')[0]) ? 'פרשת ' + h.parsha : h.parsha) : '';
-  return `📅 ${h.text}${p ? ' · ' + p : ''}${h.holiday && h.holiday !== h.parsha ? ' · ' + h.holiday : ''}`;
-}
-function hebHay(r) {
-  const h = hebOf(r); if (!h) return '';
-  return [h.text, noQ(h.text), 'פרשת ' + h.parsha, h.parsha, (h.parsha || '').replace('-', ' '), h.holiday, h.yearName, noQ(h.yearName), h.parshaYearName, noQ(h.parshaYearName), h.monthName, r.meta && r.meta.kind].filter(Boolean).join(' ');
-}
-const inParsha = (r, name) => { const h = hebOf(r); return !!h && (((h.parsha || '').split('-').includes(name)) || h.holiday === name); };
 async function loadFolders() { const { data, error } = await sb.from('folders').select('*'); dbErr(error); FOLDERS = data.sort((a, b) => a.name.localeCompare(b.name, 'he')); }
 async function loadPeople() {
   PEOPLE = {};
@@ -1133,10 +1165,14 @@ function go(page) {
   currentPage = page;
   $$('section.page').forEach((s) => s.classList.toggle('active', s.id === 'page-' + page));
   $$('#tabs button').forEach((b) => b.classList.toggle('active', b.dataset.page === page || (page === 'detail' && b.dataset.page === 'library')));
+  if (document.body.classList.contains('reading') && page !== 'detail') { document.body.classList.remove('reading'); const rx = $('#readExit'); if (rx) rx.remove(); }
   if (page === 'library') renderLibrary();
   if (page === 'stats') renderStats();
   if (page === 'settings') renderSettings();
-  if (page !== 'detail') { const p = $('#player'); if (p && !p.paused) p.pause(); }
+  if (page === 'calendar') renderCalendar();
+  if (page === 'parshiyot') renderParshiyot();
+  if (page === 'help') renderHelp();
+  Mini.update();
   window.scrollTo(0, 0);
 }
 $$('#tabs button').forEach((b) => b.onclick = () => go(b.dataset.page));
@@ -1177,9 +1213,37 @@ function guessExt(blob, name) {
 }
 async function decodeAudio(blob) {
   const buf = await blob.arrayBuffer();
-  const AC = window.AudioContext || window.webkitAudioContext;
-  const ctx = new AC();
-  try { return await ctx.decodeAudioData(buf); } finally { ctx.close && ctx.close(); }
+  // decode straight to 16kHz – 3x less memory, so long recordings and videos fit
+  try { const off = new OfflineAudioContext(1, 1, 16000); return await off.decodeAudioData(buf); }
+  catch (e) {
+    const AC = window.AudioContext || window.webkitAudioContext; const ctx = new AC();
+    try { return await ctx.decodeAudioData(await blob.arrayBuffer()); } finally { ctx.close && ctx.close(); }
+  }
+}
+/* ---- video → audio, and big files → small MP3 (free, in the browser) ---- */
+const VIDEO_EXT = /\.(mp4|mov|mkv|avi|wmv|m4v|mpeg|mpg|3gp|flv|ts)$/i;
+const isVideoFile = (blob, name) => (blob.type || '').startsWith('video/') || VIDEO_EXT.test(name || '');
+const needsCompress = (blob, name) => isVideoFile(blob, name) || blob.size > 12 * 1024 * 1024 || (/\.(wav|flac|aiff?|wma)$/i.test(name || '') && blob.size > 3 * 1024 * 1024);
+async function toMp3(blob, onPct) {
+  if (blob.size > 1.8 * 1024 * 1024 * 1024) throw new Error('הקובץ גדול מדי (מעל 1.8GB) לעיבוד בדפדפן');
+  let audio;
+  try { audio = await decodeAudio(blob); } catch (e) { throw new Error('לא הצלחתי לקרוא את הקול מהקובץ (אולי הפורמט לא נתמך, או שהקובץ גדול מדי לזיכרון המחשב)'); }
+  if (!window.lamejs) await loadScript('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+  let data = audio.getChannelData(0);
+  if (audio.numberOfChannels > 1) { const b = audio.getChannelData(1); const m = new Float32Array(data.length); for (let i = 0; i < data.length; i++) m[i] = (data[i] + b[i]) / 2; data = m; }
+  const rate = audio.sampleRate;
+  const enc = new lamejs.Mp3Encoder(1, rate, rate <= 16000 ? 32 : 48);
+  const out = []; const block = 1152, batch = block * 200;
+  const pcm = new Int16Array(batch);
+  for (let pos = 0; pos < data.length; pos += batch) {
+    const end = Math.min(data.length, pos + batch), n = end - pos;
+    for (let i = 0; i < n; i++) { const v = Math.max(-1, Math.min(1, data[pos + i])); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
+    for (let i = 0; i < n; i += block) { const buf = enc.encodeBuffer(pcm.subarray(i, Math.min(n, i + block))); if (buf.length) out.push(new Uint8Array(buf)); }
+    onPct && onPct(Math.round(end / data.length * 100));
+    await sleep(0);
+  }
+  const fin = enc.flush(); if (fin.length) out.push(new Uint8Array(fin));
+  return { blob: new Blob(out, { type: 'audio/mpeg' }), duration: audio.duration, peaks: computePeaks(audio) };
 }
 async function resampleMono16k(audioBuf, start, end) {
   const rate = 16000;
@@ -1260,113 +1324,8 @@ function engineFor(lang) {
   const e = lang === 'yi' ? S('yi_engine', 'gemini') : S('other_engine', 'groq');
   return e === 'gemini' ? 'gemini' : 'groq';
 }
-/* ---------- בדיקת כיסוי: מוצא קטעי דיבור שלא תומללו ומתמלל אותם שוב ---------- */
-function speechFrames(audio, frame = 0.1) {
-  const ch = audio.getChannelData(0), sr = audio.sampleRate, n = Math.floor(audio.duration / frame), step = Math.max(1, Math.floor(sr * frame / 400));
-  const rms = new Float32Array(n);
-  for (let i = 0; i < n; i++) {
-    const s = Math.floor(i * frame * sr), e = Math.min(ch.length, Math.floor((i + 1) * frame * sr));
-    let sum = 0, c = 0; for (let j = s; j < e; j += step) { sum += ch[j] * ch[j]; c++; }
-    rms[i] = c ? Math.sqrt(sum / c) : 0;
-  }
-  const sorted = Array.from(rms).sort((a, b) => a - b);
-  const q = (p) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))] || 0;
-  const thr = Math.max(q(0.2) * 2.5, q(0.95) * 0.12, 0.004);
-  return { frame, rms, thr, speech: Array.from(rms, (v) => v > thr) };
-}
-function findGaps(audio, segs) {
-  const { frame, speech } = speechFrames(audio);
-  const covered = new Uint8Array(speech.length);
-  (segs || []).forEach((s) => {
-    const txt = (s.text || '').replace(/^⚠️\s*/, '');
-    if (!txt || /^\[קטע/.test(txt)) return;
-    const effEnd = Math.min(s.end || s.start, s.start + 4 + txt.length * 0.15);
-    const a = Math.max(0, Math.floor((s.start - 0.6) / frame)), b = Math.min(speech.length, Math.ceil((Math.max(effEnd, s.start + 1) + 0.6) / frame));
-    for (let i = a; i < b; i++) covered[i] = 1;
-  });
-  const regions = []; let cur = null;
-  for (let i = 0; i < speech.length; i++) {
-    if (speech[i] && !covered[i]) {
-      if (cur && i - cur.last <= 15) { cur.last = i; cur.n++; }
-      else { if (cur) regions.push(cur); cur = { first: i, last: i, n: 1 }; }
-    }
-  }
-  if (cur) regions.push(cur);
-  const out = [];
-  regions.filter((r) => r.n * frame >= 1.5).forEach((r) => {
-    let a = Math.max(0, r.first * frame - 0.8); const b = Math.min(audio.duration, (r.last + 1) * frame + 0.8);
-    while (a < b - 0.5) { const e = Math.min(b, a + 100); out.push([a, e]); a = e; }
-  });
-  return out;
-}
-async function fillGaps(res, blob, lang, onProgress, opts = {}) {
-  let audio; try { audio = await decodeAudio(blob); } catch (e) { return res; }
-  if (!audio || !audio.duration) return res;
-  const gaps = findGaps(audio, res.segments);
-  if (!gaps.length) return res;
-  const segs = (res.segments || []).slice();
-  for (let g = 0; g < gaps.length; g++) {
-    const [a, b] = gaps[g];
-    onProgress && onProgress(`משלים קטע שחסר (${g + 1}/${gaps.length})…`);
-    const wav = encodeWav(await resampleMono16k(audio, a, b));
-    let add = [];
-    try {
-      if (engineFor(lang) === 'gemini') add = await geminiTranscribeOne(wav, 'audio/wav', lang, b - a, opts);
-      else { const r = await whisper(wav, 'audio.wav', lang, b - a); add = (r.segments || []).map((x) => ({ start: x.start, end: x.end, text: (x.text || '').trim() })); if (!add.length && r.text) add = [{ start: 0, end: b - a, text: r.text.trim() }]; }
-    } catch (err) {
-      console.warn('gap fill failed', err.message);
-      if (engineFor(lang) === 'gemini') { try { const r = await whisper(wav, 'audio.wav', lang, b - a); add = (r.segments || []).map((x) => ({ start: x.start, end: x.end, text: '⚠️ ' + (x.text || '').trim() })); } catch (e2) {} }
-    }
-    add = add.filter((x) => x.text && x.text.replace(/[\s.…,!?⚠️-]/g, ''));
-    if (!add.length) add = [{ start: 0, end: b - a, text: `[קטע שלא תומלל ${fmtTime(a)}–${fmtTime(b)} – אפשר ללחוץ "תמלול מחדש"]` }];
-    add.forEach((x) => segs.push({ start: Math.min(b, x.start + a), end: Math.min(b, x.end + a), text: x.text }));
-  }
-  segs.sort((x, y) => x.start - y.start);
-  return Object.assign({}, res, { segments: segs, text: segs.map((s) => s.text).join(' ') });
-}
 async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
-  const res = await transcribeRaw(blob, name, lang, onProgress, opts);
-  try { onProgress && onProgress('בודק שלא חסר כלום…'); return await fillGaps(res, blob, lang, onProgress, opts); }
-  catch (e) { console.warn('gap check failed', e); return res; }
-}
-/* Whisper בחלקים קצרים (עד 30 שניות, חיתוך בשקט) – מונע דילוג על קטעים */
-function cleanSegs(r, off = 0) {
-  let segs = (r.segments || []).filter((x) => !(x.no_speech_prob > 0.6 && x.avg_logprob < -1)).map((x) => ({ start: x.start + off, end: x.end + off, text: (x.text || '').trim() })).filter((x) => x.text);
-  if (!segs.length && r.text && r.text.trim() && !(r.segments || []).length) segs = [{ start: off, end: off + (r.duration || 0), text: r.text.trim() }];
-  return segs;
-}
-async function whisperChunked(audio, lang, onProgress) {
-  const total = audio.duration, { frame, rms, speech } = speechFrames(audio);
-  const chunks = []; let st = 0;
-  while (st < total - 0.3) {
-    if (total - st <= 30) { chunks.push([st, total]); break; }
-    const a = Math.floor((st + 18) / frame), b = Math.min(rms.length - 1, Math.floor((st + 28) / frame));
-    let best = a; for (let i = a; i <= b; i++) if (rms[i] < rms[best]) best = i;
-    const cut = (best + 0.5) * frame; chunks.push([st, cut]); st = cut;
-  }
-  const hasSpeech = ([a, b]) => { let n = 0; for (let i = Math.floor(a / frame); i < Math.min(speech.length, Math.ceil(b / frame)); i++) if (speech[i]) n++; return n * frame >= 0.4; };
-  const results = new Array(chunks.length); let done = 0, next = 0;
-  const worker = async () => {
-    while (next < chunks.length) {
-      const i = next++, [a, b] = chunks[i];
-      if (hasSpeech(chunks[i])) {
-        const wav = encodeWav(await resampleMono16k(audio, a, b));
-        const r = await whisper(wav, 'audio.wav', lang, b - a);
-        results[i] = { segs: cleanSegs(r, a), language: r.language };
-      } else results[i] = { segs: [] };
-      done++; onProgress && onProgress(chunks.length > 1 ? `מתמלל ${done}/${chunks.length}…` : 'מתמלל…');
-    }
-  };
-  await Promise.all([worker(), worker()]);
-  const segs = results.flatMap((x) => x.segs);
-  const language = (results.find((x) => x.language) || {}).language || lang;
-  return { text: segs.map((x) => x.text).join(' '), segments: segs, duration: total, language };
-}
-async function transcribeRaw(blob, name, lang, onProgress, opts = {}) {
   if (engineFor(lang) === 'gemini') return geminiTranscribe(blob, name, lang, onProgress, opts);
-  let decoded = null;
-  try { onProgress && onProgress('מכין את הקובץ…'); decoded = await decodeAudio(blob); } catch (e) { decoded = null; }
-  if (decoded && decoded.duration) return whisperChunked(decoded, lang, onProgress);
   const ext = guessExt(blob, name);
   if (blob.size <= MAX_DIRECT) {
     try {
@@ -1602,7 +1561,7 @@ async function autoTitle(text) {
     { role: 'user', content: `תן כותרת קצרה וברורה להקלטה לפי התמלול:\n"""${text.slice(0, 3000)}"""` }], { maxTokens: 300, temperature: 0.2 });
   return out.split('\n')[0].replace(/^["'״׳«»\s]+|["'״׳«»\s.]+$/g, '').replace(/^כותרת\s*:\s*/, '').slice(0, 80);
 }
-const LANG_EN = { he: 'Hebrew', yi: 'Hasidic Yiddish written in Hebrew letters the way it is written in Hasidic newspapers and books (not YIVO spelling), without nikud, keeping Hebrew/Aramaic words in their traditional spelling', en: 'English' };
+const LANG_EN = { he: 'Hebrew', yi: 'Yiddish (in Hebrew letters, standard YIVO spelling)', en: 'English' };
 function splitText(text, max = 5000) {
   const parts = []; let cur = '';
   for (const sent of text.split(/(?<=[.!?։\n])\s+/)) {
@@ -1623,20 +1582,6 @@ async function translateText(text, target, onProgress) {
   }
   return out.join('\n').trim();
 }
-async function translateSegments(res, target) {
-  const segs = res.segments || [];
-  if (!segs.length) {
-    const t = await geminiTranslateText(res.text, target).catch(() => translateText(res.text, target));
-    return Object.assign({}, res, { text: t, segments: [] });
-  }
-  const lines = segs.map((s) => `[${fmtTime(s.start)}] ${s.text}`).join('\n');
-  let t;
-  try { t = await geminiTranslateText(lines, target); } catch (e) { t = await translateText(lines, target); }
-  let out = parseTimedLines(t, res.duration || (segs.length ? segs[segs.length - 1].end : 0));
-  if (out.length < Math.max(1, segs.length * 0.5)) return Object.assign({}, res, { text: t.replace(/^\[?\d{1,2}:\d{2}(?::\d{2})?\]?\s*/gm, ''), segments: [] });
-  return Object.assign({}, res, { segments: out, text: out.map((s) => s.text).join(' ') });
-}
-const LANGS_ALL = Object.assign({ src: 'שפת המקור' }, LANGS);
 const looksDefaultTitle = (r) => !r.title || r.title === (r.fileName || '').replace(/\.[^.]+$/, '') || /^(הקלטה|recording|AUD|PTT|WhatsApp|audio|VID|voice|\d)/i.test(r.title);
 
 /* =========================================================
@@ -1646,29 +1591,46 @@ const Queue = {
   running: false,
   items: [],
   progress: {},
-  async add(blob, name, lang, title) {
+  async add(blob, name, lang, title, meta = {}) {
     const id = uuid();
-    const ext = guessExt(blob, name);
+    const when = meta.recDate ? new Date(meta.recDate + 'T12:00:00').getTime() : Date.now();
     const rec = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
-      lang, yiOut: null, createdAt: Date.now(), duration: 0, folderId: $('#upFolder').value || null, tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
-      meta: { date: dateFromFile(blob), out: LS.get('outLang', 'same'), keep: LS.get('keepSrc', true) }
+      lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
+      speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null, extras: {}
     };
-    const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: null, folder_id: rec.folderId, status: 'queued', meta: rec.meta });
+    const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
+      speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate });
     dbErr(error);
     RECS.set(id, rec);
     await Cache.put(id, blob);
     this.items.push(id);
     queueShown.add(id);
     renderQueue();
-    if (blob.size <= STORAGE_MAX) {
-      const path = `${ME.id}/${id}.${ext}`;
-      rec.uploading = sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true })
-        .then(async ({ error: ue }) => { if (ue) throw ue; rec.filePath = path; await saveRec(rec, ['filePath']); })
-        .catch((e) => { console.warn('upload failed', e); toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + (e.message || e), 6000); });
-    } else toast('⚠️ הקובץ גדול מ-50MB – התמלול יישמר בענן, אבל קובץ השמע יישאר רק במחשב הזה', 7000);
+    askNotify();
     this.run();
     return id;
+  },
+  async prepare(rec, blob, prog) {
+    if (!rec.filePath && needsCompress(blob, rec.fileName)) {
+      const label = isVideoFile(blob, rec.fileName) ? '🎬 מוציא את הקול מהסרטון' : '🗜️ דוחס את הקובץ';
+      prog(label + '…');
+      const r = await toMp3(blob, (p) => prog(`${label}… ${p}%`));
+      blob = r.blob; rec.duration = r.duration; rec.peaks = r.peaks;
+      rec.fileName = (rec.fileName || 'audio').replace(/\.[^.]+$/, '') + '.mp3'; rec.mime = 'audio/mpeg'; rec.size = blob.size;
+      await Cache.put(rec.id, blob);
+      await saveRec(rec, ['fileName', 'mime', 'size', 'duration', 'peaks']).catch(() => {});
+    }
+    if (!rec.filePath) {
+      if (blob.size <= STORAGE_MAX) {
+        prog('☁️ שומר את ההקלטה בענן…');
+        const ext = guessExt(blob, rec.fileName), path = `${ME.id}/${rec.id}.${ext}`;
+        const { error: ue } = await sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true });
+        if (ue) toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + ue.message, 6000);
+        else { rec.filePath = path; await saveRec(rec, ['filePath']).catch(() => {}); }
+      } else toast('⚠️ הקובץ גדול מדי לשמירה בענן (מעל 50MB) – התמלול יישמר, אבל השמע יישאר רק במחשב הזה', 7000);
+    }
+    return blob;
   },
   async getBlob(rec) {
     let blob = await Cache.get(rec.id);
@@ -1689,31 +1651,18 @@ const Queue = {
         if (!rec) { this.items.shift(); continue; }
         const prog = (p) => { this.progress[id] = p; renderQueue(); if (currentPage === 'detail' && Detail.id === id) Detail.renderTranscript(); };
         try {
-          const blob = await this.getBlob(rec);
+          let blob = await this.getBlob(rec);
           if (!blob) throw new Error('קובץ השמע לא נמצא (אולי הועלה ממחשב אחר ולא נשמר בענן)');
           rec.status = 'processing'; rec.error = ''; prog('מתחיל…');
           await saveRec(rec, ['status', 'error']).catch(() => {});
+          blob = await this.prepare(rec, blob, prog);
           let seconds = rec.duration || 0;
           if (!seconds) { try { seconds = (await decodeAudio(blob)).duration; } catch (e) {} }
-          const meta = rec.meta || {};
-          let want = meta.out || (rec.yiOut === 'he' ? 'he' : 'same');
-          if (want === rec.lang) want = 'same';
-          const keep = meta.keep !== false;
-          const direct = rec.lang === 'yi' && want === 'he' && !keep;   // Gemini מתרגם ישר מהשמע
-          const opts = { out: direct ? 'he' : undefined, speakers: LS.get('speakers', true), seconds };
-          let res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
-          const srcLang = rec.lang === 'auto' ? (({ hebrew: 'he', yiddish: 'yi', english: 'en', he: 'he', yi: 'yi', en: 'en' })[String(res.language || '').toLowerCase()] || 'auto') : rec.lang;
-          if (want !== 'same' && !direct && want !== srcLang && res.text) {
-            prog(`כותב ב${LANGS[want]}…`);
-            const orig = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
-            const tr = await translateSegments(res, want);
-            if (keep && srcLang !== 'auto') rec.translations = Object.assign({}, rec.translations, { [srcLang]: orig });
-            else if (keep) rec.translations = Object.assign({}, rec.translations, { src: orig });
-            res = tr;
-          }
+          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' ? 'he' : undefined, speakers: LS.get('speakers', true), seconds };
+          const res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
           rec.text = res.text; rec.segments = res.segments; rec.duration = res.duration || seconds || rec.duration;
-          rec.outLang = direct ? 'he' : (want !== 'same' ? want : rec.lang); rec.edited = false;
-          if (rec.lang === 'yi' && rec.yiOut === 'both' && !meta.out && res.text && perm('translate')) {
+          rec.outLang = opts.out || rec.lang; rec.edited = false;
+          if (rec.lang === 'yi' && rec.yiOut === 'both' && res.text && perm('translate')) {
             prog('מתרגם לעברית…');
             try {
               const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
@@ -1735,8 +1684,8 @@ const Queue = {
         try {
           await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited']);
         } catch (e) { rec.status = 'error'; rec.error = 'שמירה בענן נכשלה: ' + e.message; }
-        if (rec.uploading) await rec.uploading;
         if (rec.status === 'done' && rec.filePath) Cache.del(id);
+        notifyDone(rec);
         this.items.shift();
         renderQueue();
         if (currentPage === 'library') renderLibrary();
@@ -1772,12 +1721,15 @@ function renderQueue() {
       ${st}
       ${r.status === 'done' || r.status === 'error' ? `<button class="btn small" data-open="${r.id}">פתיחה</button>` : ''}
       ${r.status === 'error' ? `<button class="btn small" data-retry="${r.id}">🔄 שוב</button>` : ''}
+      ${(r.status === 'queued' || r.status === 'processing') && Queue.items[0] !== r.id ? `<button class="btn small" data-cancel="${r.id}" title="ביטול">✕</button>` : ''}
     </div>`;
   }).join('');
 }
 $('#queueList').addEventListener('click', async (e) => {
   const o = e.target.closest('[data-open]'); if (o) return Detail.open(o.dataset.open);
   const r = e.target.closest('[data-retry]'); if (r) return retryRec(r.dataset.retry);
+  const c = e.target.closest('[data-cancel]');
+  if (c) { const rec = RECS.get(c.dataset.cancel); Queue.items = Queue.items.filter((x) => x !== c.dataset.cancel); if (rec) { rec.status = 'error'; rec.error = 'בוטל'; saveRec(rec, ['status', 'error']).catch(() => {}); } renderQueue(); }
 });
 async function retryRec(id) {
   const rec = RECS.get(id); if (!rec) return;
@@ -1797,18 +1749,10 @@ function syncLangPills() {
 }
 $('#yiOutPills').addEventListener('click', (e) => { const b = e.target.closest('[data-yiout]'); if (!b) return; LS.set('yiOut', b.dataset.yiout); syncLangPills(); });
 $('#speakersChk').addEventListener('change', () => LS.set('speakers', $('#speakersChk').checked));
-function syncOutPills() {
-  const o = LS.get('outLang', 'same');
-  $$('#outPills button').forEach((b) => b.classList.toggle('active', b.dataset.out === o));
-  $('#keepSrcWrap').classList.toggle('hidden', o === 'same');
-  $('#keepSrcChk').checked = LS.get('keepSrc', true);
-}
-$('#outPills').addEventListener('click', (e) => { const b = e.target.closest('[data-out]'); if (!b) return; LS.set('outLang', b.dataset.out); syncOutPills(); });
-$('#keepSrcChk').addEventListener('change', () => LS.set('keepSrc', $('#keepSrcChk').checked));
 $('#langPills').addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (!b) return; $('#langSel').value = b.dataset.lang; LS.set('lastLang', b.dataset.lang); syncLangPills(); });
 
 /* ---------------- Upload ---------------- */
-const AUDIO_EXT = /\.(opus|ogg|oga|m4a|mp3|wav|aac|amr|webm|mp4|3gp|flac|mpeg|mpga|wma|mov)$/i;
+const AUDIO_EXT = /\.(opus|ogg|oga|m4a|mp3|wav|aac|amr|webm|mp4|3gp|flac|mpeg|mpga|wma|mov|mkv|avi|wmv|m4v|mpg|aiff?)$/i;
 const isAudioFile = (f) => f && f.size && ((f.type || '').startsWith('audio/') || (f.type || '').startsWith('video/') || AUDIO_EXT.test(f.name || '') || /^(AUD|PTT)-/i.test(f.name || ''));
 function addFiles(files, fromFolder = false) {
   if (!perm('transcribe')) return toast('אין לך הרשאה לתמלל');
@@ -1818,9 +1762,39 @@ function addFiles(files, fromFolder = false) {
   if (!list.length) { if (all.length) toast('לא נמצאו קבצי שמע'); return; }
   list.sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name, 'he', { numeric: true }));
   const lang = $('#langSel').value;
-  (async () => { for (const f of list) { try { await Queue.add(f, f.name, lang); } catch (e) { toast('❌ ' + f.name + ': ' + e.message, 6000); } } })();
-  toast(`נוספו ${list.length} הקלטות לתור`);
+  (async () => {
+    const dups = list.filter((f) => recsList().some((r) => r.size === f.size && (r.fileName || '').replace(/\.[^.]+$/, '') === f.name.replace(/\.[^.]+$/, '')));
+    let files = list;
+    if (dups.length && !(await confirmBox(`${dups.length === 1 ? 'הקובץ "' + dups[0].name + '" כבר הועלה' : dups.length + ' מהקבצים כבר הועלו'} בעבר. להעלות שוב?`, 'כן, להעלות שוב'))) files = list.filter((f) => !dups.includes(f));
+    if (!files.length) return;
+    let metas = files.map(() => ({}));
+    if ($('#askMeta').checked) { metas = await uploadMetaDialog(files); if (!metas) return; }
+    toast(`נוספו ${files.length} הקלטות לתור`);
+    for (let i = 0; i < files.length; i++) { const f = files[i], m = metas[i]; try { await Queue.add(f, f.name, lang, m.title || undefined, m); } catch (e) { toast('❌ ' + f.name + ': ' + e.message, 6000); } }
+  })();
 }
+async function uploadMetaDialog(files) {
+  let out = null;
+  const def = { folderId: $('#upFolder').value || '' };
+  const ok = await modal(`<h3>📝 פרטים לכל קובץ (${files.length})</h3><p class="hint">אפשר לשנות שם, לבחור תיקייה ולרשום פרטים. הפרשה והשנה מתמלאות לבד לפי התאריך אם משאירים ריק.</p>
+    ${files.length > 1 ? '<button type="button" class="btn small" id="umCopy">⬇️ להעתיק את הפרטים של הקובץ הראשון לכולם</button>' : ''}
+    <div style="max-height:60vh;overflow:auto">${files.map((f, i) => `<div class="up-row" data-um="${i}">
+      <div class="row"><b>${i + 1}.</b> <input type="text" data-umt value="${esc(f.name.replace(/\.[^.]+$/, ''))}" class="grow" style="width:auto"> <select data-umf style="width:auto;max-width:180px">${folderOptions(def.folderId, '— בלי תיקייה —')}</select></div>
+      <div class="muted" style="font-size:.8em">${esc(f.name)} · ${(f.size / 1048576).toFixed(1)}MB ${isVideoFile(f, f.name) ? '· 🎬 סרטון' : ''}</div>
+      ${metaFormHtml({}, 'u' + i + '_')}</div>`).join('')}</div>`,
+  { okText: 'להתחיל לתמלל', wide: true, onOk: (bg) => { out = files.map((f, i) => { const row = bg.querySelector(`[data-um="${i}"]`); return Object.assign(readMetaForm(row, 'u' + i + '_'), { title: row.querySelector('[data-umt]').value.trim(), folderId: row.querySelector('[data-umf]').value || null }); }); } });
+  return ok ? out : null;
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#umCopy')) return;
+  const bg = e.target.closest('.modal-bg'); const rows = $$('[data-um]', bg); const first = rows[0];
+  const vals = readMetaForm(first, 'u0_'); const fold = first.querySelector('[data-umf]').value;
+  rows.slice(1).forEach((row) => { const i = row.dataset.um; Object.entries(vals).forEach(([k, v]) => { const el = row.querySelector(`[data-mf="u${i}_${k}"]`); if (el && v) el.value = v; }); row.querySelector('[data-umf]').value = fold; });
+  toast('הועתק לכל הקבצים ✓');
+});
+/* ---- browser notification when a transcription finishes ---- */
+function askNotify() { try { if ('Notification' in window && Notification.permission === 'default' && !LS.get('notifAsked')) { LS.set('notifAsked', 1); Notification.requestPermission(); } } catch (e) {} }
+function notifyDone(rec) { try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification(rec.status === 'done' ? '✅ התמלול הסתיים' : '❌ התמלול נכשל', { body: rec.title, icon: 'icon-192.png' }); } catch (e) {} }
 $('#pickBtn').onclick = () => $('#fileInput').click();
 $('#fileInput').onchange = (e) => { addFiles(e.target.files); e.target.value = ''; };
 $('#pickDirBtn').onclick = () => $('#dirInput').click();
@@ -1850,7 +1824,7 @@ document.addEventListener('drop', (e) => { e.preventDefault(); if (currentPage =
 /* ---------------- Recorder ---------------- */
 const Rec = {
   mr: null, chunks: [], stream: null, t0: 0, timer: null, ctx: null, raf: null,
-  async toggle() { this.mr && this.mr.state === 'recording' ? this.stop() : this.start(); },
+  async toggle() { this.mr && this.mr.state !== 'inactive' ? this.stop() : this.start(); },
   async start() {
     try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
     catch (err) { toast('אין גישה למיקרופון: ' + (err.message || err.name), 6000); return; }
@@ -1861,10 +1835,11 @@ const Rec = {
     this.mr.ondataavailable = (e) => { if (e.data && e.data.size) this.chunks.push(e.data); };
     this.mr.onstop = () => this.finish();
     this.mr.start(1000);
+    this.paused = 0; this.pausedAt = 0; $('#recPause').classList.remove('hidden'); $('#recPause').textContent = '⏸ השהיה';
     this.t0 = Date.now();
     $('#recBtn').classList.add('recording'); $('#recBtn').textContent = '⏹'; $('#recBtn').title = 'עצירה ותמלול';
     $('#recHint').textContent = 'מקליט… לחץ שוב כדי לעצור ולתמלל.';
-    this.timer = setInterval(() => $('#recTime').textContent = fmtTime((Date.now() - this.t0) / 1000), 250);
+    this.timer = setInterval(() => { if (this.mr && this.mr.state === 'recording') $('#recTime').textContent = fmtTime((Date.now() - this.t0) / 1000); }, 250);
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AC();
@@ -1881,7 +1856,13 @@ const Rec = {
     } catch (e) {}
   },
   stop() { if (this.mr && this.mr.state !== 'inactive') this.mr.stop(); },
+  pause() {
+    if (!this.mr) return;
+    if (this.mr.state === 'recording') { this.mr.pause(); this.pausedAt = Date.now(); $('#recPause').textContent = '▶️ המשך'; $('#recHint').textContent = 'ההקלטה מושהית.'; $('#recBtn').classList.remove('recording'); }
+    else if (this.mr.state === 'paused') { this.mr.resume(); this.t0 += Date.now() - this.pausedAt; $('#recPause').textContent = '⏸ השהיה'; $('#recHint').textContent = 'מקליט… לחץ ⏹ כדי לעצור ולתמלל.'; $('#recBtn').classList.add('recording'); }
+  },
   async finish() {
+    $('#recPause').classList.add('hidden'); if (this.pausedAt && this.mr && this.mr.state === 'inactive' && $('#recPause').textContent.includes('המשך')) this.t0 += Date.now() - this.pausedAt;
     clearInterval(this.timer); cancelAnimationFrame(this.raf);
     if (this.ctx) { try { this.ctx.close(); } catch (e) {} this.ctx = null; }
     this.stream && this.stream.getTracks().forEach((t) => t.stop());
@@ -1903,18 +1884,34 @@ const Rec = {
   }
 };
 $('#recBtn').onclick = () => Rec.toggle();
+$('#recPause').onclick = () => Rec.pause();
 
 /* =========================================================
    LIBRARY
    ========================================================= */
-let libFolder = 'all';
+let libFolder = 'all', libView = 'list';
 const SEL = new Set();
 const folderName = (id) => { const f = FOLDERS.find((x) => x.id === id); return f ? f.name : ''; };
+const folderIcon = (f) => f.icon || ((f.shared_with && f.shared_with.length) ? '👥' : '📁');
 const canManageFolder = (f) => f && (f.owner === ME.id || isAdmin());
-function folderOptions(sel, emptyLabel = 'ללא תיקייה') {
-  return `<option value="">${emptyLabel}</option>` + FOLDERS.map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${f.owner !== ME.id ? '👥 ' : ''}${esc(f.name)}</option>`).join('');
+function folderDepth(f) { let d = 0, p = f; const seen = new Set(); while (p && p.parent_id && !seen.has(p.id)) { seen.add(p.id); p = FOLDERS.find((x) => x.id === p.parent_id); d++; } return d; }
+function folderPath(id) { const out = []; let p = FOLDERS.find((x) => x.id === id); const seen = new Set(); while (p && !seen.has(p.id)) { seen.add(p.id); out.unshift(p.name); p = FOLDERS.find((x) => x.id === p.parent_id); } return out.join(' / '); }
+function folderTree() {
+  const out = [];
+  const walk = (pid, d) => FOLDERS.filter((f) => (f.parent_id || null) === pid || (pid === null && f.parent_id && !FOLDERS.some((x) => x.id === f.parent_id)))
+    .forEach((f) => { if (out.includes(f)) return; out.push(f); walk(f.id, d + 1); });
+  walk(null, 0);
+  FOLDERS.forEach((f) => { if (!out.includes(f)) out.push(f); });
+  return out;
 }
-function fillUpFolder() { const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בלי תיקייה —'); }
+function descendants(id) { const ids = new Set([id]); let grew = true; while (grew) { grew = false; FOLDERS.forEach((f) => { if (f.parent_id && ids.has(f.parent_id) && !ids.has(f.id)) { ids.add(f.id); grew = true; } }); } return ids; }
+function folderOptions(sel, emptyLabel = 'ללא תיקייה') {
+  return `<option value="">${emptyLabel}</option>` + folderTree().map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${'\u00a0\u00a0'.repeat(folderDepth(f))}${folderIcon(f)} ${esc(f.name)}${f.owner !== ME.id ? ' (' + esc(personName(f.owner) || 'משותף') + ')' : ''}</option>`).join('');
+}
+function fillUpFolder() {
+  const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בלי תיקייה —');
+  const np = $('#newFolderParent'); if (np) np.innerHTML = folderOptions(np.value, '— ראשית —').replace('— ראשית —', '📂 תיקייה ראשית');
+}
 function highlight(text, q) {
   const t = esc(text);
   if (!q) return t;
@@ -1928,79 +1925,93 @@ function snippetFor(text, q) {
   const s = Math.max(0, i - 80);
   return (s ? '…' : '') + text.slice(s, i + 140);
 }
+const recDateOf = (r) => r.recDate ? new Date(r.recDate + 'T12:00:00').getTime() : r.createdAt;
+const FILTERS = { fSpeaker: 'speaker', fCategory: 'category', fParasha: 'parasha', fYear: 'hyear', fLang: 'lang', fTag: 'tag' };
+function inFolder(r) {
+  if (libFolder === 'all') return true;
+  if (libFolder === 'none') return !r.folderId;
+  if (libFolder === 'star') return r.starred;
+  if (libFolder === 'mine') return r.owner === ME.id;
+  return r.folderId && descendants(libFolder).has(r.folderId);
+}
+function matchFilters(r) {
+  for (const [id, key] of Object.entries(FILTERS)) {
+    const v = ($('#' + id) || {}).value; if (!v) continue;
+    if (key === 'tag') { if (!(r.tags || []).includes(v)) return false; }
+    else if (key === 'parasha') { if (!parshaMatch(r.parasha, v)) return false; }
+    else if ((r[key] || '') !== v) return false;
+  }
+  return true;
+}
 function currentList() {
   const q = $('#searchBox').value.trim();
-  let list = recsList().filter((r) => libFolder === 'all' || libFolder === 'heb' ? true : libFolder === 'none' ? !r.folderId : libFolder === 'star' ? r.starred : libFolder === 'mine' ? r.owner === ME.id : r.folderId === libFolder);
+  let list = recsList().filter((r) => inFolder(r) && matchFilters(r));
   if (q) {
     const ql = q.toLowerCase();
-    const strict = /^פרשת\s+/.test(q);
-    const qn = noQ(ql).replace(/^פרשת\s+/, '').trim();
-    const pName = HEB.PARSHIOT.find((x) => noQ(x) === qn) || HOLIDAYS.find((x) => noQ(x) === qn);
-    list = list.filter((r) => (pName && inParsha(r, pName)) || (!strict && ([r.title, r.text, r.summary, (r.tags || []).join(' '), Object.values(r.translations || {}).join(' '), hebHay(r)].join(' ').toLowerCase().includes(ql) || noQ(hebHay(r)).toLowerCase().includes(noQ(ql)))));
-    if (pName) list.forEach((r) => { r._pm = inParsha(r, pName) ? 1 : 0; });
+    list = list.filter((r) => [r.title, r.text, r.summary, (r.tags || []).join(' '), Object.values(r.translations || {}).join(' '), r.speaker, r.category, r.parasha, r.hyear, r.occasion, folderName(r.folderId), hebDate(recDateOf(r))].join(' ').toLowerCase().includes(ql));
   }
-  if (libFolder === 'heb' && libParsha) list = list.filter((r) => inParsha(r, libParsha));
   const s = $('#sortSel').value;
-  const qp = q && (HEB.PARSHIOT.find((x) => noQ(x) === noQ(q).replace(/^פרשת\s+/, '').trim()) || HOLIDAYS.find((x) => noQ(x) === noQ(q).replace(/^פרשת\s+/, '').trim()));
-  if (qp) { list.sort((a, b) => (b._pm || 0) - (a._pm || 0) || ((hebOf(b) || {}).rd || 0) - ((hebOf(a) || {}).rd || 0)); return list; }
-  list.sort(s === 'heb' || libFolder === 'heb' ? (a, b) => (hebOf(b) ? hebOf(b).rd : 0) - (hebOf(a) ? hebOf(a).rd : 0) : s === 'old' ? (a, b) => a.createdAt - b.createdAt : s === 'name' ? (a, b) => (a.title || '').localeCompare(b.title || '', 'he') : s === 'long' ? (a, b) => (b.duration || 0) - (a.duration || 0) : (a, b) => b.createdAt - a.createdAt);
+  const pi = (r) => { const i = parshaIndex(r.parasha); return i < 0 ? 999 : i; };
+  list.sort(s === 'old' ? (a, b) => a.createdAt - b.createdAt : s === 'name' ? (a, b) => (a.title || '').localeCompare(b.title || '', 'he') : s === 'long' ? (a, b) => (b.duration || 0) - (a.duration || 0)
+    : s === 'parasha' ? (a, b) => pi(a) - pi(b) || recDateOf(a) - recDateOf(b) : s === 'recdate' ? (a, b) => recDateOf(b) - recDateOf(a) : (a, b) => b.createdAt - a.createdAt);
   return list;
+}
+function fillFilters() {
+  const recs = recsList();
+  const opt = (id, label, values) => { const el = $('#' + id); const cur = el.value; el.innerHTML = `<option value="">${label}</option>` + values.map((v) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join(''); };
+  const uniq = (arr) => [...new Set(arr.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he'));
+  opt('fSpeaker', '👤 כל הדוברים', uniq(recs.map((r) => r.speaker)));
+  opt('fCategory', '🏷️ כל הסוגים', uniq(recs.map((r) => r.category)));
+  opt('fParasha', '📖 כל הפרשות', PARSHA_LIST.filter((p) => recs.some((r) => parshaMatch(r.parasha, p))));
+  opt('fYear', '🗓️ כל השנים', uniq(recs.map((r) => r.hyear)).reverse());
+  const el = $('#fLang'), cur = el.value; el.innerHTML = '<option value="">🌐 כל השפות</option>' + ['he', 'yi', 'en', 'auto'].filter((l) => recs.some((r) => r.lang === l)).map((l) => `<option value="${l}" ${l === cur ? 'selected' : ''}>${LANGS[l]}</option>`).join('');
+  opt('fTag', '# כל התגיות', uniq(recs.flatMap((r) => r.tags || [])));
 }
 function renderLibrary() {
   const recs = recsList();
-  const count = (fid) => recs.filter((r) => fid === 'all' || fid === 'heb' ? true : fid === 'none' ? !r.folderId : fid === 'star' ? r.starred : fid === 'mine' ? r.owner === ME.id : r.folderId === fid).length;
-  const base = [['all', '📂 הכל'], ['heb', '📅 לוח עברי – לפי פרשה'], ['star', '⭐ מסומנות'], ['none', '📄 ללא תיקייה']];
+  fillFilters();
+  const count = (fid) => recs.filter((r) => fid === 'all' ? true : fid === 'none' ? !r.folderId : fid === 'star' ? r.starred : fid === 'mine' ? r.owner === ME.id : r.folderId && descendants(fid).has(r.folderId)).length;
+  const base = [['all', '📂 הכל'], ['star', '⭐ מסומנות'], ['none', '📄 ללא תיקייה']];
   if (isAdmin()) base.splice(1, 0, ['mine', '👤 שלי בלבד']);
-  $('#folderList').innerHTML = [...base, ...FOLDERS.map((f) => [f.id, (f.shared_with && f.shared_with.length ? '👥 ' : '📁 ') + f.name + (f.owner !== ME.id ? ` (${personName(f.owner) || 'משותף'})` : '')])].map(([id, name]) => {
+  $('#folderList').innerHTML = [...base.map(([id, name]) => [id, name, 0]), ...folderTree().map((f) => [f.id, folderIcon(f) + ' ' + f.name + (f.owner !== ME.id ? ` (${personName(f.owner) || 'משותף'})` : ''), folderDepth(f)])].map(([id, name, d]) => {
     const f = FOLDERS.find((x) => x.id === id);
-    return `<div class="row" style="gap:.2em;flex-wrap:nowrap"><button class="f ${libFolder === id ? 'active' : ''}" data-folder="${id}"><span>${esc(name)}</span><span class="muted">${count(id)}</span></button>
-      ${f && canManageFolder(f) ? `<button class="btn small" title="שיתוף התיקייה" data-sharefolder="${id}" style="padding:.1em .4em">👥</button><button class="btn small" title="מחיקת התיקייה" data-delfolder="${id}" style="padding:.1em .45em">✕</button>` : ''}</div>`;
+    return `<div class="row" style="gap:.2em;flex-wrap:nowrap;padding-inline-start:${d * 14}px"><button class="f ${libFolder === id ? 'active' : ''}" data-folder="${id}"><span>${esc(name)}</span><span class="muted">${count(id)}</span></button>
+      ${f && canManageFolder(f) ? `<button class="btn small" title="עריכת התיקייה" data-editfolder="${id}" style="padding:.1em .4em">✏️</button><button class="btn small" title="שיתוף התיקייה" data-sharefolder="${id}" style="padding:.1em .4em">👥</button><button class="btn small" title="מחיקת התיקייה" data-delfolder="${id}" style="padding:.1em .45em">✕</button>` : ''}</div>`;
   }).join('');
+  $$('#viewPills button').forEach((b) => b.classList.toggle('active', b.dataset.view === libView));
+  const fg = $('#folderGrid');
+  fg.classList.toggle('hidden', libView !== 'folders');
+  if (libView === 'folders') {
+    const parent = FOLDERS.some((f) => f.id === libFolder) ? libFolder : null;
+    const kids = FOLDERS.filter((f) => (f.parent_id || null) === parent || (parent === null && f.parent_id && !FOLDERS.some((x) => x.id === f.parent_id)));
+    fg.innerHTML = (parent ? `<div class="fcard" data-fopen="${esc(FOLDERS.find((x) => x.id === parent).parent_id || 'all')}"><div class="ic">⬆️</div><div class="nm">חזרה למעלה</div></div>` : '') +
+      (kids.length ? kids.map((f) => `<div class="fcard" data-fopen="${f.id}" style="${f.color ? 'border-top:5px solid ' + esc(f.color) : ''}"><div class="ic">${folderIcon(f)}</div><div class="nm">${esc(f.name)}</div><div class="muted" style="font-size:.85em">${count(f.id)} הקלטות${FOLDERS.some((x) => x.parent_id === f.id) ? ' · ' + FOLDERS.filter((x) => x.parent_id === f.id).length + ' תיקיות' : ''}</div>${f.owner !== ME.id ? `<div class="muted" style="font-size:.8em">👤 ${esc(personName(f.owner))}</div>` : ''}</div>`).join('') : '<div class="muted">אין כאן תתי-תיקיות.</div>');
+  }
   const q = $('#searchBox').value.trim();
   const list = currentList();
   const showOwner = isAdmin() || FOLDERS.some((f) => f.owner !== ME.id || (f.shared_with || []).length);
-  if (libFolder === 'heb' && !libParsha && !q) { $('#recList').innerHTML = parshaIndex(recs); $('#selAll').checked = false; renderBulk(); return; }
-  const qn = noQ(q).replace(/^פרשת\s+/, '');
-  const grouped = libFolder === 'heb' || $('#sortSel').value === 'heb' || !!(HEB.PARSHIOT.find((x) => noQ(x) === qn) || HOLIDAYS.find((x) => noQ(x) === qn));
-  let lastGroup = null;
-  const groupHead = (r) => {
-    if (!grouped) return '';
-    const h = hebOf(r); const g = h ? `${h.parsha ? (HEB.PARSHIOT.includes(h.parsha.split('-')[0]) ? 'פרשת ' + h.parsha : h.parsha) : ''} ${h.parshaYearName}` : 'ללא תאריך';
-    if (g === lastGroup) return '';
-    lastGroup = g; return `<div class="group-head">📖 ${esc(g)}</div>`;
-  };
-  const back = libFolder === 'heb' && libParsha ? `<div class="row" style="margin-bottom:.6em"><button class="btn small" id="parshaBack">→ כל הפרשיות</button><b>${esc(HEB.PARSHIOT.includes(libParsha) ? 'פרשת ' + libParsha : libParsha)}</b><span class="muted">${list.length} הקלטות</span></div>` : '';
-  $('#recList').innerHTML = back + (list.length ? list.map((r) => groupHead(r) + `
-    <div class="rec-card ${SEL.has(r.id) ? 'sel' : ''}" data-rec="${r.id}">
+  $('#recList').innerHTML = (libFolder !== 'all' && FOLDERS.some((f) => f.id === libFolder) ? `<div class="muted" style="margin-bottom:6px">📂 ${esc(folderPath(libFolder))}</div>` : '') + (list.length ? list.map((r) => {
+    const ed = editable(r);
+    const meta = [r.speaker && '👤 ' + esc(r.speaker), r.category && '🏷️ ' + esc(r.category), r.parasha && '📖 ' + esc(r.parasha), r.hyear && esc(r.hyear), r.occasion && '🕯️ ' + esc(r.occasion)].filter(Boolean).join(' · ');
+    return `<div class="rec-card ${SEL.has(r.id) ? 'sel' : ''}" data-rec="${r.id}">
       <div class="row" style="flex-wrap:nowrap">
         <input type="checkbox" class="chk" data-sel="${r.id}" ${SEL.has(r.id) ? 'checked' : ''} title="בחירה">
         <button class="star ${r.starred ? 'on' : ''}" data-star="${r.id}" title="סימון בכוכב">⭐</button>
-        <span class="title grow">${highlight(r.title, q)}</span>
+        ${ed ? `<input class="inline-ren title grow" data-ren="${r.id}" value="${esc(r.title)}" title="לחץ כדי לשנות שם">` : `<span class="title grow">${highlight(r.title, q)}</span>`}
         ${r.status === 'done' ? '' : r.status === 'error' ? '<span class="badge err">נכשל</span>' : '<span class="badge warn">בתור</span>'}
         ${r.shareToken ? '<span class="badge" title="יש קישור שיתוף פעיל">🔗</span>' : ''}
-        <span class="badge">${LANGS[r.lang] || ''}</span></div>
-      <div class="heb-line">${esc(hebLine(r))}${r.meta && r.meta.kind ? `<span class="kind">${esc(r.meta.kind)}</span>` : ''}</div>
-      <div class="muted" style="font-size:.85em">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)}${r.folderId && folderName(r.folderId) ? ' · 📁 ' + esc(folderName(r.folderId)) : ''}${showOwner && r.owner !== ME.id ? ' · 👤 ' + esc(personName(r.owner)) : ''}</div>
+        <span class="badge">${LANGS[r.lang] || ''}</span>
+        <button class="btn small" data-play="${r.id}" title="ניגון">▶️</button><button class="btn small primary" data-openrec="${r.id}" title="פתיחת ההקלטה">פתיחה</button></div>
+      ${meta ? `<div style="font-size:.88em;margin-top:.15em">${meta}</div>` : ''}
+      <div class="muted" style="font-size:.85em"><span class="hdate">${esc(hebDate(recDateOf(r)))}</span> · ${fmtDate(r.createdAt)} · ${fmtTime(r.duration)}${showOwner && r.owner !== ME.id ? ' · 👤 ' + esc(personName(r.owner)) : ''}</div>
       <div>${(r.tags || []).map((t) => `<span class="tag">#${highlight(t, q)}</span>`).join('')}</div>
       <div class="snippet">${highlight(snippetFor(r.text || r.error || '', q), q)}</div>
-    </div>`).join('') : `<div class="card muted">${q ? 'לא נמצאו תוצאות לחיפוש.' : 'אין עדיין הקלטות כאן.'}</div>`);
+      ${ed ? `<div class="row" style="margin-top:.4em"><span class="muted" style="font-size:.85em">📁</span><select data-move="${r.id}" style="width:auto;padding:.2em .5em;font-size:.88em">${folderOptions(r.folderId)}</select></div>` : (r.folderId ? `<div class="muted" style="font-size:.85em">📁 ${esc(folderPath(r.folderId))}</div>` : '')}
+    </div>`;
+  }).join('') : `<div class="card muted">${q || Object.keys(FILTERS).some((k) => $('#' + k).value) ? 'לא נמצאו תוצאות.' : 'אין עדיין הקלטות כאן.'}</div>`);
   $('#selAll').checked = list.length > 0 && list.every((r) => SEL.has(r.id));
   renderBulk();
 }
-let libParsha = null;
-const HOLIDAYS = ['ראש השנה', 'יום כיפור', 'סוכות', 'שמחת תורה', 'חנוכה', 'ט״ו בשבט', 'פורים', 'פסח', 'ל״ג בעומר', 'שבועות', 'תשעה באב'];
-function parshaIndex(recs) {
-  const cnt = (name) => recs.filter((r) => inParsha(r, name)).length;
-  const btn = (name) => { const c = cnt(name); return `<button class="${c ? 'has' : 'empty'}" data-parsha="${esc(name)}">${esc(name)}${c ? `<b>${c}</b>` : ''}</button>`; };
-  return `<div class="card"><h3 style="margin-top:0">📅 לוח עברי – תורות ושיחות לפי פרשה</h3>
-    <p class="hint">לוחצים על פרשה ורואים את כל ההקלטות שלה מכל השנים, מסודרות לפי שנה (למשל בראשית תשפ״ז, בראשית תשפ״ח). אפשר גם לכתוב בחיפוש "בראשית" או "תשפ״ז". הפרשה נקבעת לפי תאריך ההקלטה (מנהג ארץ ישראל), ואפשר לשנות אותה בדף ההקלטה.</p>
-    ${HEB.BOOKS.map(([book, s, e]) => `<div class="book-title">${book}</div><div class="parsha-grid">${HEB.PARSHIOT.slice(s, e).map(btn).join('')}</div>`).join('')}
-    <div class="book-title">מועדים</div><div class="parsha-grid">${HOLIDAYS.map(btn).join('')}</div></div>`;
-}
-$('#recList').addEventListener('click', (e) => {
-  const p = e.target.closest('[data-parsha]'); if (p) { e.stopPropagation(); libParsha = p.dataset.parsha; renderLibrary(); return; }
-  if (e.target.closest('#parshaBack')) { e.stopPropagation(); libParsha = null; renderLibrary(); }
-}, true);
 function renderBulk() {
   [...SEL].forEach((id) => { if (!RECS.has(id)) SEL.delete(id); });
   $('#bulkBar').classList.toggle('hidden', !SEL.size);
@@ -2008,20 +2019,47 @@ function renderBulk() {
   $('#bulkMove').innerHTML = '<option value="__">📁 העברה לתיקייה…</option>' + folderOptions('', 'ללא תיקייה');
   $('#bulkMove').value = '__';
 }
+$('#viewPills').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (!b) return; libView = b.dataset.view; LS.set('libView', libView); renderLibrary(); });
+$('#folderGrid').addEventListener('click', (e) => { const c = e.target.closest('[data-fopen]'); if (!c) return; libFolder = c.dataset.fopen; SEL.clear(); renderLibrary(); });
+$('#filters').addEventListener('change', () => renderLibrary());
+$('#fClear').onclick = () => { Object.keys(FILTERS).forEach((k) => $('#' + k).value = ''); renderLibrary(); };
 $('#folderList').addEventListener('click', async (e) => {
   const d = e.target.closest('[data-delfolder]');
   if (d) {
     const f = FOLDERS.find((x) => x.id === d.dataset.delfolder);
-    if (!(await confirmBox(`למחוק את התיקייה "${f ? f.name : ''}"? ההקלטות שבה לא יימחקו (הן יעברו ל"ללא תיקייה").`))) return;
+    if (!(await confirmBox(`למחוק את התיקייה "${f ? f.name : ''}"? ההקלטות שבה לא יימחקו (הן יעברו ל"ללא תיקייה"), ותתי-התיקיות יעלו רמה.`))) return;
+    await sb.from('folders').update({ parent_id: f.parent_id || null }).eq('parent_id', f.id);
     const { error } = await sb.from('folders').delete().eq('id', d.dataset.delfolder);
     if (error) return toast('❌ ' + error.message, 5000);
     recsList().forEach((r) => { if (r.folderId === d.dataset.delfolder) r.folderId = null; });
     if (libFolder === d.dataset.delfolder) libFolder = 'all';
     await loadFolders(); fillUpFolder(); return renderLibrary();
   }
-  const sh = e.target.closest('[data-sharefolder]');
-  if (sh) return shareFolder(sh.dataset.sharefolder);
-  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; libParsha = null; SEL.clear(); renderLibrary(); }
+  const ed = e.target.closest('[data-editfolder]'); if (ed) return editFolder(ed.dataset.editfolder);
+  const sh = e.target.closest('[data-sharefolder]'); if (sh) return shareFolder(sh.dataset.sharefolder);
+  const b = e.target.closest('[data-folder]'); if (b) { libFolder = b.dataset.folder; SEL.clear(); renderLibrary(); }
+});
+const FOLDER_ICONS = ['📁', '📚', '📖', '🕯️', '🎙️', '🎓', '⭐', '🔥', '💎', '🏛️', '✡️', '🍷', '🌙', '🎉', '📜', '🎵'];
+const FOLDER_COLORS = ['', '#4f46e5', '#16a34a', '#d97706', '#dc2626', '#0891b2', '#db2777', '#7c3aed', '#64748b'];
+async function editFolder(id) {
+  const f = FOLDERS.find((x) => x.id === id); if (!f) return;
+  let res = null;
+  const notSelf = (html) => html.replace(`<option value="${id}"`, `<option disabled value="${id}"`);
+  const ok = await modal(`<h3>✏️ עריכת תיקייה</h3>
+    <label>שם</label><input type="text" id="efName" value="${esc(f.name)}">
+    <label>בתוך תיקייה</label><select id="efParent">${notSelf(folderOptions(f.parent_id || '', '📂 תיקייה ראשית'))}</select>
+    <label>סמל</label><div class="row" id="efIcons">${FOLDER_ICONS.map((i) => `<button type="button" class="btn small ${f.icon === i ? 'primary' : ''}" data-ic="${i}">${i}</button>`).join('')}</div>
+    <label>צבע</label><div class="row" id="efColors">${FOLDER_COLORS.map((c) => `<button type="button" class="btn small" data-col="${c}" style="background:${c || 'var(--card)'};width:30px;height:30px;${f.color === c ? 'outline:3px solid var(--text)' : ''}">${c ? '' : '∅'}</button>`).join('')}</div>`,
+  { okText: 'שמירה', onOk: (bg) => { res = { name: bg.querySelector('#efName').value.trim() || f.name, parent_id: bg.querySelector('#efParent').value || null, icon: bg.dataset.ic ?? f.icon ?? null, color: bg.dataset.col ?? f.color ?? null }; } });
+  if (!ok || !res) return;
+  if (res.parent_id && descendants(id).has(res.parent_id)) return toast('אי אפשר לשים תיקייה בתוך עצמה');
+  const { error } = await sb.from('folders').update(res).eq('id', id);
+  if (error) return toast('❌ ' + error.message, 5000);
+  await loadFolders(); fillUpFolder(); renderLibrary(); toast('נשמר ✓');
+}
+document.addEventListener('click', (e) => {
+  const ic = e.target.closest('#efIcons [data-ic]'); if (ic) { const bg = ic.closest('.modal-bg'); bg.dataset.ic = ic.dataset.ic; $$('#efIcons button', bg).forEach((b) => b.classList.toggle('primary', b === ic)); }
+  const co = e.target.closest('#efColors [data-col]'); if (co) { const bg = co.closest('.modal-bg'); bg.dataset.col = co.dataset.col; $$('#efColors button', bg).forEach((b) => b.style.outline = b === co ? '3px solid var(--text)' : ''); }
 });
 async function shareFolder(id) {
   const f = FOLDERS.find((x) => x.id === id); if (!f) return;
@@ -2041,17 +2079,21 @@ async function shareFolder(id) {
 $('#newFolderForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = $('#newFolderName').value.trim(); if (!name) return;
-  if (FOLDERS.find((f) => f.name === name && f.owner === ME.id)) { toast('כבר יש לך תיקייה בשם הזה'); return; }
-  const { error } = await sb.from('folders').insert({ name, owner: ME.id });
+  const parent = $('#newFolderParent').value || null;
+  if (FOLDERS.find((f) => f.name === name && f.owner === ME.id && (f.parent_id || null) === parent)) { toast('כבר יש תיקייה בשם הזה כאן'); return; }
+  const { error } = await sb.from('folders').insert({ name, owner: ME.id, parent_id: parent });
   if (error) return toast('❌ ' + error.message, 5000);
   $('#newFolderName').value = ''; toast('התיקייה "' + name + '" נוצרה');
   await loadFolders(); fillUpFolder(); renderLibrary();
 });
 $('#recList').addEventListener('click', async (e) => {
+  if (e.target.closest('[data-ren],[data-move]')) return;
+  const op = e.target.closest('[data-openrec]'); if (op) return Detail.open(op.dataset.openrec);
+  const pl = e.target.closest('[data-play]'); if (pl) { Playlist.set([pl.dataset.play]); return Detail.open(pl.dataset.play, { play: true }); }
   const st = e.target.closest('[data-star]');
   if (st) {
     const r = RECS.get(st.dataset.star); if (!r) return;
-    if (r.owner !== ME.id && !isAdmin()) return toast('רק הבעלים יכול לסמן');
+    if (!editable(r)) return toast('רק הבעלים יכול לסמן');
     r.starred = !r.starred; st.classList.toggle('on', r.starred);
     saveRec(r, ['starred']).catch((er) => toast('❌ ' + er.message));
     return;
@@ -2061,6 +2103,13 @@ $('#recList').addEventListener('click', async (e) => {
   const card = e.target.closest('[data-rec]');
   if (card) { if (SEL.size) { const id = card.dataset.rec; SEL.has(id) ? SEL.delete(id) : SEL.add(id); renderLibrary(); } else Detail.open(card.dataset.rec); }
 });
+$('#recList').addEventListener('change', async (e) => {
+  const rn = e.target.closest('[data-ren]');
+  if (rn) { const r = RECS.get(rn.dataset.ren); const v = rn.value.trim(); if (!r || !v || v === r.title) return; r.title = v; try { await saveRec(r, ['title']); toast('השם נשמר ✓'); } catch (er) { toast('❌ ' + er.message); } return; }
+  const mv = e.target.closest('[data-move]');
+  if (mv) { const r = RECS.get(mv.dataset.move); if (!r) return; r.folderId = mv.value || null; try { await saveRec(r, ['folderId']); toast('הועבר ל: ' + (folderPath(r.folderId) || 'ללא תיקייה') + ' ✓'); renderLibrary(); } catch (er) { toast('❌ ' + er.message); } }
+});
+$('#recList').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('[data-ren]')) e.target.blur(); });
 $('#selAll').addEventListener('change', () => { const list = currentList(); if ($('#selAll').checked) list.forEach((r) => SEL.add(r.id)); else SEL.clear(); renderLibrary(); });
 $('#bulkClear').onclick = () => { SEL.clear(); renderLibrary(); };
 const selRecs = () => [...SEL].map((id) => RECS.get(id)).filter(Boolean);
@@ -2082,6 +2131,18 @@ $('#bulkTag').addEventListener('keydown', async (e) => {
   for (const r of selRecs().filter(editable)) { if (!(r.tags || []).includes(t)) { r.tags = [...(r.tags || []), t]; await saveRec(r, ['tags']).catch(() => {}); n++; } }
   $('#bulkTag').value = ''; toast(`התגית נוספה ל-${n} הקלטות ✓`); renderLibrary();
 });
+$('#bulkMeta').onclick = async () => {
+  const list = selRecs().filter(editable); if (!list.length) return toast('אין הרשאה לערוך את ההקלטות שנבחרו');
+  let vals = null;
+  const ok = await modal(`<h3>🏷️ פרטים ל-${list.length} הקלטות</h3><p class="hint">רק שדות שתמלא ישתנו. שדה ריק – יישאר כמו שהוא.</p>${metaFormHtml({}, 'bm_')}`,
+    { okText: 'שמירה לכולן', wide: true, onOk: (bg) => { vals = readMetaForm(bg, 'bm_'); } });
+  if (!ok || !vals) return;
+  const patch = {}; Object.entries(vals).forEach(([k, v]) => { if (v) patch[k] = v; });
+  if (!Object.keys(patch).length) return;
+  for (const r of list) { Object.assign(r, patch); await saveRec(r, Object.keys(patch)).catch(() => {}); }
+  toast(`עודכנו ${list.length} הקלטות ✓`); renderLibrary();
+};
+$('#bulkExport').onclick = () => openExport(selRecs());
 $('#bulkXlsx').onclick = (e) => runExport(e.currentTarget, () => exportXlsx(selRecs(), 'תמלולים_נבחרים.xlsx', true));
 $('#bulkDel').onclick = async () => {
   const ids = selRecs().filter(editable).map((r) => r.id);
@@ -2092,48 +2153,81 @@ $('#bulkDel').onclick = async () => {
   ids.forEach((id) => { RECS.delete(id); queueShown.delete(id); });
   toast(`${ids.length} הקלטות הועברו לסל המחזור`); SEL.clear(); renderLibrary(); renderQueue();
 };
+$('#playAllBtn').onclick = () => { const l = currentList().filter((r) => r.filePath || r.status === 'done'); if (!l.length) return toast('אין מה לנגן'); Playlist.set(l.map((r) => r.id)); Detail.open(l[0].id, { play: true }); toast(`מנגן ${l.length} הקלטות ברצף ▶️`); };
 let searchT; $('#searchBox').addEventListener('input', () => { clearTimeout(searchT); searchT = setTimeout(renderLibrary, 150); });
 $('#sortSel').addEventListener('change', () => { LS.set('sort', $('#sortSel').value); renderLibrary(); });
 $('#refreshBtn').onclick = async () => { await Promise.all([loadRecs(), loadFolders(), loadPeople()]); renderLibrary(); toast('עודכן ✓'); };
+
+/* ---------------- meta form (speaker / type / parasha / year / occasion / date) ---------------- */
+const CATEGORIES = ['שיעור', 'תורה / טיש', 'שיחה', 'דרשה', 'שיעור בגמרא', 'הספד', 'שבע ברכות / חתונה', 'כינוס / אסיפה', 'הרצאה', 'ראיון', 'שיחת טלפון', 'ניגון / שירה', 'אחר'];
+const OCCASIONS = ['שבת', 'ראש השנה', 'יום כיפור', 'סוכות', 'שמחת תורה', 'חנוכה', 'שבת חנוכה', 'ט״ו בשבט', 'פורים', 'פסח', 'ספירת העומר', 'ל״ג בעומר', 'שבועות', 'שבעה עשר בתמוז', 'תשעה באב', 'ט״ו באב', 'ראש חודש', 'שבת שובה', 'שבת הגדול', 'יארצייט', 'סעודה שלישית', 'מלווה מלכה', 'חתונה', 'בר מצווה', 'ברית'];
+const MF = { speaker: 'speaker', category: 'category', parasha: 'parasha', hyear: 'hyear', occasion: 'occasion', recDate: 'recDate' };
+function metaFormHtml(v, p = 'm_') {
+  return `<div class="metagrid">
+    <div><label>👤 דובר / מגיד שיעור</label><input type="text" data-mf="${p}speaker" list="speakersList" value="${esc(v.speaker || '')}"></div>
+    <div><label>🏷️ סוג</label><select data-mf="${p}category"><option value=""></option>${CATEGORIES.map((c) => `<option ${v.category === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+    <div><label>📖 פרשה</label><select data-mf="${p}parasha">${parshaOptions(v.parasha || '')}</select></div>
+    <div><label>🗓️ שנה</label><input type="text" data-mf="${p}hyear" value="${esc(v.hyear || '')}" placeholder="תשפ״ז"></div>
+    <div><label>🕯️ מועד / אירוע</label><input type="text" data-mf="${p}occasion" list="occasionsList" value="${esc(v.occasion || '')}"></div>
+    <div><label>📅 תאריך ההקלטה</label><input type="date" data-mf="${p}recDate" value="${esc(v.recDate || '')}"></div></div>`;
+}
+function readMetaForm(root, p = 'm_') { const o = {}; Object.keys(MF).forEach((k) => { const el = root.querySelector(`[data-mf="${p}${k}"]`); if (el) o[k] = el.value.trim() || null; }); return o; }
+function fillDatalists() {
+  $('#speakersList').innerHTML = [...new Set(recsList().map((r) => r.speaker).filter(Boolean))].map((s) => `<option value="${esc(s)}">`).join('');
+  $('#occasionsList').innerHTML = OCCASIONS.map((s) => `<option value="${esc(s)}">`).join('');
+}
 
 /* =========================================================
    DETAIL
    ========================================================= */
 const Detail = {
-  id: null, rec: null, url: null, peaks: null, activeSeg: -1, chat: [],
+  id: null, rec: null, url: null, peaks: null, activeSeg: -1, chat: [], loop: false, find: [], findIdx: -1,
   canEdit() { return this.rec && (this.rec.owner === ME.id || isAdmin()); },
-  async open(id) {
+  async open(id, { play = false, stay = false } = {}) {
     let rec;
     try { rec = await fullRec(id); } catch (e) { rec = RECS.get(id); }
     if (!rec) return toast('ההקלטה לא נמצאה');
     const sameRec = this.id === id;
     this.id = id; this.rec = rec;
-    if (!sameRec) this.chat = [];
-    go('detail');
+    rec.extras = rec.extras || {};
+    if (!sameRec) { this.chat = []; this.find = []; this.loop = false; $('#loopBtn').classList.remove('primary'); $('#findInput').value = ''; $('#findCount').textContent = ''; }
+    if (!stay) go('detail');
     const ce = this.canEdit();
     $('#dTitle').value = rec.title; $('#dTitle').disabled = !ce;
     $('#dFolder').disabled = !ce; $('#dTagInput').classList.toggle('hidden', !ce);
+    $$('#dMetaGrid input, #dMetaGrid select, #dNotes').forEach((el) => el.disabled = !ce);
     $('#dOwner').textContent = rec.owner !== ME.id ? '👤 ' + (personName(rec.owner) || 'משתמש אחר') : '';
     $('#dOwner').classList.toggle('hidden', rec.owner === ME.id);
-    $('#dLang').textContent = (LANGS[rec.lang] || '') + (rec.outLang && rec.outLang !== rec.lang && LANGS[rec.outLang] ? ' ← ' + LANGS[rec.outLang] : '');
+    $('#dLang').textContent = (LANGS[rec.lang] || '') + (rec.lang === 'yi' && rec.outLang === 'he' ? ' ← עברית' : '');
     $('#dMeta').textContent = fmtDate(rec.createdAt) + ' · ' + fmtTime(rec.duration);
+    const hd = hebDate(recDateOf(rec)), pr = parshaFor(recDateOf(rec));
+    $('#dHdate').textContent = '📅 ' + hd + (pr ? ' · שבוע פרשת ' + pr : '');
     $('#dFolder').innerHTML = folderOptions(rec.folderId);
-    rec.meta = rec.meta || {};
-    $('#dDate').value = recDate(rec); $('#dDate').disabled = !ce; $('#dParsha').disabled = !ce; $('#dKind').disabled = !ce;
-    $('#dKind').value = rec.meta.kind || '';
-    this.renderHeb();
-    $$('#page-detail .toolbar > *').forEach((el) => {
+    this.renderMeta();
+    $$('#page-detail .toolbar > *, #aiBar').forEach((el) => {
       const pk = [...el.classList].find((c) => c.startsWith('perm-'));
       const hide = (pk && !perm(pk.slice(5))) || (el.classList.contains('can-edit') && !ce);
       el.classList.toggle('hidden', !!hide);
     });
     $('#chatBox').classList.toggle('hidden', !perm('chat'));
-    this.renderShared();
-    this.renderTags();
+    $('#dlAudioBtn').classList.toggle('hidden', !rec.filePath);
+    this.renderShared(); this.renderTags();
     if (!sameRec || !$('#player').src) await this.loadAudio();
     $('#player').playbackRate = +LS.get('speed', 1) || 1; $('#speedSel').value = String(LS.get('speed', 1));
-    this.renderSummary(); this.renderTranslations(); this.renderTranscript(); this.renderChat();
+    this.renderSummary(); this.renderAi(); this.renderTranslations(); this.renderTranscript(); this.renderChat(); this.renderNotes();
     $('#dEdit').classList.add('hidden'); $('#dTranscript').classList.remove('hidden');
+    Mini.update();
+    if (play) $('#player').play().catch(() => {});
+  },
+  renderMeta() {
+    const r = this.rec;
+    $('#mSpeaker').value = r.speaker || '';
+    $('#mCategory').innerHTML = '<option value=""></option>' + CATEGORIES.map((c) => `<option ${r.category === c ? 'selected' : ''}>${c}</option>`).join('') + (r.category && !CATEGORIES.includes(r.category) ? `<option selected>${esc(r.category)}</option>` : '');
+    $('#mParasha').innerHTML = parshaOptions(r.parasha || '');
+    $('#mYear').value = r.hyear || '';
+    $('#mOccasion').value = r.occasion || '';
+    $('#mDate').value = r.recDate || '';
+    fillDatalists();
   },
   async loadAudio() {
     const rec = this.rec, id = rec.id, player = $('#player');
@@ -2147,8 +2241,11 @@ const Detail = {
       this.url = data ? data.signedUrl : '';
     }
     if (this.id !== id) return;
-    if (this.url) { player.src = this.url; player.playbackRate = +LS.get('speed', 1) || 1; }
-    else { this.peaks = null; drawWave('אין קובץ שמע שמור להקלטה הזו'); }
+    if (this.url) {
+      player.src = this.url; player.playbackRate = +LS.get('speed', 1) || 1;
+      const pos = +LS.get('pos_' + id, 0) || 0;
+      if (pos > 5) player.addEventListener('loadedmetadata', function once() { player.removeEventListener('loadedmetadata', once); if (pos < (player.duration || 1e9) - 5) { player.currentTime = pos; toast('▶️ ממשיך מאיפה שעצרת: ' + fmtTime(pos), 2500); } });
+    } else { this.peaks = null; drawWave('אין קובץ שמע שמור להקלטה הזו'); }
     if (!this.peaks && this.url) {
       (async () => {
         try {
@@ -2160,12 +2257,6 @@ const Detail = {
         } catch (e) { console.warn('waveform decode failed', e); }
       })();
     }
-  },
-  renderHeb() {
-    const r = this.rec, auto = HEB.info(recDate(r));
-    $('#dHeb').textContent = hebLine(r).replace(/^📅 /, '');
-    const cur = (r.meta && r.meta.parsha) || '';
-    $('#dParsha').innerHTML = `<option value="">אוטומטי${auto && auto.parsha ? ' (' + esc(auto.parsha) + ')' : ''}</option>` + HEB.PARSHIOT.concat(HOLIDAYS).map((p) => `<option ${p === cur ? 'selected' : ''}>${esc(p)}</option>`).join('');
   },
   renderShared() {
     const r = this.rec, el = $('#dShared');
@@ -2181,9 +2272,17 @@ const Detail = {
     const s = $('#dSummary');
     if (this.rec.summary) { s.classList.remove('hidden'); s.innerHTML = '<b>✨ סיכום</b>\n' + esc(this.rec.summary); } else s.classList.add('hidden');
   },
+  renderAi() {
+    const ai = (this.rec.extras && this.rec.extras.ai) || {}, ce = this.canEdit();
+    $('#dAi').innerHTML = Object.keys(AI_TOOLS).filter((k) => ai[k]).map((k) => {
+      let body = esc(ai[k]);
+      if (k === 'chapters') body = body.replace(/\[(\d{1,2}:\d{2}(?::\d{2})?)\]/g, (m, t) => `<a href="#" data-jump="${t}">[${t}]</a>`);
+      return `<div class="ai-out"><div class="t-head">${AI_TOOLS[k].label}<span class="grow"></span><button class="btn small" data-aicopy="${k}">📋</button>${ce ? `<button class="btn small" data-aidel="${k}">✕</button>` : ''}</div>${body}</div>`;
+    }).join('');
+  },
   renderTranslations() {
     const tr = this.rec.translations || {}, ce = this.canEdit();
-    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">${k === this.rec.lang || k === 'src' ? '🎙️ התמלול בשפת המקור (' + (LANGS_ALL[k] || k) + ')' : '🌐 תרגום ל' + (LANGS_ALL[k] || k)} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
+    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
   },
   renderTranscript() {
     const r = this.rec;
@@ -2193,31 +2292,47 @@ const Detail = {
     else if (r.status === 'error') st.innerHTML = `<p class="err-text">❌ ${esc(r.error)}</p>`;
     else st.innerHTML = '';
     this.activeSeg = -1;
+    const hl = new Set((r.extras && r.extras.hl) || []), times = $('#timesChk').checked, ce = this.canEdit();
+    const box = $('#dTranscript');
+    box.className = 'transcript ' + (LS.get('font', '') || '');
     if (r.segments && r.segments.length && !r.edited) {
-      $('#dTranscript').innerHTML = r.segments.map((s, i) => `<span class="seg" data-seg="${i}" title="לחץ לניגון מ-${fmtTime(s.start)}"><span class="seg-time">${fmtTime(s.start)}</span>${esc(s.text)}</span> `).join('');
+      box.innerHTML = r.segments.map((s, i) => `<span class="seg ${hl.has(i) ? 'hl' : ''}" data-seg="${i}" title="לחץ לניגון מ-${fmtTime(s.start)}">${times ? `<span class="seg-time">${fmtTime(s.start)}</span>` : ''}${ce ? `<span class="seg-star" data-hl="${i}" title="סימון כחשוב" style="cursor:pointer;opacity:${hl.has(i) ? 1 : .25};font-size:.75em">⭐</span>` : ''}<span class="seg-text">${esc(s.text)}</span></span> `).join('');
     } else {
-      $('#dTranscript').innerHTML = esc(r.text || '').replace(/\n/g, '<br>');
+      box.innerHTML = esc(r.text || '').replace(/\n/g, '<br>');
     }
+    if ($('#findInput').value.trim()) runFind(false);
   },
   renderChat() {
     const box = $('#chatMsgs');
-    if (!this.chat.length) { box.innerHTML = '<div class="muted" style="font-size:.9em">לדוגמה: "מה הוחלט בסוף?", "מי הזכיר את התאריך?", "תן לי 3 ציטוטים חשובים".</div>'; return; }
+    if (!this.chat.length) { box.innerHTML = '<div class="muted" style="font-size:.9em">לדוגמה: "מה הוחלט בסוף?", "מה הוא אמר על פרשת השבוע?", "תן לי 3 ציטוטים חשובים".</div>'; return; }
     box.innerHTML = this.chat.map((m) => `<div class="msg ${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content)}</div>`).join('');
     box.scrollTop = box.scrollHeight;
+  },
+  renderNotes() {
+    const r = this.rec, bms = (r.extras && r.extras.bm) || [], ce = this.canEdit();
+    $('#dNotes').value = r.notes || '';
+    $('#bmCount').textContent = bms.length ? `(${bms.length} סימניות)` : '';
+    $('#bmList').innerHTML = bms.length ? bms.map((b, i) => `<div class="bm"><a href="#" data-bmgo="${b.t}">🔖 ${fmtTime(b.t)}</a><span class="grow">${esc(b.note || '')}</span>${ce ? `<button class="btn small" data-bmdel="${i}">✕</button>` : ''}</div>`).join('') : '<div class="muted" style="font-size:.9em">אין סימניות. לחץ 🔖 ליד הנגן כדי לסמן רגע חשוב.</div>';
+    if (r.notes || bms.length) $('#notesBox').open = true;
   },
   async save(fields) { await saveRec(this.rec, fields); const l = RECS.get(this.rec.id); if (l && l !== this.rec) fields.forEach((f) => l[f] = this.rec[f]); }
 };
 $('#backToLib').onclick = () => go('library');
-$('#dTitle').addEventListener('change', async () => { Detail.rec.title = $('#dTitle').value.trim() || 'הקלטה'; await Detail.save(['title']); toast('השם נשמר'); });
-async function saveMeta(patch) {
-  const r = Detail.rec; r.meta = Object.assign({}, r.meta || {}, patch);
-  Object.keys(r.meta).forEach((k) => { if (r.meta[k] === '' || r.meta[k] === null) delete r.meta[k]; });
-  await Detail.save(['meta']); HEB_CACHE.clear(); Detail.renderHeb();
-}
-$('#dDate').addEventListener('change', async () => { if (!$('#dDate').value) return; await saveMeta({ date: $('#dDate').value }); toast('התאריך נשמר ✓'); });
-$('#dParsha').addEventListener('change', async () => { await saveMeta({ parsha: $('#dParsha').value }); toast('הפרשה נשמרה ✓'); });
-$('#dKind').addEventListener('change', async () => { await saveMeta({ kind: $('#dKind').value.trim() }); toast('נשמר ✓'); });
-$('#dFolder').addEventListener('change', async () => { Detail.rec.folderId = $('#dFolder').value || null; await Detail.save(['folderId']); toast('ההקלטה הועברה לתיקייה'); });
+$('#dTitle').addEventListener('change', async () => { Detail.rec.title = $('#dTitle').value.trim() || 'הקלטה'; await Detail.save(['title']); toast('השם נשמר'); Mini.update(); });
+$('#dFolder').addEventListener('change', async () => { Detail.rec.folderId = $('#dFolder').value || null; await Detail.save(['folderId']); toast('ההקלטה הועברה ל: ' + (folderPath(Detail.rec.folderId) || 'ללא תיקייה')); });
+$('#dMetaGrid').addEventListener('change', async (e) => {
+  const map = { mSpeaker: 'speaker', mCategory: 'category', mParasha: 'parasha', mYear: 'hyear', mOccasion: 'occasion', mDate: 'recDate' };
+  const k = map[e.target.id]; if (!k) return;
+  Detail.rec[k] = e.target.value.trim() || null;
+  const f = [k];
+  if (k === 'recDate' && Detail.rec.recDate) {
+    const t = new Date(Detail.rec.recDate + 'T12:00:00').getTime();
+    const p = parshaFor(t), y = hebYearOf(t);
+    if (p && (await confirmBox(`לעדכן גם פרשה ל"${p}" ושנה ל"${y}" לפי התאריך?`, 'כן, לעדכן'))) { Detail.rec.parasha = p; Detail.rec.hyear = y; f.push('parasha', 'hyear'); Detail.renderMeta(); }
+    $('#dHdate').textContent = '📅 ' + hebDate(t) + (p ? ' · שבוע פרשת ' + p : '');
+  }
+  try { await Detail.save(f); toast('נשמר ✓'); } catch (er) { toast('❌ ' + er.message, 5000); }
+});
 $('#dTagInput').addEventListener('keydown', async (e) => {
   if (e.key !== 'Enter') return;
   e.preventDefault();
@@ -2230,24 +2345,55 @@ $('#dTags').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-deltag]'); if (!b) return;
   Detail.rec.tags.splice(+b.dataset.deltag, 1); await Detail.save(['tags']); Detail.renderTags();
 });
-$('#dTranscript').addEventListener('click', (e) => {
-  const s = e.target.closest('[data-seg]'); if (!s) return;
+async function saveExtras() { await Detail.save(['extras']); }
+$('#dTranscript').addEventListener('click', async (e) => {
+  const star = e.target.closest('[data-hl]');
+  if (star) {
+    const i = +star.dataset.hl, ex = Detail.rec.extras; ex.hl = ex.hl || [];
+    ex.hl = ex.hl.includes(i) ? ex.hl.filter((x) => x !== i) : [...ex.hl, i];
+    star.closest('.seg').classList.toggle('hl', ex.hl.includes(i)); star.style.opacity = ex.hl.includes(i) ? 1 : .25;
+    saveExtras().catch((er) => toast('❌ ' + er.message)); return;
+  }
+  const s = e.target.closest('[data-seg]'); if (!s || s.isContentEditable || e.target.closest('[contenteditable=true]')) return;
   const seg = Detail.rec.segments[+s.dataset.seg];
   const p = $('#player'); if (!p.src) return toast('אין קובץ שמע להקלטה הזו');
   p.currentTime = seg.start + 0.01; p.play().catch(() => {});
 });
+$('#dTranscript').addEventListener('dblclick', (e) => {
+  if (!Detail.canEdit()) return;
+  const s = e.target.closest('[data-seg]'); if (!s) return;
+  const t = s.querySelector('.seg-text'); if (!t) return;
+  $('#player').pause();
+  t.contentEditable = 'true'; t.focus();
+  const i = +s.dataset.seg;
+  const done = async () => {
+    t.contentEditable = 'false'; t.removeEventListener('blur', done);
+    const v = t.textContent.trim(); const seg = Detail.rec.segments[i];
+    if (v === seg.text) return;
+    seg.text = v; Detail.rec.text = Detail.rec.segments.map((x) => x.text).join(' ');
+    try { await Detail.save(['segments', 'text']); toast('המשפט תוקן ✓'); } catch (er) { toast('❌ ' + er.message); }
+  };
+  t.addEventListener('blur', done);
+  t.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); t.blur(); } if (ev.key === 'Escape') { t.textContent = Detail.rec.segments[i].text; t.blur(); } });
+});
 $('#player').addEventListener('timeupdate', () => {
   const p = $('#player'), segs = Detail.rec && Detail.rec.segments || [];
-  drawWave();
+  drawWave(); Mini.tick();
+  if (Detail.rec && p.currentTime > 3 && Math.floor(p.currentTime) % 5 === 0) LS.set('pos_' + Detail.rec.id, Math.floor(p.currentTime));
   if (!segs.length || Detail.rec.edited) return;
   const t = p.currentTime;
+  if (Detail.loop && Detail.activeSeg >= 0) { const s = segs[Detail.activeSeg]; if (t >= s.end - 0.05 || t < s.start - 0.5) { p.currentTime = s.start + 0.01; return; } }
   const idx = segs.findIndex((s) => t >= s.start && t < s.end);
-  if (idx !== Detail.activeSeg) {
+  if (idx !== Detail.activeSeg && idx >= 0) {
     $$('#dTranscript .seg.active').forEach((x) => x.classList.remove('active'));
-    if (idx >= 0) { const el = $(`#dTranscript [data-seg="${idx}"]`); if (el) el.classList.add('active'); }
+    const el = $(`#dTranscript [data-seg="${idx}"]`);
+    if (el) { el.classList.add('active'); if ($('#followChk').checked && !p.paused && currentPage === 'detail') el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
     Detail.activeSeg = idx;
   }
 });
+$('#player').addEventListener('ended', () => { if (Detail.rec) LS.del('pos_' + Detail.rec.id); Playlist.next(); });
+$('#player').addEventListener('play', () => Mini.update());
+$('#player').addEventListener('pause', () => Mini.update());
 $('#speedSel').addEventListener('change', () => { const v = +$('#speedSel').value; $('#player').playbackRate = v; LS.set('speed', v); });
 function stepSpeed(dir) {
   const opts = [...$('#speedSel').options].map((o) => +o.value);
@@ -2255,11 +2401,74 @@ function stepSpeed(dir) {
   const nx = opts[Math.max(0, Math.min(opts.length - 1, cur + dir))];
   $('#speedSel').value = String(nx); $('#player').playbackRate = nx; LS.set('speed', nx); toast('מהירות ×' + nx, 1200);
 }
+$('#loopBtn').onclick = () => { Detail.loop = !Detail.loop; $('#loopBtn').classList.toggle('primary', Detail.loop); toast(Detail.loop ? '🔁 חוזר על המשפט הנוכחי' : 'החזרה בוטלה', 1500); };
+$('#bmAdd').onclick = async () => {
+  if (!Detail.canEdit()) return toast('רק הבעלים יכול להוסיף סימניות');
+  const t = Math.floor($('#player').currentTime || 0); let note = '';
+  const ok = await modal(`<h3>🔖 סימנייה ב-${fmtTime(t)}</h3><label>הערה (לא חובה)</label><input type="text" id="bmNote">`, { okText: 'שמירה', onOk: (bg) => { note = bg.querySelector('#bmNote').value.trim(); } });
+  if (!ok) return;
+  const ex = Detail.rec.extras; ex.bm = [...(ex.bm || []), { t, note }].sort((a, b) => a.t - b.t);
+  await saveExtras(); Detail.renderNotes(); toast('הסימנייה נשמרה 🔖');
+};
+$('#bmList').addEventListener('click', async (e) => {
+  const g = e.target.closest('[data-bmgo]'); if (g) { e.preventDefault(); const p = $('#player'); p.currentTime = +g.dataset.bmgo; p.play().catch(() => {}); return; }
+  const d = e.target.closest('[data-bmdel]'); if (d) { Detail.rec.extras.bm.splice(+d.dataset.bmdel, 1); await saveExtras(); Detail.renderNotes(); }
+});
+$('#dNotes').addEventListener('change', async () => { Detail.rec.notes = $('#dNotes').value; try { await Detail.save(['notes']); toast('ההערות נשמרו ✓'); } catch (er) { toast('❌ ' + er.message); } });
+$('#timesChk').addEventListener('change', () => { LS.set('times', $('#timesChk').checked); Detail.renderTranscript(); });
+$('#followChk').addEventListener('change', () => LS.set('follow', $('#followChk').checked));
+$('#fontBtn').onclick = () => { const order = ['', 'big', 'huge']; const cur = LS.get('font', ''); const nx = order[(order.indexOf(cur) + 1) % order.length]; LS.set('font', nx); $('#dTranscript').className = 'transcript ' + nx; };
+$('#readBtn').onclick = () => {
+  document.body.classList.add('reading');
+  const b = document.createElement('button'); b.id = 'readExit'; b.className = 'btn primary'; b.textContent = '✕ יציאה ממצב קריאה';
+  b.onclick = () => { document.body.classList.remove('reading'); b.remove(); }; document.body.appendChild(b);
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch (e) {}
+};
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('reading')) { document.body.classList.remove('reading'); const b = $('#readExit'); if (b) b.remove(); } });
+/* ---- find inside transcript ---- */
+function runFind(jump = true) {
+  const q = $('#findInput').value.trim().toLowerCase();
+  $$('#dTranscript .seg.found').forEach((x) => x.classList.remove('found'));
+  Detail.find = []; Detail.findIdx = -1;
+  if (!q) { $('#findCount').textContent = ''; return; }
+  $$('#dTranscript .seg').forEach((s) => { if (s.textContent.toLowerCase().includes(q)) { s.classList.add('found'); Detail.find.push(s); } });
+  $('#findCount').textContent = Detail.find.length ? `${Detail.find.length} תוצאות` : 'לא נמצא';
+  if (jump && Detail.find.length) stepFind(1);
+}
+function stepFind(d) { if (!Detail.find.length) return; Detail.findIdx = (Detail.findIdx + d + Detail.find.length) % Detail.find.length; Detail.find[Detail.findIdx].scrollIntoView({ block: 'center', behavior: 'smooth' }); $('#findCount').textContent = `${Detail.findIdx + 1} מתוך ${Detail.find.length}`; }
+let findT; $('#findInput').addEventListener('input', () => { clearTimeout(findT); findT = setTimeout(() => runFind(true), 250); });
+$('#findInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); stepFind(e.shiftKey ? -1 : 1); } });
+$('#findNext').onclick = () => stepFind(1); $('#findPrev').onclick = () => stepFind(-1);
+/* ---- replace words / rename speakers ---- */
+$('#replaceBtn').onclick = async () => {
+  const r = Detail.rec;
+  const speakers = [...new Set(((r.segments || []).map((s) => (s.text.match(/^([^:]{2,25}):/) || [])[1]).filter(Boolean)))].slice(0, 12);
+  let res = null;
+  const ok = await modal(`<h3>🔁 החלפת מילים ודוברים</h3>
+    ${speakers.length ? `<b>שמות הדוברים:</b><div class="metagrid">${speakers.map((s, i) => `<div><label>${esc(s)}</label><input type="text" data-sp="${i}" placeholder="שם חדש"></div>`).join('')}</div><hr style="border:none;border-top:1px solid var(--line);margin:1em 0">` : ''}
+    <b>החלפת מילה או ביטוי בכל התמלול:</b>
+    <div class="metagrid"><div><label>מה להחליף</label><input type="text" id="rpFrom"></div><div><label>במה</label><input type="text" id="rpTo"></div></div>
+    <label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="rpDict" style="width:auto"> להוסיף את המילה החדשה גם למילון המונחים (כדי שבפעם הבאה ייכתב נכון)</label>`,
+  { okText: 'החלפה', wide: true, onOk: (bg) => { res = { sp: speakers.map((s, i) => [s, bg.querySelector(`[data-sp="${i}"]`).value.trim()]).filter(([, v]) => v), from: bg.querySelector('#rpFrom').value, to: bg.querySelector('#rpTo').value, dict: bg.querySelector('#rpDict').checked }; } });
+  if (!ok || !res) return;
+  const pairs = res.sp.map(([a, b]) => [a + ':', b + ':']); if (res.from) pairs.push([res.from, res.to]);
+  if (!pairs.length) return;
+  let n = 0;
+  const apply = (t) => { let o = t; pairs.forEach(([a, b]) => { const parts = o.split(a); n += parts.length - 1; o = parts.join(b); }); return o; };
+  (r.segments || []).forEach((s) => { s.text = apply(s.text); });
+  r.text = r.segments && r.segments.length && !r.edited ? r.segments.map((x) => x.text).join(' ') : apply(r.text || '');
+  if (r.translations) Object.keys(r.translations).forEach((k) => { r.translations[k] = apply(r.translations[k]); });
+  await Detail.save(['segments', 'text', 'translations']);
+  if (res.dict && res.to && isAdmin()) await sb.from('dictionary').upsert([{ term: res.to }], { onConflict: 'term', ignoreDuplicates: true });
+  Detail.renderTranscript(); Detail.renderTranslations(); toast(`הוחלפו ${n} מופעים ✓`);
+};
 const KBD_HELP = `<h3>⌨️ קיצורי מקלדת</h3><table class="tbl">
   <tr><td><span class="kbd">רווח</span></td><td>ניגון / עצירה</td></tr>
   <tr><td><span class="kbd">←</span></td><td>קדימה 5 שניות</td></tr>
   <tr><td><span class="kbd">→</span></td><td>אחורה 5 שניות</td></tr>
   <tr><td><span class="kbd">+</span> / <span class="kbd">-</span></td><td>מהר יותר / לאט יותר</td></tr>
+  <tr><td><span class="kbd">B</span></td><td>סימנייה ברגע הזה</td></tr>
+  <tr><td><span class="kbd">L</span></td><td>חזרה על המשפט</td></tr>
   <tr><td><span class="kbd">/</span></td><td>חיפוש בספרייה</td></tr>
   <tr><td><span class="kbd">Esc</span></td><td>חזרה לספרייה</td></tr>
   <tr><td><span class="kbd">?</span></td><td>החלון הזה</td></tr></table>`;
@@ -2270,13 +2479,15 @@ document.addEventListener('keydown', (e) => {
   if (['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable || $('#modalRoot').children.length) return;
   if (e.key === '/') { e.preventDefault(); if (currentPage !== 'library') go('library'); setTimeout(() => $('#searchBox').focus(), 30); return; }
   if (e.key === '?') { e.preventDefault(); $('#kbdHelp').click(); return; }
-  if (currentPage !== 'detail') return;
   const p = $('#player');
-  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); if (p.src) p.paused ? p.play().catch(() => {}) : p.pause(); }
-  else if (e.key === 'ArrowLeft') { e.preventDefault(); p.currentTime = Math.min((p.duration || 1e9), p.currentTime + 5); }
+  if ((e.key === ' ' || e.code === 'Space') && (currentPage === 'detail' || p.src)) { e.preventDefault(); if (p.src) p.paused ? p.play().catch(() => {}) : p.pause(); return; }
+  if (currentPage !== 'detail') return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); p.currentTime = Math.min((p.duration || 1e9), p.currentTime + 5); }
   else if (e.key === 'ArrowRight') { e.preventDefault(); p.currentTime = Math.max(0, p.currentTime - 5); }
   else if (e.key === '+' || e.key === '=') stepSpeed(1);
   else if (e.key === '-') stepSpeed(-1);
+  else if (e.key === 'b' || e.key === 'B' || e.key === 'נ') $('#bmAdd').click();
+  else if (e.key === 'l' || e.key === 'L' || e.key === 'ך') $('#loopBtn').click();
   else if (e.key === 'Escape') go('library');
 });
 function drawWave(msg) {
@@ -2291,6 +2502,7 @@ function drawWave(msg) {
   if (!peaks) { g.fillStyle = mut; g.font = '14px sans-serif'; g.textAlign = 'center'; g.fillText(typeof msg === 'string' ? msg : 'טוען גל קול…', w / 2, h / 2 + 5); return; }
   const p = $('#player'); const dur = p.duration || (Detail.rec && Detail.rec.duration) || 1; const prog = Math.min(1, (p.currentTime || 0) / dur);
   const bars = Math.floor(w / 3), mid = h / 2;
+  const bms = ((Detail.rec && Detail.rec.extras && Detail.rec.extras.bm) || []);
   for (let i = 0; i < bars; i++) {
     const v = peaks[Math.floor(i / bars * peaks.length)] || 0;
     const bh = Math.max(2, v * (h - 10));
@@ -2298,7 +2510,8 @@ function drawWave(msg) {
     g.globalAlpha = i / bars <= prog ? 1 : 0.45;
     g.fillRect(i * 3, mid - bh / 2, 2, bh);
   }
-  g.globalAlpha = 1;
+  g.globalAlpha = 1; g.fillStyle = '#f59e0b';
+  bms.forEach((b) => { const x = (b.t / dur) * w; g.fillRect(x - 1, 0, 3, h); });
 }
 $('#waveWrap').addEventListener('click', (e) => {
   const p = $('#player'); const r = e.currentTarget.getBoundingClientRect();
@@ -2323,7 +2536,7 @@ $('#trBtn').onclick = async () => {
   try {
     const src = r.segments && r.segments.length && !r.edited ? r.segments.map((x) => x.text).join('\n') : r.text;
     let t;
-    if (r.lang === 'yi' || target === 'yi') t = await geminiTranslateText(src, target).catch(() => translateText(src, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p));
+    if (r.lang === 'yi' || target === 'yi' || src.length > 7000) t = await geminiTranslateText(src, target).catch(() => translateText(src, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p));
     else t = await translateText(src, target, (p) => b.innerHTML = '<span class="spinner"></span> ' + p);
     r.translations = Object.assign({}, r.translations, { [target]: t });
     if (Detail.canEdit()) await Detail.save(['translations']);
@@ -2337,6 +2550,12 @@ $('#dTranslations').addEventListener('click', async (e) => {
   if (d) { const tr = Object.assign({}, Detail.rec.translations); delete tr[d.dataset.trdel]; Detail.rec.translations = tr; await Detail.save(['translations']); Detail.renderTranslations(); }
 });
 $('#copyBtn').onclick = async () => { try { await navigator.clipboard.writeText(Detail.rec.text || ''); toast('הטקסט הועתק'); } catch (e) { toast('ההעתקה נכשלה'); } };
+$('#dlAudioBtn').onclick = async () => {
+  const r = Detail.rec; if (!r.filePath) return toast('אין קובץ שמע שמור');
+  const { data } = await sb.storage.from('audio').createSignedUrl(r.filePath, 600, { download: safeName(r.title) + '.' + (r.filePath.split('.').pop() || 'mp3') });
+  if (!data) return toast('ההורדה נכשלה');
+  const a = document.createElement('a'); a.href = data.signedUrl; document.body.appendChild(a); a.click(); a.remove();
+};
 $('#editBtn').onclick = () => { $('#dEditText').value = Detail.rec.text || ''; $('#dEdit').classList.remove('hidden'); $('#dTranscript').classList.add('hidden'); };
 $('#cancelEditBtn').onclick = () => { $('#dEdit').classList.add('hidden'); $('#dTranscript').classList.remove('hidden'); };
 $('#saveEditBtn').onclick = async () => {
@@ -2347,16 +2566,6 @@ $('#saveEditBtn').onclick = async () => {
 $('#retryBtn').onclick = async () => {
   const r = Detail.rec;
   if (!(await Cache.get(r.id)) && !r.filePath) return toast('אין קובץ שמע שמור – אי אפשר לתמלל מחדש');
-  const cur = (r.meta && r.meta.out) || 'same';
-  let out = cur, keep = !(r.meta && r.meta.keep === false);
-  const ok = await modal(`<h3>🔄 תמלול מחדש</h3><p>שפת ההקלטה: <b>${esc(LANGS[r.lang] || '')}</b></p>
-    <label>הטקסט ייכתב ב:</label><select id="rtOut">${[['same', 'שפת ההקלטה'], ['he', 'עברית'], ['yi', 'יידיש'], ['en', 'אנגלית']].map(([v, t]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${t}</option>`).join('')}</select>
-    <label class="row" style="margin-top:.6em;gap:.3em"><input type="checkbox" id="rtKeep" style="width:auto" ${keep ? 'checked' : ''}> לשמור גם את התמלול בשפת המקור</label>`,
-    { okText: 'לתמלל מחדש', onOk: (bg) => { out = $('#rtOut', bg).value; keep = $('#rtKeep', bg).checked; } });
-  if (!ok) return;
-  r.meta = Object.assign({}, r.meta || {}, { out, keep });
-  const l = RECS.get(r.id); if (l) l.meta = r.meta;
-  await saveRec(r, ['meta']).catch(() => {});
   await retryRec(Detail.id); toast('נשלח לתמלול מחדש'); go('home');
 };
 $('#delBtn').onclick = async () => {
@@ -2365,10 +2574,65 @@ $('#delBtn').onclick = async () => {
   const { error } = await sb.rpc('trash_recordings', { ids: [Detail.id] });
   if (error) return toast('❌ ' + error.message, 5000);
   RECS.delete(Detail.id); queueShown.delete(Detail.id);
-  Detail.id = null; toast('הועבר לסל המחזור'); go('library'); renderQueue();
+  Detail.id = null; Mini.hide(); toast('הועבר לסל המחזור'); go('library'); renderQueue();
 };
-/* ---- share link with expiry ---- */
+/* ---- smart AI tools ---- */
+const AI_TOOLS = {
+  chapters: { label: '📑 תוכן עניינים', sys: 'אתה עורך תוכן. ענה בעברית בלבד.', ask: 'חלק את התמלול לפרקים לפי נושאים (בין 4 ל-15 פרקים). לכל פרק כתוב שורה אחת בפורמט: [mm:ss] כותרת הפרק – משפט קצר על מה מדובר. השתמש בזמנים שמופיעים בתמלול. בלי הקדמה.', timed: true },
+  sources: { label: '📚 מראי מקומות', sys: 'אתה תלמיד חכם בקי בתנ״ך, ש״ס, מדרשים, ראשונים, אחרונים וספרי חסידות. ענה בעברית בלבד.', ask: 'מצא בתמלול את כל המקורות שהדובר מצטט או מזכיר (פסוקים, גמרא, מדרש, זוהר, רש״י, ספרי חסידות, הלכה וכו׳). לכל מקור: שורה עם המקור המדויק ככל האפשר (ספר, פרק, פסוק/דף), ואחריו מקף והציטוט או התיאור הקצר. אם לא בטוח במיקום המדויק – כתוב (משוער). בלי הקדמה.' },
+  quotes: { label: '💎 ציטוטים / ווארטים', sys: 'ענה בעברית בלבד.', ask: 'בחר 5 עד 10 משפטים או רעיונות ("ווארטים") הכי חזקים ומעניינים מהתמלול. כתוב כל אחד בשורה נפרדת, מנוסח קצר וברור, עם • בתחילת השורה. בלי הקדמה.' },
+  article: { label: '📝 מאמר ערוך', sys: 'אתה עורך ספרותי של דברי תורה ושיחות. ענה בעברית בלבד (אם הדברים ביידיש – כתוב את המאמר בעברית).', ask: 'עבד את התמלול למאמר כתוב, ערוך ומסודר, מוכן לדפוס: עם כותרת, פסקאות, ניסוח קולח וברור, בלי חזרות ובלי מילות מילוי – אבל בלי להוסיף רעיונות שלא נאמרו ובלי להשמיט רעיונות חשובים. שמור על סגנון הדובר.', max: 6000 },
+  questions: { label: '❓ שאלות חזרה', sys: 'ענה בעברית בלבד.', ask: 'כתוב 6 עד 10 שאלות חזרה על התוכן (לבדיקת הבנה), ואחרי כל שאלה את התשובה הקצרה לפי התמלול. פורמט: מספר. שאלה\n   תשובה: ... בלי הקדמה.' },
+  keywords: { label: '🏷️ תגיות מוצעות', sys: 'ענה בעברית בלבד.', ask: 'תן 5 עד 8 תגיות קצרות (מילה או שתיים) שמתארות את נושאי התמלול. החזר רק את התגיות, מופרדות בפסיקים.', max: 300 }
+};
+async function aiComplete(kind, system, user, maxTokens = 2500) {
+  const long = user.length > 9000;
+  const viaGemini = async () => {
+    const models = await geminiModels(); let lastErr;
+    for (const model of models.slice(0, 3)) {
+      try {
+        const res = await gemFetch(`/models/${model}:generateContent`, { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: { temperature: 0.3, maxOutputTokens: Math.max(2000, maxTokens * 2) } }, 'summary');
+        const c = res.candidates && res.candidates[0];
+        const t = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
+        if (t) return t;
+      } catch (e) { lastErr = e; if (e.status === 403) throw e; }
+    }
+    throw lastErr || new Error('Gemini לא החזיר תשובה');
+  };
+  const viaGroq = async () => (await chatComplete(kind, [{ role: 'system', content: system }, { role: 'user', content: user }], { maxTokens })).out;
+  try { return long ? await viaGemini() : await viaGroq(); }
+  catch (e) { if (e.status === 403) throw e; console.warn('AI fallback', e); return long ? await viaGroq() : await viaGemini(); }
+}
+function transcriptForAi(r, timed, max = 60000) {
+  let t = (r.segments && r.segments.length && !r.edited) ? r.segments.map((s) => (timed ? `[${fmtTime(s.start)}] ` : '') + s.text).join('\n') : (r.text || '');
+  if (r.lang === 'yi' && r.translations && r.translations.he && !timed) t += '\n\n[תרגום לעברית]\n' + r.translations.he;
+  return t.length > max ? t.slice(0, max) + '…' : t;
+}
+$('#aiBar').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-ai]'); if (!b) return;
+  const k = b.dataset.ai, tool = AI_TOOLS[k], r = Detail.rec;
+  if (!r.text) return toast('אין עדיין תמלול');
+  const old = b.innerHTML; b.disabled = true; b.innerHTML = '<span class="spinner"></span> ' + tool.label.split(' ').slice(1).join(' ');
+  try {
+    const out = (await aiComplete('summary', tool.sys, tool.ask + '\n\nהתמלול:\n"""' + transcriptForAi(r, tool.timed) + '"""', tool.max || 2500)).replace(/\*\*/g, '').replace(/^#+\s*/gm, '');
+    r.extras = r.extras || {}; r.extras.ai = Object.assign({}, r.extras.ai, { [k]: out });
+    if (k === 'keywords') {
+      const tags = out.split(/[,،\n]/).map((x) => x.replace(/^[#•\-\s]+/, '').trim()).filter((x) => x && x.length < 30).slice(0, 8);
+      if (Detail.canEdit() && tags.length && (await confirmBox('להוסיף את התגיות להקלטה? ' + tags.join(', '), 'כן, להוסיף'))) { r.tags = [...new Set([...(r.tags || []), ...tags])]; await Detail.save(['tags']); Detail.renderTags(); }
+    }
+    if (Detail.canEdit()) await saveExtras();
+    Detail.renderAi(); toast(tool.label + ' – מוכן ✅');
+  } catch (err) { toast('❌ ' + err.message, 7000); }
+  finally { b.disabled = false; b.innerHTML = old; }
+});
+$('#dAi').addEventListener('click', async (e) => {
+  const j = e.target.closest('[data-jump]'); if (j) { e.preventDefault(); const p = $('#player'); const parts = j.dataset.jump.split(':').map(Number); p.currentTime = parts.length === 3 ? parts[0] * 3600 + parts[1] * 60 + parts[2] : parts[0] * 60 + parts[1]; p.play().catch(() => {}); return; }
+  const c = e.target.closest('[data-aicopy]'); if (c) { try { await navigator.clipboard.writeText(Detail.rec.extras.ai[c.dataset.aicopy]); toast('הועתק'); } catch (er) {} return; }
+  const d = e.target.closest('[data-aidel]'); if (d) { delete Detail.rec.extras.ai[d.dataset.aidel]; await saveExtras(); Detail.renderAi(); }
+});
+/* ---- share link with expiry + QR + WhatsApp ---- */
 const shareUrl = (token) => location.origin + location.pathname + '?view=' + token;
+async function qrImg(text) { try { if (!window.qrcode) await loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'); const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createImgTag(5, 8); } catch (e) { return ''; } }
 $('#shareBtn').onclick = async () => {
   const r = Detail.rec;
   const active = r.shareToken && (!r.shareExpires || new Date(r.shareExpires) > new Date());
@@ -2388,7 +2652,10 @@ $('#shareBtn').onclick = async () => {
   await Detail.save(['shareToken', 'shareExpires']); Detail.renderShared();
   const link = shareUrl(r.shareToken);
   try { await navigator.clipboard.writeText(link); } catch (e) {}
-  modal(`<h3>✅ הקישור מוכן</h3><p>הקישור הועתק. אפשר להדביק אותו בוואטסאפ או במייל:</p><input type="text" readonly value="${esc(link)}" dir="ltr" onclick="this.select()">`, { cancelText: '', okText: 'סגירה' });
+  const qr = await qrImg(link);
+  modal(`<h3>✅ הקישור מוכן</h3><p>הקישור הועתק. אפשר להדביק אותו בוואטסאפ או במייל:</p><input type="text" readonly value="${esc(link)}" dir="ltr" onclick="this.select()">
+    <div class="row" style="margin-top:.8em"><a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(r.title + '\n' + link)}">🟢 שליחה בוואטסאפ</a></div>
+    ${qr ? `<div style="text-align:center;margin-top:.8em">${qr}<div class="hint">סריקה במצלמה של הטלפון</div></div>` : ''}`, { cancelText: '', okText: 'סגירה' });
 };
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'copyShare') navigator.clipboard.writeText($('#shareLink').value).then(() => toast('הקישור הועתק ✓')).catch(() => {}); });
 /* ---- chat with the recording ---- */
@@ -2399,8 +2666,7 @@ $('#chatForm').addEventListener('submit', async (e) => {
   Detail.chat.push({ role: 'user', content: q }); $('#chatInput').value = ''; Detail.renderChat();
   const box = $('#chatMsgs'); box.insertAdjacentHTML('beforeend', '<div class="msg bot" id="chatWait"><span class="spinner"></span></div>'); box.scrollTop = box.scrollHeight;
   try {
-    const src = (r.translations && r.translations.he && r.lang === 'yi') ? r.text + '\n\n[תרגום לעברית]\n' + r.translations.he : r.text;
-    const ctx = src.length > 22000 ? src.slice(0, 22000) + '…' : src;
+    const ctx = transcriptForAi(r, false, 22000);
     const { out } = await chatComplete('chat', [
       { role: 'system', content: 'אתה עוזר שעונה על שאלות לגבי תמלול של הקלטה. ענה בעברית, בקצרה ולעניין, רק לפי מה שכתוב בתמלול. אם התשובה לא מופיעה בתמלול – אמור זאת. אפשר לצטט משפטים מהתמלול.' },
       { role: 'user', content: `זה התמלול:\n"""${ctx}"""` },
@@ -2426,87 +2692,205 @@ function loadScript(src) {
 async function libXLSX() { if (!window.XLSX) await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'); return window.XLSX; }
 async function libDOCX() { if (!window.docx) await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js'); return window.docx; }
 async function libPDF() { if (!window.html2pdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'); return window.html2pdf; }
-function rowsFor(r) {
-  if (r.segments && r.segments.length && !r.edited) return r.segments.map((s) => [fmtTime(s.start), fmtTime(s.end), s.text]);
-  return (r.text || '').split(/\n+/).filter(Boolean).map((t) => ['', '', t]);
+async function libPPTX() { if (!window.PptxGenJS) await loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js'); return window.PptxGenJS; }
+async function libZIP() { if (!window.JSZip) await loadScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'); return window.JSZip; }
+async function runExport(btn, fn) {
+  const old = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try { await fn(); toast('הקובץ ירד ✅'); } catch (err) { console.error(err); toast('❌ הייצוא נכשל: ' + err.message, 6000); }
+  finally { btn.disabled = false; btn.innerHTML = old; }
 }
-async function exportXlsx(recs, fileName, asLibrary = false) {
+/* the export "document model" – one function decides what goes into every format */
+const EXP_DEFAULT = { fmt: 'docx', times: false, paras: true, summary: true, translations: true, chapters: true, sources: true, quotes: false, article: false, notes: false, onlyHl: false, meta: true };
+function paragraphsOf(r, o) {
+  const segs = (r.segments && r.segments.length && !r.edited) ? r.segments : null;
+  const hl = new Set((r.extras && r.extras.hl) || []);
+  if (!segs) return (r.text || '').split(/\n+/).filter(Boolean).map((t) => ({ text: t }));
+  let list = segs.map((s, i) => ({ start: s.start, end: s.end, text: s.text, hl: hl.has(i) }));
+  if (o.onlyHl) list = list.filter((x) => x.hl);
+  if (o.times || !o.paras) return list;
+  const out = []; let cur = null, n = 0;
+  for (const s of list) {
+    const speaker = /^[^:]{2,25}:/.test(s.text);
+    if (!cur || speaker || n >= 5 || (cur.text.length > 600)) { cur = { start: s.start, text: s.text, hl: s.hl }; out.push(cur); n = 1; }
+    else { cur.text += ' ' + s.text; cur.hl = cur.hl || s.hl; n++; }
+  }
+  return out;
+}
+function buildDoc(r, o) {
+  const metaLine = [r.speaker && 'דובר: ' + r.speaker, r.category, r.parasha && 'פרשת ' + r.parasha, r.hyear, r.occasion, hebDate(recDateOf(r)), fmtTime(r.duration)].filter(Boolean).join(' · ');
+  const secs = [];
+  const ai = (r.extras && r.extras.ai) || {};
+  if (o.summary && r.summary) secs.push({ h: 'סיכום', lines: r.summary.split('\n').filter(Boolean) });
+  if (o.chapters && ai.chapters) secs.push({ h: 'תוכן עניינים', lines: ai.chapters.split('\n').filter(Boolean) });
+  if (o.sources && ai.sources) secs.push({ h: 'מראי מקומות', lines: ai.sources.split('\n').filter(Boolean) });
+  if (o.quotes && ai.quotes) secs.push({ h: 'ציטוטים', lines: ai.quotes.split('\n').filter(Boolean) });
+  if (o.article && ai.article) secs.push({ h: 'מאמר ערוך', lines: ai.article.split('\n').filter(Boolean) });
+  secs.push({ h: o.onlyHl ? 'משפטים חשובים' : 'תמלול', paras: paragraphsOf(r, o), main: true });
+  if (o.translations) Object.entries(r.translations || {}).forEach(([k, v]) => secs.push({ h: 'תרגום ל' + LANGS[k], lines: v.split('\n').filter(Boolean), ltr: k === 'en' }));
+  if (o.notes) {
+    const bm = ((r.extras && r.extras.bm) || []).map((b) => `🔖 ${fmtTime(b.t)} ${b.note || ''}`);
+    if (r.notes || bm.length) secs.push({ h: 'הערות', lines: [...(r.notes ? r.notes.split('\n') : []), ...bm].filter(Boolean) });
+  }
+  return { title: r.title, meta: o.meta ? metaLine : '', tags: r.tags || [], secs, times: o.times };
+}
+const lineOf = (p, times) => (times && p.start !== undefined ? `[${fmtTime(p.start)}] ` : '') + p.text;
+function docToText(d, md = false) {
+  let t = (md ? '# ' : '') + d.title + '\n' + (d.meta ? d.meta + '\n' : '') + '\n';
+  d.secs.forEach((s) => { t += (md ? '## ' : '') + s.h + '\n' + (s.paras ? s.paras.map((p) => lineOf(p, d.times)).join(d.times ? '\n' : '\n\n') : s.lines.join('\n')) + '\n\n'; });
+  return t;
+}
+function docToHtml(d) {
+  return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${esc(d.title)}</title><style>body{font-family:Arial,sans-serif;max-width:820px;margin:30px auto;padding:0 16px;line-height:1.9;color:#111}h1{margin-bottom:0}.m{color:#777}.t{color:#999;font-size:.8em}mark{background:#fde68a}h2{border-bottom:2px solid #eee;padding-bottom:4px;margin-top:1.6em}</style></head><body>
+<h1>${esc(d.title)}</h1><div class="m">${esc(d.meta)}</div>
+${d.secs.map((s) => `<h2>${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `<p>${d.times && p.start !== undefined ? `<span class="t">[${fmtTime(p.start)}]</span> ` : ''}${p.hl ? '<mark>' : ''}${esc(p.text)}${p.hl ? '</mark>' : ''}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr"' : ''}>${s.lines.map((l) => `<p>${esc(l)}</p>`).join('')}</div>`)).join('\n')}
+<p class="m" style="margin-top:3em">נוצר במערכת תמלול פלוס</p></body></html>`;
+}
+async function docxChildren(d, dx, { pageBreak = false } = {}) {
+  const P = (text, opts = {}) => new dx.Paragraph(Object.assign({ bidirectional: !opts.ltr, alignment: opts.ltr ? dx.AlignmentType.LEFT : dx.AlignmentType.RIGHT, spacing: { after: 120 }, pageBreakBefore: !!opts.pb, heading: opts.heading,
+    children: [new dx.TextRun({ text, rightToLeft: !opts.ltr, font: 'Arial', size: opts.size || 24, bold: !!opts.bold, color: opts.color, highlight: opts.hl ? 'yellow' : undefined })] }));
+  const kids = [P(d.title, { size: 36, bold: true, pb: pageBreak, heading: dx.HeadingLevel.HEADING_1 })];
+  if (d.meta) kids.push(P(d.meta, { size: 20, color: '777777' }));
+  d.secs.forEach((s) => {
+    kids.push(P(s.h, { size: 28, bold: true }));
+    if (s.paras) s.paras.forEach((p) => kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.RIGHT, spacing: { after: 140 },
+      children: [...(d.times && p.start !== undefined ? [new dx.TextRun({ text: `[${fmtTime(p.start)}] `, rightToLeft: true, font: 'Arial', size: 18, color: '888888' })] : []), new dx.TextRun({ text: p.text, rightToLeft: true, font: 'Arial', size: 24, highlight: p.hl ? 'yellow' : undefined })] })));
+    else s.lines.forEach((l) => kids.push(P(l, { ltr: s.ltr })));
+  });
+  return kids;
+}
+async function docToDocxBlob(docs, title) {
+  const dx = await libDOCX();
+  let kids = [];
+  if (docs.length > 1) {
+    kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, spacing: { after: 400 }, children: [new dx.TextRun({ text: title, rightToLeft: true, font: 'Arial', size: 48, bold: true })] }));
+    kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.RIGHT, children: [new dx.TextRun({ text: 'תוכן העניינים', rightToLeft: true, font: 'Arial', size: 30, bold: true })] }));
+    docs.forEach((d, i) => kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.RIGHT, spacing: { after: 80 }, children: [new dx.TextRun({ text: `${i + 1}. ${d.title}${d.meta ? ' — ' + d.meta : ''}`, rightToLeft: true, font: 'Arial', size: 22 })] })));
+  }
+  for (let i = 0; i < docs.length; i++) kids = kids.concat(await docxChildren(docs[i], dx, { pageBreak: docs.length > 1 }));
+  const doc = new dx.Document({ creator: 'תמלול פלוס', title, sections: [{ properties: {}, children: kids }] });
+  return dx.Packer.toBlob(doc);
+}
+async function docToPdf(d, name) {
+  const html2pdf = await libPDF();
+  const el = document.createElement('div'); el.dir = 'rtl';
+  el.style.cssText = 'font-family:Arial,"Segoe UI",sans-serif;color:#111;background:#fff;padding:24px;width:720px;line-height:1.8;font-size:15px;direction:rtl;text-align:right';
+  el.innerHTML = `<h1 style="font-size:22px;margin:0 0 4px">${esc(d.title)}</h1><div style="color:#777;font-size:12px;margin-bottom:14px">${esc(d.meta)}</div>` +
+    d.secs.map((s) => `<h2 style="font-size:17px;margin:14px 0 6px">${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `<p style="margin:0 0 8px;${p.hl ? 'background:#fde68a' : ''}">${d.times && p.start !== undefined ? `<span style="color:#888;font-size:11px">[${fmtTime(p.start)}]</span> ` : ''}${esc(p.text)}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr" style="text-align:left"' : ''}>${s.lines.map((l) => `<p style="margin:0 0 6px">${esc(l)}</p>`).join('')}</div>`)).join('');
+  const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-10000px;top:0;';
+  holder.appendChild(el); document.body.appendChild(holder);
+  try {
+    const blob = await html2pdf().set({ margin: 10, filename: name, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } }).from(el).outputPdf('blob');
+    download(blob, name);
+  } finally { holder.remove(); }
+}
+async function docToPptx(d, name) {
+  const P = await libPPTX(); const pptx = new P(); pptx.layout = 'LAYOUT_WIDE'; pptx.rtlMode = true;
+  const T = { rtlMode: true, align: 'right', fontFace: 'Arial', color: '1c1d29' };
+  let s = pptx.addSlide(); s.background = { color: '4f46e5' };
+  s.addText(d.title, Object.assign({}, T, { x: 0.6, y: 2.2, w: 12, h: 1.5, fontSize: 40, bold: true, color: 'FFFFFF', align: 'center' }));
+  if (d.meta) s.addText(d.meta, Object.assign({}, T, { x: 0.6, y: 3.8, w: 12, h: 0.8, fontSize: 18, color: 'E0E7FF', align: 'center' }));
+  d.secs.forEach((sec) => {
+    const lines = sec.paras ? sec.paras.map((p) => lineOf(p, d.times)) : sec.lines;
+    const chunks = []; let cur = [], len = 0;
+    lines.forEach((l) => { if (cur.length && (len + l.length > 650 || cur.length >= 7)) { chunks.push(cur); cur = []; len = 0; } cur.push(l); len += l.length; });
+    if (cur.length) chunks.push(cur);
+    chunks.forEach((c, i) => {
+      const sl = pptx.addSlide();
+      sl.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 13.33, h: 0.9, fill: { color: '4f46e5' } });
+      sl.addText(sec.h + (chunks.length > 1 ? ` (${i + 1}/${chunks.length})` : ''), Object.assign({}, T, { x: 0.4, y: 0.1, w: 12.5, h: 0.7, fontSize: 24, bold: true, color: 'FFFFFF' }));
+      sl.addText(c.map((t) => ({ text: t, options: { breakLine: true, paraSpaceAfter: 8 } })), Object.assign({}, T, { x: 0.6, y: 1.1, w: 12.1, h: 6.1, fontSize: 18, valign: 'top', align: sec.ltr ? 'left' : 'right', rtlMode: !sec.ltr }));
+    });
+  });
+  await pptx.writeFile({ fileName: name });
+}
+function toSrt(r, vtt = false) {
+  const segs = (r.segments || []);
+  const ts = (t) => { const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = Math.floor(t % 60), ms = Math.round((t % 1) * 1000); const p = (n, l = 2) => String(n).padStart(l, '0'); return `${p(h)}:${p(m)}:${p(s)}${vtt ? '.' : ','}${p(ms, 3)}`; };
+  return (vtt ? 'WEBVTT\n\n' : '') + segs.map((s, i) => `${vtt ? '' : (i + 1) + '\n'}${ts(s.start)} --> ${ts(Math.max(s.end, s.start + 1))}\n${s.text}\n`).join('\n');
+}
+async function exportXlsx(recs, fileName, asLibrary = false, o = EXP_DEFAULT) {
   const XLSX = await libXLSX();
-  const wb = XLSX.utils.book_new();
-  wb.Workbook = { Views: [{ RTL: true }] };
+  const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
   if (!asLibrary) {
-    const r = recs[0];
-    const data = [['שם', r.title], ['תאריך עברי', hebLine(r).replace(/^📅 /, '')], ['תאריך', fmtDate(r.createdAt)], ['משך', fmtTime(r.duration)], ['שפה', LANGS[r.lang] || ''], ['תגיות', (r.tags || []).join(', ')], [],
-      ['התחלה', 'סוף', 'טקסט'], ...rowsFor(r)];
-    if (r.summary) data.push([], ['סיכום', r.summary]);
-    Object.entries(r.translations || {}).forEach(([k, v]) => data.push([], ['תרגום ל' + LANGS[k], v]));
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 100 }];
+    const r = recs[0], d = buildDoc(r, o);
+    const data = [['שם', r.title], ['פרטים', d.meta], ['תגיות', (r.tags || []).join(', ')], []];
+    const main = d.secs.find((s) => s.main);
+    if (o.times) { data.push(['התחלה', 'טקסט']); main.paras.forEach((p) => data.push([p.start !== undefined ? fmtTime(p.start) : '', p.text])); }
+    else { data.push(['טקסט']); main.paras.forEach((p) => data.push([p.text])); }
+    d.secs.filter((s) => !s.main).forEach((s) => { data.push([], [s.h]); s.lines.forEach((l) => data.push([l])); });
+    const ws = XLSX.utils.aoa_to_sheet(data); ws['!cols'] = o.times ? [{ wch: 12 }, { wch: 110 }] : [{ wch: 120 }];
     XLSX.utils.book_append_sheet(wb, ws, 'תמלול');
   } else {
-    const data = [['שם', 'תאריך עברי', 'פרשה', 'סוג', 'תאריך', 'משך', 'שפה', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
-      ...recs.map((r) => [r.title, (hebOf(r) || {}).text || '', (hebOf(r) || {}).parsha || '', (r.meta && r.meta.kind) || '', recDate(r), fmtTime(r.duration), LANGS[r.lang] || '', folderName(r.folderId), (r.tags || []).join(', '), personName(r.owner), r.text || '', r.summary || '', (r.translations || {}).he || ''])];
+    const data = [['שם', 'תאריך עברי', 'תאריך', 'משך', 'שפה', 'דובר', 'סוג', 'פרשה', 'שנה', 'מועד', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
+      ...recs.map((r) => [r.title, hebDate(recDateOf(r)), fmtDate(r.createdAt), fmtTime(r.duration), LANGS[r.lang] || '', r.speaker || '', r.category || '', r.parasha || '', r.hyear || '', r.occasion || '', folderPath(r.folderId), (r.tags || []).join(', '), personName(r.owner), r.text || '', r.summary || '', (r.translations || {}).he || ''])];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{ wch: 28 }, { wch: 16 }, { wch: 14 }, { wch: 8 }, { wch: 12 }, { wch: 9 }, { wch: 9 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 90 }, { wch: 60 }, { wch: 60 }];
+    ws['!cols'] = [{ wch: 28 }, { wch: 16 }, { wch: 16 }, { wch: 8 }, { wch: 8 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 12 }, { wch: 90 }, { wch: 60 }, { wch: 60 }];
     XLSX.utils.book_append_sheet(wb, ws, 'ספרייה');
   }
   const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   download(new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileName);
 }
-async function exportDocx(r) {
-  const d = await libDOCX();
-  const P = (text, opts = {}) => new d.Paragraph(Object.assign({ bidirectional: true, alignment: d.AlignmentType.RIGHT, spacing: { after: 120 },
-    children: [new d.TextRun({ text, rightToLeft: true, font: 'Arial', size: opts.size || 24, bold: !!opts.bold, color: opts.color })] }, opts.p || {}));
-  const kids = [
-    P(r.title, { size: 36, bold: true }),
-    P(`${fmtDate(r.createdAt)} · ${fmtTime(r.duration)} · ${LANGS[r.lang] || ''}${(r.tags || []).length ? ' · ' + r.tags.map((t) => '#' + t).join(' ') : ''}`, { size: 20, color: '777777' })
-  ];
-  if (r.summary) { kids.push(P('סיכום', { size: 28, bold: true })); r.summary.split('\n').filter(Boolean).forEach((l) => kids.push(P(l))); }
-  kids.push(P('תמלול', { size: 28, bold: true }));
-  if (r.segments && r.segments.length && !r.edited) r.segments.forEach((s) => kids.push(new d.Paragraph({ bidirectional: true, alignment: d.AlignmentType.RIGHT, spacing: { after: 100 },
-    children: [new d.TextRun({ text: `[${fmtTime(s.start)}] `, rightToLeft: true, font: 'Arial', size: 18, color: '888888' }), new d.TextRun({ text: s.text, rightToLeft: true, font: 'Arial', size: 24 })] })));
-  else (r.text || '').split('\n').filter(Boolean).forEach((l) => kids.push(P(l)));
-  Object.entries(r.translations || {}).forEach(([k, v]) => { kids.push(P('תרגום ל' + LANGS[k], { size: 28, bold: true })); v.split('\n').filter(Boolean).forEach((l) => kids.push(P(l))); });
-  const doc = new d.Document({ creator: 'תמלול פלוס', title: r.title, sections: [{ properties: {}, children: kids }] });
-  download(await d.Packer.toBlob(doc), safeName(r.title) + '.docx');
+const FORMATS = { docx: '📘 Word', pdf: '📕 PDF', xlsx: '📗 Excel', pptx: '📙 PowerPoint', txt: '📄 טקסט', html: '🌐 דף אינטרנט', md: '📝 Markdown', srt: '🎬 כתוביות SRT', vtt: '🎬 כתוביות VTT' };
+async function exportOne(r, o, nameBase) {
+  const d = buildDoc(r, o), base = safeName(nameBase || r.title);
+  if (o.fmt === 'docx') return { name: base + '.docx', blob: await docToDocxBlob([d], r.title) };
+  if (o.fmt === 'txt') return { name: base + '.txt', blob: new Blob(['\ufeff' + docToText(d)], { type: 'text/plain;charset=utf-8' }) };
+  if (o.fmt === 'md') return { name: base + '.md', blob: new Blob([docToText(d, true)], { type: 'text/markdown;charset=utf-8' }) };
+  if (o.fmt === 'html') return { name: base + '.html', blob: new Blob([docToHtml(d)], { type: 'text/html;charset=utf-8' }) };
+  if (o.fmt === 'srt' || o.fmt === 'vtt') return { name: base + '.' + o.fmt, blob: new Blob([toSrt(r, o.fmt === 'vtt')], { type: 'text/plain;charset=utf-8' }) };
+  return null;
 }
-async function exportPdf(r) {
-  const html2pdf = await libPDF();
-  const el = document.createElement('div');
-  el.dir = 'rtl';
-  el.style.cssText = 'font-family:Arial,"Segoe UI",sans-serif;color:#111;background:#fff;padding:24px;width:720px;line-height:1.8;font-size:15px;direction:rtl;text-align:right';
-  const body = (r.segments && r.segments.length && !r.edited)
-    ? r.segments.map((s) => `<p style="margin:0 0 6px"><span style="color:#888;font-size:11px">[${fmtTime(s.start)}]</span> ${esc(s.text)}</p>`).join('')
-    : esc(r.text || '').split('\n').map((l) => `<p style="margin:0 0 6px">${l}</p>`).join('');
-  el.innerHTML = `<h1 style="font-size:22px;margin:0 0 4px">${esc(r.title)}</h1>
-    <div style="color:#777;font-size:12px;margin-bottom:14px">${fmtDate(r.createdAt)} · ${fmtTime(r.duration)} · ${LANGS[r.lang] || ''} ${(r.tags || []).map((t) => '#' + esc(t)).join(' ')}</div>
-    ${r.summary ? `<h2 style="font-size:17px;margin:10px 0 4px">סיכום</h2><div style="white-space:pre-wrap;background:#f1f1fb;padding:10px;border-radius:8px">${esc(r.summary)}</div>` : ''}
-    <h2 style="font-size:17px;margin:14px 0 6px">תמלול</h2>${body}
-    ${Object.entries(r.translations || {}).map(([k, v]) => `<h2 style="font-size:17px;margin:14px 0 6px">תרגום ל${LANGS[k]}</h2><div style="white-space:pre-wrap" dir="${k === 'en' ? 'ltr' : 'rtl'}">${esc(v)}</div>`).join('')}`;
-  const holder = document.createElement('div');
-  holder.style.cssText = 'position:fixed;left:-10000px;top:0;';
-  holder.appendChild(el); document.body.appendChild(holder);
+async function openExport(recs) {
+  if (!recs || !recs.length) return toast('לא נבחרו הקלטות');
+  if (!perm('export')) return toast('אין לך הרשאה להוריד קבצים');
+  const o0 = Object.assign({}, EXP_DEFAULT, LS.get('expOpts', {}));
+  const many = recs.length > 1;
+  let o = null;
+  const chk = (k, label) => `<label class="row" style="font-weight:500;gap:.4em;margin:.2em 0"><input type="checkbox" data-eo="${k}" style="width:auto" ${o0[k] ? 'checked' : ''}> ${label}</label>`;
+  const ok = await modal(`<h3>⬇️ ייצוא ${many ? recs.length + ' הקלטות' : '"' + esc(recs[0].title) + '"'}</h3>
+    <label>סוג קובץ</label><div class="lang-pills" id="eoFmt">${Object.entries(FORMATS).map(([k, v]) => `<button type="button" data-fmt="${k}" class="${o0.fmt === k ? 'active' : ''}">${v}</button>`).join('')}</div>
+    ${many ? `<label class="row" style="font-weight:500;gap:.4em;margin-top:.8em"><input type="radio" name="eoMany" value="zip" checked style="width:auto"> קובץ נפרד לכל הקלטה (בתוך ZIP)</label><label class="row" style="font-weight:500;gap:.4em"><input type="radio" name="eoMany" value="book" style="width:auto"> הכול בקובץ אחד – כמו ספר עם תוכן עניינים (Word / PDF)</label>` : ''}
+    <label style="margin-top:.8em">מה לכלול</label>
+    <div class="perm-grid">${chk('times', '⏱️ עם זמנים (שניות)')}${chk('paras', '¶ לחבר לפסקאות')}${chk('meta', 'ℹ️ פרטים (דובר, פרשה, תאריך)')}${chk('summary', '✨ סיכום')}${chk('translations', '🌐 תרגומים')}${chk('chapters', '📑 תוכן עניינים')}${chk('sources', '📚 מראי מקומות')}${chk('quotes', '💎 ציטוטים')}${chk('article', '📝 מאמר ערוך')}${chk('notes', '🗒️ הערות וסימניות')}${chk('onlyHl', '⭐ רק משפטים חשובים')}</div>
+    <div class="hint">בלי סימון "עם זמנים" – הטקסט יוצא נקי, בלי השניות. Excel רשימה / כתוביות תמיד עם זמנים.</div>`,
+  { okText: '⬇️ הורדה', wide: true, onOk: (bg) => { o = { fmt: (bg.querySelector('#eoFmt .active') || {}).dataset?.fmt || 'docx' }; $$('[data-eo]', bg).forEach((c) => { o[c.dataset.eo] = c.checked; }); const m = bg.querySelector('input[name=eoMany]:checked'); o.many = m ? m.value : 'zip'; } });
+  if (!ok || !o) return;
+  LS.set('expOpts', Object.assign({}, o, { many: undefined }));
+  toast('מכין את הקובץ…', 8000);
   try {
-    const blob = await html2pdf().set({ margin: 10, filename: safeName(r.title) + '.pdf', image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] } }).from(el).outputPdf('blob');
-    download(blob, safeName(r.title) + '.pdf');
-  } finally { holder.remove(); }
+    const full = [];
+    for (const r of recs) { const f = await fullRec(r.id).catch(() => null); full.push(f || r); }
+    if (!many) {
+      const r = full[0], base = safeName(r.title);
+      if (o.fmt === 'pdf') await docToPdf(buildDoc(r, o), base + '.pdf');
+      else if (o.fmt === 'pptx') await docToPptx(buildDoc(r, o), base + '.pptx');
+      else if (o.fmt === 'xlsx') await exportXlsx([r], base + '.xlsx', false, o);
+      else { const x = await exportOne(r, o); download(x.blob, x.name); }
+    } else if (o.many === 'book' || o.fmt === 'xlsx') {
+      const title = (libFolder !== 'all' && folderName(libFolder)) || 'קובץ תמלולים';
+      if (o.fmt === 'xlsx') await exportXlsx(full, safeName(title) + '.xlsx', true);
+      else if (o.fmt === 'pdf') { const docs = full.map((r) => buildDoc(r, o)); await docToPdf({ title, meta: `${docs.length} הקלטות`, times: o.times, secs: docs.flatMap((d) => [{ h: '■ ' + d.title, lines: d.meta ? [d.meta] : [] }, ...d.secs]) }, safeName(title) + '.pdf'); }
+      else if (o.fmt === 'pptx') { const docs = full.map((r) => buildDoc(r, o)); await docToPptx({ title, meta: `${docs.length} הקלטות`, times: o.times, secs: docs.flatMap((d) => [{ h: d.title, lines: d.meta ? [d.meta] : ['—'] }, ...d.secs]) }, safeName(title) + '.pptx'); }
+      else download(await docToDocxBlob(full.map((r) => buildDoc(r, o)), title), safeName(title) + '.docx');
+    } else {
+      const Z = await libZIP(); const zip = new Z(); const used = {};
+      for (const r of full) {
+        let x;
+        if (o.fmt === 'pdf' || o.fmt === 'pptx') x = await exportOne(r, Object.assign({}, o, { fmt: 'docx' }));
+        else x = await exportOne(r, o);
+        let nm = x.name; if (used[nm]) nm = nm.replace(/(\.\w+)$/, ` (${++used[x.name]})$1`); else used[nm] = 1;
+        zip.file(nm, x.blob);
+      }
+      download(await zip.generateAsync({ type: 'blob' }), 'תמלולים.zip');
+      if (o.fmt === 'pdf' || o.fmt === 'pptx') toast('בקובץ ZIP הקבצים יוצאים כ-Word. ל-PDF/PowerPoint אחד – בחר "הכול בקובץ אחד".', 7000);
+    }
+    toast('הקובץ ירד ✅');
+  } catch (err) { console.error(err); toast('❌ הייצוא נכשל: ' + err.message, 7000); }
 }
-async function runExport(btn, fn) {
-  const old = btn.textContent; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-  try { await fn(); toast('הקובץ ירד ✅'); } catch (err) { console.error(err); toast('❌ הייצוא נכשל: ' + err.message, 6000); }
-  finally { btn.disabled = false; btn.textContent = old; }
-}
-$('#xlsxBtn').onclick = (e) => runExport(e.currentTarget, () => exportXlsx([Detail.rec], safeName(Detail.rec.title) + '.xlsx'));
-$('#docxBtn').onclick = (e) => runExport(e.currentTarget, () => exportDocx(Detail.rec));
-$('#pdfBtn').onclick = (e) => runExport(e.currentTarget, () => exportPdf(Detail.rec));
-$('#txtBtn').onclick = () => { const r = Detail.rec; download(new Blob(['\ufeff' + r.title + '\n\n' + (r.summary ? 'סיכום:\n' + r.summary + '\n\n' : '') + (r.text || '') + Object.entries(r.translations || {}).map(([k, v]) => `\n\nתרגום ל${LANGS[k]}:\n${v}`).join('')], { type: 'text/plain;charset=utf-8' }), safeName(r.title) + '.txt'); };
-$('#exportAllXlsx').onclick = (e) => runExport(e.currentTarget, async () => {
-  const recs = currentList();
-  if (!recs.length) throw new Error('אין הקלטות לייצוא');
-  await exportXlsx(recs, 'ספריית_תמלולים.xlsx', true);
-});
+document.addEventListener('click', (e) => { const b = e.target.closest('#eoFmt [data-fmt]'); if (b) $$('#eoFmt button').forEach((x) => x.classList.toggle('active', x === b)); });
+$('#exportBtn').onclick = () => openExport([Detail.rec]);
+$('#exportAllXlsx').onclick = (e) => runExport(e.currentTarget, async () => { const recs = currentList(); if (!recs.length) throw new Error('אין הקלטות לייצוא'); await exportXlsx(recs, 'ספריית_תמלולים.xlsx', true); });
+$('#exportBook').onclick = async () => { const recs = currentList().filter((r) => r.status === 'done'); if (!recs.length) return toast('אין הקלטות'); if (recs.length > 60 && !(await confirmBox(`יש ${recs.length} הקלטות – זה ייקח זמן. להמשיך?`, 'כן'))) return; LS.set('expOpts', Object.assign({}, LS.get('expOpts', {}), { fmt: 'docx' })); openExport(recs); };
 
 /* =========================================================
    STATS
@@ -2521,14 +2905,14 @@ function renderStats() {
   const totalSec = done.reduce((a, r) => a + (r.duration || 0), 0);
   const words = done.reduce((a, r) => a + (r.text ? r.text.split(/\s+/).filter(Boolean).length : 0), 0);
   const week = recs.filter((r) => r.createdAt > Date.now() - 7 * 864e5).length;
-  const cards = [['הקלטות', recs.length], ['תומללו בהצלחה', done.length], ['דקות שתומללו', fmtMinutes(totalSec)], ['מילים', words.toLocaleString('he-IL')],
-    ['השבוע', week], ['תיקיות', FOLDERS.length], ['עם סיכום', recs.filter((r) => r.summary).length], ['נכשלו', recs.filter((r) => r.status === 'error').length]];
+  const cards = [['הקלטות', recs.length], ['תומללו בהצלחה', done.length], ['שעות שתומללו', (totalSec / 3600).toFixed(1)], ['מילים', words.toLocaleString('he-IL')],
+    ['השבוע', week], ['תיקיות', FOLDERS.length], ['דוברים', new Set(recs.map((r) => r.speaker).filter(Boolean)).size], ['פרשות', PARSHA_LIST.filter((p) => recs.some((r) => parshaMatch(r.parasha, p))).length]];
   $('#statCards').innerHTML = cards.map(([k, v]) => `<div class="card stat"><div class="num">${v}</div><div class="muted">${k}</div></div>`).join('');
-  const byLang = {}; recs.forEach((r) => { const k = LANGS[r.lang] || 'אחר'; byLang[k] = (byLang[k] || 0) + 1; });
-  bars($('#statLang'), Object.entries(byLang).sort((a, b) => b[1] - a[1]), (v) => v + ' הקלטות');
-  const byF = {};
-  recs.forEach((r) => { const k = folderName(r.folderId) || 'ללא תיקייה'; byF[k] = (byF[k] || 0) + 1; });
-  bars($('#statFolder'), Object.entries(byF).sort((a, b) => b[1] - a[1]), (v) => v + ' הקלטות');
+  const group = (fn) => { const o = {}; recs.forEach((r) => { const k = fn(r); if (k) o[k] = (o[k] || 0) + 1; }); return Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 12); };
+  bars($('#statLang'), group((r) => LANGS[r.lang] || 'אחר'), (v) => v + ' הקלטות');
+  bars($('#statFolder'), group((r) => folderName(r.folderId) || 'ללא תיקייה'), (v) => v + ' הקלטות');
+  bars($('#statSpeaker'), group((r) => r.speaker), (v) => v + ' הקלטות');
+  bars($('#statCat'), group((r) => r.category), (v) => v + ' הקלטות');
   const months = [];
   for (let i = 5; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); months.push([d.getFullYear() + '-' + d.getMonth(), d.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }), 0]); }
   done.forEach((r) => { const d = new Date(r.createdAt); const m = months.find((x) => x[0] === d.getFullYear() + '-' + d.getMonth()); if (m) m[2] += r.duration || 0; });
@@ -2538,6 +2922,236 @@ function renderStats() {
     bars($('#statUsers'), Object.entries(byU).sort((a, b) => b[1] - a[1]), (v) => fmtMinutes(v) + ' דק׳');
   }
 }
+
+/* =========================================================
+   HEBREW CALENDAR HELPERS (Hebcal – free, open source)
+   ========================================================= */
+const HC = window.hebcal || null;
+const BOOKS = [
+  ['בראשית', ['בראשית', 'נח', 'לך לך', 'וירא', 'חיי שרה', 'תולדות', 'ויצא', 'וישלח', 'וישב', 'מקץ', 'ויגש', 'ויחי']],
+  ['שמות', ['שמות', 'וארא', 'בא', 'בשלח', 'יתרו', 'משפטים', 'תרומה', 'תצוה', 'כי תשא', 'ויקהל', 'פקודי']],
+  ['ויקרא', ['ויקרא', 'צו', 'שמיני', 'תזריע', 'מצורע', 'אחרי מות', 'קדושים', 'אמור', 'בהר', 'בחוקותי']],
+  ['במדבר', ['במדבר', 'נשא', 'בהעלותך', 'שלח', 'קרח', 'חוקת', 'בלק', 'פנחס', 'מטות', 'מסעי']],
+  ['דברים', ['דברים', 'ואתחנן', 'עקב', 'ראה', 'שופטים', 'כי תצא', 'כי תבוא', 'נצבים', 'וילך', 'האזינו', 'וזאת הברכה']]
+];
+const PARSHA_LIST = BOOKS.flatMap((b) => b[1]);
+const PARSHA_EN = ['Bereshit', 'Noach', 'Lech-Lecha', 'Vayera', 'Chayei Sara', 'Toldot', 'Vayetzei', 'Vayishlach', 'Vayeshev', 'Miketz', 'Vayigash', 'Vayechi', 'Shemot', 'Vaera', 'Bo', 'Beshalach', 'Yitro', 'Mishpatim', 'Terumah', 'Tetzaveh', 'Ki Tisa', 'Vayakhel', 'Pekudei', 'Vayikra', 'Tzav', 'Shmini', 'Tazria', 'Metzora', 'Achrei Mot', 'Kedoshim', 'Emor', 'Behar', 'Bechukotai', 'Bamidbar', 'Nasso', "Beha'alotcha", "Sh'lach", 'Korach', 'Chukat', 'Balak', 'Pinchas', 'Matot', 'Masei', 'Devarim', 'Vaetchanan', 'Eikev', "Re'eh", 'Shoftim', 'Ki Teitzei', 'Ki Tavo', 'Nitzavim', 'Vayeilech', "Ha'azinu", 'Vezot Haberakhah'];
+const stripNikud = (s) => String(s || '').replace(/[֑-ׇ]/g, '');
+const normHe = (s) => stripNikud(s).replace(/[ךםןףץ]/g, (c) => ({ 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' }[c])).replace(/[^א-ת]/g, '').replace(/[וי]/g, '');
+const normEn = (s) => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+function parshaIndex(name) { if (!name) return -1; const first = String(name).split(/[-–־]/)[0]; const n = normHe(first); return PARSHA_LIST.findIndex((p) => normHe(p) === n); }
+function parshaMatch(value, p) { if (!value) return false; const n = normHe(p); return String(value).split(/[-–־,]/).some((x) => normHe(x) === n); }
+function parshaOptions(sel) {
+  const has = sel && parshaIndex(sel) < 0;
+  return '<option value=""></option>' + (has ? `<option selected>${esc(sel)}</option>` : '') + BOOKS.map(([b, list]) => `<optgroup label="ספר ${b}">${list.map((p) => `<option ${parshaMatch(sel, p) && sel === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`).join('') +
+    `<optgroup label="פרשיות מחוברות">${['ויקהל-פקודי', 'תזריע-מצורע', 'אחרי מות-קדושים', 'בהר-בחוקותי', 'חוקת-בלק', 'מטות-מסעי', 'נצבים-וילך'].map((p) => `<option ${sel === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
+}
+function gem(n) {
+  n = Math.floor(n) % 1000; if (n <= 0) return '';
+  const L = [[400, 'ת'], [300, 'ש'], [200, 'ר'], [100, 'ק'], [90, 'צ'], [80, 'פ'], [70, 'ע'], [60, 'ס'], [50, 'נ'], [40, 'מ'], [30, 'ל'], [20, 'כ'], [10, 'י'], [9, 'ט'], [8, 'ח'], [7, 'ז'], [6, 'ו'], [5, 'ה'], [4, 'ד'], [3, 'ג'], [2, 'ב'], [1, 'א']];
+  let s = ''; let x = n;
+  while (x >= 400) { s += 'ת'; x -= 400; }
+  if (x === 15) s += 'טו'; else if (x === 16) s += 'טז'; else for (const [v, c] of L) { while (x >= v && v < 400) { s += c; x -= v; } }
+  return s.length > 1 ? s.slice(0, -1) + '״' + s.slice(-1) : s + '׳';
+}
+function hdOf(t) { try { return HC ? new HC.HDate(new Date(t)) : null; } catch (e) { return null; } }
+function hebDate(t) {
+  if (!t) return '';
+  const hd = hdOf(t);
+  if (hd) { try { return `${gem(hd.getDate())} ${heMonth(hd)} ${gem(hd.getFullYear())}`; } catch (e) {} }
+  try { return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(t)); } catch (e) { return ''; }
+}
+function heMonth(hd) { try { return stripNikud(HC.Locale.gettext(hd.getMonthName(), 'he')); } catch (e) { return hd.getMonthName(); } }
+function hebYearOf(t) { const hd = hdOf(t); if (hd) return gem(hd.getFullYear()); try { const y = +new Intl.DateTimeFormat('en-u-ca-hebrew', { year: 'numeric' }).format(new Date(t)).replace(/\D/g, ''); return y ? gem(y) : ''; } catch (e) { return ''; } }
+function enToHe(name) {
+  let i = HC && HC.parshiot ? HC.parshiot.indexOf(name) : -1;
+  if (i < 0) i = PARSHA_EN.findIndex((x) => normEn(x) === normEn(name));
+  if (i >= 0 && PARSHA_LIST[i]) return PARSHA_LIST[i];
+  try { const h = stripNikud(HC.Locale.gettext(name, 'he')); const j = PARSHA_LIST.findIndex((p) => normHe(p) === normHe(h)); return j >= 0 ? PARSHA_LIST[j] : h; } catch (e) { return name; }
+}
+const PARSHA_CACHE = {};
+function parshaFor(t) {
+  if (!HC || !t) return '';
+  const key = new Date(t).toDateString(); if (key in PARSHA_CACHE) return PARSHA_CACHE[key];
+  let out = '';
+  try {
+    const hd = hdOf(t); const sat = hd.onOrAfter(6);
+    const sedra = HC.getSedra ? HC.getSedra(sat.getFullYear(), true) : new HC.Sedra(sat.getFullYear(), true);
+    const r = sedra.lookup(sat);
+    if (r && !r.chag && r.parsha && r.parsha.length) out = r.parsha.map(enToHe).join('-');
+  } catch (e) { console.warn('parsha', e); }
+  return (PARSHA_CACHE[key] = out);
+}
+function holidaysOn(t) {
+  if (!HC) return [];
+  try {
+    const evs = HC.HebrewCalendar.getHolidaysOnDate(hdOf(t), true) || [];
+    return evs.filter((ev) => !/Katan|Mevarchim|Candle|Havdalah|Omer|Chanukah: \d Candles?$/i.test(ev.getDesc ? ev.getDesc() : '')).map((ev) => stripNikud(ev.render ? ev.render('he') : ev.getDesc()));
+  } catch (e) { return []; }
+}
+function holidayOf(t) { const h = holidaysOn(t); return h.length ? h[0] : ''; }
+const dayKey = (t) => { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+
+/* =========================================================
+   CALENDAR PAGE
+   ========================================================= */
+let calCursor = null; // greg time inside the shown Hebrew month
+function renderCalendar(selKey) {
+  const recs = recsList();
+  const byDay = {}; recs.forEach((r) => { const k = dayKey(recDateOf(r)); (byDay[k] = byDay[k] || []).push(r); });
+  const today = dayKey(Date.now());
+  const DOW = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  let days = [], title = '', sub = '';
+  if (HC) {
+    const cur = hdOf(calCursor || Date.now());
+    const y = cur.getFullYear(), m = cur.getMonth();
+    const first = new HC.HDate(1, m, y), n = HC.HDate.daysInMonth(m, y);
+    title = `${heMonth(first)} ${gem(y)}`;
+    const g1 = first.greg(), g2 = new HC.HDate(n, m, y).greg();
+    sub = `${g1.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })} – ${g2.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    for (let d = 1; d <= n; d++) { const g = new HC.HDate(d, m, y).greg(); days.push({ t: g.getTime(), hd: gem(d), gd: g.getDate() + '/' + (g.getMonth() + 1), dow: g.getDay() }); }
+    calCursor = g1.getTime();
+  } else {
+    const base = new Date(calCursor || Date.now()); base.setDate(1);
+    title = base.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+    const n = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+    for (let d = 1; d <= n; d++) { const g = new Date(base.getFullYear(), base.getMonth(), d, 12); days.push({ t: g.getTime(), hd: hebDate(g).split(' ')[0], gd: d + '/' + (g.getMonth() + 1), dow: g.getDay() }); }
+    calCursor = base.getTime();
+  }
+  $('#calTitle').textContent = '📅 ' + title;
+  $('#calSub').textContent = sub;
+  let html = DOW.map((d) => `<div class="dh">${d}</div>`).join('');
+  for (let i = 0; i < days[0].dow; i++) html += '<div></div>';
+  days.forEach((d) => {
+    const k = dayKey(d.t), list = byDay[k] || [], hol = holidaysOn(d.t), pr = d.dow === 6 ? parshaFor(d.t) : '';
+    html += `<div class="day ${k === today ? 'today' : ''}" data-day="${d.t}" style="${k === selKey ? 'outline:2px solid var(--primary)' : ''}"><div class="row" style="justify-content:space-between"><span class="hd">${d.hd}</span><span class="gd">${d.gd}</span></div>
+      ${pr ? `<div class="pr">פרשת ${esc(pr)}</div>` : ''}${hol.slice(0, 2).map((h) => `<div class="ev">${esc(h)}</div>`).join('')}
+      ${list.length ? `<span class="cnt">🎙️ ${list.length}</span>` : ''}</div>`;
+  });
+  $('#calGrid').innerHTML = html;
+}
+function showCalDay(t) {
+  const k = dayKey(t), list = recsList().filter((r) => dayKey(recDateOf(r)) === k);
+  const hol = holidaysOn(t), pr = parshaFor(t);
+  $('#calDay').innerHTML = `<h3>${esc(hebDate(t))} · ${new Date(t).toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h3>
+    <div class="muted">${pr ? 'שבוע פרשת ' + esc(pr) : ''}${hol.length ? ' · ' + hol.map(esc).join(', ') : ''}</div>
+    ${list.length ? list.map((r) => `<div class="rec-card" data-open="${r.id}"><div class="title">${esc(r.title)}</div><div class="muted" style="font-size:.85em">${[r.speaker, r.category, r.parasha && 'פרשת ' + r.parasha, fmtTime(r.duration)].filter(Boolean).map(esc).join(' · ')}</div></div>`).join('') : '<p class="muted">אין הקלטות ביום הזה.</p>'}`;
+  renderCalendar(k);
+}
+$('#calGrid').addEventListener('click', (e) => { const d = e.target.closest('[data-day]'); if (d) showCalDay(+d.dataset.day); });
+$('#calDay').addEventListener('click', (e) => { const o = e.target.closest('[data-open]'); if (o) Detail.open(o.dataset.open); });
+$('#parshaRecs').addEventListener('click', (e) => { const o = e.target.closest('[data-open]'); if (o) Detail.open(o.dataset.open); });
+$('#calPrev').onclick = () => { calCursor = (calCursor || Date.now()) - 2 * 864e5; if (HC) { const hd = hdOf(calCursor); calCursor = new HC.HDate(1, hd.getMonth(), hd.getFullYear()).greg().getTime(); } else { const d = new Date(calCursor); d.setDate(1); calCursor = d.getTime(); } renderCalendar(); };
+$('#calNext').onclick = () => { calCursor = (calCursor || Date.now()) + 32 * 864e5; if (HC) { const hd = hdOf(calCursor); calCursor = new HC.HDate(1, hd.getMonth(), hd.getFullYear()).greg().getTime(); } renderCalendar(); };
+$('#calToday').onclick = () => { calCursor = null; renderCalendar(); showCalDay(Date.now()); };
+
+/* =========================================================
+   PARSHIYOT BOARD
+   ========================================================= */
+let pSel = null;
+function renderParshiyot() {
+  const recs = recsList();
+  const years = [...new Set(recs.map((r) => r.hyear).filter(Boolean))].sort().reverse();
+  const yv = $('#pYear').value;
+  $('#pYear').innerHTML = '<option value="">כל השנים</option>' + years.map((y) => `<option ${y === yv ? 'selected' : ''}>${esc(y)}</option>`).join('');
+  const pool = recs.filter((r) => !$('#pYear').value || r.hyear === $('#pYear').value);
+  const cnt = (p) => pool.filter((r) => parshaMatch(r.parasha, p)).length;
+  const thisWeek = parshaFor(Date.now());
+  const occ = {}; pool.forEach((r) => { if (r.occasion) occ[r.occasion] = (occ[r.occasion] || 0) + 1; });
+  $('#parshaBoard').innerHTML = BOOKS.map(([b, list]) => `<h3>ספר ${b}</h3><div class="parsha-grid">${list.map((p) => { const c = cnt(p); return `<button data-parsha="${p}" class="${c ? 'has' : ''}" style="${parshaMatch(thisWeek, p) ? 'outline:2px dashed var(--warn)' : ''}"><span>${p}${parshaMatch(thisWeek, p) ? ' <span class="pill-note">השבוע</span>' : ''}</span><span class="muted">${c || ''}</span></button>`; }).join('')}</div>`).join('') +
+    (Object.keys(occ).length ? `<h3>🕯️ מועדים ואירועים</h3><div class="parsha-grid">${Object.entries(occ).sort((a, b) => b[1] - a[1]).map(([o, c]) => `<button data-occ="${esc(o)}" class="has"><span>${esc(o)}</span><span class="muted">${c}</span></button>`).join('')}</div>` : '');
+  if (pSel) showParsha(pSel.type, pSel.v);
+}
+function showParsha(type, v) {
+  pSel = { type, v };
+  const list = recsList().filter((r) => (!$('#pYear').value || r.hyear === $('#pYear').value) && (type === 'p' ? parshaMatch(r.parasha, v) : r.occasion === v)).sort((a, b) => recDateOf(b) - recDateOf(a));
+  $('#parshaRecs').innerHTML = `<div class="row"><h3 class="grow">${type === 'p' ? '📖 פרשת ' : '🕯️ '}${esc(v)} ${$('#pYear').value ? esc($('#pYear').value) : ''} – ${list.length} הקלטות</h3>
+    ${list.length ? `<button class="btn small" id="pPlay">▶️ ניגון ברצף</button><button class="btn small perm-export" id="pBook">📕 ייצוא</button>` : ''}</div>` +
+    (list.length ? list.map((r) => `<div class="rec-card" data-open="${r.id}"><div class="title">${esc(r.title)}</div><div class="muted" style="font-size:.85em">${[r.speaker && '👤 ' + r.speaker, r.category, r.hyear, hebDate(recDateOf(r)), fmtTime(r.duration)].filter(Boolean).map(esc).join(' · ')}</div><div class="snippet">${esc((r.summary || r.text || '').slice(0, 200))}</div></div>`).join('') : '<p class="muted">עדיין אין הקלטות לפרשה הזו. בהעלאה – סמן "פרטים לכל קובץ" ובחר פרשה, או ערוך בדף ההקלטה.</p>');
+  const pp = $('#pPlay'); if (pp) pp.onclick = () => { Playlist.set(list.map((r) => r.id)); Detail.open(list[0].id, { play: true }); };
+  const pb = $('#pBook'); if (pb) { pb.classList.toggle('hidden', !perm('export')); pb.onclick = () => openExport(list); }
+}
+$('#parshaBoard').addEventListener('click', (e) => { const b = e.target.closest('[data-parsha]'); if (b) return showParsha('p', b.dataset.parsha); const o = e.target.closest('[data-occ]'); if (o) showParsha('o', o.dataset.occ); });
+$('#pYear').addEventListener('change', () => renderParshiyot());
+
+/* =========================================================
+   MINI PLAYER + PLAYLIST + LOCK-SCREEN CONTROLS
+   ========================================================= */
+const Playlist = {
+  ids: [], i: 0,
+  set(ids) { this.ids = ids; this.i = 0; },
+  next() { if (this.ids.length && this.i < this.ids.length - 1) { this.i++; Detail.open(this.ids[this.i], { play: true, stay: currentPage !== 'detail' }); toast('▶️ הבאה ברשימה', 1500); } },
+  prev() { if (this.ids.length && this.i > 0) { this.i--; Detail.open(this.ids[this.i], { play: true, stay: currentPage !== 'detail' }); } }
+};
+const Mini = {
+  el: null,
+  build() {
+    if (this.el) return;
+    const d = document.createElement('div'); d.id = 'miniPlayer'; d.className = 'hidden';
+    d.innerHTML = `<button class="icon-btn" data-mp="back" title="אחורה 15 שניות">⏪</button><button class="icon-btn" data-mp="play" title="ניגון/עצירה">▶️</button><button class="icon-btn" data-mp="fwd" title="קדימה 15 שניות">⏩</button>
+      <span class="ttl" data-mp="open" title="פתיחת ההקלטה"></span><span class="muted" data-mp="time" style="font-variant-numeric:tabular-nums;font-size:.85em"></span>
+      <input type="range" min="0" max="1000" value="0" data-mp="seek"><button class="icon-btn" data-mp="next" title="הבאה">⏭</button><button class="icon-btn" data-mp="close" title="סגירה">✕</button>`;
+    document.body.appendChild(d); this.el = d;
+    d.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-mp]'); if (!b) return; const p = $('#player');
+      ({ back: () => p.currentTime = Math.max(0, p.currentTime - 15), fwd: () => p.currentTime += 15, play: () => p.paused ? p.play().catch(() => {}) : p.pause(), open: () => Detail.id && Detail.open(Detail.id), next: () => Playlist.next(), close: () => { p.pause(); Mini.hide(); } }[b.dataset.mp] || (() => {}))();
+    });
+    d.querySelector('[data-mp=seek]').addEventListener('input', (e) => { const p = $('#player'); if (p.duration) p.currentTime = e.target.value / 1000 * p.duration; });
+  },
+  hide() { this.closed = true; if (this.el) this.el.classList.add('hidden'); document.body.classList.remove('has-mini'); },
+  update() {
+    this.build(); const p = $('#player');
+    if (!p.paused) this.closed = false;
+    const show = !!(p.src && Detail.rec && currentPage !== 'detail' && !this.closed && (!p.paused || p.currentTime > 0));
+    this.el.classList.toggle('hidden', !show); document.body.classList.toggle('has-mini', show);
+    this.el.querySelector('[data-mp=play]').textContent = p.paused ? '▶️' : '⏸';
+    this.el.querySelector('[data-mp=open]').textContent = Detail.rec ? Detail.rec.title : '';
+    this.el.querySelector('[data-mp=next]').classList.toggle('hidden', !(Playlist.ids.length > Playlist.i + 1));
+    this.tick();
+    if ('mediaSession' in navigator && Detail.rec) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({ title: Detail.rec.title, artist: Detail.rec.speaker || 'תמלול פלוס', album: [Detail.rec.parasha && 'פרשת ' + Detail.rec.parasha, Detail.rec.hyear].filter(Boolean).join(' ') || 'תמלול פלוס', artwork: [{ src: 'icon-512.png', sizes: '512x512', type: 'image/png' }] });
+        if (!this.msSet) {
+          this.msSet = true;
+          navigator.mediaSession.setActionHandler('play', () => p.play());
+          navigator.mediaSession.setActionHandler('pause', () => p.pause());
+          navigator.mediaSession.setActionHandler('seekbackward', () => p.currentTime = Math.max(0, p.currentTime - 15));
+          navigator.mediaSession.setActionHandler('seekforward', () => p.currentTime += 15);
+          navigator.mediaSession.setActionHandler('nexttrack', () => Playlist.next());
+          navigator.mediaSession.setActionHandler('previoustrack', () => Playlist.prev());
+        }
+      } catch (e) {}
+    }
+  },
+  tick() {
+    if (!this.el || this.el.classList.contains('hidden')) return; const p = $('#player');
+    this.el.querySelector('[data-mp=time]').textContent = fmtTime(p.currentTime) + ' / ' + fmtTime(p.duration || (Detail.rec && Detail.rec.duration) || 0);
+    if (p.duration) this.el.querySelector('[data-mp=seek]').value = Math.round(p.currentTime / p.duration * 1000);
+  }
+};
+
+/* =========================================================
+   HELP, WELCOME, BANNER, OFFLINE
+   ========================================================= */
+function renderHelp() { $('#helpSearch').value = ''; $$('#page-help details').forEach((d, i) => { d.classList.remove('hidden'); }); }
+$('#helpSearch').addEventListener('input', () => {
+  const q = $('#helpSearch').value.trim();
+  $$('#page-help details').forEach((d) => { const hit = !q || d.textContent.includes(q); d.classList.toggle('hidden', !hit); if (q && hit) d.open = true; });
+});
+function welcome() {
+  if (LS.get('welcomed21')) return;
+  LS.set('welcomed21', 1);
+  modal(`<h3>👋 ברוך הבא לתמלול פלוס!</h3><ul style="line-height:1.9">
+    <li>🎙️ מקליטים או מעלים קבצים / סרטונים – והמערכת מתמללת (עברית, יידיש, אנגלית).</li>
+    <li>📚 בספרייה: חיפוש, תיקיות, סינון לפי דובר / פרשה / שנה.</li>
+    <li>📅 לוח עברי ו📖 לוח פרשיות – כל ההקלטות לפי תאריך ופרשה.</li>
+    <li>🤖 כלים חכמים: סיכום, תרגום, תוכן עניינים, מראי מקומות, מאמר ערוך.</li>
+    <li>⬇️ ייצוא ל-Word, PDF, Excel, PowerPoint – עם או בלי זמנים.</li></ul>
+    <p class="hint">המדריך המלא תמיד בלשונית "❓ עזרה".</p>`, { okText: 'בואו נתחיל', cancelText: '📖 למדריך', onOk: () => {} }).then((v) => { if (v === false) go('help'); });
+}
+function showBanner() { const t = (S('announcement', '') || '').toString().trim(); $('#banner').textContent = '📢 ' + t; $('#banner').classList.toggle('hidden', !t); }
+function offlineBar() { let b = $('#offlineBar'); if (navigator.onLine) { if (b) b.remove(); return; } if (!b) { b = document.createElement('div'); b.id = 'offlineBar'; b.className = 'offline'; b.textContent = '⚠️ אין חיבור לאינטרנט – התמלול והשמירה ימשיכו כשהחיבור יחזור'; document.body.appendChild(b); } }
+window.addEventListener('online', offlineBar); window.addEventListener('offline', offlineBar);
 
 /* =========================================================
    ADMIN SETTINGS
@@ -2609,6 +3223,12 @@ $('#usersTbl').addEventListener('click', async (e) => {
     return renderUsers();
   }
 });
+$('#usersXlsx').onclick = (e) => runExport(e.currentTarget, async () => {
+  const XLSX = await libXLSX(); const { data: stats } = await sb.rpc('admin_user_stats'); const st = Object.fromEntries((stats || []).map((s) => [s.user_id, s]));
+  const rows = [['שם', 'מייל', 'תפקיד', 'מושבת', 'הקלטות', 'דקות', 'מכסה לחודש', 'נוצר', 'נראה לאחרונה', 'הרשאות חסומות'], ...USERS.map((u) => [u.display_name || '', u.email, u.role === 'admin' ? 'מנהל' : 'משתמש', u.disabled ? 'כן' : '', (st[u.id] || {}).recordings || 0, Math.round(((st[u.id] || {}).seconds || 0) / 60), u.minutes_limit ?? '', fmtDate(u.created_at), u.last_seen ? fmtDate(u.last_seen) : '', Object.keys(PERM_NAMES).filter((k) => u.perms && u.perms[k] === false).map((k) => PERM_NAMES[k]).join(', ')])];
+  const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] }; XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'משתמשים');
+  download(new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })]), 'משתמשים.xlsx');
+});
 $('#inviteForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = (t, ok) => $('#nuMsg').innerHTML = `<span class="${ok ? 'ok-text' : 'err-text'}">${esc(t)}</span>`;
@@ -2670,11 +3290,22 @@ $('#testMailBtn').onclick = async () => {
   catch (err) { $('#sysMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
 };
 /* ---- security ---- */
-function renderSecurity() { $('#idleMin').value = +S('idle_minutes', 30) || 0; $('#weeklyChk').checked = S('weekly_report', true) !== false; }
+async function renderSecurity() {
+  $('#idleMin').value = +S('idle_minutes', 30) || 0; $('#weeklyChk').checked = S('weekly_report', true) !== false; $('#annInput').value = S('announcement', '') || '';
+  $('#storText').textContent = 'מחשב…';
+  try {
+    let total = 0, n = 0;
+    for (let from = 0; ; from += 1000) { const { data, error } = await sb.from('recordings').select('size,file_path').range(from, from + 999); if (error) throw error; data.forEach((r) => { if (r.file_path) { total += r.size || 0; n++; } }); if (data.length < 1000) break; }
+    const pct = Math.min(100, total / (1024 ** 3) * 100);
+    $('#storBar').style.width = pct.toFixed(1) + '%';
+    $('#storText').textContent = `${(total / 1048576).toFixed(0)}MB מתוך 1,024MB (${pct.toFixed(1)}%) · ${n} קובצי שמע שמורים`;
+  } catch (e) { $('#storText').textContent = e.message; }
+}
 $('#saveSecBtn').onclick = async () => {
   try {
     await setSetting('idle_minutes', Math.max(0, Math.min(1440, +$('#idleMin').value || 0)));
     await setSetting('weekly_report', $('#weeklyChk').checked);
+    await setSetting('announcement', $('#annInput').value.trim()); showBanner();
     LS.set('idleMinCache', +S('idle_minutes', 0) || 0);
     $('#secMsg').innerHTML = '<span class="ok-text">נשמר ✓</span>';
   } catch (err) { $('#secMsg').innerHTML = `<span class="err-text">${esc(err.message)}</span>`; }
@@ -2853,7 +3484,8 @@ async function showViewer(token) {
     const r = await api('share-view', { token }, { timeout: 30000 });
     document.title = r.title + ' – תמלול פלוס';
     $('#vTitle').textContent = r.title;
-    $('#vMeta').textContent = fmtDate(r.created_at) + ' · ' + fmtTime(r.duration) + ' · ' + (LANGS[r.lang] || '');
+    const vt = r.rec_date ? new Date(r.rec_date + 'T12:00:00').getTime() : new Date(r.created_at).getTime();
+    $('#vMeta').textContent = [r.speaker && '👤 ' + r.speaker, r.category, r.parasha && 'פרשת ' + r.parasha, r.hyear, r.occasion, hebDate(vt), fmtTime(r.duration), LANGS[r.lang]].filter(Boolean).join(' · ');
     $('#vExp').textContent = r.share_expires ? 'הקישור בתוקף עד ' + fmtDate(r.share_expires) : '';
     if (r.audio) $('#vPlayer').src = r.audio; else $('#vPlayer').classList.add('hidden');
     if (r.summary) { $('#vSummary').classList.remove('hidden'); $('#vSummary').innerHTML = '<b>✨ סיכום</b>\n' + esc(r.summary); }
@@ -2922,7 +3554,10 @@ async function enterApp() {
   LS.set('idleMinCache', +S('idle_minutes', 0) || 0);
   $('#langSel').value = LS.get('lastLang', S('def_lang', 'he'));
   $('#sortSel').value = LS.get('sort', 'new');
-  syncLangPills(); syncOutPills(); fillUpFolder();
+  syncLangPills(); fillUpFolder();
+  libView = LS.get('libView', 'list'); $('#timesChk').checked = LS.get('times', true); $('#followChk').checked = LS.get('follow', true);
+  showBanner(); offlineBar(); fillDatalists(); Mini.build();
+  setTimeout(welcome, 600);
   sb.rpc('touch_me', {}).then(() => {}, () => {});
   Idle.start();
   Queue.resume();
