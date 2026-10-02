@@ -1,0 +1,34 @@
+{
+  "id": "./",
+  "name": "תמלול פלוס – מערכת תמלול הקלטות",
+  "short_name": "תמלול פלוס",
+  "description": "תמלול הקלטות בעברית, יידיש ואנגלית",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f6fb",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "files": [
+        {
+          "name": "audio",
+          "accept": ["audio/*", "video/*", ".opus", ".ogg", ".oga", ".m4a", ".mp3", ".wav", ".aac", ".amr", ".webm", ".mp4", ".3gp", ".mov", ".mkv", ".avi", ".m4v"]
+        }
+      ]
+    }
+  }
+}
