@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "תמלול פלוס – מערכת תמלול הקלטות",
-  "short_name": "תמלול פלוס",
+  "name": "ביאלה – מערכת תמלול הקלטות",
+  "short_name": "ביאלה",
   "description": "תמלול הקלטות וסרטונים בעברית, יידיש ואנגלית – מסונכרן בין המחשב לטלפון",
   "lang": "he",
   "dir": "rtl",
@@ -9,8 +9,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0b1437",
-  "theme_color": "#1e3a8a",
+  "background_color": "#0a1028",
+  "theme_color": "#1b2a4e",
   "icons": [
     {
       "src": "icon-192.png",
