@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ביאלה – מערכת תמלול הקלטות</title>
 <meta name="description" content="תמלול הקלטות בעברית, יידיש ואנגלית">
-<meta name="theme-color" content="#1b2a4e">
+<meta name="theme-color" content="#5b3fd6">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@500;600;700;800&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@500;600;700;800&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500;700;900&family=David+Libre:wght@400;700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -319,7 +319,7 @@ body.has-mini main{padding-bottom:80px}
    ===== עיצוב 3.1 – "מוצלח" – שכבת עיצוב חדשה (גוברת על כל מה שלמעלה) =====
    ===================================================================== */
 :root{
-  --primary:#1b2a4e; --primary-2:#2f4a8a; --accent:#c9a24a;
+  --primary:#5b3fd6; --primary-2:#9b5cf6; --accent:#d9b25a;
   --primary-soft:color-mix(in srgb,var(--primary) 11%,var(--card));
   --grad:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
   --grad-soft:linear-gradient(135deg,color-mix(in srgb,var(--primary) 14%,transparent),color-mix(in srgb,var(--primary-2) 10%,transparent));
@@ -556,7 +556,7 @@ body.dark .cal > .dh:nth-child(7n){color:var(--accent)}
 @keyframes flash{0%,100%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 70%,transparent)}}
 
 /* ---------- auth ---------- */
-#auth{background:linear-gradient(125deg,#0b1437 0%,var(--primary) 50%,var(--primary-2) 100%);background-size:200% 200%;animation:gradMove 16s ease infinite}
+#auth{background:linear-gradient(125deg,#1a0b45 0%,var(--primary) 50%,var(--primary-2) 100%);background-size:200% 200%;animation:gradMove 16s ease infinite}
 @keyframes gradMove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 #auth::before{animation:float 12s ease-in-out infinite}
 #auth::after{animation:float 14s ease-in-out infinite reverse}
@@ -587,7 +587,7 @@ body.has-mini #toTop{bottom:84px}
 .empty b{display:block;color:var(--text);font-size:1.05em;margin-bottom:.2em}
 
 /* ---------- splash ---------- */
-#splash{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#0b1437,var(--primary),var(--primary-2));color:#fff;transition:opacity .5s,visibility .5s}
+#splash{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#1a0b45,var(--primary),var(--primary-2));color:#fff;transition:opacity .5s,visibility .5s}
 #splash.out{opacity:0;visibility:hidden}
 #splash img{width:84px;height:84px;border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.35);animation:splashPop 1s var(--ease)}
 #splash .t{font-family:"Rubik",sans-serif;font-size:1.7em;font-weight:800;letter-spacing:-.01em}
@@ -752,7 +752,7 @@ header.top::after{background:linear-gradient(90deg,transparent,#c9a24a,#f3d98b,#
 .auth-brand > div{text-align:center}
 .auth-name{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:2em;text-align:center;color:var(--primary)}
 .auth-sub{text-align:center}
-#splash{background:radial-gradient(circle at 50% 40%,#2f4a8a,#1b2a4e 55%,#0a1028)}
+#splash{background:radial-gradient(circle at 50% 40%,#7b5cf0,#4a2fb8 50%,#1a0b45)}
 #splash img{width:190px;height:auto;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))}
 #splash .t{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:2.4em;background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
 #splash .bars i{background:#e2c271}
@@ -764,6 +764,66 @@ header.top::after{background:linear-gradient(90deg,transparent,#c9a24a,#f3d98b,#
 .rec-time{background:var(--grad)}
 @media(max-width:700px){header.top .logo img.crown{height:32px}header.top .logo{font-size:1.3em}}
 .auth-name{display:none}
+
+/* ===== 3.3 ===== */
+/* season */
+#seasonDeco{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#seasonDeco span{position:absolute;font-size:2.1em;opacity:.22;animation:float 7s ease-in-out infinite;filter:saturate(1.2)}
+.season-chip{background:rgba(217,178,90,.32)!important;border-color:rgba(246,221,148,.6)!important}
+/* live wave */
+#recWave{width:100%;height:70px;display:block;margin:.4em 0}
+/* big mobile record */
+#bigRec{display:none}
+@media(max-width:700px){#bigRec{display:flex;align-items:center;justify-content:center;gap:.4em;width:100%;margin-top:14px;padding:1em;border:none;border-radius:18px;font-size:1.25em;font-weight:800;color:#5b1a1a;background:linear-gradient(135deg,#fff,#ffe9e9);box-shadow:0 10px 26px rgba(0,0,0,.2)}#bigRec.on{background:linear-gradient(135deg,#ef4444,#be123c);color:#fff;animation:breathe 1.6s infinite}}
+/* folder cover */
+.fcover{position:relative;border-radius:22px;overflow:hidden;margin-bottom:14px;min-height:150px;background:var(--grad);background-image:linear-gradient(90deg,rgba(15,8,40,.15),rgba(15,8,40,.75)),var(--cov,none),var(--grad);background-size:cover;background-position:center;color:#fff;box-shadow:var(--shadow-lg);border-top:5px solid var(--fc,transparent)}
+.fcover-in{display:flex;align-items:flex-end;gap:16px;padding:22px 24px;min-height:150px}
+.fcover-ic{font-size:2.8em;width:74px;height:74px;border-radius:20px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fcover h2{margin:0;color:#fff;font-size:1.8em;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.fcover p{margin:.2em 0 .5em;opacity:.92}
+.fcover .btn{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.4);align-self:flex-start}
+.fcard.has-cover{background-image:linear-gradient(180deg,rgba(255,255,255,.2),var(--card) 70%),var(--cov);background-size:cover;background-position:center top;padding-top:70px}
+/* marks */
+#markBar{border:1px solid color-mix(in srgb,var(--primary) 16%,var(--line));background:color-mix(in srgb,var(--primary) 4%,var(--card));border-radius:16px;padding:.6em .8em;margin:.6em 0}
+#markBar.ro .mk-btn{display:none}
+.mk-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:.2em 0}
+.mk-lbl{font-weight:800;font-size:.92em;margin-inline-end:.2em}
+.mk-btn{border:1.5px solid var(--line);background:var(--mc,var(--card));border-radius:999px;padding:.28em .8em;font-weight:600;font-size:.88em;color:#222;transition:.15s}
+.mk-btn[data-mk=erase],.mk-btn[data-mk=head]{background:var(--card);color:var(--text)}
+.mk-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.mk-btn.on{outline:3px solid var(--primary);outline-offset:1px;font-weight:800}
+.mk-legend{display:flex;gap:4px;flex-wrap:wrap;margin-inline-start:auto}
+.mk-legend span{border-radius:999px;padding:.1em .6em;font-size:.82em;background:var(--primary-soft);color:#222}
+.seg.mk-imp{background:#fde68a;color:#222}.seg.mk-rev{background:#bbf7d0;color:#222}.seg.mk-q{background:#fbcfe8;color:#222}.seg.mk-src{background:#bae6fd;color:#222}.seg.mk-fix{background:#fecaca;color:#222}
+.seg[class*=mk-]{border-radius:5px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.transcript.marking .seg{cursor:cell}
+.transcript.marking .seg:hover{outline:2px dashed var(--primary)}
+.seg-head{display:block;font-family:"Frank Ruhl Libre",serif;font-weight:800;font-size:1.25em;color:var(--primary);margin:1em 0 .3em;padding-bottom:.2em;border-bottom:2px solid color-mix(in srgb,var(--accent) 60%,transparent)}
+body.dark .seg-head{color:#e9cf86}
+.fixsug{border:none;background:var(--accent);border-radius:50%;width:1.5em;height:1.5em;font-size:.75em;margin-inline-start:.25em;cursor:pointer;vertical-align:middle;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.fix-opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:.8em 1em;margin:.4em 0;font-size:1.05em;cursor:pointer;transition:.15s}
+.fix-opt:hover{border-color:var(--primary);background:var(--primary-soft)}
+/* book mode */
+.transcript.book{font-family:"Frank Ruhl Libre","David Libre",serif;font-size:1.32em;line-height:2.05;text-align:justify;background:linear-gradient(180deg,#fffaf0,#fbf3e0);color:#2b2112;border:1px solid #e8d9b5;border-radius:6px;padding:2.4em 2.6em;box-shadow:inset 0 0 0 6px #fffaf0,inset 0 0 0 7px #d9b25a,0 18px 40px rgba(60,40,10,.18);column-count:2;column-gap:3em;column-rule:1px solid #e3d2a8}
+@media(max-width:900px){.transcript.book{column-count:1;padding:1.6em 1.4em}}
+.transcript.book .seg-time,.transcript.book .seg-star,.transcript.book .fixsug{display:none}
+.transcript.book .seg{padding:0}
+.transcript.book .seg-head{column-span:all;text-align:center;color:#6b4a12;border-bottom-color:#d9b25a;font-size:1.3em}
+body.dark .transcript.book{background:linear-gradient(180deg,#2a2418,#211c12);color:#f1e6cc;border-color:#5a4a28;box-shadow:inset 0 0 0 6px #2a2418,inset 0 0 0 7px #a88838}
+/* help speak */
+.help summary .say{border:none;background:var(--primary-soft);border-radius:50%;width:2em;height:2em;margin-inline-start:.4em;cursor:pointer;font-size:.85em}
+/* voice */
+#voicePill{position:fixed;bottom:20px;right:20px;z-index:90;border:none;border-radius:999px;padding:.6em 1.1em;background:var(--grad);color:#fff;font-weight:700;box-shadow:var(--shadow-lg);animation:breathe 2.4s infinite}
+#voicePill small{opacity:.8;font-weight:500}
+@media(max-width:700px){#voicePill{bottom:84px;right:12px}}
+.voice-list{display:flex;flex-wrap:wrap;gap:6px}.voice-list span{background:var(--primary-soft);border-radius:999px;padding:.3em .8em;font-weight:600}
+.stmt h4{margin:1em 0 .3em;color:var(--primary)}.stmt ul{line-height:1.8}
+/* free usage */
+#freeCard{margin-bottom:16px;border:1.5px solid color-mix(in srgb,var(--ok) 35%,var(--line))}
+.free-row{margin:.7em 0}.free-bar{height:12px;border-radius:8px;background:var(--line);overflow:hidden;margin-top:.3em}.free-bar>div{height:100%;border-radius:8px;transition:width 1s var(--ease)}
+.banner .btn{color:#3a2a05;background:#fff;border-color:transparent;font-weight:700}
+body{overflow-x:clip}
+@media(max-width:700px){header.top .logo{font-size:0;gap:0}header.top .logo img.crown{height:34px}#darkBtn{display:none}.top-actions{gap:.25em}.top-actions .icon-btn{width:34px;height:34px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -825,7 +885,7 @@ header.top::after{background:linear-gradient(90deg,transparent,#c9a24a,#f3d98b,#
         <div class="pass-wrap"><input id="loginPass" type="password" autocomplete="current-password" required><button type="button" class="eye" data-eye="loginPass" title="הצגת סיסמה">👁️</button></div></div>
       <button class="btn-auth" type="submit" id="loginSubmit">התחברות</button>
       <a class="auth-link" id="forgotBtn" href="#">שכחת סיסמה? / אין לך סיסמה? לחץ כאן</a><br>
-      <a class="auth-link" id="reqAccessBtn" href="#">🙋 אין לך גישה למערכת? בקש גישה מהמנהל</a>
+      <a class="auth-link" id="reqAccessBtn" href="#">🙋 אין לך גישה למערכת? בקש גישה מהמנהל</a><br><a class="auth-link" id="authA11y" href="#" style="font-size:.82em;opacity:.8">♿ הצהרת נגישות</a>
     </form>
 
     <form id="forgotForm" class="hidden">
@@ -1444,7 +1504,7 @@ header.top::after{background:linear-gradient(90deg,transparent,#c9a24a,#f3d98b,#
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.2.0';
+const APP_VERSION = '3.3.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -1812,7 +1872,7 @@ function applyTheme() {
   document.body.classList.toggle('dark', dark);
   $('#darkBtn').textContent = dark ? '☀️' : '🌙';
   $('#darkBtn').title = dark ? 'מצב בהיר' : 'מצב חושך';
-  document.querySelector('meta[name=theme-color]').content = dark ? '#191a2e' : '#1e3a8a';
+  document.querySelector('meta[name=theme-color]').content = dark ? '#151030' : '#5b3fd6';
   if (currentPage === 'detail') drawWave();
 }
 $('#darkBtn').onclick = () => { LS.set('dark', !LS.get('dark', false)); applyTheme(); };
@@ -3449,13 +3509,14 @@ function paragraphsOf(r, o) {
   const segs = (r.segments && r.segments.length && !r.edited) ? r.segments : null;
   const hl = new Set((r.extras && r.extras.hl) || []);
   if (!segs) return (r.text || '').split(/\n+/).filter(Boolean).map((t) => ({ text: t }));
-  let list = segs.map((s, i) => ({ start: s.start, end: s.end, text: s.text, hl: hl.has(i) }));
-  if (o.onlyHl) list = list.filter((x) => x.hl);
+  const marks = (r.extras && r.extras.marks) || {}, heads = (r.extras && r.extras.heads) || {};
+  let list = segs.map((s, i) => ({ start: s.start, end: s.end, text: s.text, hl: hl.has(i) || !!marks[i], mk: marks[i] || (hl.has(i) ? 'imp' : ''), head: heads[i] || '' }));
+  if (o.onlyHl) list = list.filter((x) => x.hl || x.head);
   if (o.times || !o.paras) return list;
   const out = []; let cur = null, n = 0;
   for (const s of list) {
     const speaker = /^[^:]{2,25}:/.test(s.text);
-    if (!cur || speaker || n >= 5 || (cur.text.length > 600)) { cur = { start: s.start, text: s.text, hl: s.hl }; out.push(cur); n = 1; }
+    if (!cur || speaker || n >= 5 || (cur.text.length > 600) || s.head || (s.mk || '') !== (cur.mk || '')) { cur = { start: s.start, text: s.text, hl: s.hl, mk: s.mk, head: s.head }; out.push(cur); n = 1; }
     else { cur.text += ' ' + s.text; cur.hl = cur.hl || s.hl; n++; }
   }
   return out;
@@ -3479,7 +3540,8 @@ function buildDoc(r, o) {
   if (wm) secs.push({ h: '', lines: [wm] });
   return { title: r.title, meta: o.meta ? metaLine : '', tags: r.tags || [], secs, times: o.times };
 }
-const lineOf = (p, times) => (times && p.start !== undefined ? `[${fmtTime(p.start)}] ` : '') + p.text;
+const markBg = (p) => (p.mk && typeof MARK_COLORS !== 'undefined' && MARK_COLORS[p.mk]) ? MARK_COLORS[p.mk].bg : (p.hl ? '#fde68a' : '');
+const lineOf = (p, times) => (p.head ? '■ ' + p.head + '\n' : '') + (times && p.start !== undefined ? `[${fmtTime(p.start)}] ` : '') + p.text;
 function docToText(d, md = false) {
   let t = (md ? '# ' : '') + d.title + '\n' + (d.meta ? d.meta + '\n' : '') + '\n';
   d.secs.forEach((s) => { t += (md ? '## ' : '') + s.h + '\n' + (s.paras ? s.paras.map((p) => lineOf(p, d.times)).join(d.times ? '\n' : '\n\n') : s.lines.join('\n')) + '\n\n'; });
@@ -3488,7 +3550,7 @@ function docToText(d, md = false) {
 function docToHtml(d) {
   return `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${esc(d.title)}</title><style>body{font-family:Arial,sans-serif;max-width:820px;margin:30px auto;padding:0 16px;line-height:1.9;color:#111}h1{margin-bottom:0}.m{color:#777}.t{color:#999;font-size:.8em}mark{background:#fde68a}h2{border-bottom:2px solid #eee;padding-bottom:4px;margin-top:1.6em}</style></head><body>
 <h1>${esc(d.title)}</h1><div class="m">${esc(d.meta)}</div>
-${d.secs.map((s) => `<h2>${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `<p>${d.times && p.start !== undefined ? `<span class="t">[${fmtTime(p.start)}]</span> ` : ''}${p.hl ? '<mark>' : ''}${esc(p.text)}${p.hl ? '</mark>' : ''}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr"' : ''}>${s.lines.map((l) => `<p>${esc(l)}</p>`).join('')}</div>`)).join('\n')}
+${d.secs.map((s) => `<h2>${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `${p.head ? `<h3>${esc(p.head)}</h3>` : ''}<p${markBg(p) ? ` style="background:${markBg(p)};border-radius:4px;padding:2px 6px"` : ''}>${d.times && p.start !== undefined ? `<span class="t">[${fmtTime(p.start)}]</span> ` : ''}${esc(p.text)}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr"' : ''}>${s.lines.map((l) => `<p>${esc(l)}</p>`).join('')}</div>`)).join('\n')}
 <p class="m" style="margin-top:3em">נוצר במערכת ביאלה</p></body></html>`;
 }
 async function docxChildren(d, dx, { pageBreak = false } = {}) {
@@ -3498,8 +3560,8 @@ async function docxChildren(d, dx, { pageBreak = false } = {}) {
   if (d.meta) kids.push(P(d.meta, { size: 20, color: '777777' }));
   d.secs.forEach((s) => {
     kids.push(P(s.h, { size: 28, bold: true }));
-    if (s.paras) s.paras.forEach((p) => kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.RIGHT, spacing: { after: 140 },
-      children: [...(d.times && p.start !== undefined ? [new dx.TextRun({ text: `[${fmtTime(p.start)}] `, rightToLeft: true, font: 'Arial', size: 18, color: '888888' })] : []), new dx.TextRun({ text: p.text, rightToLeft: true, font: 'Arial', size: 24, highlight: p.hl ? 'yellow' : undefined })] })));
+    if (s.paras) s.paras.forEach((p) => (p.head && kids.push(P(p.head, { size: 26, bold: true, color: '1b2a4e' })), kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.RIGHT, spacing: { after: 140 },
+      children: [...(d.times && p.start !== undefined ? [new dx.TextRun({ text: `[${fmtTime(p.start)}] `, rightToLeft: true, font: 'Arial', size: 18, color: '888888' })] : []), new dx.TextRun({ text: p.text, rightToLeft: true, font: 'Arial', size: 24, highlight: (p.mk && typeof MARK_COLORS !== 'undefined' && MARK_COLORS[p.mk]) ? MARK_COLORS[p.mk].dx : (p.hl ? 'yellow' : undefined) })] }))));
     else s.lines.forEach((l) => kids.push(P(l, { ltr: s.ltr })));
   });
   return kids;
@@ -3521,7 +3583,7 @@ async function docToPdf(d, name) {
   const el = document.createElement('div'); el.dir = 'rtl';
   el.style.cssText = 'font-family:Arial,"Segoe UI",sans-serif;color:#111;background:#fff;padding:24px;width:720px;line-height:1.8;font-size:15px;direction:rtl;text-align:right';
   el.innerHTML = `<h1 style="font-size:22px;margin:0 0 4px">${esc(d.title)}</h1><div style="color:#777;font-size:12px;margin-bottom:14px">${esc(d.meta)}</div>` +
-    d.secs.map((s) => `<h2 style="font-size:17px;margin:14px 0 6px">${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `<p style="margin:0 0 8px;${p.hl ? 'background:#fde68a' : ''}">${d.times && p.start !== undefined ? `<span style="color:#888;font-size:11px">[${fmtTime(p.start)}]</span> ` : ''}${esc(p.text)}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr" style="text-align:left"' : ''}>${s.lines.map((l) => `<p style="margin:0 0 6px">${esc(l)}</p>`).join('')}</div>`)).join('');
+    d.secs.map((s) => `<h2 style="font-size:17px;margin:14px 0 6px">${esc(s.h)}</h2>` + (s.paras ? s.paras.map((p) => `${p.head ? `<h3 style="font-size:15px;margin:12px 0 4px;color:#1b2a4e">${esc(p.head)}</h3>` : ''}<p style="margin:0 0 8px;${markBg(p) ? 'background:' + markBg(p) : ''}">${d.times && p.start !== undefined ? `<span style="color:#888;font-size:11px">[${fmtTime(p.start)}]</span> ` : ''}${esc(p.text)}</p>`).join('') : `<div ${s.ltr ? 'dir="ltr" style="text-align:left"' : ''}>${s.lines.map((l) => `<p style="margin:0 0 6px">${esc(l)}</p>`).join('')}</div>`)).join('');
   const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-10000px;top:0;';
   holder.appendChild(el); document.body.appendChild(holder);
   try {
@@ -3561,10 +3623,11 @@ async function exportXlsx(recs, fileName, asLibrary = false, o = EXP_DEFAULT) {
     const r = recs[0], d = buildDoc(r, o);
     const data = [['שם', r.title], ['פרטים', d.meta], ['תגיות', (r.tags || []).join(', ')], []];
     const main = d.secs.find((s) => s.main);
-    if (o.times) { data.push(['התחלה', 'טקסט']); main.paras.forEach((p) => data.push([p.start !== undefined ? fmtTime(p.start) : '', p.text])); }
-    else { data.push(['טקסט']); main.paras.forEach((p) => data.push([p.text])); }
+    const mkName = (p) => (p.mk && typeof MARK_COLORS !== 'undefined' && MARK_COLORS[p.mk]) ? MARK_COLORS[p.mk].n : '';
+    if (o.times) { data.push(['התחלה', 'טקסט', 'סימון']); main.paras.forEach((p) => { if (p.head) data.push(['', '■ ' + p.head, '']); data.push([p.start !== undefined ? fmtTime(p.start) : '', p.text, mkName(p)]); }); }
+    else { data.push(['טקסט', 'סימון']); main.paras.forEach((p) => { if (p.head) data.push(['■ ' + p.head, '']); data.push([p.text, mkName(p)]); }); }
     d.secs.filter((s) => !s.main).forEach((s) => { data.push([], [s.h]); s.lines.forEach((l) => data.push([l])); });
-    const ws = XLSX.utils.aoa_to_sheet(data); ws['!cols'] = o.times ? [{ wch: 12 }, { wch: 110 }] : [{ wch: 120 }];
+    const ws = XLSX.utils.aoa_to_sheet(data); ws['!cols'] = o.times ? [{ wch: 12 }, { wch: 110 }, { wch: 14 }] : [{ wch: 120 }, { wch: 14 }];
     XLSX.utils.book_append_sheet(wb, ws, 'תמלול');
   } else {
     const data = [['שם', 'תאריך עברי', 'תאריך', 'משך', 'שפה', 'דובר', 'סוג', 'פרשה', 'שנה', 'מועד', 'תיקייה', 'תגיות', 'בעלים', 'תמלול', 'סיכום', 'תרגום לעברית'],
@@ -4610,8 +4673,8 @@ async function showPublic(slug) {
    עיצוב 3.1 – ערכות צבע, נגישות, חיפוש מהיר, הישגים, אנימציות
    ========================================================= */
 const THEMES = {
+  royal: { n: 'סגול מלכותי', p: '#5b3fd6', p2: '#9b5cf6', a: '#d9b25a' },
   navy: { n: 'קלאסי – כחול וזהב', p: '#1b2a4e', p2: '#2f4a8a', a: '#c9a24a' },
-  royal: { n: 'סגול מלכותי', p: '#5b4bdb', p2: '#9b5cf6', a: '#f5b942' },
   ocean: { n: 'כחול ים', p: '#0369a1', p2: '#06b6d4', a: '#facc15' },
   gold: { n: 'זהב ירושלמי', p: '#a16207', p2: '#d97706', a: '#2563eb' },
   forest: { n: 'ירוק זית', p: '#15803d', p2: '#0d9488', a: '#f59e0b' },
@@ -4623,18 +4686,18 @@ function applyLook() {
   const b = (typeof S === 'function' ? S('brand', {}) : {}) || {};
   const key = LS.get('look', '');
   let t = THEMES[key];
-  if (!t) t = (b.color && !['#4f46e5', '#5b4bdb'].includes(b.color)) ? { p: b.color, p2: b.color, a: '#c9a24a' } : THEMES.navy;
+  if (!t) t = (b.color && !['#4f46e5', '#5b4bdb'].includes(b.color)) ? { p: b.color, p2: b.color, a: '#d9b25a' } : THEMES.royal;
   const acc = LS.get('accent', '');
   const st = document.documentElement.style;
   st.setProperty('--primary', acc || t.p); st.setProperty('--primary-2', acc || t.p2); st.setProperty('--accent', t.a);
-  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = document.body.classList.contains('dark') ? '#121a30' : (acc || t.p);
+  const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = document.body.classList.contains('dark') ? '#151030' : (acc || t.p);
   $$('header.top .logo').forEach((l) => { if (!l.querySelector('.eq')) l.insertAdjacentHTML('beforeend', ''); });
 }
 { const _ab = applyBrand; applyBrand = function () { _ab(); applyLook(); }; }
 { const _at = applyTheme; applyTheme = function () { _at(); applyLook(); }; }
 
 function openThemes() {
-  const cur = LS.get('look', '') || 'navy';
+  const cur = LS.get('look', '') || 'royal';
   modal(`<h3>🎨 ערכת צבעים</h3><p class="muted" style="margin:.2em 0">בחר את הצבעים שהכי נעימים לך. הבחירה נשמרת במחשב הזה.</p>
     <div class="themes">${Object.entries(THEMES).map(([k, t]) => `<button class="theme-opt ${k === cur ? 'on' : ''}" data-theme="${k}" style="--acc:${t.a}"><div class="sw" style="background:linear-gradient(135deg,${t.p},${t.p2})"></div>${t.n}</button>`).join('')}</div>
     <div class="row" style="margin-top:1em"><button class="btn" id="thDark">${document.body.classList.contains('dark') ? '☀️ מצב בהיר' : '🌙 מצב חושך'}</button><button class="btn" id="thA11y">♿ נגישות</button></div>`, { okText: 'סגירה', cancelText: '' });
@@ -4998,6 +5061,489 @@ $('#themeBtn').onclick = openThemes;
 $('#a11yBtn').onclick = openA11y;
 applyA11y();
 applyLook();
+
+/* =========================================================
+   ביאלה 3.3 – חגים, גל קול, כרטיס לוואטסאפ, שערי תיקיות, מצב ספר,
+   סימון בצבעים, הצעות תיקון, הקראה, שליטה בקול, נגישות, מצב החינם, גיבוי לדרייב
+   ========================================================= */
+const MARK_COLORS = {
+  imp: { n: 'חשוב', bg: '#fde68a', dx: 'yellow', ic: '⭐' },
+  rev: { n: 'לחזור עליו', bg: '#bbf7d0', dx: 'green', ic: '🔁' },
+  q: { n: 'שאלה', bg: '#fbcfe8', dx: 'magenta', ic: '❓' },
+  src: { n: 'מקור / ציטוט', bg: '#bae6fd', dx: 'cyan', ic: '📚' },
+  fix: { n: 'לתיקון', bg: '#fecaca', dx: 'red', ic: '✏️' }
+};
+
+/* ---------------- 1. רקע לפי חג ועונה ---------------- */
+const SEASONS = [
+  ['chanuka', /חנוכה/, '🕎', 'חנוכה שמח', ['🕎', '🕯️', '✨', '🍩']],
+  ['sukkot', /סוכות|הושענא/, '🌿', 'חג סוכות שמח', ['🌿', '🍋', '🌴', '🏕️']],
+  ['simchat', /שמחת תורה|שמיני עצרת/, '📜', 'חג שמח – שמחת תורה', ['📜', '🎉', '💃', '✨']],
+  ['pesach', /פסח/, '🍷', 'חג פסח כשר ושמח', ['🍷', '🫓', '🌸', '✨']],
+  ['purim', /פורים/, '🎭', 'פורים שמח', ['🎭', '👑', '🎉', '📜']],
+  ['rh', /ראש השנה/, '🍎', 'שנה טובה ומתוקה', ['🍎', '🍯', '📯', '🍇']],
+  ['yk', /כיפור/, '🕊️', 'גמר חתימה טובה', ['🕊️', '🤍', '✨']],
+  ['shavuot', /שבועות/, '🌾', 'חג שבועות שמח', ['🌾', '📜', '🌸', '🥛']],
+  ['tubshvat', /שבט/, '🌳', 'ט״ו בשבט שמח', ['🌳', '🌰', '🍇', '🌱']],
+  ['lag', /ל״ג|לג בעומר/, '🔥', 'ל״ג בעומר שמח', ['🔥', '🏹', '✨']]
+];
+function seasonNow() {
+  let names = '';
+  try { names = (holidaysOn(Date.now()) || []).join(' '); } catch (e) {}
+  for (const s of SEASONS) if (s[1].test(names)) return s;
+  const d = new Date(), wd = d.getDay(), h = d.getHours();
+  if ((wd === 5 && h >= 12) || (wd === 6 && h < 19)) return ['shabbat', null, '🕯️', 'שבת שלום', ['🕯️', '🍷', '🥖', '✨']];
+  return null;
+}
+function applySeason() {
+  const s = seasonNow();
+  document.body.dataset.season = s ? s[0] : '';
+  const hero = $('#page-home .hero'); if (!hero) return;
+  let deco = $('#seasonDeco');
+  if (!s) { if (deco) deco.remove(); return; }
+  if (!deco) { deco = document.createElement('div'); deco.id = 'seasonDeco'; deco.setAttribute('aria-hidden', 'true'); hero.appendChild(deco); }
+  const pos = [[6, 12], [22, 70], [40, 20], [58, 78], [74, 30], [88, 64], [14, 44], [66, 50]];
+  deco.innerHTML = pos.map((p, i) => `<span style="right:${p[0]}%;top:${p[1]}%;animation-delay:${-i * .7}s">${s[4][i % s[4].length]}</span>`).join('');
+  const chips = $('#heroChips');
+  if (chips && !chips.querySelector('.season-chip')) chips.insertAdjacentHTML('afterbegin', `<span class="hero-chip season-chip">${s[2]} <b>${s[3]}</b></span>`);
+}
+
+/* ---------------- 2. גל קול חי בזמן הקלטה ---------------- */
+let waveRaf = 0;
+function startLiveWave() {
+  try {
+    if (!Rec.ctx || !Rec.stream) return;
+    let cv = $('#recWave');
+    if (!cv) { cv = document.createElement('canvas'); cv.id = 'recWave'; $('#meterBar').parentElement.after(cv); }
+    cv.classList.remove('hidden'); $('#meterBar').parentElement.classList.add('hidden');
+    const an = Rec.ctx.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = .75;
+    Rec.ctx.createMediaStreamSource(Rec.stream).connect(an);
+    const data = new Uint8Array(an.frequencyBinCount), x = cv.getContext('2d');
+    const draw = () => {
+      if (!Rec.mr || Rec.mr.state === 'inactive') { cancelAnimationFrame(waveRaf); return; }
+      const W = cv.width = cv.clientWidth * devicePixelRatio, H = cv.height = cv.clientHeight * devicePixelRatio;
+      an.getByteFrequencyData(data);
+      x.clearRect(0, 0, W, H);
+      const cs = getComputedStyle(document.documentElement), g = x.createLinearGradient(0, 0, W, 0);
+      g.addColorStop(0, cs.getPropertyValue('--primary').trim() || '#5b4bdb'); g.addColorStop(.5, cs.getPropertyValue('--accent').trim() || '#c9a24a'); g.addColorStop(1, cs.getPropertyValue('--primary-2').trim() || '#9b5cf6');
+      x.fillStyle = g;
+      const n = 48, bw = W / n;
+      for (let i = 0; i < n; i++) {
+        const k = Math.abs(i - n / 2) / (n / 2), v = data[Math.floor((1 - k) * 40) + 2] / 255;
+        const h = Math.max(H * .06, v * H * .92), y = (H - h) / 2;
+        x.beginPath(); x.roundRect ? x.roundRect(i * bw + bw * .2, y, bw * .6, h, bw * .3) : x.rect(i * bw + bw * .2, y, bw * .6, h); x.fill();
+      }
+      waveRaf = requestAnimationFrame(draw);
+    };
+    draw();
+  } catch (e) { console.warn(e); }
+}
+function stopLiveWave() { cancelAnimationFrame(waveRaf); const cv = $('#recWave'); if (cv) cv.classList.add('hidden'); const m = $('#meterBar'); if (m) m.parentElement.classList.remove('hidden'); }
+{
+  const _st = Rec.start, _sp = Rec.stop;
+  Rec.start = async function (...a) { const r = await _st.apply(this, a); if (this.mr && this.mr.state !== 'inactive') { startLiveWave(); setBigRec(true); voicePause(true); } return r; };
+  Rec.stop = function (...a) { stopLiveWave(); setBigRec(false); const r = _sp.apply(this, a); setTimeout(() => voicePause(false), 1500); return r; };
+}
+
+/* ---------------- 6. כפתור גדול בטלפון ---------------- */
+function setBigRec(on) { const b = $('#bigRec'); if (b) { b.classList.toggle('on', on); b.innerHTML = on ? '⏹️ לעצור ולהפוך לטקסט' : '🎤 להקליט ולתמלל'; } }
+function ensureBigRec() {
+  if ($('#bigRec')) return;
+  const b = document.createElement('button'); b.id = 'bigRec'; b.type = 'button'; b.innerHTML = '🎤 להקליט ולתמלל';
+  b.onclick = () => { if (currentPage !== 'home') go('home'); Rec.toggle(); };
+  const hero = $('#page-home .hero .grow'); if (hero) hero.appendChild(b);
+}
+
+/* ---------------- 8. להמשיך מהפעם האחרונה (רק בלחיצה) ---------------- */
+{
+  const _op = Detail.open.bind(Detail);
+  Detail.open = async function (id, opts) { const r = await _op(id, opts); try { if (this.rec && this.rec.id === id) { LS.set('lastRec', { id, t: Date.now() }); afterDetailOpen(); } } catch (e) { console.warn(e); } return r; };
+}
+function continueChip() {
+  const l = LS.get('lastRec', null); if (!l || !RECS.get(l.id)) return '';
+  const r = RECS.get(l.id), pos = LS.get('pos_' + l.id, 0) || 0;
+  return `<span class="hero-chip link" id="heroCont" title="פותח את ההקלטה האחרונה מהמקום שעצרת">▶️ להמשיך מהפעם האחרונה: <b>${esc(r.title.length > 28 ? r.title.slice(0, 28) + '…' : r.title)}</b>${pos ? ' · ' + fmtTime(pos) : ''}</span>`;
+}
+document.addEventListener('click', (e) => { if (e.target.closest('#heroCont')) { const l = LS.get('lastRec', null); if (l) Detail.open(l.id); } });
+
+/* ---------------- 3. כרטיס לוואטסאפ ---------------- */
+let crownImg = null;
+const loadCrown = () => crownImg ? Promise.resolve(crownImg) : new Promise((res) => { const i = new Image(); i.onload = () => { crownImg = i; res(i); }; i.onerror = () => res(null); i.src = 'logo-crown.png'; });
+function wrapText(x, text, maxW) {
+  const words = String(text || '').split(/\s+/), lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur); return lines;
+}
+async function shareCard(r) {
+  r = r || Detail.rec; if (!r) return;
+  try { await document.fonts.load('700 60px "Frank Ruhl Libre"'); } catch (e) {}
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.direction = 'rtl'; x.textAlign = 'center';
+  const cs = getComputedStyle(document.documentElement);
+  const p1 = cs.getPropertyValue('--primary').trim() || '#5b4bdb', p2 = cs.getPropertyValue('--primary-2').trim() || '#9b5cf6';
+  const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#120a2e'); g.addColorStop(.45, p1); g.addColorStop(1, p2);
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const rg = x.createRadialGradient(W / 2, 330, 40, W / 2, 330, 520); rg.addColorStop(0, 'rgba(240,200,110,.35)'); rg.addColorStop(1, 'rgba(240,200,110,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, H);
+  x.strokeStyle = '#d8b25a'; x.lineWidth = 6; x.strokeRect(36, 36, W - 72, H - 72); x.lineWidth = 2; x.strokeRect(52, 52, W - 104, H - 104);
+  const cr = await loadCrown(); if (cr) { const cw = 420, ch = cw * cr.height / cr.width; x.drawImage(cr, (W - cw) / 2, 110, cw, ch); }
+  const serif = '"Frank Ruhl Libre","David Libre",serif';
+  x.fillStyle = '#fff'; x.font = `700 68px ${serif}`;
+  let y = 520; wrapText(x, r.title, W - 200).slice(0, 3).forEach((l) => { x.fillText(l, W / 2, y); y += 84; });
+  const gold = x.createLinearGradient(0, y - 30, 0, y + 60); gold.addColorStop(0, '#f6dd94'); gold.addColorStop(1, '#c9a24a');
+  x.fillStyle = gold; x.font = `600 42px Heebo, Arial`;
+  const meta = [r.speaker, r.parasha && 'פרשת ' + r.parasha, r.hyear].filter(Boolean).join(' · ');
+  if (meta) { y += 10; x.fillText(meta, W / 2, y); y += 60; }
+  x.fillStyle = 'rgba(255,255,255,.85)'; x.font = `500 36px Heebo, Arial`;
+  x.fillText([hebDate(recDateOf(r)), r.duration ? '⏱ ' + fmtTime(r.duration) : ''].filter(Boolean).join('   ·   '), W / 2, y); y += 70;
+  const quote = (r.summary || r.text || '').replace(/\s+/g, ' ').trim().slice(0, 260);
+  if (quote) {
+    x.font = `400 38px ${serif}`; const ql = wrapText(x, '״' + quote + (quote.length >= 260 ? '…' : '') + '״', W - 300).slice(0, 4); const qh = ql.length * 56 + 64;
+    x.fillStyle = 'rgba(255,255,255,.1)'; x.beginPath(); x.roundRect ? x.roundRect(110, y, W - 220, qh, 28) : x.rect(110, y, W - 220, qh); x.fill();
+    x.fillStyle = '#fff'; let qy = y + 66;
+    ql.forEach((l) => { x.fillText(l, W / 2, qy); qy += 56; });
+    y += qh + 40;
+  }
+  x.fillStyle = gold; x.font = `900 54px ${serif}`; x.fillText('ביאלה', W / 2, H - 120);
+  x.fillStyle = 'rgba(255,255,255,.7)'; x.font = `400 28px Heebo, Arial`; x.fillText('תמלול שיעורים ותורות', W / 2, H - 76);
+  const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+  const url = URL.createObjectURL(blob), name = safeName(r.title) + '.png';
+  const canShare = navigator.canShare && navigator.canShare({ files: [new File([blob], name, { type: 'image/png' })] });
+  await modal(`<h3>🖼️ כרטיס לוואטסאפ</h3><img src="${url}" alt="" style="width:100%;border-radius:14px;box-shadow:var(--shadow)">
+    <div class="row" style="margin-top:.8em">${canShare ? '<button class="btn primary" id="scShare">📤 שליחה (וואטסאפ…)</button>' : ''}<button class="btn ${canShare ? '' : 'primary'}" id="scDl">⬇️ הורדת התמונה</button></div>
+    <div class="hint">${canShare ? 'בטלפון: "שליחה" ← בוחרים וואטסאפ.' : 'מורידים את התמונה ושולחים אותה בוואטסאפ כמו כל תמונה.'}</div>`, { okText: '', cancelText: 'סגירה' });
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.id === 'scDl') { const img = e.target.closest('.modal').querySelector('img'); const b = await fetch(img.src).then((r) => r.blob()); download(b, safeName(Detail.rec ? Detail.rec.title : 'ביאלה') + '.png'); }
+  if (e.target.id === 'scShare') { const img = e.target.closest('.modal').querySelector('img'); const b = await fetch(img.src).then((r) => r.blob()); const nm = safeName(Detail.rec ? Detail.rec.title : 'ביאלה') + '.png'; try { await navigator.share({ files: [new File([b], nm, { type: 'image/png' })], title: Detail.rec ? Detail.rec.title : 'ביאלה' }); } catch (er) {} }
+});
+
+/* ---------------- 4. עמוד שער לתיקייה ---------------- */
+function folderCoverHtml(f) {
+  const cnt = recsList().filter((r) => r.folderId && descendants(f.id).has(r.folderId)).length;
+  return `<div class="fcover" style="${f.cover ? `--cov:url('${f.cover.replace(/'/g, '%27')}')` : ''};${f.color ? '--fc:' + f.color : ''}"><div class="fcover-in"><div class="fcover-ic">${folderIcon(f)}</div><div class="grow"><h2>${esc(f.name)}</h2>${f.descr ? `<p>${esc(f.descr)}</p>` : ''}<span class="hero-chip">🎧 <b>${cnt}</b> הקלטות</span></div>${canManageFolder(f) ? '<button class="btn small" id="fcEdit">🖼️ עיצוב השער</button>' : ''}</div></div>`;
+}
+function renderFolderCover() {
+  const old = $('#folderCover'); if (old) old.remove();
+  const f = FOLDERS.find((x) => x.id === libFolder); if (!f || libView === 'folders') return;
+  const el = document.createElement('div'); el.id = 'folderCover'; el.innerHTML = folderCoverHtml(f);
+  const anchor = $('#folderGrid'); if (anchor) anchor.before(el);
+}
+async function shrinkImage(file, max = 900) {
+  const url = URL.createObjectURL(file); const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+  const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = img.width * k; c.height = img.height * k;
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); return c.toDataURL('image/jpeg', .78);
+}
+async function editCover(id) {
+  const f = FOLDERS.find((x) => x.id === id); if (!f) return;
+  let cover = f.cover || null;
+  const ok = await modal(`<h3>🖼️ עמוד שער לתיקייה "${esc(f.name)}"</h3>
+    <label>תמונת שער</label><div class="row"><button class="btn" id="fcPick" type="button">📷 בחירת תמונה</button><button class="btn small" id="fcClear" type="button">✕ בלי תמונה</button><input type="file" id="fcFile" accept="image/*" class="hidden"></div>
+    <div id="fcPrev" class="fcover" style="margin-top:.6em;${cover ? `--cov:url('${cover}')` : ''}"><div class="fcover-in"><div class="fcover-ic">${folderIcon(f)}</div><div class="grow"><h2>${esc(f.name)}</h2></div></div></div>
+    <label>תיאור קצר</label><input type="text" id="fcDesc" value="${esc(f.descr || '')}" placeholder="למשל: שיעורי השבת של האדמו״ר, תשפ״ו">`,
+  { okText: 'שמירה', wide: true });
+  if (!ok) return;
+  const patch = { cover: window.__fcCover !== undefined ? window.__fcCover : cover, descr: window.__fcDesc !== undefined ? window.__fcDesc : (f.descr || null) };
+  window.__fcCover = undefined; window.__fcDesc = undefined;
+  const { error } = await sb.from('folders').update(patch).eq('id', id);
+  if (error) return toast('❌ ' + (/column/.test(error.message) ? 'צריך לעדכן את בסיס הנתונים (פנה למנהל)' : error.message), 6000);
+  Object.assign(f, patch); toast('✅ השער נשמר'); renderLibrary();
+}
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'fcEdit') return editCover(libFolder);
+  if (e.target.id === 'fcPick') return $('#fcFile').click();
+  if (e.target.id === 'fcClear') { window.__fcCover = null; $('#fcPrev').style.removeProperty('--cov'); }
+});
+document.addEventListener('change', async (e) => {
+  if (e.target.id === 'fcFile' && e.target.files[0]) { const d = await shrinkImage(e.target.files[0]); window.__fcCover = d; $('#fcPrev').style.setProperty('--cov', `url('${d}')`); }
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'fcDesc') window.__fcDesc = e.target.value.trim() || null; });
+{ const _rl = renderLibrary; renderLibrary = function () { _rl(); try { renderFolderCover(); decorateFolderGrid(); } catch (e) { console.warn(e); } }; }
+function decorateFolderGrid() { $$('#folderGrid .fcard[data-fopen]').forEach((c) => { const f = FOLDERS.find((x) => x.id === c.dataset.fopen); if (f && f.cover) { c.classList.add('has-cover'); c.style.setProperty('--cov', `url('${f.cover}')`); } }); }
+
+/* ---------------- 5. מצב ספר + 20. סימון בצבעים, כותרות, הורדה בלחיצה ---------------- */
+let markMode = '';
+function afterDetailOpen() {
+  if (!$('#markBar')) {
+    const bar = document.createElement('div'); bar.id = 'markBar';
+    bar.innerHTML = `<div class="mk-row"><span class="mk-lbl">🖍️ סימון:</span>${Object.entries(MARK_COLORS).map(([k, m]) => `<button type="button" class="mk-btn" data-mk="${k}" style="--mc:${m.bg}">${m.ic} ${m.n}</button>`).join('')}<button type="button" class="mk-btn" data-mk="erase">🧽 מחיקת סימון</button><button type="button" class="mk-btn" data-mk="head">➕ כותרת</button><span class="grow"></span><button type="button" class="btn small" id="bookBtn">📖 מצב ספר</button><button type="button" class="btn small" id="cardBtn">🖼️ כרטיס לוואטסאפ</button></div>
+      <div class="mk-row qx"><span class="mk-lbl">⬇️ בלחיצה אחת:</span><button type="button" class="btn small" data-qx="print">🖨️ הדפסה</button><button type="button" class="btn small" data-qx="pdf">📕 PDF</button><button type="button" class="btn small" data-qx="docx">📘 Word</button><button type="button" class="btn small" data-qx="xlsx">📗 Excel</button><span class="mk-legend" id="mkLegend"></span></div>
+      <div class="hint" id="mkHint"></div>`;
+    $('#dTranscript').before(bar);
+  }
+  $('#markBar').classList.toggle('ro', !Detail.canEdit());
+  setMarkMode('');
+  $('#dTranscript').classList.toggle('book', !!LS.get('bookMode', false));
+  $('#bookBtn').classList.toggle('primary', !!LS.get('bookMode', false));
+  decorateTranscript();
+}
+function setMarkMode(m) {
+  markMode = markMode === m ? '' : m;
+  $$('#markBar [data-mk]').forEach((b) => b.classList.toggle('on', b.dataset.mk === markMode));
+  $('#dTranscript').classList.toggle('marking', !!markMode);
+  $('#mkHint').textContent = !markMode ? 'כדי לסמן: בוחרים צבע ולוחצים על משפטים בטקסט. כולם רואים את הסימונים של ההקלטה.' : markMode === 'head' ? 'לחץ על המשפט שלפניו תבוא הכותרת.' : markMode === 'erase' ? 'לחץ על משפט מסומן כדי למחוק את הסימון או הכותרת.' : `מסמן ב"${MARK_COLORS[markMode].n}" – לחץ על משפטים. לסיום לחץ שוב על הצבע.`;
+}
+function decorateTranscript() {
+  const r = Detail.rec; if (!r) return;
+  const marks = (r.extras && r.extras.marks) || {}, heads = (r.extras && r.extras.heads) || {};
+  $$('#dTranscript .seg-head').forEach((h) => h.remove());
+  $$('#dTranscript .seg[data-seg]').forEach((s) => {
+    const i = s.dataset.seg; Object.keys(MARK_COLORS).forEach((k) => s.classList.remove('mk-' + k));
+    if (marks[i]) s.classList.add('mk-' + marks[i]);
+    if (heads[i]) s.insertAdjacentHTML('beforebegin', `<div class="seg-head" data-headof="${i}">${esc(heads[i])}</div>`);
+    if (s.classList.contains('unsure') && Detail.canEdit() && !s.querySelector('.fixsug')) s.insertAdjacentHTML('beforeend', '<button type="button" class="fixsug" title="הצעות תיקון">💡</button>');
+  });
+  const cnt = {}; Object.values(marks).forEach((k) => cnt[k] = (cnt[k] || 0) + 1);
+  const lg = $('#mkLegend'); if (lg) lg.innerHTML = Object.entries(cnt).map(([k, n]) => MARK_COLORS[k] ? `<span style="background:${MARK_COLORS[k].bg}">${MARK_COLORS[k].ic} ${n}</span>` : '').join('') + (Object.keys(heads).length ? `<span>📑 ${Object.keys(heads).length} כותרות</span>` : '');
+}
+{ const _rt = Detail.renderTranscript.bind(Detail); Detail.renderTranscript = function () { _rt(); try { decorateTranscript(); } catch (e) {} }; }
+document.addEventListener('click', async (e) => {
+  const mb = e.target.closest('#markBar [data-mk]'); if (mb) return setMarkMode(mb.dataset.mk);
+  if (e.target.id === 'bookBtn') { const on = !LS.get('bookMode', false); LS.set('bookMode', on); $('#dTranscript').classList.toggle('book', on); e.target.classList.toggle('primary', on); return; }
+  if (e.target.id === 'cardBtn') return shareCard();
+  const qx = e.target.closest('[data-qx]'); if (qx) return quickExport(qx.dataset.qx, qx);
+}, true);
+// לחיצה על משפט במצב סימון – תופסים לפני הניגון
+document.addEventListener('click', async (e) => {
+  const fs = e.target.closest('.fixsug'); if (fs) { e.stopPropagation(); e.preventDefault(); return suggestFix(+fs.closest('.seg').dataset.seg); }
+  if (!markMode) return;
+  const s = e.target.closest('#dTranscript .seg[data-seg]'); const hd = e.target.closest('#dTranscript .seg-head');
+  if (!s && !hd) return;
+  e.stopPropagation(); e.preventDefault();
+  if (!Detail.canEdit()) return toast('אין לך הרשאה לערוך את ההקלטה הזו');
+  const ex = Detail.rec.extras = Detail.rec.extras || {}; ex.marks = ex.marks || {}; ex.heads = ex.heads || {};
+  const i = s ? s.dataset.seg : hd.dataset.headof;
+  if (markMode === 'erase') { if (hd) delete ex.heads[i]; else delete ex.marks[i]; }
+  else if (markMode === 'head') {
+    let t = null;
+    await modal(`<h3>➕ כותרת</h3><input type="text" id="hdIn" value="${esc(ex.heads[i] || '')}" placeholder="למשל: חלק א׳ – הקדמה">`, { okText: 'שמירה', onOk: (bg) => { t = bg.querySelector('#hdIn').value.trim(); } });
+    if (t === null) return; if (t) ex.heads[i] = t; else delete ex.heads[i];
+  } else { if (!s) return; ex.marks[i] = ex.marks[i] === markMode ? undefined : markMode; if (!ex.marks[i]) delete ex.marks[i]; }
+  decorateTranscript();
+  try { await saveExtras(); } catch (er) { toast('❌ ' + er.message); }
+}, true);
+async function quickExport(kind, btn) {
+  const r = await fullRec(Detail.rec.id).catch(() => Detail.rec);
+  const o = Object.assign({}, EXP_DEFAULT, { times: false, paras: true, meta: true, summary: true, chapters: true, sources: true, translations: false });
+  const base = safeName(r.title);
+  if (kind === 'print') { const w = window.open('', '_blank'); if (!w) return toast('הדפדפן חסם חלון חדש – אפשר "חלונות קופצים" לאתר'); w.document.write(docToHtml(buildDoc(r, o)).replace('</body>', '<script>setTimeout(()=>print(),500)<\/script></body>')); w.document.close(); return; }
+  return runExport(btn, async () => {
+    if (kind === 'pdf') await docToPdf(buildDoc(r, o), base + '.pdf');
+    else if (kind === 'xlsx') await exportXlsx([r], base + '.xlsx', false, o);
+    else { const x = await exportOne(r, Object.assign(o, { fmt: 'docx' })); download(x.blob, x.name); }
+  });
+}
+
+/* ---------------- 10. הצעות תיקון למילה לא בטוחה ---------------- */
+async function suggestFix(i) {
+  const segs = Detail.rec.segments || [], s = segs[i]; if (!s) return;
+  const ctx = [segs[i - 2], segs[i - 1]].filter(Boolean).map((x) => x.text).join(' '), after = [segs[i + 1], segs[i + 2]].filter(Boolean).map((x) => x.text).join(' ');
+  toast('💡 מחפש הצעות תיקון…', 6000);
+  let out = '';
+  try {
+    out = await aiComplete('chat', 'אתה עורך תמלולים בעברית וביידיש. המשפט המסומן תומלל אוטומטית וכנראה יש בו טעות שמיעה. החזר בדיוק 3 גרסאות מתוקנות סבירות של המשפט המסומן בלבד, כל אחת בשורה נפרדת, בלי מספור ובלי הסברים. שמור על השפה והסגנון.',
+      `לפני: ${ctx}\nהמשפט: [${s.text}]\nאחרי: ${after}`, 600);
+  } catch (e) { return toast('❌ ' + e.message, 6000); }
+  const opts = out.split('\n').map((x) => x.replace(/^[\s\d.\-–•*"״]+|["״]+$/g, '').trim()).filter((x) => x && x !== s.text).slice(0, 3);
+  if (!opts.length) return toast('לא נמצאו הצעות');
+  let pick = null;
+  await modal(`<h3>💡 הצעות תיקון</h3><div class="muted" style="margin-bottom:.5em">כרגע: "${esc(s.text)}"</div>${opts.map((o, k) => `<button type="button" class="fix-opt" data-fo="${k}">${esc(o)}</button>`).join('')}<div class="hint">לחיצה על הצעה מחליפה את המשפט. אפשר גם לחיצה כפולה על המשפט ולתקן בעצמך.</div>`, { okText: '', cancelText: 'להשאיר כמו שהוא' });
+  void pick;
+}
+document.addEventListener('click', async (e) => {
+  const fo = e.target.closest('[data-fo]'); if (!fo) return;
+  const m = fo.closest('.modal-bg'); const txt = fo.textContent; if (m) m.remove();
+  const i = +($('#dTranscript .fixsug-active') || {}).dataset?.seg;
+  void i;
+  const segIdx = window.__fixSeg; const seg = Detail.rec.segments[segIdx]; if (!seg) return;
+  seg.text = txt; delete seg.u; Detail.rec.text = Detail.rec.segments.map((x) => x.text).join(' ');
+  try { await Detail.save(['segments', 'text']); toast('✅ המשפט תוקן'); Detail.renderTranscript(); } catch (er) { toast('❌ ' + er.message); }
+});
+{ const _sf = suggestFix; suggestFix = function (i) { window.__fixSeg = i; return _sf(i); }; }
+
+/* ---------------- 11. הקראת ההוראות ---------------- */
+function speakHe(text) {
+  if (!('speechSynthesis' in window)) return toast('הדפדפן לא תומך בהקראה');
+  const he = speechSynthesis.getVoices().find((v) => /^he/i.test(v.lang));
+  if (!he) toast('ℹ️ אם לא שומעים – צריך להתקין קול עברי: הגדרות Windows ← זמן ושפה ← דיבור', 7000);
+  speak(text);
+}
+function addHelpSpeakers() {
+  $$('#page-help details > summary').forEach((sm) => {
+    if (sm.querySelector('.say')) return;
+    sm.insertAdjacentHTML('beforeend', '<button type="button" class="say" title="הקראה בקול">🔊</button>');
+  });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#page-help .say'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
+  const d = b.closest('details'); d.open = true;
+  speakHe(d.textContent.replace('🔊', '').replace(/\s+/g, ' '));
+}, true);
+{ const _rh2 = renderHelp; renderHelp = function () { _rh2(); try { addHelpSpeakers(); } catch (e) {} }; }
+
+/* ---------------- 13. שליטה בקול ---------------- */
+const Voice = { on: false, rec: null, paused: false };
+function voiceStart() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast('הדפדפן לא תומך בשליטה בקול – נסה בכרום');
+  if (Voice.rec) try { Voice.rec.abort(); } catch (e) {}
+  const r = new SR(); r.lang = 'he-IL'; r.continuous = true; r.interimResults = false;
+  r.onresult = (ev) => { const t = ev.results[ev.results.length - 1][0].transcript.trim(); voiceCmd(t); };
+  r.onend = () => { if (Voice.on && !Voice.paused) setTimeout(() => { try { r.start(); } catch (e) {} }, 300); };
+  r.onerror = (ev) => { if (ev.error === 'not-allowed') { Voice.on = false; voiceUi(); toast('אין גישה למיקרופון'); } };
+  Voice.rec = r; try { r.start(); } catch (e) {}
+}
+function voicePause(p) { if (!Voice.on) return; Voice.paused = p; if (p) { try { Voice.rec && Voice.rec.abort(); } catch (e) {} } else voiceStart(); voiceUi(); }
+function voiceToggle() { Voice.on = !Voice.on; LS.set('voiceOn', Voice.on); if (Voice.on) { voiceStart(); toast('🎙️ שליטה בקול פעילה – אמור למשל "ספרייה" או "תתחיל הקלטה"', 6000); } else { try { Voice.rec && Voice.rec.abort(); } catch (e) {} } voiceUi(); }
+function voiceUi() {
+  let p = $('#voicePill');
+  if (!Voice.on) { if (p) p.remove(); return; }
+  if (!p) { p = document.createElement('button'); p.id = 'voicePill'; p.type = 'button'; p.onclick = () => voiceHelp(); document.body.appendChild(p); }
+  p.innerHTML = Voice.paused ? '⏸️ השליטה בקול מושהית בזמן הקלטה' : '🎙️ מקשיב… <small>(לחיצה = רשימת פקודות)</small>';
+}
+const VOICE_CMDS = [
+  [/(תתחיל|התחל|להתחיל).*(הקלטה|להקליט)|^הקלט/, 'תתחיל הקלטה', () => { go('home'); setTimeout(() => Rec.start(), 300); }],
+  [/ספרי/, 'ספרייה', () => go('library')], [/לוח/, 'לוח עברי', () => go('calendar')], [/פרשיות|פרשות/, 'פרשיות', () => go('parshiyot')],
+  [/הוראות|עזרה/, 'הוראות', () => go('help')], [/סטטיסטיק/, 'סטטיסטיקה', () => go('stats')], [/בית|תמלול חדש/, 'דף הבית', () => go('home')],
+  [/^(חפש|תחפש)\s+(.+)/, 'חפש ___', (m) => { go('library'); setTimeout(() => { const sb2 = $('#searchBox'); sb2.value = m[2]; sb2.dispatchEvent(new Event('input', { bubbles: true })); }, 200); }],
+  [/^(נגן|תנגן|המשך)/, 'תנגן', () => { const p = $('#player'); if (p.src) p.play().catch(() => {}); }],
+  [/^(עצור|תעצור|הפסק)/, 'תעצור', () => { const p = $('#player'); if (p && !p.paused) p.pause(); speechSynthesis.cancel(); }],
+  [/^(סגור|תסגור|ביטול)/, 'סגור', () => { const m = $('#modalRoot').lastElementChild; if (m) m.remove(); const c = $('#cmdk'); if (c) c.remove(); }],
+  [/חושך|לילה/, 'מצב חושך', () => $('#darkBtn').click()], [/הגדל|גדול יותר/, 'הגדל טקסט', () => { const a = LS.get('a11y', {}) || {}; a.fs = Math.min(3, (a.fs || 0) + 1); LS.set('a11y', a); applyA11y(); }],
+  [/הקטן|קטן יותר/, 'הקטן טקסט', () => { const a = LS.get('a11y', {}) || {}; a.fs = Math.max(0, (a.fs || 0) - 1); LS.set('a11y', a); applyA11y(); }],
+  [/הפסק להקשיב|כבה שליטה/, 'כבה שליטה בקול', () => voiceToggle()]
+];
+function voiceCmd(t) {
+  for (const [re, , fn] of VOICE_CMDS) { const m = t.match(re); if (m) { toast('🎙️ ' + t); fn(m); return; } }
+}
+function voiceHelp() { modal(`<h3>🎙️ פקודות קוליות</h3><p class="muted">אומרים בקול אחת מהפקודות:</p><div class="voice-list">${VOICE_CMDS.map((c) => `<span>"${c[1]}"</span>`).join('')}</div><div class="row" style="margin-top:1em"><button class="btn danger" id="voiceOff">⏹️ לכבות שליטה בקול</button></div>`, { okText: 'סגירה', cancelText: '' }); }
+document.addEventListener('click', (e) => { if (e.target.id === 'voiceOff') { e.target.closest('.modal-bg').remove(); if (Voice.on) voiceToggle(); } if (e.target.id === 'a11yVoice') { e.target.closest('.modal-bg').remove(); voiceToggle(); } if (e.target.id === 'a11yStmt') { e.target.closest('.modal-bg').remove(); openA11yStatement(); } });
+{ const _oa = openA11y; openA11y = function () { _oa(); const bg = $('#modalRoot').lastElementChild; const g = bg && bg.querySelector('.a11y-grid'); if (g) g.insertAdjacentHTML('afterend', `<div class="row" style="margin-top:.6em"><button class="btn" id="a11yVoice">🎙️ ${Voice.on ? 'לכבות' : 'להפעיל'} שליטה בקול</button><button class="btn" id="a11yStmt">📄 הצהרת נגישות</button></div>`); }; }
+
+/* ---------------- 16. הצהרת נגישות ---------------- */
+function openA11yStatement() {
+  modal(`<h3>♿ הצהרת נגישות</h3><div class="stmt">
+    <p>אנו רואים חשיבות רבה במתן שירות שווה לכל המשתמשים, ופועלים כדי שמערכת <b>ביאלה</b> תהיה נוחה ונגישה גם לאנשים עם מוגבלות.</p>
+    <h4>רמת הנגישות</h4><p>המערכת הותאמה ככל האפשר לדרישות תקן ישראלי 5568 ולהנחיות WCAG 2.1 ברמה AA.</p>
+    <h4>מה יש באתר</h4><ul><li>תפריט נגישות (♿ למעלה, או Alt+A): הגדלת טקסט ב-4 רמות, ניגודיות גבוהה, גופן קריא, ריווח שורות, הדגשת קישורים, סמן עכבר גדול, עצירת אנימציות ושחור-לבן.</li>
+    <li>ניווט מלא במקלדת, כולל דילוג לתוכן הראשי וחיפוש מהיר (Ctrl+K).</li><li>שליטה בקול בעברית, והקראה בקול של ההוראות ושל התמלולים.</li>
+    <li>תמיכה בקוראי מסך: תוויות לכפתורים, מבנה כותרות ותיאורים.</li><li>מצב חושך, ומצב ספר עם אותיות גדולות לקריאה נוחה.</li><li>כתוביות לסרטונים ותמלול מלא לכל הקלטה.</li></ul>
+    <h4>מגבלות ידועות</h4><p>חלק מהקבצים שמשתמשים מעלים (הקלטות, מסמכים ישנים) עשויים שלא להיות נגישים במלואם. אנו ממשיכים לשפר.</p>
+    <h4>יצירת קשר בנושא נגישות</h4><p>נתקלתם בבעיה? נשמח לשמוע ולתקן. ${ME ? '<button class="btn small" id="stmtMsg">✉️ שליחת הודעה לרכז הנגישות</button>' : 'פנו למנהל המערכת.'}</p>
+    <p class="muted">עודכן לאחרונה: ${esc(hebDate(Date.now()))}</p></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+}
+document.addEventListener('click', (e) => { if (e.target.id === 'stmtMsg') { e.target.closest('.modal-bg').remove(); $('#msgBtn').click(); } if (e.target.id === 'authA11y') { e.preventDefault(); openA11yStatement(); } });
+
+/* ---------------- 22. מצב החינם (למנהל) ---------------- */
+const FREE_LIMITS = { storage: 1024 ** 3, transcribeDay: 8 * 3600, emailsMonth: 200 };
+async function renderFreeCard() {
+  if (!isAdmin()) return;
+  let card = $('#freeCard');
+  if (!card) { card = document.createElement('div'); card.id = 'freeCard'; card.className = 'card'; $('#page-settings').insertBefore(card, $('#page-settings').children[1] || null); }
+  card.innerHTML = '<h3>💚 מצב החינם</h3><p class="muted"><span class="spinner"></span> בודק…</p>';
+  try {
+    const u = await api('admin-usage', {}, { timeout: 30000 });
+    const bar = (lbl, used, lim, fmt, tip) => { const p = Math.min(100, Math.round(used / lim * 100)); const c = p > 85 ? 'var(--err)' : p > 60 ? 'var(--warn)' : 'var(--ok)'; return `<div class="free-row" title="${esc(tip)}"><div class="row"><b class="grow">${lbl}</b><span>${fmt(used)} מתוך ${fmt(lim)}</span></div><div class="free-bar"><div style="width:${Math.max(2, p)}%;background:${c}"></div></div></div>`; };
+    const mb = (b) => (b / 1024 / 1024 >= 1024 ? (b / 1024 ** 3).toFixed(2) + ' GB' : Math.round(b / 1024 / 1024) + ' MB');
+    const hrs = (s) => (s / 3600).toFixed(s < 36000 ? 1 : 0) + ' שעות';
+    card.innerHTML = `<h3>💚 מצב החינם <span class="muted" style="font-size:.75em;font-weight:500;margin-inline-start:auto">אין כרטיס אשראי באף שירות – לא ייתכן חיוב</span></h3>
+      ${bar('💾 אחסון קבצי שמע (Supabase)', u.storage || 0, FREE_LIMITS.storage, mb, 'כשמתקרבים לתקרה: ניהול ← מחיקת שמע ישן – הטקסט נשאר')}
+      ${bar('🎙️ תמלול היום (Groq)', u.transcribeToday || 0, FREE_LIMITS.transcribeDay, hrs, 'מתאפס כל יום')}
+      ${bar('✉️ מיילים החודש (EmailJS)', u.emailsMonth || 0, FREE_LIMITS.emailsMonth, (n) => Math.round(n), 'מתאפס בתחילת כל חודש')}
+      <div class="hint">החודש תומללו ${hrs(u.transcribeMonth || 0)} · ${u.aiToday || 0} פעולות בינה מלאכותית היום · ${u.recs || 0} קבצי שמע שמורים.</div>
+      <div class="row" style="margin-top:.6em"><button class="btn primary" id="driveBk">☁️ גיבוי לגוגל דרייב</button><span class="hint" id="driveLast">${LS.get('driveLast', '') ? 'גיבוי אחרון לדרייב: ' + fmtDate(LS.get('driveLast', 0)) : 'עוד לא היה גיבוי לדרייב'}</span></div>`;
+  } catch (e) { card.innerHTML = `<h3>💚 מצב החינם</h3><p class="muted">לא הצלחתי לבדוק כרגע (${esc(e.message)}).</p><button class="btn primary" id="driveBk">☁️ גיבוי לגוגל דרייב</button>`; }
+}
+{ const _rs = renderSettings; renderSettings = function () { _rs(); try { renderFreeCard(); } catch (e) {} }; }
+
+/* ---------------- 23. גיבוי לגוגל דרייב ---------------- */
+const DRIVE_ACCOUNT = 'bnyytmrkwt@gmail.com';
+async function driveToken() {
+  if (!(window.google && google.accounts && google.accounts.oauth2)) await loadScript('https://accounts.google.com/gsi/client');
+  return new Promise((res, rej) => {
+    const tc = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', hint: DRIVE_ACCOUNT, login_hint: DRIVE_ACCOUNT,
+      callback: (r) => r && r.access_token ? res(r.access_token) : rej(new Error((r && r.error_description) || (r && r.error) || 'ההרשאה בוטלה')),
+      error_callback: (er) => rej(new Error(er && er.type === 'popup_closed' ? 'החלון נסגר לפני האישור' : 'לא התקבלה הרשאה')) });
+    tc.requestAccessToken({ prompt: '' });
+  });
+}
+async function gdrive(tok, path, opts = {}) {
+  const r = await fetch('https://www.googleapis.com/' + path, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + tok }, opts.headers || {}) }));
+  if (!r.ok) { const t = await r.text(); throw new Error('Drive ' + r.status + ': ' + (/accessNotConfigured|has not been used/.test(t) ? 'צריך להפעיל את Google Drive API בפרויקט' : t.slice(0, 160))); }
+  return r;
+}
+async function driveFolder(tok, name, parent) {
+  const q = encodeURIComponent(`name='${name.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false${parent ? ` and '${parent}' in parents` : ''}`);
+  const l = await (await gdrive(tok, `drive/v3/files?q=${q}&fields=files(id)`)).json();
+  if (l.files && l.files[0]) return l.files[0].id;
+  const c = await (await gdrive(tok, 'drive/v3/files', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: parent ? [parent] : undefined }) })).json();
+  return c.id;
+}
+async function driveUpload(tok, blob, name, parent, props) {
+  const meta = { name, parents: [parent], appProperties: props || undefined };
+  const init = await gdrive(tok, 'upload/drive/v3/files?uploadType=resumable', { method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': blob.type || 'application/octet-stream' }, body: JSON.stringify(meta) });
+  const loc = init.headers.get('Location');
+  if (loc) { const r = await fetch(loc, { method: 'PUT', headers: { 'Content-Type': blob.type || 'application/octet-stream' }, body: blob }); if (!r.ok) throw new Error('Drive upload ' + r.status); return; }
+  const fd = new FormData(); fd.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' })); fd.append('file', blob);
+  await gdrive(tok, 'upload/drive/v3/files?uploadType=multipart', { method: 'POST', body: fd });
+}
+async function driveBackup() {
+  let withAudio = false;
+  const ok = await modal(`<h3>☁️ גיבוי לגוגל דרייב</h3><p>הגיבוי נשמר בדרייב של <b dir="ltr">${DRIVE_ACCOUNT}</b>, בתיקייה <b>"ביאלה – גיבויים"</b>.</p>
+    <ul style="line-height:1.8"><li>📦 קובץ גיבוי מלא (אפשר לשחזר ממנו את כל המערכת)</li><li>📗 קובץ Excel עם כל ההקלטות והתמלולים – לקריאה נוחה</li></ul>
+    <label class="row" style="font-weight:500;gap:.4em"><input type="checkbox" id="dbAudio" style="width:auto"> 🎵 גם קבצי השמע (בפעם הראשונה לוקח זמן; אחר כך רק החדשים)</label>
+    <div class="hint">🟧 ייפתח חלון של גוגל – בוחרים את החשבון <b dir="ltr">${DRIVE_ACCOUNT}</b> ומאשרים.</div>`, { okText: '☁️ להתחיל גיבוי', onOk: (bg) => { withAudio = bg.querySelector('#dbAudio').checked; } });
+  if (!ok) return;
+  let tok; try { tok = await driveToken(); } catch (e) { return toast('❌ ' + e.message, 7000); }
+  const st = (t) => toast('☁️ ' + t, 60000);
+  try {
+    st('מכין את הגיבוי…');
+    const all = [];
+    for (let from = 0; ; from += 500) { const { data, error } = await sb.from('recordings').select('*').is('deleted_at', null).range(from, from + 499); dbErr(error); all.push(...data.map((r) => Object.assign({}, r, { peaks: undefined }))); if (data.length < 500) break; }
+    const day = new Date().toISOString().slice(0, 10);
+    const root = await driveFolder(tok, 'ביאלה – גיבויים');
+    st('מעלה קובץ גיבוי…');
+    await driveUpload(tok, new Blob([JSON.stringify({ app: 'tamlul-plus', version: APP_VERSION, cloud: true, exported: new Date().toISOString(), folders: FOLDERS, recordings: all, dictionary: DICT })], { type: 'application/json' }), `ביאלה-גיבוי-${day}.json`, root);
+    st('מכין Excel…');
+    let cap = null; const _dl = download; download = (b, n) => { cap = { b, n }; };
+    try { await exportXlsx(recsList(), 'x.xlsx', true); } finally { download = _dl; }
+    if (cap) await driveUpload(tok, cap.b, `ביאלה-ספרייה-${day}.xlsx`, root);
+    let n = 0;
+    if (withAudio) {
+      const af = await driveFolder(tok, 'קבצי שמע', root);
+      const have = new Set(); let pt = '';
+      do { const l = await (await gdrive(tok, `drive/v3/files?q=${encodeURIComponent(`'${af}' in parents and trashed=false`)}&fields=nextPageToken,files(appProperties)&pageSize=1000${pt ? '&pageToken=' + pt : ''}`)).json(); (l.files || []).forEach((f) => f.appProperties && have.add(f.appProperties.recId)); pt = l.nextPageToken || ''; } while (pt);
+      const todo = all.filter((r) => r.file_path && !have.has(r.id));
+      for (const r of todo) {
+        st(`מעלה שמע ${++n}/${todo.length}: ${r.title}`);
+        const { data: s } = await sb.storage.from('audio').createSignedUrl(r.file_path, 600); if (!s) continue;
+        const b = await fetch(s.signedUrl).then((x) => x.blob());
+        const ext = (r.file_path.split('.').pop() || 'mp3').slice(0, 5);
+        await driveUpload(tok, b, `${safeName(r.title)}.${ext}`, af, { recId: r.id });
+      }
+    }
+    LS.set('driveLast', Date.now());
+    toast(`✅ הגיבוי לדרייב הסתיים${withAudio ? ` (${n} קבצי שמע חדשים)` : ''}`, 6000);
+    const dl = $('#driveLast'); if (dl) dl.textContent = 'גיבוי אחרון לדרייב: ' + fmtDate(Date.now());
+  } catch (e) { console.error(e); toast('❌ הגיבוי נכשל: ' + e.message, 9000); }
+}
+document.addEventListener('click', (e) => { if (e.target.id === 'driveBk') driveBackup(); });
+function driveReminder() {
+  if (!isAdmin()) return; const last = LS.get('driveLast', 0);
+  if (last && Date.now() - last < 7 * 864e5) return;
+  if (LS.get('driveSnooze', 0) > Date.now()) return;
+  const b = $('#banner'); if (!b || !b.classList.contains('hidden')) return;
+  b.innerHTML = `☁️ ${last ? 'עבר שבוע מהגיבוי האחרון לדרייב' : 'עוד לא גיבית לגוגל דרייב'} – <button class="btn small" id="driveBk">גיבוי עכשיו</button> <button class="btn small" id="driveSn">אחר כך</button>`;
+  b.classList.remove('hidden');
+}
+document.addEventListener('click', (e) => { if (e.target.id === 'driveSn') { LS.set('driveSnooze', Date.now() + 3 * 864e5); $('#banner').classList.add('hidden'); } });
+
+/* ---------------- חיבור לדף הבית ---------------- */
+{ const _rh3 = renderHomeDash; renderHomeDash = function () { _rh3(); try { ensureBigRec(); applySeason(); const c = continueChip(); const chips = $('#heroChips'); if (c && chips && !$('#heroCont')) chips.insertAdjacentHTML('beforeend', c); } catch (e) { console.warn(e); } }; }
+$('#a11yBtn').onclick = () => openA11y();
+{ const _ea2 = enterApp; enterApp = async function () { await _ea2(); try { if (LS.get('voiceOn', false)) { Voice.on = true; voiceStart(); voiceUi(); } setTimeout(driveReminder, 4000); } catch (e) {} }; }
 
 /* =========================================================
    ADMIN SETTINGS
