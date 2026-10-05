@@ -1506,7 +1506,7 @@ body{overflow-x:clip}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.3.1';
+const APP_VERSION = '3.3.2';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -4011,6 +4011,7 @@ $('#helpSearch').addEventListener('input', () => {
   $$('#page-help details').forEach((d) => { const hit = !q || d.textContent.includes(q); d.classList.toggle('hidden', !hit); if (q && hit) d.open = true; });
 });
 function welcome() {
+  return; // בוטל לבקשת המנהל – הסיור זמין רק בלחיצה על "🧭 סיור מודרך" בהוראות
   if (LS.get('welcomed30')) return;
   LS.set('welcomed30', 1);
   modal(`<h3>👋 ברוך הבא לביאלה!</h3><ul style="line-height:1.9">
