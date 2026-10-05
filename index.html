@@ -824,6 +824,8 @@ body.dark .transcript.book{background:linear-gradient(180deg,#2a2418,#211c12);co
 .banner .btn{color:#3a2a05;background:#fff;border-color:transparent;font-weight:700}
 body{overflow-x:clip}
 @media(max-width:700px){header.top .logo{font-size:0;gap:0}header.top .logo img.crown{height:34px}#darkBtn{display:none}.top-actions{gap:.25em}.top-actions .icon-btn{width:34px;height:34px}}
+.tr-box{background:var(--primary-soft);border-radius:12px;padding:.15em .5em}
+.tr-lbl{font-weight:700;font-size:.9em;white-space:nowrap}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -962,11 +964,11 @@ body{overflow-x:clip}
       <div id="noTranscribe" class="card hidden" style="border-color:var(--warn);margin-bottom:16px">⚠️ אין לך הרשאה לתמלל הקלטות חדשות. אפשר לצפות בספרייה. לשינוי – פנה למנהל.</div>
       <div id="transcribeArea">
       <div class="row" style="margin-bottom:14px">
-        <span style="font-weight:700">🗣️ באיזו שפה מדברים?</span>
+        <span style="font-weight:700">🗣️ שפת ההקלטה – באיזו שפה מדברים?</span>
         <div class="lang-pills" id="langPills">
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
-        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em">
+        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
           <button data-yiout="yi">📜 כתיבה ביידיש</button><button data-yiout="he">🇮🇱 ישר לעברית</button><button data-yiout="both">📜+🇮🇱 גם וגם</button>
         </div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
@@ -1126,7 +1128,7 @@ body{overflow-x:clip}
         </div>
         <div class="toolbar">
           <button class="btn small primary perm-summarize" id="sumBtn">✨ סיכום</button>
-          <span class="row perm-translate" style="gap:.25em"><select id="trLang" style="width:auto;padding:.25em .5em;font-size:.9em"><option value="he">לעברית</option><option value="en">לאנגלית</option><option value="yi">ליידיש</option><option value="fr">לצרפתית</option><option value="ru">לרוסית</option><option value="es">לספרדית</option><option value="de">לגרמנית</option><option value="ar">לערבית</option></select><button class="btn small primary" id="trBtn">🌐 תרגום</button></span>
+          <span class="row perm-translate tr-box" style="gap:.35em"><span class="tr-lbl">🌐 לתרגם ל:</span><select id="trLang" title="לאיזו שפה לתרגם" style="width:auto;padding:.3em .6em;font-size:.95em;font-weight:700"><option value="he">לעברית</option><option value="en">לאנגלית</option><option value="yi">ליידיש</option><option value="fr">לצרפתית</option><option value="ru">לרוסית</option><option value="es">לספרדית</option><option value="de">לגרמנית</option><option value="ar">לערבית</option></select><button class="btn small primary" id="trBtn">🌐 תרגום</button></span>
           <button class="btn small primary perm-export" id="exportBtn">⬇️ ייצוא (Word / PDF / Excel / PowerPoint…)</button>
           <button class="btn small" id="copyBtn">📋 העתקה</button>
           <button class="btn small" id="dlAudioBtn">🎵 הורדת ההקלטה</button>
@@ -1504,7 +1506,7 @@ body{overflow-x:clip}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.3.0';
+const APP_VERSION = '3.3.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -3080,7 +3082,7 @@ const Detail = {
   },
   renderTranslations() {
     const tr = this.rec.translations || {}, ce = this.canEdit();
-    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-speak="tr:${k}" title="הקראה בקול">🔊</button><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
+    $('#dTranslations').innerHTML = Object.keys(tr).map((k) => `<div class="translation" dir="${k === 'en' ? 'ltr' : 'rtl'}"><div class="t-head" dir="rtl">🌐 תרגום מ${LANGS[this.rec.lang] || 'שפת ההקלטה'} ל${LANGS[k]} <span class="grow"></span><button class="btn small" data-speak="tr:${k}" title="הקראה בקול">🔊</button><button class="btn small" data-trcopy="${k}">📋 העתקה</button>${ce ? `<button class="btn small" data-trdel="${k}">✕</button>` : ''}</div>${esc(tr[k])}</div>`).join('');
   },
   renderTranscript() {
     const r = this.rec;
