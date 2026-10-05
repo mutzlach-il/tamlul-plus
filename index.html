@@ -826,6 +826,9 @@ body{overflow-x:clip}
 @media(max-width:700px){header.top .logo{font-size:0;gap:0}header.top .logo img.crown{height:34px}#darkBtn{display:none}.top-actions{gap:.25em}.top-actions .icon-btn{width:34px;height:34px}}
 .tr-box{background:var(--primary-soft);border-radius:12px;padding:.15em .5em}
 .tr-lbl{font-weight:700;font-size:.9em;white-space:nowrap}
+.inst-wait{display:flex;align-items:center;gap:.5em;flex-wrap:wrap;background:var(--primary-soft);border-radius:12px;padding:.7em .9em;font-weight:600;margin-bottom:.6em}
+.inst-wait small{font-weight:400;color:var(--muted)}
+#installBtn.ready{animation:breathe 1.6s infinite}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1506,7 +1509,7 @@ body{overflow-x:clip}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.3.2';
+const APP_VERSION = '3.3.3';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -4989,18 +4992,38 @@ async function openInstall(kind) {
   const sec = (ic, t, steps, on) => `<div class="inst-sec ${on ? 'on' : ''}"><div class="inst-h"><span>${ic}</span>${t}${on ? '<span class="pill-note">המכשיר הזה</span>' : ''}</div><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol></div>`;
   if (appStandalone()) return modal('<div class="inst-ok">✅ המערכת כבר מותקנת ופתוחה כאפליקציה במכשיר הזה.</div>', { okText: 'סגירה', cancelText: '' });
   if (kind === 'pc') {
-    if (can && !isPhone()) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; if (outcome === 'accepted') toast('✅ מותקן! האייקון יופיע בשולחן העבודה'); return; }
+    if (!isPhone() && !edge) return waitAndInstall('💻 התקנה במחשב', '', ['בשורת הכתובת למעלה – הסמל <b>🖥️⬇</b> בצד הכתובת', 'או: תפריט <b>⋮</b> ← <b>"העברה, שמירה ושיתוף"</b> ← <b>"התקנת הדף כאפליקציה"</b>', '<b>"התקנה"</b>']);
     if (isPhone()) return modal(`<h3>💻 התקנה במחשב</h3><p>פתח את הכתובת הזו <b>במחשב</b> (בכרום או באדג׳) ולחץ שם על "📲 התקנה" למעלה:</p><div class="inst-qr" style="direction:ltr;justify-content:center;font-weight:700">${esc(SITE_HOME)}</div>`, { okText: 'סגירה', cancelText: '' });
     return modal(`<h3>💻 התקנה במחשב</h3>${sec(edge ? '🌐' : '🟢', edge ? 'אדג׳' : 'כרום', edge ? ['למעלה: תפריט <b>⋯</b>', '<b>"אפליקציות"</b>', '<b>"התקן את האתר הזה כאפליקציה"</b>'] : ['בשורת הכתובת למעלה – לוחצים על סמל ההתקנה <b>🖥️⬇</b> שבצד הכתובת', 'או: תפריט <b>⋮</b> ← <b>"העברה, שמירה ושיתוף"</b> ← <b>"התקנת הדף כאפליקציה"</b>', 'לוחצים <b>"התקנה"</b> – והאייקון יופיע בשולחן העבודה'], true)}`, { okText: 'סגירה', cancelText: '' });
   }
   // phone
-  if (android && can) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; if (outcome === 'accepted') toast('✅ מותקן! האייקון יופיע במסך הבית'); return; }
+  if (android && !ios) return waitAndInstall('📱 התקנה בטלפון', '⋮ (שלוש הנקודות למעלה)', ['<b>⋮</b> שלוש הנקודות בפינה העליונה של כרום', '<b>"התקנת אפליקציה"</b> (או "הוספה למסך הבית")', '<b>"התקנה"</b> – והאייקון של ביאלה יופיע עם כל האפליקציות']);
   const qr = isPhone() ? '' : await qrImg(SITE_HOME);
   modal(`<h3>📱 התקנה בטלפון</h3>
     ${qr ? `<div class="inst-qr">${qr}<div><b>שלב 1: לפתוח בטלפון</b><div class="muted">מכוונים את מצלמת הטלפון לקוד – והמערכת נפתחת.</div><div style="direction:ltr;text-align:right;font-size:.85em;margin-top:.3em">${esc(SITE_HOME)}</div></div></div>` : ''}
     ${sec('🤖', 'אנדרואיד – כרום', ['תפריט <b>⋮</b> למעלה', '<b>"הוספה למסך הבית"</b> או <b>"התקנת אפליקציה"</b>', '<b>"התקנה"</b>'], android)}
     ${sec('🍎', 'אייפון – ספארי', ['פותחים ב<b>ספארי</b> (לא בכרום)', 'כפתור השיתוף <b>⬆️</b> בתחתית', '<b>"הוסף למסך הבית"</b> ← <b>"הוסף"</b>'], ios)}`, { okText: 'סגירה', cancelText: '', wide: true });
 }
+async function doPrompt() {
+  const dp = deferredPrompt; if (!dp) return false;
+  dp.prompt(); const { outcome } = await dp.userChoice; deferredPrompt = null;
+  if (outcome === 'accepted') { const m = $('#instWait'); if (m) m.closest('.modal-bg').remove(); toast('✅ ביאלה מותקנת! האייקון יופיע עם שאר האפליקציות'); }
+  return true;
+}
+function waitAndInstall(title, _x, steps) {
+  if (deferredPrompt) return doPrompt();
+  modal(`<h3>${title}</h3><div id="instWait" class="inst-wait"><span class="spinner"></span> מכין את ההתקנה… <small>(בדרך כלל עד חצי דקה – אפשר להמשיך להסתכל באתר)</small></div>
+    <button class="btn-auth hidden" id="instGo">📲 התקן עכשיו את ביאלה</button>
+    <div class="inst-sec on" style="margin-top:.8em"><div class="inst-h"><span>✋</span>לא רוצה לחכות? התקנה ידנית</div><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol></div>`, { okText: '', cancelText: 'סגירה' });
+  const t0 = Date.now();
+  const iv = setInterval(() => {
+    const w = $('#instWait'); if (!w) return clearInterval(iv);
+    if (deferredPrompt) { clearInterval(iv); w.innerHTML = '✅ מוכן! לחץ על הכפתור:'; $('#instGo').classList.remove('hidden'); }
+    else if (Date.now() - t0 > 45000) { clearInterval(iv); w.innerHTML = 'הדפדפן לא אישר התקנה אוטומטית במכשיר הזה – השתמש בהתקנה הידנית למטה (10 שניות).'; }
+  }, 500);
+}
+document.addEventListener('click', (e) => { if (e.target.id === 'instGo') doPrompt(); });
+window.addEventListener('beforeinstallprompt', () => { const ib = $('#installBtn'); if (ib) ib.classList.add('ready'); });
 document.addEventListener('click', (e) => { const k = e.target.closest('[data-ik]'); if (!k) return; const m = k.closest('.modal-bg'); if (m) m.remove(); openInstall(k.dataset.ik); });
 document.addEventListener('click', async (e) => {
   if (e.target.id !== 'instNow' || typeof deferredPrompt === 'undefined' || !deferredPrompt) return;
