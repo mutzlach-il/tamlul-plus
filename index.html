@@ -829,6 +829,17 @@ body{overflow-x:clip}
 .inst-wait{display:flex;align-items:center;gap:.5em;flex-wrap:wrap;background:var(--primary-soft);border-radius:12px;padding:.7em .9em;font-weight:600;margin-bottom:.6em}
 .inst-wait small{font-weight:400;color:var(--muted)}
 #installBtn.ready{animation:breathe 1.6s infinite}
+.inst-diag{font-size:.8em;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:.5em .7em;margin:.3em 0 .6em;direction:rtl}
+.act-list{max-height:60vh;overflow:auto;margin-top:.6em}
+.act-day{position:sticky;top:0;background:var(--card);font-weight:800;color:var(--primary);padding:.5em 0 .3em;border-bottom:2px solid var(--primary-soft);margin-top:.4em;z-index:1}
+.act-row{display:flex;align-items:center;gap:.5em;padding:.4em .2em;border-bottom:1px solid var(--line);font-size:.93em;flex-wrap:wrap}
+.act-t{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85em;min-width:4.6em}
+.act-ic{width:1.6em;text-align:center}
+.act-u{color:var(--primary)}
+.act-a{font-weight:700}
+.act-d{color:var(--muted);flex:1;min-width:120px;overflow-wrap:anywhere}
+.act-sum{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:.6em}
+.act-chip{background:var(--primary-soft)!important;color:var(--text)!important;border-color:transparent!important}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1456,6 +1467,7 @@ body{overflow-x:clip}
           <li>לחיצה על השם שלך למעלה – שינוי שם תצוגה וסיסמה.</li>
           <li>כניסה: עם Google, עם קוד למייל, או עם סיסמה. שכחת סיסמה? "שכחת סיסמה" ← קוד למייל.</li>
           <li>אם לא פעלתם זמן מה – המערכת מנתקת לבד, לביטחון.</li>
+          <li>🔎 לשם אבטחה וסדר, הפעולות במערכת (כניסות, העלאות, הורדות, שינויים) נרשמות ביומן שרק המנהל רואה.</li>
         </ul></details>
       </div>
       <h2 class="admin-only" style="margin-top:1.4em">🛡️ מדריך למנהל</h2>
@@ -1509,7 +1521,7 @@ body{overflow-x:clip}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.3.3';
+const APP_VERSION = '3.4.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -5004,14 +5016,28 @@ async function openInstall(kind) {
     ${sec('🤖', 'אנדרואיד – כרום', ['תפריט <b>⋮</b> למעלה', '<b>"הוספה למסך הבית"</b> או <b>"התקנת אפליקציה"</b>', '<b>"התקנה"</b>'], android)}
     ${sec('🍎', 'אייפון – ספארי', ['פותחים ב<b>ספארי</b> (לא בכרום)', 'כפתור השיתוף <b>⬆️</b> בתחתית', '<b>"הוסף למסך הבית"</b> ← <b>"הוסף"</b>'], ios)}`, { okText: 'סגירה', cancelText: '', wide: true });
 }
+async function installDiag() {
+  const ua = navigator.userAgent;
+  const br = /Claude|Electron/i.test(ua) ? 'חלון Claude' : /Edg\//.test(ua) ? 'Edge' : /SamsungBrowser/.test(ua) ? 'Samsung' : /OPR\//.test(ua) ? 'Opera' : /Firefox/.test(ua) ? 'Firefox' : /CriOS|Chrome\//.test(ua) ? 'Chrome ' + ((ua.match(/Chrome\/(\d+)/) || [])[1] || '') : /Safari/.test(ua) ? 'Safari' : '?';
+  const sw = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+  const img = (src) => new Promise((r) => { const i = new Image(); i.onload = () => r(i.naturalWidth); i.onerror = () => r(0); i.src = src + '?d=' + Date.now(); });
+  const [i1, i2] = await Promise.all([img('icon-192.png'), img('icon-512.png')]);
+  let man = 'לא'; try { const r = await fetch('manifest.webmanifest', { cache: 'no-store' }); man = r.ok ? 'כן' : String(r.status); } catch (e) {}
+  return [`דפדפן: ${br}`, `שירות רקע: ${sw ? 'כן' : 'לא'}`, `מניפסט: ${man}`, `אייקונים: ${i1}/${i2}`, `גרסה: ${APP_VERSION}`].join(' · ');
+}
 async function doPrompt() {
   const dp = deferredPrompt; if (!dp) return false;
   dp.prompt(); const { outcome } = await dp.userChoice; deferredPrompt = null;
   if (outcome === 'accepted') { const m = $('#instWait'); if (m) m.closest('.modal-bg').remove(); toast('✅ ביאלה מותקנת! האייקון יופיע עם שאר האפליקציות'); }
   return true;
 }
-function waitAndInstall(title, _x, steps) {
+async function alreadyInstalled() { try { if (!navigator.getInstalledRelatedApps) return false; const l = await navigator.getInstalledRelatedApps(); return l.some((x) => x.platform === 'webapp'); } catch (e) { return false; } }
+async function waitAndInstall(title, _x, steps) {
   if (deferredPrompt) return doPrompt();
+  const man = `<div class="inst-sec on" style="margin-top:.8em"><div class="inst-h"><span>✋</span>התקנה ידנית (10 שניות)</div><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol></div>`;
+  if (await alreadyInstalled()) return modal(`<h3>${title}</h3><div class="inst-ok">✅ ביאלה כבר מותקנת במכשיר הזה!</div><p>מחפשים את האייקון של <b>ביאלה</b> (הכתר) ${isPhone() ? 'ברשימת האפליקציות של הטלפון' : 'בשולחן העבודה או בתפריט התחל'} ולוחצים עליו.</p>`, { okText: 'סגירה', cancelText: '' });
+  if (!('BeforeInstallPromptEvent' in window)) return modal(`<h3>${title}</h3><div class="inst-wait" style="background:color-mix(in srgb,var(--warn) 15%,var(--card))">⚠️ הדפדפן הזה לא יודע להתקין אפליקציות (למשל החלון של Claude, פיירפוקס, או ספארי במחשב).</div>
+    <p><b>פתח את האתר ב-Google Chrome</b>${isPhone() ? '' : ' או ב-Edge'} – ושם לחיצה על "התקנה" תתקין מיד:</p><div class="inst-qr" style="direction:ltr;justify-content:center;font-weight:700;user-select:all">${esc(SITE_HOME)}</div><button class="btn" id="instCopy" style="margin-top:.6em">📋 העתקת הכתובת</button>${man}`, { okText: '', cancelText: 'סגירה' });
   modal(`<h3>${title}</h3><div id="instWait" class="inst-wait"><span class="spinner"></span> מכין את ההתקנה… <small>(בדרך כלל עד חצי דקה – אפשר להמשיך להסתכל באתר)</small></div>
     <button class="btn-auth hidden" id="instGo">📲 התקן עכשיו את ביאלה</button>
     <div class="inst-sec on" style="margin-top:.8em"><div class="inst-h"><span>✋</span>לא רוצה לחכות? התקנה ידנית</div><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol></div>`, { okText: '', cancelText: 'סגירה' });
@@ -5019,10 +5045,10 @@ function waitAndInstall(title, _x, steps) {
   const iv = setInterval(() => {
     const w = $('#instWait'); if (!w) return clearInterval(iv);
     if (deferredPrompt) { clearInterval(iv); w.innerHTML = '✅ מוכן! לחץ על הכפתור:'; $('#instGo').classList.remove('hidden'); }
-    else if (Date.now() - t0 > 45000) { clearInterval(iv); w.innerHTML = 'הדפדפן לא אישר התקנה אוטומטית במכשיר הזה – השתמש בהתקנה הידנית למטה (10 שניות).'; }
+    else if (Date.now() - t0 > 45000) { clearInterval(iv); w.innerHTML = 'כרום עדיין לא אישר התקנה בלחיצה. שתי סיבות אפשריות: <b>ביאלה כבר מותקנת</b> (חפש את האייקון עם הכתר, או סמל "פתח באפליקציה" בשורת הכתובת), או שצריך לגלוש באתר עוד דקה. בינתיים – ההתקנה הידנית למטה עובדת תמיד.'; installDiag().then((d) => { const x = $('#instWait'); if (x) x.insertAdjacentHTML('afterend', `<div class="inst-diag">🔧 בדיקה טכנית (לצלם ולשלוח): ${d}</div>`); }); }
   }, 500);
 }
-document.addEventListener('click', (e) => { if (e.target.id === 'instGo') doPrompt(); });
+document.addEventListener('click', (e) => { if (e.target.id === 'instGo') doPrompt(); if (e.target.id === 'instCopy') { navigator.clipboard.writeText(SITE_HOME).then(() => toast('✅ הכתובת הועתקה – הדבק אותה בכרום')); } });
 window.addEventListener('beforeinstallprompt', () => { const ib = $('#installBtn'); if (ib) ib.classList.add('ready'); });
 document.addEventListener('click', (e) => { const k = e.target.closest('[data-ik]'); if (!k) return; const m = k.closest('.modal-bg'); if (m) m.remove(); openInstall(k.dataset.ik); });
 document.addEventListener('click', async (e) => {
@@ -5570,6 +5596,214 @@ document.addEventListener('click', (e) => { if (e.target.id === 'driveSn') { LS.
 { const _rh3 = renderHomeDash; renderHomeDash = function () { _rh3(); try { ensureBigRec(); applySeason(); const c = continueChip(); const chips = $('#heroChips'); if (c && chips && !$('#heroCont')) chips.insertAdjacentHTML('beforeend', c); } catch (e) { console.warn(e); } }; }
 $('#a11yBtn').onclick = () => openA11y();
 { const _ea2 = enterApp; enterApp = async function () { await _ea2(); try { if (LS.get('voiceOn', false)) { Voice.on = true; voiceStart(); voiceUi(); } setTimeout(driveReminder, 4000); } catch (e) {} }; }
+
+/* =========================================================
+   3.4 – תיקון "חורים" בתמלול + יומן פעולות מפורט למנהל
+   ========================================================= */
+
+/* ---------------- תיקון חורים בתמלול (Groq/Whisper) ---------------- */
+const HALLU_RE = /^[\s.,!?…"״'-]*(תודה רבה|תודה רבה לכם|תודה על הצפייה|תודה שצפיתם|תודה שהאזנתם|כתוביות[^.]*|תורגם[^.]*|מתורגם[^.]*|שבוע טוב|ביי|אמן|thank you\.?|thanks for watching\.?|you)[\s.,!?…"״'-]*$/i;
+function boostSamples(x) {
+  // הגברה ונרמול: מביא את הדיבור השקט לעוצמה טובה, בלי לעוות
+  let sum = 0, peak = 0;
+  for (let i = 0; i < x.length; i++) { const v = Math.abs(x[i]); sum += v * v; if (v > peak) peak = v; }
+  const rms = Math.sqrt(sum / Math.max(1, x.length));
+  if (!rms) return x;
+  const g = Math.min(25, 0.12 / rms, peak ? 0.98 / peak * 3 : 25);
+  if (g <= 1.05) return x;
+  const out = new Float32Array(x.length);
+  for (let i = 0; i < x.length; i++) { const v = x[i] * g; out[i] = v > 0.98 ? 0.98 : v < -0.98 ? -0.98 : v; }
+  return out;
+}
+function findHoles(segs, total) {
+  const holes = [];
+  const add = (s, e, why) => { s = Math.max(0, s - 0.4); e = Math.min(total, e + 0.4); if (e - s >= 2) holes.push({ s, e, why }); };
+  let prev = 0;
+  segs.forEach((g) => {
+    const d = (g.end || 0) - (g.start || 0), len = (g.text || '').replace(/\s/g, '').length;
+    if (g.start - prev > 4) add(prev, g.start, 'gap');
+    if (HALLU_RE.test(g.text || '') && d > 1.2) add(g.start, g.end, 'hallu');
+    else if (d >= 7 && len / d < 3) add(g.start, g.end, 'thin');
+    prev = Math.max(prev, g.end || 0);
+  });
+  if (total - prev > 4) add(prev, total, 'gap');
+  // מיזוג חלונות קרובים, וחיתוך לחלונות של עד 60 שניות
+  holes.sort((a, b) => a.s - b.s);
+  const merged = [];
+  holes.forEach((h) => { const l = merged[merged.length - 1]; if (l && h.s - l.e < 1.5) l.e = Math.max(l.e, h.e); else merged.push({ ...h }); });
+  const out = [];
+  merged.forEach((h) => { for (let t = h.s; t < h.e; t += 60) out.push({ s: t, e: Math.min(h.e, t + 60) }); });
+  return out;
+}
+async function transcribeHole(audio, h, lang, opts) {
+  const wav = encodeWav(boostSamples(await resampleMono16k(audio, h.s, h.e)));
+  const dur = h.e - h.s;
+  try {
+    const segs = await geminiTranscribeOne(wav, 'audio/wav', lang === 'auto' ? 'auto' : lang, dur, Object.assign({}, opts, { speakers: false, hole: true }));
+    const good = (segs || []).filter((x) => x.text && !HALLU_RE.test(x.text));
+    if (good.length) return good.map((x) => ({ start: Math.min(h.e, x.start + h.s), end: Math.min(h.e, x.end + h.s), text: x.text, u: 1 }));
+  } catch (e) { console.warn('hole gemini failed', e.message); }
+  try {
+    const res = await whisper(wav, 'audio.wav', lang, dur);
+    const segs = (res.segments || []).filter((x) => (x.text || '').trim() && !HALLU_RE.test(x.text));
+    if (segs.length) return segs.map((x) => ({ start: Math.min(h.e, x.start + h.s), end: Math.min(h.e, x.end + h.s), text: x.text.trim(), u: 1 }));
+  } catch (e) { console.warn('hole whisper failed', e.message); }
+  return [{ start: h.s, end: h.e, text: '[קטע לא ברור – כדאי להאזין]', u: 1 }];
+}
+async function repairHoles(blob, res, lang, onProgress, opts) {
+  if (!res || !res.segments) return res;
+  let audio; try { audio = await decodeAudio(blob); } catch (e) { return res; }
+  const total = audio.duration || res.duration || 0;
+  let holes = findHoles(res.segments, total);
+  if (!holes.length) return res;
+  // שומרים על המכסה החינמית: עד 40% מההקלטה או 30 חלונות
+  let budget = Math.max(90, total * 0.4); holes = holes.filter((h) => { if (budget <= 0) return false; budget -= (h.e - h.s); return true; }).slice(0, 30);
+  let segs = res.segments.slice();
+  for (let i = 0; i < holes.length; i++) {
+    const h = holes[i];
+    onProgress && onProgress(`משלים קטעים לא ברורים ${i + 1} מתוך ${holes.length}…`);
+    const fill = await transcribeHole(audio, h, lang, opts);
+    segs = segs.filter((g) => !((g.start >= h.s - 0.2 && g.end <= h.e + 0.2) || (HALLU_RE.test(g.text || '') && g.start < h.e && g.end > h.s)));
+    segs = segs.concat(fill);
+  }
+  segs.sort((a, b) => a.start - b.start);
+  return Object.assign({}, res, { segments: segs, text: segs.map((g) => g.text).join(' '), repaired: holes.length });
+}
+{
+  const _gp = gemPrompt;
+  gemPrompt = function (lang, opts = {}) {
+    let p = _gp(lang, opts);
+    if (opts.hole) p = 'This is a SHORT excerpt where the speaker is quiet, unclear, far from the microphone or there is background noise. Listen very carefully and transcribe EVERY word you can hear – do not skip anything and do not stop at short phrases like "thank you". If a word is unclear, write your best guess followed by (?). If there is truly no speech at all, output nothing. ' + p;
+    return p;
+  };
+}
+{
+  const _tb = transcribeBlob;
+  transcribeBlob = async function (blob, name, lang, onProgress, opts = {}) {
+    const res = await _tb(blob, name, lang, onProgress, opts);
+    if (engineFor(lang, opts.rec) === 'gemini' || S('repair_holes', true) === false) return res;
+    try { return await repairHoles(blob, res, lang, onProgress, opts); } catch (e) { console.warn('repair failed', e); return res; }
+  };
+}
+
+/* ---------------- יומן פעולות ---------------- */
+const ACT = { q: [], t: 0, last: '', lt: 0 };
+function logAct(action, details, recId) {
+  try {
+    if (!ME || !action) return;
+    const key = action + '|' + (details || '') + '|' + (recId || '');
+    if (key === ACT.last && Date.now() - ACT.lt < 5000) return;
+    ACT.last = key; ACT.lt = Date.now();
+    ACT.q.push({ user_id: ME.id, action, details: details ? String(details).slice(0, 600) : null, rec_id: recId && /^[0-9a-f-]{36}$/i.test(recId) ? recId : null, page: typeof currentPage === 'string' ? currentPage : null, at: new Date().toISOString() });
+    clearTimeout(ACT.t); ACT.t = setTimeout(flushAct, ACT.q.length > 20 ? 50 : 2500);
+  } catch (e) {}
+}
+async function flushAct() { if (!ACT.q.length || !ME) return; const rows = ACT.q.splice(0); try { const { error } = await sb.from('activity_log').insert(rows); if (error) console.warn('activity log', error.message); } catch (e) {} }
+addEventListener('pagehide', flushAct);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushAct(); });
+const PAGE_HE = { home: 'דף הבית', library: 'ספרייה', calendar: 'לוח עברי', parshiyot: 'פרשיות', stats: 'סטטיסטיקה', help: 'הוראות', settings: 'ניהול' };
+const FIELD_HE = { title: 'שם', text: 'טקסט', segments: 'טקסט', folderId: 'תיקייה', tags: 'תגיות', extras: 'סימונים/הערות', speaker: 'דובר', category: 'סוג', parasha: 'פרשה', hyear: 'שנה', occasion: 'מועד', recDate: 'תאריך', notes: 'הערות', summary: 'סיכום', translations: 'תרגום', starred: 'כוכב', shareToken: 'קישור שיתוף', shareExpires: 'תוקף שיתוף', series: 'סדרה', seriesNo: 'מספר בסדרה', locked: 'נעילה', edited: 'עריכה' };
+const recTitle = (id) => { const r = (typeof RECS !== 'undefined' && RECS.get(id)) || (Detail.rec && Detail.rec.id === id ? Detail.rec : null); return r ? r.title : ''; };
+{ const _go = go; go = function (page) { _go(page); if (PAGE_HE[page]) logAct('מעבר לדף', PAGE_HE[page]); }; }
+{ const _op = Detail.open; Detail.open = async function (id, o) { const r = await _op.call(this, id, o); if (this.rec && this.rec.id === id) logAct('פתח הקלטה', this.rec.title, id); return r; }; }
+{ const _add = Queue.add; Queue.add = function (blob, name, lang, title, meta) { logAct('העלה לתמלול', `${title || name || ''} (${LANGS[lang] || lang || ''}${blob && blob.size ? ', ' + Math.round(blob.size / 1048576 * 10) / 10 + 'MB' : ''})`); return _add.apply(this, arguments); }; }
+{ const _rs = Rec.start, _rp = Rec.stop; Rec.start = async function (...a) { const r = await _rs.apply(this, a); if (this.mr && this.mr.state !== 'inactive') logAct(a[0] ? 'התחיל הקלטה מהמחשב' : 'התחיל הקלטה'); return r; }; Rec.stop = function (...a) { if (this.mr && this.mr.state !== 'inactive') logAct('סיים הקלטה', $('#recTime') ? $('#recTime').textContent : ''); return _rp.apply(this, a); }; }
+{ const _dl = download; download = function (blob, name) { logAct('הוריד קובץ', name); return _dl.apply(this, arguments); }; }
+{ const _sr = saveRec; saveRec = async function (rec, fields) { const r = await _sr.apply(this, arguments); try { const f = [...new Set((fields || []).map((k) => FIELD_HE[k] || k))].join(', '); if (f && !(fields.length === 1 && fields[0] === 'progress')) logAct('שינה בהקלטה', `${rec.title || ''} – ${f}`, rec.id); } catch (e) {} return r; }; }
+{ const _ai = aiComplete; aiComplete = async function (kind) { logAct('כלי חכם', ({ chat: 'צ׳אט', summary: 'סיכום', title: 'כותרת' })[kind] || kind, Detail.rec && Detail.rec.id); return _ai.apply(this, arguments); }; }
+{
+  const _api = api;
+  const API_HE = { 'fetch-url': 'ייבוא מקישור', nakdan: 'ניקוד', 'admin-invite': 'הוסיף משתמש', 'admin-update-user': 'שינה הרשאות משתמש', 'admin-delete-user': 'מחק משתמש', 'admin-backup-now': 'גיבוי', 'admin-monthly-now': 'דו"ח חודשי', 'admin-weekly-now': 'דו"ח שבועי', 'admin-purge': 'מחיקה לצמיתות' };
+  api = async function (action, data = {}) {
+    try {
+      if (API_HE[action]) logAct(API_HE[action], data.email || data.url || (data.ids ? data.ids.length + ' הקלטות' : '') || (data.id ? personName(data.id) : ''));
+      if ((action === 'groq-chat' || action === 'gemini') && ['translate', 'summary', 'chat'].includes(data.kind)) logAct(({ translate: 'תרגום', summary: 'סיכום', chat: 'שאלה בצ׳אט' })[data.kind], Detail.rec ? Detail.rec.title : '', Detail.rec && Detail.rec.id);
+    } catch (e) {}
+    return _api.apply(this, arguments);
+  };
+}
+{
+  const _rpc = sb.rpc.bind(sb);
+  sb.rpc = function (fn, args) {
+    if (fn === 'trash_recordings') logAct('מחק לסל המחזור', (args.ids || []).map(recTitle).filter(Boolean).join(', ') || (args.ids || []).length + ' הקלטות');
+    if (fn === 'restore_recordings') logAct('שחזר מהסל', (args.ids || []).map(recTitle).filter(Boolean).join(', '));
+    return _rpc(fn, args);
+  };
+  const TBL_HE = { folders: 'תיקייה', comments: 'תגובה', playlists: 'רשימת השמעה', messages: 'הודעה', favorites: 'מועדפים', dictionary: 'מילון', app_settings: 'הגדרות מערכת', groups: 'קבוצה', access_requests: 'בקשת גישה' };
+  const OP_HE = { insert: 'הוסיף', update: 'עדכן', delete: 'מחק', upsert: 'שמר' };
+  const brief = (x) => { try { const o = Array.isArray(x) ? x[0] : x; if (!o) return ''; return o.name || o.body || o.term || o.title || o.key || ''; } catch (e) { return ''; } };
+  const _from = sb.from.bind(sb);
+  sb.from = function (t) {
+    const q = _from(t);
+    if (TBL_HE[t]) ['insert', 'update', 'delete', 'upsert'].forEach((m) => { const f = q[m]; if (typeof f === 'function') q[m] = function (...a) { logAct(`${OP_HE[m]} ${TBL_HE[t]}`, String(brief(a[0]) || '').slice(0, 120)); return f.apply(this, a); }; });
+    return q;
+  };
+}
+{ const _lo = logout; logout = async function (...a) { logAct('יצא מהמערכת'); await flushAct(); return _lo.apply(this, a); }; }
+{ const _ea3 = enterApp; enterApp = async function () { await _ea3(); const ua = navigator.userAgent; logAct('נכנס למערכת', (/Android/i.test(ua) ? 'אנדרואיד' : /iPhone|iPad/i.test(ua) ? 'אייפון' : /Windows/i.test(ua) ? 'מחשב Windows' : /Mac/i.test(ua) ? 'Mac' : 'מכשיר') + (matchMedia('(display-mode: standalone)').matches ? ' · אפליקציה' : ' · דפדפן')); }; }
+document.addEventListener('copy', () => { const s = String(getSelection() || ''); if (s.length > 20) logAct('העתיק טקסט', s.length + ' תווים' + (Detail.rec && currentPage === 'detail' ? ' מ: ' + Detail.rec.title : ''), currentPage === 'detail' && Detail.rec ? Detail.rec.id : null); });
+{ let st = 0; document.addEventListener('input', (e) => { if (!e.target.matches('#searchBox, #pubSearch')) return; clearTimeout(st); const v = e.target.value.trim(); st = setTimeout(() => { if (v.length > 1) logAct('חיפוש', v); }, 2000); }); }
+{ const p = $('#player'); if (p) { p.addEventListener('play', () => { if (Detail.rec) logAct('השמיע הקלטה', `${Detail.rec.title} (מ-${fmtTime(p.currentTime)})`, Detail.rec.id); }); } }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#shareBtn, #exportBtn, #printBook, #dlAudioBtn, #offlineBtn, #studyBtn, #videoBtn, #lockBtn, [data-qx], #cardBtn, #bookBtn'); if (!b) return;
+  logAct('לחץ: ' + (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40), Detail.rec && currentPage === 'detail' ? Detail.rec.title : '', Detail.rec && currentPage === 'detail' ? Detail.rec.id : null);
+}, true);
+
+/* ---------------- מסך היומן למנהל ---------------- */
+const ACT_ICON = (a) => /נכנס/.test(a) ? '🔑' : /יצא/.test(a) ? '🚪' : /העלה|הקלטה/.test(a) ? '🎙️' : /פתח|השמיע/.test(a) ? '🎧' : /הוריד|לחץ: ⬇|PDF|Word|Excel|הדפסה/.test(a) ? '⬇️' : /מחק|מחיקה/.test(a) ? '🗑️' : /שינה|עדכן|שמר/.test(a) ? '✏️' : /תרגום|סיכום|חכם|צ׳אט|ניקוד/.test(a) ? '🤖' : /חיפוש/.test(a) ? '🔍' : /העתיק/.test(a) ? '📋' : /דף/.test(a) ? '🧭' : /משתמש|הרשאות/.test(a) ? '👥' : '•';
+function actRowsHtml(rows, showUser) {
+  if (!rows.length) return '<div class="empty"><span class="em-ic">📭</span><b>אין פעולות בטווח הזה</b></div>';
+  let day = '';
+  return rows.map((r) => {
+    const d = new Date(r.at), dk = d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+    const head = dk !== day ? (day = dk, `<div class="act-day">${esc(dk)} · ${esc(hebDate(d.getTime()))}</div>`) : '';
+    return head + `<div class="act-row"><span class="act-t">${d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span><span class="act-ic">${ACT_ICON(r.action)}</span>${showUser ? `<b class="act-u">${esc(personName(r.user_id) || '?')}</b>` : ''}<span class="act-a">${esc(r.action)}</span><span class="act-d">${esc(r.details || '')}</span>${r.rec_id ? `<button class="btn small" data-actopen="${r.rec_id}">פתח</button>` : ''}</div>`;
+  }).join('');
+}
+async function fetchActs(userId, days, q) {
+  let qq = sb.from('activity_log').select('*').order('at', { ascending: false }).limit(1000);
+  if (userId) qq = qq.eq('user_id', userId);
+  if (days) qq = qq.gte('at', new Date(Date.now() - days * 864e5).toISOString());
+  const { data, error } = await qq; if (error) throw new Error(/relation|does not exist/.test(error.message) ? 'צריך לעדכן את בסיס הנתונים (schema6)' : error.message);
+  return q ? data.filter((r) => (r.action + ' ' + (r.details || '')).includes(q)) : data;
+}
+async function openUserActs(userId) {
+  const u = (typeof USERS !== 'undefined' && USERS.find((x) => x.id === userId)) || { display_name: personName(userId) };
+  modal(`<h3>📜 כל הפעולות של ${esc(u.display_name || u.email || '')}</h3>
+    <div class="row" style="gap:.4em"><select id="actDays" style="width:auto"><option value="1">היום</option><option value="7" selected>7 ימים</option><option value="30">30 יום</option><option value="0">הכול</option></select><input type="search" id="actQ" placeholder="🔍 חיפוש ביומן" class="grow" style="width:auto"><button class="btn small" id="actXls">📗 Excel</button></div>
+    <div class="act-sum" id="actSum"></div><div id="actList" class="act-list"><span class="spinner"></span></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const bg = $('#modalRoot').lastElementChild; bg.querySelector('.modal').style.maxWidth = '820px';
+  let rows = [];
+  const load = async () => {
+    $('#actList', bg).innerHTML = '<span class="spinner"></span>';
+    try { rows = await fetchActs(userId, +$('#actDays', bg).value, $('#actQ', bg).value.trim()); } catch (e) { $('#actList', bg).innerHTML = `<p class="err-text">${esc(e.message)}</p>`; return; }
+    const cnt = (re) => rows.filter((r) => re.test(r.action)).length;
+    $('#actSum', bg).innerHTML = [['🔑 כניסות', /נכנס/], ['🎙️ העלאות והקלטות', /העלה|התחיל הקלטה/], ['🎧 הקלטות שנפתחו', /פתח הקלטה/], ['⬇️ הורדות', /הוריד/], ['✏️ שינויים', /שינה|עדכן/], ['🗑️ מחיקות', /מחק/]].map(([l, re]) => `<span class="hero-chip act-chip">${l}: <b>${cnt(re)}</b></span>`).join('') + `<span class="muted" style="font-size:.85em">${rows.length} פעולות${rows.length >= 1000 ? ' (מוצגות 1000 האחרונות)' : ''}</span>`;
+    $('#actList', bg).innerHTML = actRowsHtml(rows, false);
+  };
+  bg.addEventListener('change', (e) => { if (e.target.id === 'actDays') load(); });
+  let t; bg.addEventListener('input', (e) => { if (e.target.id === 'actQ') { clearTimeout(t); t = setTimeout(load, 400); } });
+  bg.addEventListener('click', async (e) => {
+    const o = e.target.closest('[data-actopen]'); if (o) { bg.remove(); Detail.open(o.dataset.actopen); }
+    if (e.target.id === 'actXls') { const X = await libXLSX(); const ws = X.utils.aoa_to_sheet([['תאריך', 'שעה', 'פעולה', 'פרטים', 'דף'], ...rows.map((r) => { const d = new Date(r.at); return [d.toLocaleDateString('he-IL'), d.toLocaleTimeString('he-IL'), r.action, r.details || '', PAGE_HE[r.page] || r.page || '']; })]); const wb = X.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] }; X.utils.book_append_sheet(wb, ws, 'פעולות'); download(new Blob([X.write(wb, { bookType: 'xlsx', type: 'array' })]), `פעולות-${safeName(u.display_name || 'משתמש')}.xlsx`); }
+  });
+  load();
+}
+{ const _ru = renderUsers; renderUsers = async function () { await _ru(); $$('#usersTbl [data-uedit]').forEach((b) => { if (!b.parentElement.querySelector('[data-uacts]')) b.insertAdjacentHTML('beforebegin', `<button class="btn small primary" data-uacts="${b.dataset.uedit}">📜 פעולות</button> `); }); }; }
+$('#usersTbl').addEventListener('click', (e) => { const b = e.target.closest('[data-uacts]'); if (b) { e.stopPropagation(); openUserActs(b.dataset.uacts); } }, true);
+{
+  const _rl2 = renderLog;
+  renderLog = async function () {
+    await _rl2();
+    let card = $('#actAllCard');
+    if (!card) { card = document.createElement('div'); card.id = 'actAllCard'; card.className = 'card settings-sec'; card.dataset.secbox = 'log'; card.style.marginTop = '16px'; $('#logTbl').closest('.card').after(card); }
+    card.classList.remove('hidden');
+    card.innerHTML = `<div class="row"><h3 class="grow">📜 יומן פעולות – כל המשתמשים</h3><select id="actAllUser" style="width:auto"><option value="">כל המשתמשים</option>${(USERS && USERS.length ? USERS : Object.entries(PEOPLE).map(([id, n]) => ({ id, display_name: n }))).map((u) => `<option value="${u.id}">${esc(u.display_name || u.email || '')}</option>`).join('')}</select><select id="actAllDays" style="width:auto"><option value="1">היום</option><option value="7" selected>7 ימים</option><option value="30">30 יום</option></select></div><div id="actAllList" class="act-list"><span class="spinner"></span></div>`;
+    const load = async () => { try { const rows = await fetchActs($('#actAllUser').value || null, +$('#actAllDays').value); $('#actAllList').innerHTML = actRowsHtml(rows.slice(0, 400), true); } catch (e) { $('#actAllList').innerHTML = `<p class="err-text">${esc(e.message)}</p>`; } };
+    card.onchange = load; card.onclick = (e) => { const o = e.target.closest('[data-actopen]'); if (o) Detail.open(o.dataset.actopen); };
+    load();
+  };
+}
 
 /* =========================================================
    ADMIN SETTINGS
