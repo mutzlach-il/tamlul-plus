@@ -1527,7 +1527,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.6.0';
+const APP_VERSION = '3.6.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -1639,7 +1639,7 @@ async function parseApi(r) {
   try { j = JSON.parse(txt); } catch (e) { j = { error: txt.slice(0, 300) || ('שגיאה ' + r.status) }; }
   if (!r.ok || (j && j.error)) {
     const e = j && j.error; const msg = typeof e === 'string' ? e : (e && e.message) || ('שגיאה ' + r.status);
-    const err = new Error(msg); err.status = r.status; throw err;
+    const err = new Error(msg); err.status = r.status; err.raw = txt.slice(0, 4000); if (r.status === 429 && /PerDay|per day|daily/i.test(txt)) err.dayQuota = true; throw err;
   }
   return j;
 }
@@ -2094,7 +2094,8 @@ async function transcribeBlob(blob, name, lang, onProgress, opts = {}) {
 async function gemFetch(path, payload, kind, seconds, attempt = 0) {
   try { return await api('gemini', { path, payload, kind, seconds }); }
   catch (err) {
-    if ((err.status === 429 && attempt < 4) || ((err.status === 503 || err.status === 500) && attempt < 1)) {
+    if (err.dayQuota) { err.message = 'Gemini: ' + err.message; throw err; }
+    if ((err.status === 429 && attempt < 2) || ((err.status === 503 || err.status === 500) && attempt < 1)) {
       let wait = 8 * (attempt + 1); const m = String(err.message).match(/retry in ([\d.]+)s/i); if (m) wait = Math.min(90, +m[1] + 1);
       await sleep(wait * 1000);
       return gemFetch(path, payload, kind, seconds, attempt + 1);
@@ -2167,12 +2168,17 @@ function parseTimedLines(txt, dur) {
   for (let i = 0; i < segs.length; i++) segs[i].end = i + 1 < segs.length ? Math.max(segs[i].start, segs[i + 1].start) : Math.max(segs[i].start, dur || segs[i].start + 5);
   return segs;
 }
+// מכסה יומית חינמית: מתאפסת בחצות שעון קליפורניה (בערך 10:00 בבוקר בישראל)
+function gemQuotaDay() { return new Date(Date.now() - 7 * 3600e3).toISOString().slice(0, 10); }
+const GEM_DAY_OUT = new Set((() => { const s = LS.get('gemDayOut', null); return s && s.day === gemQuotaDay() ? s.list : []; })());
+function gemQuotaErr() { const e = new Error('⏸️ המכסה היומית החינמית של Gemini נגמרה להיום. ההקלטה תמשיך לבד מחר אחרי 10:00 בבוקר (מהמקום שבו עצרה) – אין צורך לעשות כלום.'); e.dayQuota = true; e.status = 429; e.quotaStop = true; return e; }
 async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
   const models = await geminiModels();
   const b64 = await blobToB64(blob);
   let lastErr;
   const tries = [];
-  models.slice(0, 5).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
+  models.filter((m) => !GEM_DAY_OUT.has(m)).slice(0, 5).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
+  if (!tries.length) throw gemQuotaErr();
   for (const model of tries) {
     try {
       const body = { contents: [{ role: 'user', parts: [...(opts.refParts || []), { inline_data: { mime_type: mime, data: b64 } }, { text: gemPrompt(lang, opts) }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } };
@@ -2184,6 +2190,7 @@ async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
       return parseTimedLines(txt, dur);
     } catch (err) {
       lastErr = err; console.warn('Gemini model failed', model, err.message);
+      if (err.dayQuota) { GEM_DAY_OUT.add(model); LS.set('gemDayOut', { day: gemQuotaDay(), list: [...GEM_DAY_OUT] }); if (!models.some((m) => !GEM_DAY_OUT.has(m))) throw gemQuotaErr(); continue; }
       if (err.status === 403 || (err.status === 400 && /API key|permission|PERMISSION/i.test(err.message))) throw err;
     }
   }
@@ -2197,7 +2204,7 @@ async function geminiSubChunks(audio, st, en, lang, onProgress, opts = {}) {
     onProgress && onProgress(`קטע ${k}…`);
     const wav = encodeWav(await resampleMono16k(audio, t, e));
     let segs = null;
-    try { segs = await geminiTranscribeOne(wav, 'audio/wav', lang, e - t, opts); } catch (err) { console.warn('sub-chunk gemini failed', err.message); }
+    try { segs = await geminiTranscribeOne(wav, 'audio/wav', lang, e - t, opts); } catch (err) { if (err.dayQuota) throw err; console.warn('sub-chunk gemini failed', err.message); }
     if (!segs || !segs.length) {
       try {
         const res = await whisper(wav, 'audio.wav', lang, e - t);
@@ -2222,8 +2229,8 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     for (let round = 0; ; round++) {
       try { return await fn(); }
       catch (err) {
-        if (/לא החזיר/.test(err.message)) throw err;
-        if (round >= 3 || err.status === 403 || (err.status && ![429, 500, 502, 503, 504, 546].includes(err.status) && !/timeout|בזמן/.test(err.message))) throw err;
+        if (/לא החזיר/.test(err.message) || err.dayQuota) throw err;
+        if (round >= 2 || err.status === 403 || (err.status && ![429, 500, 502, 503, 504, 546].includes(err.status) && !/timeout|בזמן/.test(err.message))) throw err;
         const wait = 20 * (round + 1);
         onProgress && onProgress(`Gemini עמוס – מנסה שוב${label} בעוד ${wait} שניות…`);
         await sleep(wait * 1000);
@@ -2245,7 +2252,8 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     onProgress && onProgress(`Gemini מתמלל חלק ${i + 1} מתוך ${parts}…`);
     const isIv = !!(opts.rec && opts.rec.extras && opts.rec.extras.interview);
     const cacheKey = blob.size + ':' + lang + ':' + (opts.out || '') + ':' + (isIv ? 'iv:' : '') + i;
-    let segs = GEM_CHUNK_CACHE.get(cacheKey);
+    const lsKey = opts.rec && opts.rec.id ? 'gc_' + opts.rec.id + '_' + cacheKey : null;
+    let segs = GEM_CHUNK_CACHE.get(cacheKey) || (lsKey && LS.get(lsKey, null));
     if (!segs) {
       const wav = encodeWav(await resampleMono16k(audio, st, en));
       try { segs = await retrying(() => geminiTranscribeOne(wav, 'audio/wav', lang, en - st, opts), ` חלק ${i + 1}`); }
@@ -2254,6 +2262,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
         segs = (await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st }));
       }
       GEM_CHUNK_CACHE.set(cacheKey, segs);
+      if (lsKey) try { LS.set(lsKey, segs); } catch (e) {}
     }
     if (isIv) opts.prevTail = segs.slice(-5).map((x) => x.text).join('\n');
     segs.forEach((s) => out.segments.push({ start: Math.min(en, s.start + st), end: Math.min(en, s.end + st), text: s.text }));
@@ -2414,6 +2423,7 @@ const Queue = {
             prog('נותן כותרת…');
             try { const t = await autoTitle(rec.translations && rec.translations.he || res.text); if (t) rec.title = t; } catch (e) { console.warn('auto title failed', e); }
           }
+          try { Object.keys(localStorage).filter((k) => k.includes('gc_' + rec.id + '_')).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
           rec.status = res.text ? 'done' : 'error';
           rec.error = res.text ? '' : 'לא זוהה דיבור בהקלטה';
         } catch (err) {
@@ -2434,6 +2444,7 @@ const Queue = {
         if (currentPage === 'home') renderHomeDash();
         if (currentPage === 'detail' && Detail.id === id) Detail.open(id);
         if (rec.status === 'done') toast('✅ התמלול הסתיים: ' + rec.title);
+        else if (/^⏸️/.test(rec.error || '')) toast('⏸️ נגמרה המכסה היומית של Gemini – "' + rec.title + '" ימשיך לבד מחר אחרי 10:00', 9000);
         else toast('❌ התמלול נכשל: ' + rec.title, 5000);
       }
     } finally { this.running = false; }
@@ -6043,6 +6054,16 @@ document.addEventListener('click', (e) => {
 { const p = $('#player'); if (p) p.addEventListener('timeupdate', () => { if (VIEW_AS && Detail.rec) LS.del('pos_' + Detail.rec.id); }); }
 // לא לרענן נתונים מהשרת בזמן צפייה (זה היה מחזיר את כל ההקלטות)
 { const _lr = loadRecs; loadRecs = async function () { if (VIEW_AS) return; return _lr.apply(this, arguments); }; }
+// --- המשך אוטומטי אחרי שהמכסה היומית של Gemini מתאפסת ---
+function resumeQuotaWaits() {
+  if (VIEW_AS || !ME) return;
+  const s = LS.get('gemDayOut', null);
+  if (s && s.day === gemQuotaDay()) return;           // עדיין אותו יום – המכסה עוד לא התאפסה
+  GEM_DAY_OUT.clear();
+  [...RECS.values()].filter((r) => r.owner === ME.id && r.status === 'error' && /^⏸️/.test(r.error || '')).forEach((r) => retryRec(r.id));
+}
+setInterval(resumeQuotaWaits, 10 * 60 * 1000);
+{ const _ea3 = enterApp; enterApp = async function () { const r = await _ea3.apply(this, arguments); setTimeout(resumeQuotaWaits, 8000); return r; }; }
 
 /* =========================================================
    ADMIN SETTINGS
