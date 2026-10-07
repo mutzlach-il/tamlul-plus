@@ -872,6 +872,7 @@ body.viewas #toTop{display:none}
 .ntext .m-verse{background:#e9e6f5;text-align:center;font-weight:700;padding:.35em .6em;border-radius:8px;margin:.4em 0 .8em}
 .ntext .m-h{background:#e4e4ea;text-align:center;font-weight:800;padding:.35em .6em;border-radius:8px;margin:1em 0 .5em;font-size:1.02em}
 .ntext .src{font-size:.78em}
+#yiOutPills button.nus-pill.active{background:var(--accent,#d9b25a)!important;color:#222!important;border-color:var(--accent,#d9b25a)!important}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1542,7 +1543,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.8.0';
+const APP_VERSION = '3.8.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2381,7 +2382,7 @@ const Queue = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
       lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
       speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
-      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {})
+      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
       speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate, series: rec.series, series_no: rec.seriesNo, extras: rec.extras });
@@ -2459,6 +2460,10 @@ const Queue = {
             prog('✍️ כותב נוסח כתיבה (לפני עריכה)…');
             rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'before', { silent: true }); } catch (e) { console.warn('nusach failed', e); }
+          }
+          if (res.text && rec.extras && rec.extras.wantAfter && rec.extras.nusach && rec.extras.nusach.before && !rec.extras.nusach.after && perm('translate')) {
+            prog('🖨️ כותב את הנוסח הסופי (אחרי עריכה)…');
+            try { await makeNusach(rec, 'after', { silent: true }); } catch (e) { console.warn('nusach after failed', e); }
           }
           if (res.text && looksDefaultTitle(rec)) {
             prog('נותן כותרת…');
@@ -6354,13 +6359,22 @@ document.addEventListener('click', async (e) => {
 /* ---------- בהעלאה: "גם נוסח כתיבה" ---------- */
 function syncNusachPill() {
   const host = $('#yiOutPills'); if (!host) return;
-  let b = $('#nusachPill');
-  if (!b) { host.insertAdjacentHTML('beforeend', `<button type="button" id="nusachPill" title="אחרי התמלול מילה במילה – המערכת תכתוב גם נוסח כתיבה בלשון הקודש">✍️ + נוסח כתיבה (לפני עריכה)</button>`); b = $('#nusachPill'); }
-  b.classList.toggle('active', !!LS.get('autoNusach', false));
+  if (!$('#nusBefore')) {
+    host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'לפני עריכה' בלשון הקודש, בסגנון שלימדנו אותה">📜 לפני עריכה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'אחרי עריכה', מוכן להדפסה עם הלוגו">🖨️ אחרי עריכה</button>`);
+  }
+  $('#nusBefore').classList.toggle('active', !!LS.get('autoNusach', false));
+  $('#nusAfter').classList.toggle('active', !!LS.get('autoNusachAfter', false));
 }
-document.addEventListener('click', (e) => { if (e.target.closest('#nusachPill')) { e.preventDefault(); e.stopPropagation(); LS.set('autoNusach', !LS.get('autoNusach', false)); syncNusachPill(); toast(LS.get('autoNusach', false) ? '✍️ אחרי התמלול תיכתב גם נוסח כתיבה' : 'בלי נוסח כתיבה – רק תמלול'); } }, true);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#nusBefore,#nusAfter'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const key = b.id === 'nusBefore' ? 'autoNusach' : 'autoNusachAfter';
+  LS.set(key, !LS.get(key, false)); syncNusachPill();
+  const on = [LS.get('autoNusach', false) && '"לפני עריכה"', LS.get('autoNusachAfter', false) && '"אחרי עריכה"'].filter(Boolean);
+  toast(on.length ? '✍️ אחרי התמלול ייכתב גם: ' + on.join(' + ') : 'רק תמלול – בלי נוסחים');
+}, true);
 { const _sl = syncLangPills; syncLangPills = function () { const x = _sl.apply(this, arguments); try { syncNusachPill(); } catch (e) {} return x; }; }
-{ const _qa3 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) { if (lang === 'yi' && LS.get('autoNusach', false) && !meta.wantNusach) meta = Object.assign({}, meta, { wantNusach: true }); return _qa3.call(this, blob, name, lang, title, meta); }; }
+{ const _qa3 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) { if (lang === 'yi') { const wb = LS.get('autoNusach', false), wa = LS.get('autoNusachAfter', false); if (wb || wa) meta = Object.assign({}, meta, { wantNusach: true, wantAfter: wa }); } return _qa3.call(this, blob, name, lang, title, meta); }; }
 
 /* ---------- ניהול הדוגמאות (מנהל / עורך) ---------- */
 async function openStyleExamples() {
