@@ -851,6 +851,12 @@ body{overflow-x:clip}
 .transcript.chat .spk{font-weight:800;color:#3b2a8a;margin-inline-end:.2em}
 .transcript.chat .seg.active{outline:3px solid var(--accent)}
 body.dark .transcript.chat .seg{filter:brightness(.92)}
+/* ===== 3.6 צפייה כמשתמש ===== */
+#vaBar{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;gap:.5em;align-items:center;justify-content:center;background:linear-gradient(90deg,#f59e0b,#ea580c);color:#fff;padding:.5em 1em;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#vaBar .btn{background:rgba(255,255,255,.95);color:#7c2d12;border:none}
+#vaBar .btn.primary{background:#fff;color:#7c2d12;font-weight:800}
+body.viewas header.top{top:44px}
+body.viewas #toTop{display:none}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1521,7 +1527,7 @@ body.dark .transcript.chat .seg{filter:brightness(.92)}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.5.0';
+const APP_VERSION = '3.6.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -4053,7 +4059,7 @@ async function loadPersonal() {
   const [f, p, pl, g] = await Promise.all([
     sb.from('favorites').select('rec_id').eq('user_id', ME.id),
     sb.from('progress').select('rec_id,pct,pos').eq('user_id', ME.id),
-    sb.from('playlists').select('*').order('created_at'),
+    sb.from('playlists').select('*').eq('owner', ME.id).order('created_at'),
     sb.from('groups').select('*').order('name')
   ]);
   FAV.clear(); (f.data || []).forEach((x) => FAV.add(x.rec_id));
@@ -5947,6 +5953,96 @@ document.addEventListener('click', async (e) => {
   const d = e.target.closest('[data-vdel]');
   if (d) { if (!(await confirmBox('למחוק את הקול הזה? המערכת לא תזהה אותו יותר לבד.', 'כן, למחוק'))) return; const { error } = await sb.from('voice_profiles').delete().eq('id', d.dataset.vdel); if (error) return toast('❌ ' + error.message); await loadVoices(true); d.closest('.modal-bg').remove(); openVoices(); }
 });
+
+/* =========================================================
+   3.6 – מנהל: "צפייה כמשתמש" (קריאה בלבד, בלי להשאיר שום סימן)
+   ========================================================= */
+let VIEW_AS = null;   // { admin: <profile של המנהל>, user: <profile של המשתמש> }
+const viewAsOn = () => !!VIEW_AS;
+function vaBlock(what) { toast('👁️ מצב צפייה בלבד – ' + (what || 'אי אפשר לשנות כלום'), 2500); }
+// --- חסימת כל שינוי בזמן צפייה ---
+{
+  const RO = ['insert', 'update', 'delete', 'upsert'];
+  const _from2 = sb.from;
+  sb.from = function (t) {
+    const q = _from2.call(this, t);
+    if (VIEW_AS) RO.forEach((m) => { if (typeof q[m] === 'function') q[m] = function () { const fake = { then: (res) => res({ data: null, error: null }), select() { return fake; }, eq() { return fake; }, in() { return fake; }, single() { return fake; }, maybeSingle() { return fake; } }; return fake; }; });
+    return q;
+  };
+  const _rpc2 = sb.rpc;
+  sb.rpc = function (fn, args) { if (VIEW_AS && !['list_people', 'admin_live', 'admin_user_stats', 'my_groups'].includes(fn)) return Promise.resolve({ data: null, error: null }); return _rpc2.call(this, fn, args); };
+  const _api2 = api;
+  api = async function (action, data) { if (VIEW_AS && !['share-view', 'public-folder'].includes(action)) { vaBlock(); throw Object.assign(new Error('מצב צפייה בלבד'), { status: 403 }); } return _api2.apply(this, arguments); };
+  const _sr2 = saveRec; saveRec = async function (rec, fields) { if (VIEW_AS) return; return _sr2.apply(this, arguments); };
+  const _qa2 = Queue.add; Queue.add = async function () { if (VIEW_AS) { vaBlock('אי אפשר להעלות'); return null; } return _qa2.apply(this, arguments); };
+  const _rs3 = Rec.start; Rec.start = async function () { if (VIEW_AS) return vaBlock('אי אפשר להקליט'); return _rs3.apply(this, arguments); };
+  const _la = logAct; logAct = function () { if (VIEW_AS) return; return _la.apply(this, arguments); };
+  const _st = sb.storage.from.bind(sb.storage);
+  sb.storage.from = function (b) { const s = _st(b); if (VIEW_AS) ['upload', 'remove', 'update', 'move'].forEach((m) => { if (s[m]) s[m] = async () => ({ data: null, error: null }); }); return s; };
+}
+document.addEventListener('click', (e) => {
+  if (!VIEW_AS) return;
+  const b = e.target.closest('#recBtn, #sysRecBtn, #pickBtn, #pickDirBtn, #urlBtn, #bigRec, [data-mk], #dTitle, .inline-ren, [data-del], #delBtn, #bulkDel, #retranscribeBtn, [data-spkname], #newFolderForm button, #plNew');
+  if (b && !b.closest('#vaBar')) { e.preventDefault(); e.stopPropagation(); vaBlock(); }
+}, true);
+document.addEventListener('dblclick', (e) => { if (VIEW_AS && e.target.closest('#dTranscript')) { e.preventDefault(); e.stopPropagation(); vaBlock('אי אפשר לערוך'); } }, true);
+document.addEventListener('change', (e) => { if (VIEW_AS && e.target.closest('#page-detail, #page-library') && !e.target.closest('#vaBar') && /^(dFolder|mSpeaker|mCategory|mParasha|mYear|mOccasion|mDate|mSeries|mSeriesNo)$/.test(e.target.id)) { e.stopPropagation(); vaBlock(); Detail.render && Detail.render(); } }, true);
+
+// --- מה המשתמש רואה ---
+function visibleForUser(u) {
+  if (u.role === 'admin' || u.role === 'editor') return { recs: null, folders: null };
+  const gs = new Set(u.groups || []);
+  const fset = new Set(FOLDERS.filter((f) => f.owner === u.id || (f.shared_with || []).includes(u.id) || (f.shared_groups || []).some((g) => gs.has(g))).map((f) => f.id));
+  // גם תתי-תיקיות של תיקייה משותפת
+  let grew = true; while (grew) { grew = false; FOLDERS.forEach((f) => { if (f.parent_id && fset.has(f.parent_id) && !fset.has(f.id)) { fset.add(f.id); grew = true; } }); }
+  return { folders: fset, recs: (r) => r.owner === u.id || (r.folderId && fset.has(r.folderId)) };
+}
+async function enterViewAs(uid) {
+  const u = (USERS || []).find((x) => x.id === uid); if (!u) return;
+  if (uid === ME.id) return toast('זה אתה 🙂');
+  toast('👁️ טוען את המערכת כמו שהיא נראית אצל ' + (u.display_name || u.email) + '…', 4000);
+  await flushAct();
+  const vis = visibleForUser(u);
+  VIEW_AS = { admin: ME, user: u, allRecs: new Map(RECS), allFolders: FOLDERS.slice(), fav: new Set(FAV), prog: Object.assign({}, PROG), pls: PLAYLISTS };
+  // ההקלטות והתיקיות שלו בלבד
+  if (vis.recs) { [...RECS.keys()].forEach((id) => { if (!vis.recs(RECS.get(id))) RECS.delete(id); }); FOLDERS = FOLDERS.filter((f) => vis.folders.has(f.id)); }
+  // המועדפים, ההתקדמות ורשימות ההשמעה שלו
+  const [f, p, pl] = await Promise.all([
+    sb.from('favorites').select('rec_id').eq('user_id', uid),
+    sb.from('progress').select('rec_id,pct,pos,updated_at').eq('user_id', uid),
+    sb.from('playlists').select('*').eq('owner', uid).order('created_at')
+  ]);
+  FAV.clear(); (f.data || []).forEach((x) => FAV.add(x.rec_id));
+  Object.keys(PROG).forEach((k) => delete PROG[k]); (p.data || []).forEach((x) => { PROG[x.rec_id] = x.pct; });
+  VIEW_AS.progRows = p.data || [];
+  PLAYLISTS = pl.data || [];
+  ME = Object.assign({}, u);
+  document.body.classList.add('viewas');
+  applyPerms(); try { setHello(); } catch (e) {}
+  let bar = $('#vaBar');
+  if (!bar) { bar = document.createElement('div'); bar.id = 'vaBar'; document.body.prepend(bar); }
+  bar.innerHTML = `<span>👁️ אתה צופה במערכת <b>כמו ${esc(u.display_name || u.email)}</b> · קריאה בלבד – שום דבר לא משתנה ולא נרשם</span><button class="btn small" id="vaHeard">🎧 מה הוא שמע</button><button class="btn small" id="vaActs">📜 הפעולות שלו</button><button class="btn small primary" id="vaExit">✕ חזרה לחשבון שלי</button>`;
+  go('home'); renderHomeDash();
+}
+function exitViewAs() { if (!VIEW_AS) return; toast('חוזר לחשבון שלך…'); setTimeout(() => location.reload(), 300); }
+function openHeard() {
+  const rows = (VIEW_AS && VIEW_AS.progRows || []).slice().sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+  const all = VIEW_AS.allRecs;
+  modal(`<h3>🎧 מה ${esc(VIEW_AS.user.display_name || '')} שמע</h3>${rows.length ? rows.map((r) => { const rec = all.get(r.rec_id); return `<div class="act-row"><span class="act-t">${fmtDate(r.updated_at)}</span><b class="grow">${esc(rec ? rec.title : 'הקלטה שנמחקה')}</b><span class="badge ${r.pct >= 97 ? 'ok' : ''}">${r.pct >= 97 ? 'שמע עד הסוף' : 'שמע ' + (r.pct || 0) + '%'}</span><span class="muted" style="font-size:.85em">עצר ב-${fmtTime(r.pos || 0)}</span>${rec ? `<button class="btn small" data-vaopen="${r.rec_id}">פתח</button>` : ''}</div>`; }).join('') : '<div class="empty"><span class="em-ic">🎧</span><b>עוד לא שמע הקלטות</b></div>'}`, { okText: 'סגירה', cancelText: '', wide: true });
+}
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'vaExit') return exitViewAs();
+  if (e.target.id === 'vaHeard') return openHeard();
+  if (e.target.id === 'vaActs') { const uid = VIEW_AS.user.id; const adm = VIEW_AS.admin; const keep = ME; ME = adm; try { openUserActs(uid); } finally { ME = keep; } return; }
+  const o = e.target.closest('[data-vaopen]'); if (o) { const m = o.closest('.modal-bg'); if (m) m.remove(); Detail.open(o.dataset.vaopen); return; }
+  const v = e.target.closest('[data-uview]'); if (v) { e.stopPropagation(); enterViewAs(v.dataset.uview); }
+}, true);
+// כפתור בטבלת המשתמשים
+{ const _ru2 = renderUsers; renderUsers = async function () { await _ru2(); $$('#usersTbl [data-uacts]').forEach((b) => { if (b.dataset.uacts !== (VIEW_AS ? VIEW_AS.admin.id : ME.id) && !b.parentElement.querySelector('[data-uview]')) b.insertAdjacentHTML('afterend', ` <button class="btn small" data-uview="${b.dataset.uacts}" title="לראות את המערכת בדיוק כמו שהוא רואה – בלי לשנות כלום">👁️ צפייה כמשתמש</button>`); }); }; }
+// בזמן צפייה: ההתקדמות לא נשמרת והנגן לא זוכר מקום
+{ const p = $('#player'); if (p) p.addEventListener('timeupdate', () => { if (VIEW_AS && Detail.rec) LS.del('pos_' + Detail.rec.id); }); }
+// לא לרענן נתונים מהשרת בזמן צפייה (זה היה מחזיר את כל ההקלטות)
+{ const _lr = loadRecs; loadRecs = async function () { if (VIEW_AS) return; return _lr.apply(this, arguments); }; }
 
 /* =========================================================
    ADMIN SETTINGS
