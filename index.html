@@ -840,6 +840,17 @@ body{overflow-x:clip}
 .act-d{color:var(--muted);flex:1;min-width:120px;overflow-wrap:anywhere}
 .act-sum{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:.6em}
 .act-chip{background:var(--primary-soft)!important;color:var(--text)!important;border-color:transparent!important}
+/* ===== 3.5 ראיון / שיחה ===== */
+#spkBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1px solid color-mix(in srgb,var(--primary) 16%,var(--line));background:color-mix(in srgb,var(--primary) 4%,var(--card));border-radius:16px;padding:.55em .8em;margin:.6em 0}
+.spk-chip{display:inline-flex;align-items:center;gap:.35em;background:var(--sc);color:#222;border-radius:999px;padding:.2em .3em .2em .8em}
+.spk-chip small{opacity:.7}
+.spk-chip .btn{padding:.15em .6em;font-size:.8em}
+.transcript.chat .seg{display:block;max-width:88%;width:fit-content;background:var(--sc,var(--primary-soft));color:#1d1d2b;border-radius:16px;padding:.15em .8em;margin:.1em 0}
+.transcript.chat .seg.spk-start{margin-top:.6em}
+.transcript.chat .seg[data-spk="1"],.transcript.chat .seg[data-spk="3"],.transcript.chat .seg[data-spk="5"]{margin-inline-start:auto}
+.transcript.chat .spk{font-weight:800;color:#3b2a8a;margin-inline-end:.2em}
+.transcript.chat .seg.active{outline:3px solid var(--accent)}
+body.dark .transcript.chat .seg{filter:brightness(.92)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -980,11 +991,12 @@ body{overflow-x:clip}
       <div class="row" style="margin-bottom:14px">
         <span style="font-weight:700">🗣️ שפת ההקלטה – באיזו שפה מדברים?</span>
         <div class="lang-pills" id="langPills">
-          <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
+          <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="yi" data-iv="1">🗣️ ראיון / שיחה (יידיש)</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
         <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
           <button data-yiout="yi">📜 כתיבה ביידיש</button><button data-yiout="he">🇮🇱 ישר לעברית</button><button data-yiout="both">📜+🇮🇱 גם וגם</button>
         </div>
+        <div class="lang-pills hidden" id="ivPills"><span style="font-weight:700;align-self:center">👥 איך לסמן את הדוברים:</span><button data-ivstyle="ab">א׳ / ב׳ / ג׳</button><button data-ivstyle="qa">שאלה / תשובה</button><span class="hint" id="ivVoices" style="align-self:center"></span></div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
         <select id="langSel" class="hidden">
           <option value="he">עברית</option><option value="yi">יידיש</option><option value="en">אנגלית</option><option value="auto">זיהוי אוטומטי</option>
@@ -1397,23 +1409,12 @@ body{overflow-x:clip}
     <section class="page help" id="page-help">
       <div class="row"><h2 class="grow">📘 הוראות ומדריך</h2><button class="btn primary" id="helpTour">🧭 סיור מודרך</button><input type="search" id="helpSearch" placeholder="🔍 חיפוש במדריך" style="width:220px"></div>
       <div class="card">
-        <details open><summary>🆕 מה חדש בגרסה 3</summary><ul>
-          <li>🏠 <b>דף בית אישי</b>: התאריך העברי, פרשת השבוע וכל ההקלטות עליה מכל השנים, "היום לפני שנה", להמשיך לשמוע ואחרונות.</li>
-          <li>📅 <b>לוח עברי</b>: גוררים הקלטה ישר על יום – והיא נשמרת עם התאריך, הפרשה והשנה. כפתור ＋ בכל יום. לחיצה על "פרשת…" פותחת את כל ההקלטות של הפרשה. זמני היום, הדלקת נרות וצאת שבת לפי עיר, וימי הילולא.</li>
-          <li>🎙️ <b>תמלול חי</b> על המסך בזמן ההקלטה · 🖥️ <b>הקלטה מהמחשב</b> (זום / יוטיוב – בחלון השיתוף לסמן "שיתוף אודיו") · 🔗 <b>ייבוא מקישור</b> או מגוגל דרייב.</li>
-          <li>✂️ <b>חיתוך</b> (מדקה עד דקה) · 🔗 <b>חיבור כמה קבצים</b> להקלטה אחת · 🧹 <b>ניקוי רעשים</b>.</li>
-          <li>📚 <b>סדרות שיעורים</b> עם "הבא / הקודם" · 🎵 <b>רשימות השמעה</b> · ⭐ מועדפים אישיים · 🗓️ ארכיון לפי שנים · 📈 גרף שבועי לחיץ.</li>
-          <li>🧠 <b>חיפוש חכם</b> לפי משמעות · 💬 <b>שאל את כל הספרייה</b> · 🎤 חיפוש בקול.</li>
-          <li>🎓 <b>מצב לימוד</b> משפט-משפט · ⏭️ <b>דילוג על שקטים</b> · 😴 <b>טיימר שינה</b> · 🔊 <b>הקראה בקול</b> · 🎬 צפייה בסרטון עם כתוביות · 📥 <b>שמירה להאזנה בלי אינטרנט</b> · אחוז "כמה שמעתי".</li>
-          <li>📰 <b>עלון שבת</b> מוכן להדפסה · 🖼️ <b>מצגת</b> אוטומטית · 🖨️ <b>ספר מעוצב</b> עם שער ותוכן עניינים · ִ <b>ניקוד</b> · 📖 קישור לספריא בכל מקור · תרגום גם לצרפתית, רוסית, ספרדית, גרמנית וערבית.</li>
-          <li>⚖️ <b>השוואת מנועים</b> על הדקה הראשונה · קו כתום מנוקד = מילה שהמערכת לא בטוחה בה · 🕓 <b>היסטוריית שינויים</b> עם החזרה לגרסה קודמת.</li>
-          <li>💬 <b>הערות</b> על הקלטה ו💡 <b>הצעות תיקון</b> שהבעלים מאשר בלחיצה · 🔔 התראות · ✉️ הודעות למנהל.</li>
-          <li>🎨 צבע וגופן אישיים (לחיצה על השם שלך) · קליק ימני על תגית = צבע לתגית · תפריט תחתון בטלפון.</li>
-        </ul></details>
-        <p><b>ביאלה</b> הופך הקלטות וסרטונים לטקסט בעברית, יידיש ואנגלית – ושומר הכול בענן, מסודר לפי תיקיות, פרשיות, דוברים ותאריכים עבריים. הכול חינם.</p>
+        
+        <p><b>ביאלה</b> הופך הקלטות וסרטונים לטקסט בעברית, יידיש ואנגלית – ושומר הכול בענן, מסודר לפי תיקיות, פרשיות, דוברים ותאריכים עבריים.</p>
         <details open><summary>🎙️ איך מתמללים?</summary><ol>
           <li>בוחרים למעלה את <b>שפת ההקלטה</b> (עברית / יידיש / אנגלית / זיהוי אוטומטי). ביידיש אפשר לבחור: כתיבה ביידיש, ישר לעברית, או גם וגם.</li>
           <li>מקליטים במיקרופון (🎤 – אפשר גם להשהות ⏸), <b>או</b> גוררים קבצים / תיקייה שלמה, <b>או</b> לוחצים "קובץ אחד או כמה".</li>
+          <li>🗣️ <b>ראיון / שיחה ביידיש</b> – בוחרים "ראיון / שיחה (יידיש)", והמערכת מפרידה בין הדוברים (א׳ / ב׳, או שאלה / תשובה). אחרי התמלול לוחצים "🏷️ מי זה?" ליד דובר כדי לתת לו שם – ואפשר ללמד את המערכת את הקול שלו, כך שבפעם הבאה היא תזהה אותו לבד.</li>
           <li>גם <b>סרטונים</b> (mp4, mov, mkv…) – המערכת מוציאה מהם את הקול לבד.</li>
           <li>מסמנים "לפני התמלול – לתת לכל קובץ שם, תיקייה ופרטים" כדי לרשום לכל קובץ: שם, תיקייה, דובר, סוג, פרשה, שנה ותאריך.</li>
           <li>ההקלטות נכנסות ל<b>תור</b> ומתמללות אחת אחרי השנייה. כשמסתיים – מופיעה הודעה. אפשר להמשיך לעבוד בינתיים.</li>
@@ -1426,7 +1427,7 @@ body{overflow-x:clip}
           <li><b>תיקיות ותתי-תיקיות</b> – יוצרים תיקייה, ואפשר לבחור "בתוך תיקייה". "🗂️ כל התיקיות" מראה את כולן ביחד.</li>
           <li><b>בחירה מרובה</b> – מסמנים כמה הקלטות ← העברה, תגית, פרטים לכולם, ייצוא או מחיקה בבת אחת.</li>
           <li>⭐ מסמן הקלטה מועדפת. "▶️ ניגון ברצף" מנגן את כל הרשימה אחת אחרי השנייה.</li>
-          <li><b>שיתוף תיקייה</b> (👥) – בעל התיקייה בוחר מי עוד יראה אותה.</li>
+          <li><b>שיתוף תיקייה</b> (👥) – אפשר לשתף תיקייה שלך עם אנשים אחרים במערכת.</li>
         </ul></details>
         <details><summary>📅 לוח עברי ופרשיות</summary><ul>
           <li>בכל הקלטה רואים את <b>התאריך העברי</b>. בלשונית "לוח עברי" יש לוח חודשי עם תאריכים עבריים, פרשת השבוע, חגים – וכמה הקלטות יש בכל יום.</li>
@@ -1442,7 +1443,7 @@ body{overflow-x:clip}
           <li>הנגן הקטן למטה ממשיך לנגן גם כשעוברים לדף אחר, וזוכר איפה עצרתם.</li>
           <li>🎵 הורדת ההקלטה – מוריד את קובץ השמע.</li>
         </ul></details>
-        <details><summary>🤖 כלים חכמים (חינם)</summary><ul>
+        <details><summary>🤖 כלים חכמים</summary><ul>
           <li>✨ <b>סיכום</b> · 🌐 <b>תרגום</b> לעברית / אנגלית / יידיש · 💬 <b>צ'אט</b> – שואלים שאלות על ההקלטה.</li>
           <li>📑 <b>תוכן עניינים</b> עם זמנים · 📚 <b>מראי מקומות</b> (פסוקים, גמרא, ספרים) · 💎 <b>ציטוטים / ווארטים</b>.</li>
           <li>📝 <b>עיבוד למאמר</b> – הופך את הדיבור לטקסט ערוך ומסודר, מוכן לדפוס.</li>
@@ -1467,7 +1468,6 @@ body{overflow-x:clip}
           <li>לחיצה על השם שלך למעלה – שינוי שם תצוגה וסיסמה.</li>
           <li>כניסה: עם Google, עם קוד למייל, או עם סיסמה. שכחת סיסמה? "שכחת סיסמה" ← קוד למייל.</li>
           <li>אם לא פעלתם זמן מה – המערכת מנתקת לבד, לביטחון.</li>
-          <li>🔎 לשם אבטחה וסדר, הפעולות במערכת (כניסות, העלאות, הורדות, שינויים) נרשמות ביומן שרק המנהל רואה.</li>
         </ul></details>
       </div>
       <h2 class="admin-only" style="margin-top:1.4em">🛡️ מדריך למנהל</h2>
@@ -1521,7 +1521,7 @@ body{overflow-x:clip}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.4.0';
+const APP_VERSION = '3.5.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2169,7 +2169,7 @@ async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
   models.slice(0, 5).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
   for (const model of tries) {
     try {
-      const body = { contents: [{ role: 'user', parts: [{ inline_data: { mime_type: mime, data: b64 } }, { text: gemPrompt(lang, opts) }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } };
+      const body = { contents: [{ role: 'user', parts: [...(opts.refParts || []), { inline_data: { mime_type: mime, data: b64 } }, { text: gemPrompt(lang, opts) }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } };
       const res = await gemFetch(`/models/${model}:generateContent`, body, 'transcribe', dur);
       const cand = res.candidates && res.candidates[0];
       const txt = cand && cand.content && (cand.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
@@ -2237,7 +2237,8 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   for (let i = 0; i < parts; i++) {
     const st = i * GEM_CHUNK_SEC, en = Math.min(total, st + GEM_CHUNK_SEC);
     onProgress && onProgress(`Gemini מתמלל חלק ${i + 1} מתוך ${parts}…`);
-    const cacheKey = blob.size + ':' + lang + ':' + (opts.out || '') + ':' + i;
+    const isIv = !!(opts.rec && opts.rec.extras && opts.rec.extras.interview);
+    const cacheKey = blob.size + ':' + lang + ':' + (opts.out || '') + ':' + (isIv ? 'iv:' : '') + i;
     let segs = GEM_CHUNK_CACHE.get(cacheKey);
     if (!segs) {
       const wav = encodeWav(await resampleMono16k(audio, st, en));
@@ -2248,6 +2249,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
       }
       GEM_CHUNK_CACHE.set(cacheKey, segs);
     }
+    if (isIv) opts.prevTail = segs.slice(-5).map((x) => x.text).join('\n');
     segs.forEach((s) => out.segments.push({ start: Math.min(en, s.start + st), end: Math.min(en, s.end + st), text: s.text }));
   }
   out.text = out.segments.map((s) => s.text).join(' ');
@@ -2328,7 +2330,7 @@ const Queue = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
       lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
       speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
-      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: meta.prep ? { prep: meta.prep } : {}
+      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
       speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate, series: rec.series, series_no: rec.seriesNo, extras: rec.extras });
@@ -5804,6 +5806,147 @@ $('#usersTbl').addEventListener('click', (e) => { const b = e.target.closest('[d
     load();
   };
 }
+
+/* =========================================================
+   3.5 – מצב ראיון / שיחה ביידיש: הפרדת דוברים + זיהוי קולות מוכרים
+   ========================================================= */
+let VOICES = null;
+async function loadVoices(force) {
+  if (VOICES && !force) return VOICES;
+  try { const { data, error } = await sb.from('voice_profiles').select('id,name,mime,audio_b64,created_at').order('created_at', { ascending: false }).limit(20); VOICES = error ? [] : (data || []); }
+  catch (e) { VOICES = []; }
+  return VOICES;
+}
+const ivOn = () => $('#langSel').value === 'yi' && !!LS.get('interview', false);
+// כפתורי השפה
+$('#langPills').addEventListener('click', (e) => { const b = e.target.closest('[data-lang]'); if (!b) return; LS.set('interview', !!b.dataset.iv); }, true);
+{
+  const _sl = syncLangPills;
+  syncLangPills = function () {
+    _sl();
+    const iv = ivOn();
+    $$('#langPills button').forEach((b) => { if (b.dataset.lang === 'yi') b.classList.toggle('active', $('#langSel').value === 'yi' && (!!b.dataset.iv === iv)); });
+    $('#ivPills').classList.toggle('hidden', !iv);
+    const st = LS.get('ivStyle', 'ab'); $$('#ivPills [data-ivstyle]').forEach((b) => b.classList.toggle('active', b.dataset.ivstyle === st));
+    if (iv) loadVoices().then((v) => { $('#ivVoices').textContent = v.length ? '🎙️ קולות מוכרים שהמערכת תזהה לבד: ' + v.map((x) => x.name).join(', ') : '💡 אחרי התמלול אפשר ללמד את המערכת לזהות קול מסוים (למשל האדמו״ר)'; });
+  };
+}
+$('#ivPills').addEventListener('click', (e) => { const b = e.target.closest('[data-ivstyle]'); if (!b) return; LS.set('ivStyle', b.dataset.ivstyle); syncLangPills(); });
+try { syncLangPills(); } catch (e) {}
+// סימון ההקלטה כראיון
+{ const _qa = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) { if (lang === 'yi' && LS.get('interview', false) && !meta.interview) meta = Object.assign({}, meta, { interview: { style: LS.get('ivStyle', 'ab') } }); return _qa.call(this, blob, name, lang, title, meta); }; }
+// הוראות ל-Gemini
+{
+  const _gp2 = gemPrompt;
+  gemPrompt = function (lang, opts = {}) {
+    const iv = opts.rec && opts.rec.extras && opts.rec.extras.interview;
+    if (!iv) return _gp2(lang, opts);
+    let p = _gp2(lang, Object.assign({}, opts, { speakers: false }));
+    const labels = iv.style === 'qa' ? 'use "שאלה" for the person who asks / interviews and "תשובה" for the person who answers (if there are more people, add "דובר ג׳" etc.)' : 'use "א׳" for the first voice that speaks, "ב׳" for the second voice, "ג׳" for a third, in order of first appearance';
+    p += ` IMPORTANT – this is a CONVERSATION / INTERVIEW between two or more people. Listen to the different VOICES and separate them. Start a NEW line every time the speaker changes, even for a short interjection. Begin EVERY line, right after the time, with the speaker label and a colon. For the labels: ${labels}.`;
+    if (opts.refParts && opts.refParts.length) p += ' Before the recording you received reference voice samples with names. If a speaker\'s voice matches one of the samples, use THAT NAME as the label instead (exactly as written).';
+    if (opts.prevTail) p += ` For continuity: the previous part of this same conversation ended with these lines – keep the SAME labels for the same voices:\n${opts.prevTail}\n`;
+    return p;
+  };
+}
+// דוגמאות הקול נשלחות יחד עם ההקלטה
+{
+  const _tb2 = transcribeBlob;
+  transcribeBlob = async function (blob, name, lang, onProgress, opts = {}) {
+    if (opts.rec && opts.rec.extras && opts.rec.extras.interview && !opts.refParts) {
+      const v = (await loadVoices(true)).slice(0, 3);
+      if (v.length) opts.refParts = [].concat(...v.map((x) => [{ text: `Reference voice sample of the speaker named "${x.name}":` }, { inline_data: { mime_type: x.mime || 'audio/mpeg', data: x.audio_b64 } }]), [{ text: 'End of reference samples. The recording to transcribe follows:' }]);
+      opts.prevTail = '';
+    }
+    return _tb2(blob, name, lang, onProgress, opts);
+  };
+}
+
+/* ---------------- תצוגת שיחה ---------------- */
+const SPK_RE = /^\s*([^:：\n]{1,28})\s*[:：]\s*/;
+const SPK_COLORS = ['#ede9fe', '#dcfce7', '#fef3c7', '#dbeafe', '#fce7f3', '#e0f2fe'];
+function speakersOf(r) {
+  const order = [], cnt = {};
+  (r.segments || []).forEach((s) => { const m = (s.text || '').match(SPK_RE); if (!m) return; const l = m[1].trim(); if (!(l in cnt)) { cnt[l] = 0; order.push(l); } cnt[l]++; });
+  return order.map((l) => ({ label: l, n: cnt[l] }));
+}
+function decorateInterview() {
+  const r = Detail.rec; const box = $('#dTranscript'); if (!r || !box) return;
+  const iv = !!(r.extras && r.extras.interview);
+  box.classList.toggle('chat', iv);
+  let bar = $('#spkBar');
+  if (!iv) { if (bar) bar.remove(); return; }
+  const spk = speakersOf(r), idx = {}; spk.forEach((s, i) => idx[s.label] = i);
+  let cur = -1;
+  $$('#dTranscript .seg[data-seg]').forEach((el) => {
+    const t = el.querySelector('.seg-text'); if (!t) return;
+    const m = t.textContent.match(SPK_RE);
+    if (m) cur = idx[m[1].trim()] ?? cur;
+    if (cur >= 0) { el.dataset.spk = cur % 6; el.style.setProperty('--sc', SPK_COLORS[cur % 6]); }
+    if (m && !t.querySelector('.spk')) t.innerHTML = `<span class="spk">${esc(m[0].trim())}</span> ` + esc(t.textContent.slice(m[0].length));
+    el.classList.toggle('spk-start', !!m);
+  });
+  if (!bar) { bar = document.createElement('div'); bar.id = 'spkBar'; const mb = $('#markBar'); (mb || box).before(bar); }
+  const ce = Detail.canEdit();
+  bar.innerHTML = `<span class="mk-lbl">🗣️ הדוברים בשיחה:</span>${spk.map((s, i) => `<span class="spk-chip" style="--sc:${SPK_COLORS[i % 6]}"><b>${esc(s.label)}</b> <small>${s.n} קטעים</small>${ce ? ` <button type="button" class="btn small" data-spkname="${esc(s.label)}">🏷️ מי זה?</button>` : ''}</span>`).join('') || '<span class="muted">לא זוהו דוברים</span>'}<span class="grow"></span><button type="button" class="btn small" id="voicesBtn">🎙️ קולות מוכרים</button>`;
+}
+{ const _rt2 = Detail.renderTranscript.bind(Detail); Detail.renderTranscript = function () { _rt2(); try { decorateInterview(); } catch (e) { console.warn(e); } }; }
+{ const _op2 = Detail.open; Detail.open = async function (id, o) { const r = await _op2.call(this, id, o); try { decorateInterview(); } catch (e) {} return r; }; }
+
+/* ---------------- "מי זה?" – שינוי שם + לימוד הקול ---------------- */
+async function nameSpeaker(label) {
+  const v = await loadVoices();
+  const canSave = typeof isEditor === 'function' ? isEditor() : isAdmin();
+  let name = null, remember = false;
+  await modal(`<h3>🏷️ מי זה "${esc(label)}"?</h3>
+    <label>שם הדובר</label><input type="text" id="spkNm" list="spkVoicesDl" placeholder="למשל: האדמו״ר שליט״א" value="${esc(/^(א׳|ב׳|ג׳|ד׳|שאלה|תשובה|דובר.*)$/.test(label) ? '' : label)}"><datalist id="spkVoicesDl">${v.map((x) => `<option value="${esc(x.name)}">`).join('')}</datalist>
+    ${canSave ? `<label class="row" style="font-weight:500;gap:.4em;margin-top:.8em"><input type="checkbox" id="spkRem" style="width:auto" checked> 🎙️ ללמד את המערכת את הקול הזה – בפעם הבאה היא תזהה אותו לבד</label>` : ''}
+    <div class="hint">כל הקטעים של "${esc(label)}" בהקלטה הזו יקבלו את השם החדש.</div>`,
+  { okText: 'שמירה', onOk: (bg) => { name = bg.querySelector('#spkNm').value.trim(); const c = bg.querySelector('#spkRem'); remember = !!(c && c.checked); if (!name) { toast('כתוב שם'); return false; } } });
+  if (!name) return;
+  const r = Detail.rec, re = new RegExp('^\\s*' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:：]\\s*');
+  const mine = (r.segments || []).filter((s) => re.test(s.text || ''));
+  // קטעים ששייכים לדובר (כולל השורות שאחריו עד החלפת דובר) – בשביל דגימת הקול
+  const owned = []; let on = false;
+  (r.segments || []).forEach((s) => { const m = (s.text || '').match(SPK_RE); if (m) on = m[1].trim() === label; if (on) owned.push(s); });
+  (r.segments || []).forEach((s) => { if (re.test(s.text || '')) s.text = s.text.replace(re, name + ': '); });
+  r.text = r.segments.map((s) => s.text).join(' ');
+  try { await Detail.save(['segments', 'text']); toast(`✅ "${label}" ← ${name} (${mine.length} קטעים)`); } catch (e) { return toast('❌ ' + e.message); }
+  Detail.renderTranscript();
+  if (remember) { try { await saveVoice(name, owned); } catch (e) { toast('❌ לא הצלחתי לשמור את הקול: ' + e.message, 6000); } }
+}
+async function saveVoice(name, segs) {
+  const src = $('#player').src; if (!src) throw new Error('אין קובץ שמע להקלטה הזו');
+  toast('🎙️ לומד את הקול…', 8000);
+  const audio = await decodeAudio(await fetch(src).then((x) => x.blob()));
+  const parts = []; let left = 14;
+  for (const s of segs.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start))) {
+    if (left <= 0.5) break; const d = Math.min(left, s.end - s.start); if (d < 1) continue;
+    parts.push(await resampleMono16k(audio, s.start, s.start + d)); left -= d;
+  }
+  if (!parts.length) throw new Error('לא נמצא מספיק דיבור של הדובר הזה');
+  const n = parts.reduce((a, p) => a + p.length, 0), all = new Float32Array(n); let o = 0; parts.forEach((p) => { all.set(p, o); o += p.length; });
+  const wav = new Blob([encodeWav(boostSamples(all))], { type: 'audio/wav' });
+  let blob = wav, mime = 'audio/wav';
+  try { const m = await toMp3(wav); blob = m.blob; mime = 'audio/mpeg'; } catch (e) {}
+  const b64 = await blobToB64(blob);
+  const ex = (await loadVoices(true)).find((x) => x.name === name);
+  const q = ex ? sb.from('voice_profiles').update({ audio_b64: b64, mime }).eq('id', ex.id) : sb.from('voice_profiles').insert({ name, audio_b64: b64, mime, created_by: ME.id });
+  const { error } = await q; if (error) throw new Error(/relation|does not exist/.test(error.message) ? 'צריך לעדכן את בסיס הנתונים' : error.message);
+  await loadVoices(true);
+  toast(`✅ הקול של "${name}" נשמר – בראיונות הבאים המערכת תזהה אותו לבד`, 6000);
+}
+async function openVoices() {
+  const v = await loadVoices(true); const can = typeof isEditor === 'function' ? isEditor() : isAdmin();
+  modal(`<h3>🎙️ קולות מוכרים</h3><p class="muted" style="margin-top:0">בראיונות ביידיש המערכת משווה לקולות האלה ורושמת את השם לבד (עד 3 קולות אחרונים).</p>
+    ${v.length ? v.map((x) => `<div class="act-row"><b class="grow">${esc(x.name)}</b><audio controls preload="none" src="data:${x.mime || 'audio/mpeg'};base64,${x.audio_b64}" style="height:32px;width:200px"></audio>${can ? `<button class="btn small danger" data-vdel="${x.id}">🗑️</button>` : ''}</div>`).join('') : '<div class="empty"><span class="em-ic">🎙️</span><b>עוד אין קולות</b>בהקלטה של ראיון לוחצים "🏷️ מי זה?" ליד דובר, ומסמנים "ללמד את המערכת את הקול".</div>'}`, { okText: 'סגירה', cancelText: '' });
+}
+document.addEventListener('click', async (e) => {
+  const n = e.target.closest('[data-spkname]'); if (n) return nameSpeaker(n.dataset.spkname);
+  if (e.target.id === 'voicesBtn') return openVoices();
+  const d = e.target.closest('[data-vdel]');
+  if (d) { if (!(await confirmBox('למחוק את הקול הזה? המערכת לא תזהה אותו יותר לבד.', 'כן, למחוק'))) return; const { error } = await sb.from('voice_profiles').delete().eq('id', d.dataset.vdel); if (error) return toast('❌ ' + error.message); await loadVoices(true); d.closest('.modal-bg').remove(); openVoices(); }
+});
 
 /* =========================================================
    ADMIN SETTINGS
