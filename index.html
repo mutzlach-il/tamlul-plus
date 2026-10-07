@@ -867,6 +867,11 @@ body.viewas #toTop{display:none}
 .ntext p{margin:0 0 .75em}
 .nempty{display:flex;flex-direction:column;align-items:center;gap:.45em;text-align:center;padding:1em .5em}
 #nusachPill.active{background:var(--accent,#d9b25a);color:#222}
+.ntext .m-title{text-align:center;font-weight:800;font-size:1.25em;line-height:1.35}
+.ntext .m-reva{text-align:center;font-weight:700;margin:.2em 0 .6em;color:var(--muted,#555)}
+.ntext .m-verse{background:#e9e6f5;text-align:center;font-weight:700;padding:.35em .6em;border-radius:8px;margin:.4em 0 .8em}
+.ntext .m-h{background:#e4e4ea;text-align:center;font-weight:800;padding:.35em .6em;border-radius:8px;margin:1em 0 .5em;font-size:1.02em}
+.ntext .src{font-size:.78em}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1537,7 +1542,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.7.0';
+const APP_VERSION = '3.8.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -6125,11 +6130,13 @@ async function loadStyleExamples(force) {
 }
 function nusachSource(rec, kind) {
   const ex = rec.extras || {};
-  if (kind === 'after' && ex.nusach && ex.nusach.before) return { text: ex.nusach.before, from: 'before' };
   const segs = rec.segments && rec.segments.length ? rec.segments.map((s) => s.text).join('\n') : (rec.text || '');
-  return { text: segs.replace(/\[⏸️[^\]]*\]/g, '').trim(), from: 'verbatim' };
+  const verb = segs.replace(/\[⏸️[^\]]*\]/g, '').trim();
+  if (kind === 'after' && ex.nusach && ex.nusach.before) return { text: `[הטיוטה – "לפני עריכה"]\n${ex.nusach.before}${verb ? `\n\n[התמלול המלא מילה במילה (יידיש) – להשלמת פרטים שהושמטו בטיוטה]\n${verb.slice(0, 45000)}` : ''}`, from: 'before', whole: true };
+  return { text: verb, from: 'verbatim' };
 }
-function pickExamples(list, rec, kind, maxChars = 34000) {
+function pickExamples(list, rec, kind, maxChars) {
+  maxChars = maxChars || (kind === 'after' ? 50000 : 34000);
   const all = list.filter((x) => x.kind === kind && x.target_text);
   // קודם: אותה פרשה / כותרת דומה, אחר כך זוגות מלאים (מקור+נוסח), אחר כך השאר
   const t = (rec.title || '') + ' ' + (rec.parasha || '');
@@ -6158,12 +6165,23 @@ RULES:
 - Quote verses and Chazal correctly in their original Hebrew/Aramaic. If a source reference is unclear, do not invent page numbers.
 - If a word was misrecognized, write what was obviously meant from the context.
 - Paragraphs separated by one empty line.`
-    : `You are the final editor who prepares the Biala Rebbe's Torah talks for print.
-INPUT: the first written draft ("לפני עריכה") of a talk.
-OUTPUT: the final, print-ready edited version ("אחרי עריכה") EXACTLY in the style, structure and level of editing shown in the examples below.
-RULES: keep all the content and sources, do not add ideas, follow the examples' style (titles, paragraphing, abbreviations, punctuation, source references). No markdown.`;
+    : `You are the senior editor of "דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" (מכון דא"ח ביאלה), the weekly printed booklet of the Biala Rebbe's Torah talks.
+INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.
+OUTPUT: the final print-ready ma'amar ("אחרי עריכה") – EXACTLY like the printed examples below: the same structure, language, level of editing, length and typography markers.
+WHAT THE EDITORS DO (learn it from the examples):
+- Rabbinic Hebrew of the sefarim, polished and flowing. The final version is FULLER than the draft (usually ~1.5–2× longer): restore details, explanations and stories from the transcript that the draft shortened, and make every step of the argument clear.
+- They ADD: exact source references in parentheses right after a quote – e.g. (שמות יט, ב), (סנהדרין צ ע"ב), (קדוח"י ריש פרשת תצוה), (בפרשתן ד"ה וירא); connecting phrases (ויובן בהקדם..., וכוונת הדברים..., וביתר ביאור..., ועל פי זה יש לבאר...); endings like עכד"ק / עכ"ל / יעו"ש; and a closing blessing paragraph (…ובא לציון גואל… ונזכה לבנין בית המקדש במהרה בימינו אמן).
+- They do NOT add new Torah ideas, new stories or new sources that the Rebbe did not bring. Add a reference only when you are sure of it; otherwise leave the quote without a reference.
+- Names of tzaddikim / sefarim that are quoted at the start of a teaching are written in bold: **כ"ק אאזמו"ר זיעוכי"א**, **מהרה"ק מווארקא זצ"ל**.
+FORMAT – use exactly these line markers, each block separated by an empty line:
+# a title line (2–3 short title lines at the top that sum up the main message, like the examples)
+@ רעוא דרעווין פרשת ___ תשפ"_   (or the occasion of the talk, like the examples)
+> the opening verse with its reference, e.g. > ואתה תצוה את בני ישראל... (כז, כ).
+## a sub-heading (a short sentence that states the point of the next section – every 2–4 paragraphs, 5–8 sub-headings in a full ma'amar)
+plain paragraphs (no marker) for the body text.
+No other markdown, no bullet points, no timestamps.`;
   const start = ctx.index === 0
-    ? (kind === 'before' ? 'Start like the examples (בס"ד, then the opening verse / topic line).' : '')
+    ? (kind === 'before' ? 'Start like the examples (בס"ד, then the opening verse / topic line).' : 'Start with the # title lines, then the @ line, then the > opening verse.')
     : `This is part ${ctx.index + 1} of ${ctx.total} of the same talk. Continue the written text seamlessly from where the previous part ended (do NOT write בס"ד or an opening again). The previous part ended with:\n«${ctx.prevTail}»`;
   return `${task}\n${start}\nOutput ONLY the Hebrew text.\n\n===== EXAMPLES OF THE STYLE =====\n${ex || '(no examples yet)'}\n\n===== THE ${kind === 'before' ? 'TRANSCRIPT' : 'DRAFT'} TO WRITE UP =====\n${part}`;
 }
@@ -6200,7 +6218,7 @@ async function makeNusach(rec, kind = 'before', { silent = false } = {}) {
   try {
     prog('טוען דוגמאות נוסח…');
     const examples = pickExamples(await loadStyleExamples(), rec, kind);
-    const parts = splitText(src.text, 16000);
+    const parts = src.whole ? [src.text] : splitText(src.text, 16000);
     const out = [];
     for (let i = 0; i < parts.length; i++) {
       prog(parts.length > 1 ? `כותב את הנוסח – חלק ${i + 1} מתוך ${parts.length}…` : 'כותב את הנוסח… (בערך דקה)');
@@ -6233,6 +6251,22 @@ function nusachBox() {
   return box;
 }
 let NUSACH_TAB = 'verbatim';
+function parseMarked(txt) {
+  return String(txt || '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).map((b) => {
+    const m = b.match(/^(##|#|@|>)\s*/);
+    const t = m ? b.slice(m[0].length).replace(/\n/g, ' ') : b.replace(/\n/g, ' ');
+    return { k: !m ? 'p' : m[1] === '##' ? 'h' : m[1] === '#' ? 'title' : m[1] === '@' ? 'reva' : 'verse', t };
+  });
+}
+function inlineMarked(t, small) {
+  let h = esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  if (small) h = h.replace(/\(([^()]{1,60})\)/g, '<span class="src">($1)</span>');
+  return h;
+}
+function markedHtml(txt) {
+  return parseMarked(txt).map((b) => b.k === 'title' ? `<div class="m-title">${inlineMarked(b.t)}</div>` : b.k === 'reva' ? `<div class="m-reva">${inlineMarked(b.t)}</div>` : b.k === 'verse' ? `<div class="m-verse">${inlineMarked(b.t)}</div>` : b.k === 'h' ? `<h4 class="m-h">${inlineMarked(b.t)}</h4>` : `<p>${inlineMarked(b.t, true)}</p>`).join('');
+}
+const HE_BUSY = {};
 function renderNusach() {
   const r = Detail.rec; if (!r) return;
   const box = nusachBox();
@@ -6241,11 +6275,18 @@ function renderNusach() {
   if (!show) return;
   const n = (r.extras && r.extras.nusach) || {};
   const canMake = perm('translate') && !VIEW_AS;
-  const tabs = [['verbatim', '📝 מילה במילה'], ['before', '📜 לפני עריכה'], ['after', '🖨️ אחרי עריכה']];
-  const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${k !== 'verbatim' && n[k] ? ' ✓' : ''}</button>`).join('');
+  const isYi = r.lang === 'yi' && r.outLang !== 'he';
+  const tabs = [['verbatim', isYi ? '📝 מילה במילה (יידיש)' : '📝 מילה במילה']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 לפני עריכה'], ['after', '🖨️ אחרי עריכה']]);
+  if (!tabs.some((x) => x[0] === NUSACH_TAB)) NUSACH_TAB = 'verbatim';
+  const tr = r.translations || {};
+  const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${(k === 'he' ? tr.he : k !== 'verbatim' && n[k]) ? ' ✓' : ''}</button>`).join('');
   let body = '';
   if (NUSACH_TAB === 'verbatim') {
-    body = `<div class="muted" style="padding:.4em .2em">📝 התמלול המלא מילה במילה נמצא למטה, כמו תמיד – הוא לא משתנה.</div>`;
+    body = `<div class="muted" style="padding:.4em .2em">📝 התמלול המלא מילה במילה${isYi ? ' ביידיש – בשפה של האדמו"ר –' : ''} נמצא למטה, כמו תמיד. הוא לא משתנה.</div>`;
+  } else if (NUSACH_TAB === 'he') {
+    if (HE_BUSY[r.id]) body = `<p><span class="spinner"></span> מתרגם מילה במילה לעברית…</p>`;
+    else if (tr.he) body = `<div class="nbar"><span class="muted">🇮🇱 תרגום מלא מילה במילה מהיידיש לעברית (בלי קיצור ובלי עריכה)</span><span class="grow"></span><button class="btn small" data-hecopy="1">📋 העתקה</button>${canMake ? '<button class="btn small can-edit" data-hemake="1">🔄 לתרגם מחדש</button>' : ''}</div><div class="ntext" dir="rtl">${esc(tr.he).replace(/\n/g, '<br>')}</div>`;
+    else body = `<div class="nempty"><div style="font-size:2em">🇮🇱</div><b>מילה במילה בעברית</b><div class="muted">תרגום מלא של כל מה שהאדמו"ר אמר – מילה במילה, בלי לקצר ובלי לערוך.</div>${canMake ? '<button class="btn primary" data-hemake="1">🇮🇱 לתרגם עכשיו</button>' : ''}</div>`;
   } else {
     const k = NUSACH_TAB, busy = NUSACH_BUSY[r.id + k], txt = n[k];
     const src = nusachSource(r, k);
@@ -6256,7 +6297,7 @@ function renderNusach() {
         <button class="btn small" data-ncopy="${k}">📋 העתקה</button><button class="btn small" data-nword="${k}">📘 וורד</button><button class="btn small" data-nprint="${k}">🖨️ הדפסה / PDF</button>
         ${canMake ? `<button class="btn small can-edit" data-nedit="${k}">✏️ עריכה</button><button class="btn small can-edit" data-nmake="${k}">🔄 לכתוב מחדש</button>` : ''}
         ${canMake && ME.role !== 'viewer' ? `<button class="btn small can-edit" data-nasex="${k}" title="הנוסח הזה טוב? שמור אותו כדוגמה כדי שהמערכת תלמד ממנו">⭐ לשמור כדוגמה</button>` : ''}</div>
-        <div class="ntext" id="nText" dir="rtl">${esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`;
+        <div class="ntext ${k === 'after' ? 'marked' : ''}" id="nText" dir="rtl">${k === 'after' || /^(#|@|>)/m.test(txt) ? markedHtml(txt) : esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`;
     } else {
       const why = k === 'after' && !n.before ? 'כדאי קודם לכתוב את הנוסח "לפני עריכה" – ממנו נכתב הנוסח הסופי.' : '';
       body = `<div class="nempty"><div style="font-size:2em">${NUSACH_KINDS[k].icon}</div><b>${NUSACH_KINDS[k].name}</b>
@@ -6277,6 +6318,7 @@ function nusachHtmlDoc(rec, k) {
   return `<!doctype html><html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${esc(rec.title)}</title><style>@page{size:A4;margin:2.2cm 2cm}body{font-family:"David","Frank Ruehl CLM","Times New Roman",serif;font-size:14.5pt;line-height:1.75;color:#000;text-align:justify}h1{font-size:19pt;text-align:center;margin:0 0 .2em}.sub{text-align:center;color:#555;font-size:11pt;margin-bottom:1.2em}p{margin:0 0 .7em;text-indent:1.2em}p:first-of-type{text-indent:0}</style></head><body><h1>${esc(rec.title)}</h1><div class="sub">${esc([rec.parasha, rec.hyear, rec.occasion].filter(Boolean).join(' · '))}</div>${paras}</body></html>`;
 }
 async function nusachDocx(rec, k) {
+  if (k === 'after' || /^(#|@|>)/m.test(rec.extras.nusach[k])) return bookletDocx(rec, k);
   const dx = await libDOCX();
   const txt = rec.extras.nusach[k];
   const run = (t, o = {}) => new dx.TextRun(Object.assign({ text: t, font: 'David', size: 29, rightToLeft: true }, o));
@@ -6294,6 +6336,7 @@ document.addEventListener('click', async (e) => {
   const txt = r.extras && r.extras.nusach && r.extras.nusach[k]; if (!txt) return;
   if (t.dataset.ncopy) { await navigator.clipboard.writeText(txt).catch(() => {}); return toast('הועתק 📋'); }
   if (t.dataset.nword) { download(await nusachDocx(r, k), safeName(r.title + ' - ' + NUSACH_KINDS[k].short) + '.docx'); return; }
+  if (t.dataset.nprint && k === 'after') return openBookletPrint(r);
   if (t.dataset.nprint) { const w = window.open('', '_blank'); if (!w) return toast('הדפדפן חסם חלון – אפשר חלונות קופצים לאתר'); w.document.write(nusachHtmlDoc(r, k)); w.document.close(); setTimeout(() => { try { w.focus(); w.print(); } catch (er) {} }, 500); return; }
   if (t.dataset.nedit) {
     const bg = modal(`<h3>✏️ עריכת ה${NUSACH_KINDS[k].name}</h3><textarea id="nEditTa" rows="22" dir="rtl" style="width:100%;font-family:David,serif;font-size:1.15em;line-height:1.7">${esc(txt)}</textarea>`, { okText: 'שמירה', wide: true, onOk: async (b) => { const v = b.querySelector('#nEditTa').value.trim(); if (!v) return; r.extras.nusach[k] = v; r.extras.nusach[k + 'At'] = Date.now(); await saveRec(r, ['extras']); renderNusach(); toast('נשמר ✓'); } });
@@ -6393,6 +6436,118 @@ function addStyleExBtn() {
   host.insertAdjacentHTML('beforeend', `<button type="button" id="styleExBtn" title="הדוגמאות שמהן המערכת לומדת לכתוב נוסח">📚 דוגמאות נוסח</button>`);
 }
 { const _go4 = go; go = function (p) { const x = _go4.apply(this, arguments); setTimeout(() => { try { addStyleExBtn(); } catch (e) {} }, 50); return x; }; }
+
+/* ---------- מילה במילה בעברית ---------- */
+document.addEventListener('click', async (e) => {
+  const m = e.target.closest('[data-hemake],[data-hecopy]'); if (!m || !Detail.rec) return;
+  const r = Detail.rec;
+  if (m.dataset.hecopy) { await navigator.clipboard.writeText((r.translations || {}).he || '').catch(() => {}); return toast('הועתק 📋'); }
+  if (VIEW_AS) return;
+  const src = nusachSource(r, 'before').text; if (!src) return toast('אין עדיין תמלול');
+  HE_BUSY[r.id] = 1; renderNusach();
+  try {
+    const he = await geminiTranslateText(src, 'he');
+    r.translations = Object.assign({}, r.translations, { he });
+    await saveRec(r, ['translations']); toast('🇮🇱 התרגום מילה במילה מוכן ✅');
+    try { logAct && logAct('תרגום מילה במילה לעברית', r.title, r.id); } catch (er) {}
+  } catch (err) { toast('❌ ' + (err.message || err), 7000); }
+  finally { delete HE_BUSY[r.id]; renderNusach(); try { Detail.renderTranslations(); } catch (er) {} }
+});
+
+/* ---------- חוברת לדפוס – בדיוק כמו "דברי אלוקים חיים ושיחות קודש" ---------- */
+const BOOK_HEAD = 'דא"ח מכ"ק מרן אדמו"ר שליט"א';
+function shortYear(hy) { const m = String(hy || '').match(/תש(.+)$/); return m ? m[1] : (hy || ''); }
+function openBookletPrint(rec) {
+  const lastG = LS.get('bookGil', '');
+  const par = (rec.parasha ? 'פרשת ' + rec.parasha.replace(/^פרשת\s*/, '') : '') + (rec.hyear ? ' ' + shortYear(rec.hyear) : '');
+  modal(`<h3>🖨️ הדפסה כחוברת "דברי אלוקים חיים"</h3>
+    <div class="col" style="gap:.55em">
+      <label class="row" style="gap:.4em;font-weight:600"><input type="checkbox" id="bkCover" style="width:auto" ${LS.get('bookCover', true) ? 'checked' : ''}> עם דף השער (הלוגו)</label>
+      <label>שורת הפרשה בשער <input id="bkPar" value="${esc(LS.get('bookParLast_' + rec.id, par))}" placeholder='פרשת תצווה - זכור פ"ו'></label>
+      <label>מספר גיליון <input id="bkGil" value="${esc(LS.get('bookGilRec_' + rec.id, lastG))}" placeholder='קצ"ג'></label>
+      <label>זמני קריאת שמע (לא חובה) <input id="bkZm" value="${esc(LS.get('bookZm', ''))}" placeholder='סוף זמן קר"ש מג"א: 8:16 - סוף זמן קר"ש בעה"ת: 09:09'></label>
+      <div class="muted" style="font-size:.88em">💡 בחלון ההדפסה אפשר לבחור "שמירה כ-PDF". מומלץ: גודל A4, בלי "כותרות עליונות ותחתונות" של הדפדפן.</div>
+    </div>`, { okText: '🖨️ להדפסה', wide: false, onOk: (bg) => {
+      const o = { cover: bg.querySelector('#bkCover').checked, par: bg.querySelector('#bkPar').value.trim(), gil: bg.querySelector('#bkGil').value.trim(), zm: bg.querySelector('#bkZm').value.trim() };
+      LS.set('bookCover', o.cover); LS.set('bookParLast_' + rec.id, o.par); LS.set('bookGilRec_' + rec.id, o.gil); if (o.gil) LS.set('bookGil', o.gil); LS.set('bookZm', o.zm);
+      const w = window.open('', '_blank'); if (!w) return toast('הדפדפן חסם חלון – אפשר חלונות קופצים לאתר');
+      w.document.write(bookletHtml(rec, o)); w.document.close();
+      const go2 = () => { try { w.focus(); w.print(); } catch (er) {} };
+      w.addEventListener('load', () => { (w.document.fonts && w.document.fonts.ready ? w.document.fonts.ready : Promise.resolve()).then(() => setTimeout(go2, 400)); });
+    } });
+}
+function bookletHtml(rec, o) {
+  const abs = (p) => new URL(p, location.href).href;
+  const blocks = parseMarked(rec.extras.nusach.after);
+  const titles = blocks.filter((b) => b.k === 'title'), reva = blocks.find((b) => b.k === 'reva');
+  const firstVerse = blocks.findIndex((b) => b.k === 'verse');
+  const verse = firstVerse >= 0 && firstVerse < 6 ? blocks[firstVerse] : null;
+  const body = blocks.filter((b) => !(b.k === 'title' || b === reva || b === verse));
+  const bodyHtml = body.map((b) => b.k === 'h' ? `<h3>${inlineMarked(b.t)}</h3>` : b.k === 'verse' ? `<div class="vrs">${inlineMarked(b.t)}</div>` : b.k === 'reva' ? `<div class="rv2">${inlineMarked(b.t)}</div>` : `<p>${inlineMarked(b.t, true)}</p>`).join('');
+  const cover = o.cover ? `<section class="cover"><img src="${abs('print-cover.jpg')}" alt=""><div class="par">${o.par ? '• ' + esc(o.par) + (o.gil ? ' • גיליון ' + esc(o.gil) : '') + ' •' : ''}</div>${o.zm ? `<div class="zm">${esc(o.zm)}</div>` : ''}</section>` : '';
+  return `<!doctype html><html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${esc(rec.title)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:17mm 13mm 15mm 13mm;
+  @top-center{content:'${BOOK_HEAD}';font:700 10pt 'Frank Ruhl Libre',serif;color:#222;border-bottom:1.3pt solid #444;vertical-align:bottom;padding-bottom:2mm;width:100%}
+  @bottom-left{content:'עמוד ' counter(page);font:9pt 'Frank Ruhl Libre',serif;color:#333}}
+@page cover{margin:0;@top-center{content:none;border:0}@bottom-left{content:none}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Frank Ruhl Libre','David',serif;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cover{page:cover;position:relative;width:210mm;height:297mm;break-after:page;overflow:hidden}
+.cover img{position:absolute;inset:0;width:100%;height:100%}
+.cover .par{position:absolute;top:74.6%;left:6%;right:6%;text-align:center;font-weight:900;font-size:17pt;letter-spacing:.2px}
+.cover .zm{position:absolute;top:80.4%;left:17%;right:17%;border:1.6pt solid #222;border-radius:9mm;background:#fff;text-align:center;font-weight:700;font-size:11.5pt;padding:2.2mm 3mm}
+.banner{position:relative;width:92%;margin:0 auto 2.5mm;aspect-ratio:1058/357;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3% 11%}
+.banner img{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.banner .t{font-weight:900;font-size:15.5pt;line-height:1.25}
+.banner .r{font-weight:700;font-size:11pt;margin-top:2.2mm}
+.verse{background:#e3e3e3;font-weight:700;text-align:center;font-size:11pt;padding:1.6mm 3mm;margin:0 0 3mm}
+.cols{column-count:2;column-gap:7mm;column-rule:.4pt solid #bbb;text-align:justify;font-size:12pt;line-height:1.42}
+.cols p{margin:0 0 2.2mm;orphans:2;widows:2}
+.cols h3{background:#dcdcdc;text-align:center;font-weight:700;font-size:12.5pt;line-height:1.3;padding:1.6mm 2.5mm;margin:3.5mm 0 2.5mm;break-after:avoid;break-inside:avoid}
+.cols .vrs{background:#e9e9e9;font-weight:700;text-align:center;padding:1.2mm 2mm;margin:2mm 0;break-inside:avoid}
+.cols .rv2{text-align:center;font-weight:700;margin:2mm 0}
+.src{font-size:8.5pt}
+b{font-weight:700}
+@media screen{body{background:#888}.cover,.page-wrap{background:#fff;margin:8mm auto;box-shadow:0 2px 10px #0005}.page-wrap{width:210mm;padding:17mm 13mm}}
+</style></head><body>
+${cover}
+<div class="page-wrap">
+${titles.length || reva ? `<div class="banner"><img src="${abs('print-banner.png')}" alt="">${titles.map((x) => `<div class="t">${inlineMarked(x.t)}</div>`).join('')}${reva ? `<div class="r">${inlineMarked(reva.t)}</div>` : ''}</div>` : `<div class="banner"><img src="${abs('print-banner.png')}" alt=""><div class="t">${esc(rec.title)}</div></div>`}
+${verse ? `<div class="verse">${inlineMarked(verse.t)}</div>` : ''}
+<div class="cols">${bodyHtml}</div>
+</div></body></html>`;
+}
+async function bookletDocx(rec, k) {
+  const dx = await libDOCX();
+  const blocks = parseMarked(rec.extras.nusach[k]);
+  const runs = (t, base = {}) => {
+    const out = []; String(t).split(/(\*\*.+?\*\*)/).forEach((s) => { if (!s) return; const b = /^\*\*.+\*\*$/.test(s); out.push(new dx.TextRun(Object.assign({ text: b ? s.slice(2, -2) : s, font: 'Frank Ruehl CLM', size: 23, rightToLeft: true, bold: b || undefined }, base))); });
+    return out;
+  };
+  const shade = { type: dx.ShadingType.CLEAR, fill: 'DCDCDC', color: 'auto' };
+  const head = [], body = [];
+  let inHead = true;
+  blocks.forEach((b) => {
+    if (inHead && !['title', 'reva', 'verse'].includes(b.k)) inHead = false;
+    const arr = inHead ? head : body;
+    if (b.k === 'title') arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, children: runs(b.t, { bold: true, size: 32 }) }));
+    else if (b.k === 'reva') arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, spacing: { before: 80, after: 160 }, children: runs(b.t, { bold: true, size: 22 }) }));
+    else if (b.k === 'verse') arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, shading: shade, spacing: { after: 160 }, children: runs(b.t, { bold: true, size: 22 }) }));
+    else if (b.k === 'h') arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, shading: shade, keepNext: true, spacing: { before: 160, after: 100 }, children: runs(b.t, { bold: true, size: 25 }) }));
+    else arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.BOTH, spacing: { after: 80, line: 300 }, children: runs(b.t) }));
+  });
+  const margin = { top: 960, bottom: 850, left: 740, right: 740 };
+  const header = new dx.Header({ children: [new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, border: { bottom: { style: dx.BorderStyle.SINGLE, size: 8, color: '444444', space: 2 } }, children: [new dx.TextRun({ text: BOOK_HEAD, bold: true, font: 'Frank Ruehl CLM', size: 20, rightToLeft: true })] })] });
+  const footer = new dx.Footer({ children: [new dx.Paragraph({ alignment: dx.AlignmentType.LEFT, children: [new dx.TextRun({ text: 'עמוד ', font: 'Frank Ruehl CLM', size: 18, rightToLeft: true }), new dx.TextRun({ children: [dx.PageNumber.CURRENT], size: 18 })] })] });
+  const doc = new dx.Document({ sections: [
+    { properties: { page: { margin } }, headers: { default: header }, footers: { default: footer }, children: head.length ? head : [new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, children: runs(rec.title || '', { bold: true, size: 32 }) })] },
+    { properties: { type: dx.SectionType.CONTINUOUS, page: { margin }, column: { count: 2, space: 400, separate: true } }, headers: { default: header }, footers: { default: footer }, children: body }
+  ] });
+  return dx.Packer.toBlob(doc);
+}
 
 /* =========================================================
    ADMIN SETTINGS
