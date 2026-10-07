@@ -857,6 +857,16 @@ body.dark .transcript.chat .seg{filter:brightness(.92)}
 #vaBar .btn.primary{background:#fff;color:#7c2d12;font-weight:800}
 body.viewas header.top{top:44px}
 body.viewas #toTop{display:none}
+/* ===== 3.7 נוסחים ===== */
+.nusach-box{border:1.5px solid var(--primary-soft,#e7e1fb);border-radius:16px;padding:.7em .9em;margin:.8em 0;background:var(--card,#fff)}
+.ntabs{display:flex;flex-wrap:wrap;gap:.4em;margin-bottom:.6em}
+.ntab{border:1.5px solid var(--primary,#5b3fd6);background:transparent;color:var(--primary,#5b3fd6);border-radius:999px;padding:.35em 1em;font-weight:700;cursor:pointer;font:inherit;font-weight:700}
+.ntab.active{background:var(--primary,#5b3fd6);color:#fff}
+.nbar{display:flex;flex-wrap:wrap;gap:.4em;align-items:center;margin-bottom:.5em}
+.ntext{font-family:"David","Frank Ruehl CLM","Noto Serif Hebrew",serif;font-size:1.22em;line-height:1.85;text-align:justify;background:var(--bg-soft,#faf9ff);border-radius:12px;padding:1em 1.3em;max-height:70vh;overflow:auto}
+.ntext p{margin:0 0 .75em}
+.nempty{display:flex;flex-direction:column;align-items:center;gap:.45em;text-align:center;padding:1em .5em}
+#nusachPill.active{background:var(--accent,#d9b25a);color:#222}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1527,7 +1537,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.6.1';
+const APP_VERSION = '3.7.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2180,6 +2190,7 @@ async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
   models.filter((m) => !GEM_DAY_OUT.has(m)).slice(0, 5).forEach((m, i) => { tries.push(m); if (i === 0) tries.push(m); });
   if (!tries.length) throw gemQuotaErr();
   for (const model of tries) {
+    if (opts.deadline && Date.now() > opts.deadline) break;
     try {
       const body = { contents: [{ role: 'user', parts: [...(opts.refParts || []), { inline_data: { mime_type: mime, data: b64 } }, { text: gemPrompt(lang, opts) }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } };
       const res = await gemFetch(`/models/${model}:generateContent`, body, 'transcribe', dur);
@@ -2232,6 +2243,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
         if (/לא החזיר/.test(err.message) || err.dayQuota) throw err;
         if (round >= 2 || err.status === 403 || (err.status && ![429, 500, 502, 503, 504, 546].includes(err.status) && !/timeout|בזמן/.test(err.message))) throw err;
         const wait = 20 * (round + 1);
+        if (opts.deadline && Date.now() + wait * 1000 > opts.deadline) throw err;
         onProgress && onProgress(`Gemini עמוס – מנסה שוב${label} בעוד ${wait} שניות…`);
         await sleep(wait * 1000);
       }
@@ -2247,6 +2259,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   if (!audio) throw new Error('לא הצלחתי לפענח את קובץ השמע (פורמט לא נתמך)');
   const parts = Math.ceil(total / GEM_CHUNK_SEC);
   const out = { text: '', segments: [], duration: total, language: lang };
+  const missing = []; let dayOut = false, busyRow = 0;
   for (let i = 0; i < parts; i++) {
     const st = i * GEM_CHUNK_SEC, en = Math.min(total, st + GEM_CHUNK_SEC);
     onProgress && onProgress(`Gemini מתמלל חלק ${i + 1} מתוך ${parts}…`);
@@ -2255,12 +2268,25 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     const lsKey = opts.rec && opts.rec.id ? 'gc_' + opts.rec.id + '_' + cacheKey : null;
     let segs = GEM_CHUNK_CACHE.get(cacheKey) || (lsKey && LS.get(lsKey, null));
     if (!segs) {
+      if (dayOut || busyRow >= 2) { missing.push(i); out.segments.push({ start: st, end: en, text: `[⏸️ חלק ${i + 1} (${fmtTime(st)}–${fmtTime(en)}) עוד לא תומלל]` }); continue; }
       const wav = encodeWav(await resampleMono16k(audio, st, en));
+      opts.deadline = Date.now() + 6 * 60 * 1000;   // לא יותר מ-6 דקות לחלק אחד – אחר כך ממשיכים הלאה
       try { segs = await retrying(() => geminiTranscribeOne(wav, 'audio/wav', lang, en - st, opts), ` חלק ${i + 1}`); }
-      catch (err) {
-        if (!/לא החזיר/.test(err.message)) throw err;
-        segs = (await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st }));
+      catch (err0) {
+        let err = err0;
+        if (/לא החזיר/.test(err.message) && !err.dayQuota) {
+          try { segs = (await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st })); }
+          catch (e2) { err = e2; segs = null; }
+        }
+        if (!segs) {
+          if (err.status === 403 || (err.status === 400 && /API key|permission/i.test(err.message))) throw err;
+          console.warn('chunk failed – skipping for now', i, err.message);
+          if (err.dayQuota) dayOut = true; else busyRow++;
+          missing.push(i); out.segments.push({ start: st, end: en, text: `[⏸️ חלק ${i + 1} (${fmtTime(st)}–${fmtTime(en)}) עוד לא תומלל]` });
+          delete opts.deadline; continue;
+        }
       }
+      delete opts.deadline; busyRow = 0;
       GEM_CHUNK_CACHE.set(cacheKey, segs);
       if (lsKey) try { LS.set(lsKey, segs); } catch (e) {}
     }
@@ -2268,6 +2294,11 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     segs.forEach((s) => out.segments.push({ start: Math.min(en, s.start + st), end: Math.min(en, s.end + st), text: s.text }));
   }
   out.text = out.segments.map((s) => s.text).join(' ');
+  if (missing.length) {
+    const done = parts - missing.length;
+    const e = dayOut ? gemQuotaErr() : new Error(`⏸️ Gemini עמוס כרגע – תומללו ${done} מתוך ${parts} חלקים. השאר ימשיכו לבד בעוד כחצי שעה (מה שכבר תומלל נשמר).`);
+    e.partial = out; e.busyPause = !dayOut; throw e;
+  }
   return out;
 }
 
@@ -2345,7 +2376,7 @@ const Queue = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
       lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
       speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
-      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {})
+      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
       speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate, series: rec.series, series_no: rec.seriesNo, extras: rec.extras });
@@ -2419,6 +2450,11 @@ const Queue = {
               rec.translations = Object.assign({}, rec.translations, { he });
             } catch (e) { console.warn('auto translate failed', e); }
           }
+          if (res.text && rec.extras && rec.extras.wantNusach && !(rec.extras.nusach && rec.extras.nusach.before) && perm('translate')) {
+            prog('✍️ כותב נוסח כתיבה (לפני עריכה)…');
+            rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
+            try { await makeNusach(rec, 'before', { silent: true }); } catch (e) { console.warn('nusach failed', e); }
+          }
           if (res.text && looksDefaultTitle(rec)) {
             prog('נותן כותרת…');
             try { const t = await autoTitle(rec.translations && rec.translations.he || res.text); if (t) rec.title = t; } catch (e) { console.warn('auto title failed', e); }
@@ -2429,6 +2465,8 @@ const Queue = {
         } catch (err) {
           console.error(err);
           rec.status = 'error'; rec.error = err.message || String(err);
+          if (err.partial && err.partial.segments && err.partial.segments.length) { rec.text = err.partial.text; rec.segments = err.partial.segments; rec.duration = err.partial.duration || rec.duration; }
+          if (/^⏸️/.test(rec.error)) LS.set('pauseAt_' + rec.id, Date.now());
         }
         delete this.progress[id];
         try {
@@ -6058,12 +6096,303 @@ document.addEventListener('click', (e) => {
 function resumeQuotaWaits() {
   if (VIEW_AS || !ME) return;
   const s = LS.get('gemDayOut', null);
-  if (s && s.day === gemQuotaDay()) return;           // עדיין אותו יום – המכסה עוד לא התאפסה
-  GEM_DAY_OUT.clear();
-  [...RECS.values()].filter((r) => r.owner === ME.id && r.status === 'error' && /^⏸️/.test(r.error || '')).forEach((r) => retryRec(r.id));
+  const sameDay = s && s.day === gemQuotaDay();          // עדיין אותו יום – המכסה היומית עוד לא התאפסה
+  if (!sameDay) GEM_DAY_OUT.clear();
+  [...RECS.values()].filter((r) => r.owner === ME.id && r.status === 'error' && /^⏸️/.test(r.error || '')).forEach((r) => {
+    const isDay = /מחר/.test(r.error);
+    if (isDay ? sameDay : Date.now() - (LS.get('pauseAt_' + r.id, 0) || 0) < 25 * 60 * 1000) return;
+    if (Queue.items.includes(r.id)) return;
+    retryRec(r.id);
+  });
 }
 setInterval(resumeQuotaWaits, 10 * 60 * 1000);
 { const _ea3 = enterApp; enterApp = async function () { const r = await _ea3.apply(this, arguments); setTimeout(resumeQuotaWaits, 8000); return r; }; }
+
+/* =========================================================
+   3.7 – נוסחים: "מילה במילה" / "לפני עריכה" (נוסח כתיבה) / "אחרי עריכה" (לדפוס)
+   המערכת לומדת את הסגנון מדוגמאות שנשמרות בטבלה style_examples
+   ========================================================= */
+const NUSACH_KINDS = {
+  before: { icon: '📜', name: 'נוסח כתיבה (לפני עריכה)', short: 'לפני עריכה' },
+  after: { icon: '🖨️', name: 'נוסח סופי (אחרי עריכה – לדפוס)', short: 'אחרי עריכה' }
+};
+let STYLE_EX = null;
+async function loadStyleExamples(force) {
+  if (STYLE_EX && !force) return STYLE_EX;
+  const { data, error } = await sb.from('style_examples').select('id,kind,title,source_text,target_text,rec_id,created_at').order('created_at');
+  if (error) { console.warn('style_examples', error.message); STYLE_EX = []; } else STYLE_EX = data || [];
+  return STYLE_EX;
+}
+function nusachSource(rec, kind) {
+  const ex = rec.extras || {};
+  if (kind === 'after' && ex.nusach && ex.nusach.before) return { text: ex.nusach.before, from: 'before' };
+  const segs = rec.segments && rec.segments.length ? rec.segments.map((s) => s.text).join('\n') : (rec.text || '');
+  return { text: segs.replace(/\[⏸️[^\]]*\]/g, '').trim(), from: 'verbatim' };
+}
+function pickExamples(list, rec, kind, maxChars = 34000) {
+  const all = list.filter((x) => x.kind === kind && x.target_text);
+  // קודם: אותה פרשה / כותרת דומה, אחר כך זוגות מלאים (מקור+נוסח), אחר כך השאר
+  const t = (rec.title || '') + ' ' + (rec.parasha || '');
+  const score = (x) => (t && x.title && t.includes(x.title) ? 100 : 0) + (x.source_text ? 10 : 0) + (x.target_text.length < 12000 ? 1 : 0);
+  const sorted = all.slice().sort((a, b) => score(b) - score(a));
+  const out = []; let used = 0;
+  for (const x of sorted) {
+    const len = x.target_text.length + (x.source_text ? Math.min(x.source_text.length, 14000) : 0);
+    if (out.length >= 4 || (out.length >= 2 && used + len > maxChars)) break;
+    out.push(x); used += len;
+  }
+  return out;
+}
+function nusachPrompt(kind, part, examples, ctx) {
+  const ex = examples.map((x, i) => (x.source_text ? `### דוגמה ${i + 1} – ${x.title}\n[המקור]\n${x.source_text.slice(0, 14000)}\n\n[הנוסח הכתוב]\n${x.target_text}` : `### דוגמה ${i + 1} – ${x.title}\n${x.target_text}`)).join('\n\n');
+  const task = kind === 'before'
+    ? `You are the editor who writes up the Torah talks (שיחות / דרשות) of the Biala Rebbe (חסידות ביאלה, בני ברק).
+INPUT: a word-by-word transcript of a talk spoken in Hasidic Yiddish (it may contain speech-recognition errors and Hebrew/Aramaic quotes).
+OUTPUT: the written version ("נוסח כתיבה") in Rabbinic Hebrew – the language of Hasidic sefarim – EXACTLY in the style of the examples below.
+RULES:
+- Keep ALL the ideas, explanations, sources, stories and their order. Do not skip content and do not invent anything that was not said.
+- Remove repetitions, filler words, hesitations and spoken-language noise; join broken sentences into flowing written sentences.
+- Write it as a flowing ma'amar, like the examples – NOT bullet points, NO headings, NO markdown, NO timestamps.
+- LENGTH: like the examples – each example is about 15–20 minutes of speech written in roughly 900–1,300 words (about half the spoken words). So compress the wording, but keep every idea, source and story – it is not a short summary.
+- Use the same expressions and abbreviations the examples use (e.g. השי"ת, ע"ה, ח"ו, זיעוכי"א, זצללה"ה, כ"ק אאזמו"ר וכו') and the same way of opening a paragraph and citing sources.
+- Quote verses and Chazal correctly in their original Hebrew/Aramaic. If a source reference is unclear, do not invent page numbers.
+- If a word was misrecognized, write what was obviously meant from the context.
+- Paragraphs separated by one empty line.`
+    : `You are the final editor who prepares the Biala Rebbe's Torah talks for print.
+INPUT: the first written draft ("לפני עריכה") of a talk.
+OUTPUT: the final, print-ready edited version ("אחרי עריכה") EXACTLY in the style, structure and level of editing shown in the examples below.
+RULES: keep all the content and sources, do not add ideas, follow the examples' style (titles, paragraphing, abbreviations, punctuation, source references). No markdown.`;
+  const start = ctx.index === 0
+    ? (kind === 'before' ? 'Start like the examples (בס"ד, then the opening verse / topic line).' : '')
+    : `This is part ${ctx.index + 1} of ${ctx.total} of the same talk. Continue the written text seamlessly from where the previous part ended (do NOT write בס"ד or an opening again). The previous part ended with:\n«${ctx.prevTail}»`;
+  return `${task}\n${start}\nOutput ONLY the Hebrew text.\n\n===== EXAMPLES OF THE STYLE =====\n${ex || '(no examples yet)'}\n\n===== THE ${kind === 'before' ? 'TRANSCRIPT' : 'DRAFT'} TO WRITE UP =====\n${part}`;
+}
+async function gemText(prompt, kind, onProgress) {
+  const models = (await geminiModels()).filter((m) => !GEM_DAY_OUT.has(m));
+  if (!models.length) throw gemQuotaErr();
+  let lastErr;
+  for (let round = 0; round < 3; round++) {
+    for (const model of models.slice(0, 4)) {
+      try {
+        const res = await gemFetch(`/models/${model}:generateContent`, { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.35, maxOutputTokens: 30000 } }, kind);
+        const c = res.candidates && res.candidates[0];
+        const txt = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
+        if (txt) return txt.replace(/^```\w*\n?|```$/g, '').trim();
+        lastErr = new Error('Gemini לא החזיר טקסט');
+      } catch (err) {
+        lastErr = err; if (err.status === 403) throw err;
+        if (err.dayQuota) { GEM_DAY_OUT.add(model); LS.set('gemDayOut', { day: gemQuotaDay(), list: [...GEM_DAY_OUT] }); }
+      }
+    }
+    if (!models.some((m) => !GEM_DAY_OUT.has(m))) throw gemQuotaErr();
+    onProgress && onProgress(`Gemini עמוס – מנסה שוב בעוד ${20 * (round + 1)} שניות…`);
+    await sleep(20000 * (round + 1));
+  }
+  throw lastErr || new Error('Gemini נכשל');
+}
+const NUSACH_BUSY = {};
+async function makeNusach(rec, kind = 'before', { silent = false } = {}) {
+  if (NUSACH_BUSY[rec.id + kind]) return;
+  const src = nusachSource(rec, kind);
+  if (!src.text || src.text.length < 40) { if (!silent) toast('אין עדיין תמלול מילה במילה – קודם צריך לתמלל'); return; }
+  NUSACH_BUSY[rec.id + kind] = '…';
+  const prog = (p) => { NUSACH_BUSY[rec.id + kind] = p; if (Detail.rec && Detail.rec.id === rec.id) renderNusach(); };
+  try {
+    prog('טוען דוגמאות נוסח…');
+    const examples = pickExamples(await loadStyleExamples(), rec, kind);
+    const parts = splitText(src.text, 16000);
+    const out = [];
+    for (let i = 0; i < parts.length; i++) {
+      prog(parts.length > 1 ? `כותב את הנוסח – חלק ${i + 1} מתוך ${parts.length}…` : 'כותב את הנוסח… (בערך דקה)');
+      const prevTail = out.length ? out[out.length - 1].slice(-600) : '';
+      out.push(await gemText(nusachPrompt(kind, parts[i], examples, { index: i, total: parts.length, prevTail }), 'nusach', prog));
+    }
+    rec.extras = Object.assign({}, rec.extras);
+    rec.extras.nusach = Object.assign({}, rec.extras.nusach, { [kind]: out.join('\n\n'), [kind + 'At']: Date.now(), [kind + 'Ex']: examples.length });
+    if (kind === 'before' && rec.extras.nusach.after) rec.extras.nusach.afterOld = true;
+    await saveRec(rec, ['extras']);
+    try { logAct && logAct('nusach', rec.title + ' · ' + NUSACH_KINDS[kind].short, rec.id); } catch (e) {}
+    if (!silent) toast(`${NUSACH_KINDS[kind].icon} ה${NUSACH_KINDS[kind].short.replace('לפני', 'נוסח לפני').replace('אחרי', 'נוסח אחרי')} מוכן ✅`);
+  } catch (err) {
+    console.error(err);
+    if (!silent) toast('❌ ' + (err.message || err), 7000);
+    rec.extras = Object.assign({}, rec.extras, { nusachErr: err.message || String(err) });
+  } finally {
+    delete NUSACH_BUSY[rec.id + kind];
+    if (Detail.rec && Detail.rec.id === rec.id) renderNusach();
+  }
+}
+
+/* ---------- תצוגה בדף ההקלטה ---------- */
+function nusachBox() {
+  let box = $('#dNusach');
+  if (!box) {
+    box = document.createElement('div'); box.id = 'dNusach'; box.className = 'nusach-box';
+    const anchor = $('#dTranslations'); anchor.parentNode.insertBefore(box, anchor);
+  }
+  return box;
+}
+let NUSACH_TAB = 'verbatim';
+function renderNusach() {
+  const r = Detail.rec; if (!r) return;
+  const box = nusachBox();
+  const show = r.status === 'done' || (r.extras && r.extras.nusach);
+  box.classList.toggle('hidden', !show);
+  if (!show) return;
+  const n = (r.extras && r.extras.nusach) || {};
+  const canMake = perm('translate') && !VIEW_AS;
+  const tabs = [['verbatim', '📝 מילה במילה'], ['before', '📜 לפני עריכה'], ['after', '🖨️ אחרי עריכה']];
+  const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${k !== 'verbatim' && n[k] ? ' ✓' : ''}</button>`).join('');
+  let body = '';
+  if (NUSACH_TAB === 'verbatim') {
+    body = `<div class="muted" style="padding:.4em .2em">📝 התמלול המלא מילה במילה נמצא למטה, כמו תמיד – הוא לא משתנה.</div>`;
+  } else {
+    const k = NUSACH_TAB, busy = NUSACH_BUSY[r.id + k], txt = n[k];
+    const src = nusachSource(r, k);
+    const exN = (STYLE_EX || []).filter((x) => x.kind === k).length;
+    if (busy) body = `<p><span class="spinner"></span> ${esc(busy)}</p>`;
+    else if (txt) {
+      body = `<div class="nbar"><span class="muted">${n[k + 'At'] ? 'נכתב ' + fmtDate(n[k + 'At']) : ''}${k === 'after' && n.afterOld ? ' · ⚠️ נכתב לפני שהנוסח "לפני עריכה" עודכן' : ''}</span><span class="grow"></span>
+        <button class="btn small" data-ncopy="${k}">📋 העתקה</button><button class="btn small" data-nword="${k}">📘 וורד</button><button class="btn small" data-nprint="${k}">🖨️ הדפסה / PDF</button>
+        ${canMake ? `<button class="btn small can-edit" data-nedit="${k}">✏️ עריכה</button><button class="btn small can-edit" data-nmake="${k}">🔄 לכתוב מחדש</button>` : ''}
+        ${canMake && ME.role !== 'viewer' ? `<button class="btn small can-edit" data-nasex="${k}" title="הנוסח הזה טוב? שמור אותו כדוגמה כדי שהמערכת תלמד ממנו">⭐ לשמור כדוגמה</button>` : ''}</div>
+        <div class="ntext" id="nText" dir="rtl">${esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`;
+    } else {
+      const why = k === 'after' && !n.before ? 'כדאי קודם לכתוב את הנוסח "לפני עריכה" – ממנו נכתב הנוסח הסופי.' : '';
+      body = `<div class="nempty"><div style="font-size:2em">${NUSACH_KINDS[k].icon}</div><b>${NUSACH_KINDS[k].name}</b>
+        <div class="muted">${k === 'before' ? 'המערכת תכתוב מהתמלול מילה במילה מאמר בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח הסופי לדפוס – לפי הדוגמאות של "אחרי עריכה".'}</div>
+        <div class="muted" style="font-size:.9em">📚 דוגמאות שהמערכת לומדת מהן: <b>${exN}</b>${!exN ? ' – עוד אין דוגמאות מהסוג הזה (אפשר להוסיף בהגדרות ← 📚 דוגמאות נוסח)' : ''}</div>
+        ${why ? `<div class="muted">${why}</div>` : ''}
+        ${canMake ? `<button class="btn primary" data-nmake="${k}" ${!src.text ? 'disabled' : ''}>${NUSACH_KINDS[k].icon} לכתוב עכשיו</button>` : '<div class="muted">אין לך הרשאה ליצור נוסח</div>'}</div>`;
+    }
+  }
+  box.innerHTML = `<div class="ntabs"><b style="align-self:center">✍️ נוסחים:</b>${tabHtml}</div>${body}`;
+}
+{ const _dr = Detail.renderTranslations; Detail.renderTranslations = function () { const x = _dr.apply(this, arguments); try { renderNusach(); } catch (e) { console.warn(e); } return x; }; }
+{ const _do = Detail.open; Detail.open = function () { NUSACH_TAB = 'verbatim'; if (!STYLE_EX) loadStyleExamples().then(() => { try { renderNusach(); } catch (e) {} }); return _do.apply(this, arguments); }; }
+
+function nusachHtmlDoc(rec, k) {
+  const txt = rec.extras.nusach[k];
+  const paras = txt.split(/\n{2,}/).map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+  return `<!doctype html><html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${esc(rec.title)}</title><style>@page{size:A4;margin:2.2cm 2cm}body{font-family:"David","Frank Ruehl CLM","Times New Roman",serif;font-size:14.5pt;line-height:1.75;color:#000;text-align:justify}h1{font-size:19pt;text-align:center;margin:0 0 .2em}.sub{text-align:center;color:#555;font-size:11pt;margin-bottom:1.2em}p{margin:0 0 .7em;text-indent:1.2em}p:first-of-type{text-indent:0}</style></head><body><h1>${esc(rec.title)}</h1><div class="sub">${esc([rec.parasha, rec.hyear, rec.occasion].filter(Boolean).join(' · '))}</div>${paras}</body></html>`;
+}
+async function nusachDocx(rec, k) {
+  const dx = await libDOCX();
+  const txt = rec.extras.nusach[k];
+  const run = (t, o = {}) => new dx.TextRun(Object.assign({ text: t, font: 'David', size: 29, rightToLeft: true }, o));
+  const kids = [new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, spacing: { after: 240 }, children: [run(rec.title || '', { bold: true, size: 38 })] })];
+  txt.split(/\n{2,}/).forEach((p) => kids.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.BOTH, spacing: { after: 160, line: 360 }, children: [run(p.replace(/\n/g, ' '))] })));
+  const doc = new dx.Document({ sections: [{ properties: { page: { margin: { top: 1250, bottom: 1250, left: 1130, right: 1130 } } }, children: kids }] });
+  return dx.Packer.toBlob(doc);
+}
+document.addEventListener('click', async (e) => {
+  const t = e.target.closest('[data-ntab],[data-nmake],[data-ncopy],[data-nword],[data-nprint],[data-nedit],[data-nasex]'); if (!t || !Detail.rec) return;
+  const r = Detail.rec;
+  if (t.dataset.ntab) { NUSACH_TAB = t.dataset.ntab; if (NUSACH_TAB === 'verbatim') { const tr = $('#dTranscript'); tr && tr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } return renderNusach(); }
+  if (t.dataset.nmake) { const k = t.dataset.nmake; if (r.extras && r.extras.nusach && r.extras.nusach[k] && !(await confirmBox('לכתוב את הנוסח מחדש? הנוסח הנוכחי יוחלף (כולל תיקונים שעשית בו).', 'כן, לכתוב מחדש'))) return; return makeNusach(r, k); }
+  const k = t.dataset.ncopy || t.dataset.nword || t.dataset.nprint || t.dataset.nedit || t.dataset.nasex;
+  const txt = r.extras && r.extras.nusach && r.extras.nusach[k]; if (!txt) return;
+  if (t.dataset.ncopy) { await navigator.clipboard.writeText(txt).catch(() => {}); return toast('הועתק 📋'); }
+  if (t.dataset.nword) { download(await nusachDocx(r, k), safeName(r.title + ' - ' + NUSACH_KINDS[k].short) + '.docx'); return; }
+  if (t.dataset.nprint) { const w = window.open('', '_blank'); if (!w) return toast('הדפדפן חסם חלון – אפשר חלונות קופצים לאתר'); w.document.write(nusachHtmlDoc(r, k)); w.document.close(); setTimeout(() => { try { w.focus(); w.print(); } catch (er) {} }, 500); return; }
+  if (t.dataset.nedit) {
+    const bg = modal(`<h3>✏️ עריכת ה${NUSACH_KINDS[k].name}</h3><textarea id="nEditTa" rows="22" dir="rtl" style="width:100%;font-family:David,serif;font-size:1.15em;line-height:1.7">${esc(txt)}</textarea>`, { okText: 'שמירה', wide: true, onOk: async (b) => { const v = b.querySelector('#nEditTa').value.trim(); if (!v) return; r.extras.nusach[k] = v; r.extras.nusach[k + 'At'] = Date.now(); await saveRec(r, ['extras']); renderNusach(); toast('נשמר ✓'); } });
+    return bg;
+  }
+  if (t.dataset.nasex) {
+    if (!(await confirmBox(`לשמור את הנוסח הזה כדוגמה? מעכשיו המערכת תלמד גם ממנו איך לכתוב "${NUSACH_KINDS[k].short}".`, 'כן, לשמור כדוגמה'))) return;
+    const src = k === 'before' ? nusachSource(r, 'before').text : (r.extras.nusach.before || null);
+    const { error } = await sb.from('style_examples').insert({ kind: k, title: r.title, source_text: src ? src.slice(0, 30000) : null, target_text: txt, rec_id: r.id, created_by: ME.id });
+    if (error) return toast('❌ ' + error.message);
+    await loadStyleExamples(true); toast('⭐ נשמר כדוגמה'); renderNusach();
+  }
+});
+
+/* ---------- בהעלאה: "גם נוסח כתיבה" ---------- */
+function syncNusachPill() {
+  const host = $('#yiOutPills'); if (!host) return;
+  let b = $('#nusachPill');
+  if (!b) { host.insertAdjacentHTML('beforeend', `<button type="button" id="nusachPill" title="אחרי התמלול מילה במילה – המערכת תכתוב גם נוסח כתיבה בלשון הקודש">✍️ + נוסח כתיבה (לפני עריכה)</button>`); b = $('#nusachPill'); }
+  b.classList.toggle('active', !!LS.get('autoNusach', false));
+}
+document.addEventListener('click', (e) => { if (e.target.closest('#nusachPill')) { e.preventDefault(); e.stopPropagation(); LS.set('autoNusach', !LS.get('autoNusach', false)); syncNusachPill(); toast(LS.get('autoNusach', false) ? '✍️ אחרי התמלול תיכתב גם נוסח כתיבה' : 'בלי נוסח כתיבה – רק תמלול'); } }, true);
+{ const _sl = syncLangPills; syncLangPills = function () { const x = _sl.apply(this, arguments); try { syncNusachPill(); } catch (e) {} return x; }; }
+{ const _qa3 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) { if (lang === 'yi' && LS.get('autoNusach', false) && !meta.wantNusach) meta = Object.assign({}, meta, { wantNusach: true }); return _qa3.call(this, blob, name, lang, title, meta); }; }
+
+/* ---------- ניהול הדוגמאות (מנהל / עורך) ---------- */
+async function openStyleExamples() {
+  const list = await loadStyleExamples(true);
+  const row = (x) => `<div class="act-row"><span class="badge">${NUSACH_KINDS[x.kind] ? NUSACH_KINDS[x.kind].icon + ' ' + NUSACH_KINDS[x.kind].short : x.kind}</span><b class="grow">${esc(x.title)}</b><span class="muted" style="font-size:.85em">${x.source_text ? 'מקור + נוסח' : 'נוסח בלבד'} · ${Math.round(x.target_text.length / 1000)}K תווים</span><button class="btn small" data-sexview="${x.id}">👁️</button><button class="btn small danger" data-sexdel="${x.id}">🗑️</button></div>`;
+  modal(`<h3>📚 דוגמאות נוסח – מהן המערכת לומדת את הסגנון</h3>
+    <p class="muted">כשכותבים נוסח, המערכת מקבלת כמה דוגמאות מכאן (קודם מאותה פרשה, אם יש) וכותבת בדיוק באותו סגנון. כמה שיותר דוגמאות טובות – יותר מדויק.</p>
+    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "לפני עריכה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "אחרי עריכה"</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
+    ${list.length ? list.map(row).join('') : '<div class="empty"><b>אין עדיין דוגמאות</b></div>'}
+    <details style="margin-top:1em"><summary style="font-weight:700;cursor:pointer">➕ הוספת דוגמה חדשה</summary>
+      <div class="col" style="gap:.5em;margin-top:.5em">
+        <label>סוג <select id="sexKind"><option value="before">📜 לפני עריכה</option><option value="after">🖨️ אחרי עריכה</option></select></label>
+        <label>שם (למשל: פרשת נח תשפ"ו) <input id="sexTitle"></label>
+        <label>הנוסח הכתוב (להדביק כאן מהוורד) <textarea id="sexText" rows="8" dir="rtl"></textarea></label>
+        <label>(לא חובה) מקור – מה שנאמר / הגרסה הקודמת <textarea id="sexSrc" rows="4" dir="rtl"></textarea></label>
+        <button class="btn primary" id="sexAdd">➕ הוספה</button>
+      </div></details>`, { okText: 'סגירה', cancelText: '', wide: true });
+}
+async function docxToText(file) {
+  const JSZip = await libZIP();
+  const zip = await JSZip.loadAsync(file);
+  const xml = await zip.file('word/document.xml').async('string');
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  const paras = [...doc.getElementsByTagNameNS(W, 'p')].map((p) => {
+    let s = '';
+    p.querySelectorAll('*').forEach((n) => { if (n.namespaceURI !== W) return; if (n.localName === 't') s += n.textContent; else if (n.localName === 'tab') s += ' '; else if (n.localName === 'br') s += '\n'; });
+    return s.trim();
+  });
+  return paras.filter(Boolean).join('\n\n');
+}
+async function importStyleFiles(kind) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.accept = '.docx,.txt';
+  inp.onchange = async () => {
+    const files = [...inp.files]; if (!files.length) return;
+    const have = new Set((STYLE_EX || []).filter((x) => x.kind === kind).map((x) => x.title));
+    let ok = 0, skip = 0, bad = [];
+    toast(`⏳ טוען ${files.length} קבצים…`, 3000);
+    for (const f of files) {
+      const title = f.name.replace(/\.(docx|txt)$/i, '').trim();
+      if (have.has(title)) { skip++; continue; }
+      try {
+        const text = /\.txt$/i.test(f.name) ? (await f.text()).trim() : await docxToText(f);
+        if (text.length < 200) { bad.push(title); continue; }
+        const { error } = await sb.from('style_examples').insert({ kind, title, target_text: text, created_by: ME.id });
+        if (error) throw error; ok++;
+      } catch (err) { console.warn(err); bad.push(title); }
+    }
+    await loadStyleExamples(true);
+    toast(`✅ נטענו ${ok} דוגמאות${skip ? ` · ${skip} כבר היו` : ''}${bad.length ? ` · לא הצלחתי: ${bad.join(', ')}` : ''}`, 8000);
+    $$('.modal-bg').forEach((m) => m.remove()); openStyleExamples();
+  };
+  inp.style.display = 'none'; document.body.appendChild(inp); setTimeout(() => inp.remove(), 10 * 60 * 1000);
+  inp.click();
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('#styleExBtn')) return openStyleExamples();
+  const sf = e.target.closest('[data-sexfiles]'); if (sf) return importStyleFiles(sf.dataset.sexfiles);
+  const v = e.target.closest('[data-sexview]'); if (v) { const x = (STYLE_EX || []).find((y) => y.id === v.dataset.sexview); if (x) modal(`<h3>${esc(x.title)}</h3><div dir="rtl" style="white-space:pre-wrap;max-height:60vh;overflow:auto;font-family:David,serif;font-size:1.1em;line-height:1.7">${esc(x.target_text)}</div>`, { okText: 'סגירה', cancelText: '', wide: true }); return; }
+  const d = e.target.closest('[data-sexdel]'); if (d) { if (!(await confirmBox('למחוק את הדוגמה הזאת?', 'כן, למחוק'))) return; const { error } = await sb.from('style_examples').delete().eq('id', d.dataset.sexdel); if (error) return toast('❌ ' + error.message); const m = d.closest('.modal-bg'); if (m) m.remove(); return openStyleExamples(); }
+  if (e.target.closest('#sexAdd')) {
+    const title = $('#sexTitle').value.trim(), text = $('#sexText').value.trim(), src = $('#sexSrc').value.trim();
+    if (!title || text.length < 200) return toast('צריך שם ונוסח (לפחות כמה שורות)');
+    const { error } = await sb.from('style_examples').insert({ kind: $('#sexKind').value, title, target_text: text, source_text: src || null, created_by: ME.id });
+    if (error) return toast('❌ ' + error.message);
+    const m = e.target.closest('.modal-bg'); if (m) m.remove(); toast('נוספה דוגמה ✓'); openStyleExamples();
+  }
+});
+// כפתור בהגדרות / ניהול (רק למנהל ולעורך)
+function addStyleExBtn() {
+  if (!ME || !(ME.role === 'admin' || ME.role === 'editor') || $('#styleExBtn')) return;
+  const host = $('#setNav'); if (!host) return;
+  host.insertAdjacentHTML('beforeend', `<button type="button" id="styleExBtn" title="הדוגמאות שמהן המערכת לומדת לכתוב נוסח">📚 דוגמאות נוסח</button>`);
+}
+{ const _go4 = go; go = function (p) { const x = _go4.apply(this, arguments); setTimeout(() => { try { addStyleExBtn(); } catch (e) {} }, 50); return x; }; }
 
 /* =========================================================
    ADMIN SETTINGS
