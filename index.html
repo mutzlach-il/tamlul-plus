@@ -879,6 +879,7 @@ body.viewas #toTop{display:none}
 #yiOutPills button.nus-pill.active{background:var(--accent,#d9b25a)!important;color:#222!important;border-color:var(--accent,#d9b25a)!important}
 .chk-badge{font-size:.82em;font-weight:700;padding:.15em .55em;border-radius:999px}.chk-badge.ok{background:#e3f7e8;color:#17803a}.chk-badge.warn{background:#fff1d6;color:#9a5b00}
 .bk-fields{display:flex;flex-wrap:wrap;gap:.5em .8em;align-items:flex-end;margin:.5em 0;padding:.6em .7em;border:1.5px dashed var(--accent,#d9b25a);border-radius:12px}.bk-fields label{display:flex;flex-direction:column;font-size:.85em;font-weight:700;gap:.2em}.bk-fields input{min-width:150px}
+.paste-bar{display:flex;gap:.5em;align-items:center;flex-wrap:wrap;background:#fff7e6;border:1.5px dashed var(--accent,#d9b25a);border-radius:12px;padding:.5em .8em;margin:.4em 0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1549,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.4';
+const APP_VERSION = '3.9.5';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2477,10 +2478,21 @@ const Queue = {
           blob = await this.prepare(rec, blob, prog);
           let seconds = rec.duration || 0;
           if (!seconds) { try { seconds = (await decodeAudio(blob)).duration; } catch (e) {} }
-          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' ? 'he' : undefined, speakers: LS.get('speakers', true), seconds, rec };
+          const opts = { out: rec.lang === 'yi' && rec.yiOut === 'he' && !YI_TWO_STEP ? 'he' : undefined, speakers: LS.get('speakers', true), seconds, rec };
           const res = await transcribeBlob(blob, rec.fileName, rec.lang, prog, opts);
           rec.text = res.text; rec.segments = res.segments; rec.duration = res.duration || seconds || rec.duration;
           rec.outLang = opts.out || rec.lang; rec.edited = false;
+          if (YI_TWO_STEP && rec.lang === 'yi' && rec.yiOut === 'he' && res.segments && res.segments.length && perm('translate')) {
+            try {
+              const yiSegs = res.segments.slice();
+              const heSegs = await translateSegsToHe(yiSegs, prog);
+              if (heSegs && heSegs.length) {
+                rec.extras = Object.assign({}, rec.extras, { yiOrig: yiSegs });
+                res.segments = heSegs; res.text = heSegs.map((x) => x.text).join(' ');
+                rec.text = res.text; rec.segments = res.segments; rec.outLang = 'he';
+              }
+            } catch (e) { console.warn('two-step translate failed – keeping Yiddish', e); }
+          }
           if (rec.lang === 'yi' && rec.yiOut === 'both' && res.text && perm('translate')) {
             prog('מתרגם לעברית…');
             try {
@@ -6520,16 +6532,16 @@ async function importStyleFiles(kind) {
     toast(`⏳ טוען ${files.length} קבצים…`, 3000);
     for (const f of files) {
       const title = f.name.replace(/\.(docx|txt)$/i, '').trim();
-      if (have.has(title)) { skip++; continue; }
+      const prevEx = (STYLE_EX || []).find((x) => x.kind === kind && x.title === title);
       try {
         const text = /\.txt$/i.test(f.name) ? (await f.text()).trim() : await docxToText(f);
         if (text.length < 200) { bad.push(title); continue; }
-        const { error } = await sb.from('style_examples').insert({ kind, title, target_text: text, created_by: ME.id });
-        if (error) throw error; ok++;
+        const { error } = prevEx ? await sb.from('style_examples').update({ target_text: text }).eq('id', prevEx.id) : await sb.from('style_examples').insert({ kind, title, target_text: text, created_by: ME.id });
+        if (error) throw error; ok++; if (prevEx) skip++;
       } catch (err) { console.warn(err); bad.push(title); }
     }
     await loadStyleExamples(true);
-    toast(`✅ נטענו ${ok} דוגמאות${skip ? ` · ${skip} כבר היו` : ''}${bad.length ? ` · לא הצלחתי: ${bad.join(', ')}` : ''}`, 8000);
+    toast(`✅ נטענו ${ok} דוגמאות${skip ? ` (${skip} מהן עודכנו)` : ''}${bad.length ? ` · לא הצלחתי: ${bad.join(', ')}` : ''}`, 8000);
     $$('.modal-bg').forEach((m) => m.remove()); openStyleExamples();
   };
   inp.style.display = 'none'; document.body.appendChild(inp); setTimeout(() => inp.remove(), 10 * 60 * 1000);
@@ -7406,6 +7418,248 @@ async function createUpFolder() {
 }
 document.addEventListener('click', (e) => { if (e.target.closest('#upNewFolderBtn')) createUpFolder(); });
 document.addEventListener('keydown', (e) => { if (e.target.id === 'upNewFolder' && e.key === 'Enter') { e.preventDefault(); createUpFolder(); } });
+
+
+/* =========================================================
+   3.9.5 – איכות: מילון שמות של ביאלא · תיקונים שנלמדים מכל המשתמשים ·
+   יידיש→עברית בשני שלבים · מעבר הגהה · ניקוי חזרות · העתקה והדבקה של הקלטות
+   ========================================================= */
+const BIALA_GLOSSARY = [
+  // תארים וקיצורים
+  'כ"ק מרן אדמו"ר שליט"א', 'כ"ק אאזמו"ר זצללה"ה זיעוכי"א', 'כ"ק אאמו"ר זצ"ל זיעוכי"א', 'זקני זצללה"ה', 'זקה"ק מביאלא', 'אא"ז', 'דו"ז', 'זי"ע', 'זיע"א', 'זיעוכי"א', 'זצללה"ה', 'זצוק"ל', 'הרה"ק', 'הרה"צ', 'השי"ת', 'רעוא דרעווין', 'שובבי"ם', 'הילולא', 'יומא דהילולא', 'טיש', 'שטיבל',
+  // בית ביאלא ואבותיו
+  'ביאלא', 'הסבא מביאלא', 'הדברי בינה', 'הלהבת דוד', 'הקדושת חלקת יהושע', 'קדוח"י', 'בעל התולדות אדם', 'הרה"ק ר\' יהושע מאוסטרובה', 'הרה"ק ר\' ירחמיאל מפשיסחא', 'הרה"ק ר\' נתן דוד משידלובצא', 'הרה"ק ר\' שלמה לייב מלענטשנא', 'היהודי הקדוש מפשיסחא', 'הרבי ר\' בונים מפרשיסחא', 'הרה"ק מקאצק', 'הרה"ק מראדזמין', 'הרה"ק מווארקא', 'הרה"ק ר\' יחזקאל מקוזמיר', 'הרה"ק מלעכאוויטש', 'הרה"ק מקאז\'ניץ', 'הרה"ק ר\' דוד מלעלוב', 'החוזה מלובלין', 'הרה"ק ר\' אלימלך מליזענסק', 'הרה"ק ר\' זושא', 'הרה"ק ר\' לוי יצחק מברדיטשוב', 'המגיד הגדול ממעזריטש', 'הבעל שם טוב הקדוש', 'הבעש"ט', 'הרה"ק ר\' מנחם מענדל מרימנוב', 'הרה"ק ר\' נפתלי מרופשיץ', 'הרה"ק ר\' מענדל מוויטעבסק', 'בעל התניא', 'הישמח ישראל מאלכסנדר', 'הרה"ק ר\' העניך מאלכסנדר', 'הרה"ק משלאנים', 'הרה"ק מבעלזא', 'הרה"ק מקוידינוב', 'שדליץ', 'ברנוביץ', 'ווארשא',
+  // ספרים
+  'תפארת שלמה', 'שם משמואל', 'אבני נזר', 'בית אהרן', 'מאור עינים', 'מאור ושמש', 'עבודת ישראל', 'ישמח משה', 'ישמח ישראל', 'בייטב לב', 'נועם אלימלך', 'אגרא דכלה', 'בני יששכר', 'שפת אמת', 'פרי צדיק', 'צדקת הצדיק', 'תניא', 'אגרת הקודש', 'אור החיים הקדוש', 'אלשיך הקדוש', 'קדושת לוי', 'דגל מחנה אפרים', 'תולדות יעקב יוסף', 'מגיד דבריו ליעקב', 'אהבת שלום', 'פלא יועץ', 'ראשית חכמה', 'סדר היום', 'יסוד העבודה', 'שארית ישראל', 'ספר החינוך', 'זוה"ק', 'מדרש רבה', 'תנא דבי אליהו'
+];
+let FIXES = null;
+async function loadFixes(force) {
+  if (FIXES && !force) return FIXES;
+  try { const { data } = await sb.from('nusach_fixes').select('wrong,right,hits').order('hits', { ascending: false }).limit(150); FIXES = data || []; } catch (e) { FIXES = []; }
+  return FIXES;
+}
+function glossaryText(max = 2500) {
+  const all = [...new Set([...BIALA_GLOSSARY, ...((typeof DICT !== 'undefined' && DICT) || []).map((d) => d.term)])];
+  let s = ''; for (const t of all) { if ((s + t).length > max) break; s += (s ? ' · ' : '') + t; } return s;
+}
+function fixesText(max = 2500) {
+  let s = ''; for (const f of (FIXES || [])) { const l = `${f.wrong} ← ${f.right}`; if ((s + l).length > max) break; s += (s ? ' | ' : '') + l; } return s;
+}
+// ---- תמלול ביידיש: מילון השמות + המשכיות בין החלקים ----
+{ const _gp5 = gemPrompt; gemPrompt = function (lang, opts = {}) {
+  let p = _gp5.apply(this, arguments);
+  if (lang === 'yi' || lang === 'auto') {
+    p += `\nCONTEXT: This is a Torah talk (שיחה / דרשה) of the Biala Rebbe (חסידות ביאלא) in Hasidic Yiddish, full of Hebrew and Aramaic quotes. Write Hebrew/Aramaic words, verses and names of tzaddikim, places and sefarim in their correct traditional spelling. Names and terms that appear often in these talks (use exactly this spelling when you hear them): ${glossaryText(1800)}.`;
+    if (FIXES && FIXES.length) p += `\nCommon mistakes that editors corrected before (wrong ← right): ${fixesText(1200)}.`;
+    p += '\nIf a passage is unclear, write your best guess once – NEVER repeat the same sentence or phrase over and over.';
+    if (opts.prevTail) p += `\nThe previous part of the talk ended with: «${String(opts.prevTail).slice(-400)}» – continue naturally (do not repeat it).`;
+  }
+  return p;
+}; }
+// ---- ניקוי חזרות ולולאות בתמלול ----
+function collapseRepeats(t) {
+  let s = String(t || '');
+  for (let i = 0; i < 3; i++) s = s.replace(/(\S(?:.{4,80}?\S)?)(?:[\s,.;:!?–-]+\1){2,}/g, '$1');
+  return s;
+}
+function cleanSegs(segs, keepSpk) {
+  const out = [];
+  (segs || []).forEach((x) => {
+    let t = collapseRepeats(x.text);
+    if (!keepSpk) t = t.replace(/^\s*דובר\s*\d+\s*:\s*/, '');
+    if (out.length && out[out.length - 1].text.trim() === t.trim()) return;
+    out.push(Object.assign({}, x, { text: t }));
+  });
+  return out;
+}
+{ const _tb5 = transcribeBlob; transcribeBlob = async function (blob, name, lang, onProgress, opts = {}) {
+  const res = await _tb5.apply(this, arguments);
+  try { if (res && res.segments && (lang === 'yi' || lang === 'auto')) { res.segments = cleanSegs(res.segments, opts.speakers !== false && /דובר\s*2/.test(res.text || '')); res.text = res.segments.map((s) => s.text).join(' '); } } catch (e) { console.warn('clean', e); }
+  return res;
+}; }
+// ---- יידיש→עברית: קודם תמלול מדויק ביידיש, אחר כך תרגום (הרבה יותר מדויק מתרגום ישר מהשמע) ----
+async function translateSegsToHe(segs, onProgress) {
+  const lines = segs.map((s) => `[${fmtTime(s.start)}] ${s.text}`);
+  const parts = []; let cur = '';
+  lines.forEach((l) => { if ((cur + '\n' + l).length > 7000 && cur) { parts.push(cur); cur = l; } else cur = cur ? cur + '\n' + l : l; });
+  if (cur) parts.push(cur);
+  const out = [];
+  for (let i = 0; i < parts.length; i++) {
+    onProgress && onProgress(`🇮🇱 מתרגם לעברית – חלק ${i + 1} מתוך ${parts.length}…`);
+    const prompt = `Translate this transcript of a Torah talk of the Biala Rebbe from Hasidic Yiddish into Hebrew – LINE BY LINE, faithfully (not a summary, nothing added, nothing skipped).
+- Keep the [mm:ss] time at the start of every line exactly as it is.
+- Hebrew/Aramaic quotes (verses, Chazal, Zohar) stay exactly in their original wording.
+- Names of tzaddikim, places and sefarim: use the correct traditional spelling, e.g.: ${glossaryText(1200)}.
+${FIXES && FIXES.length ? `- Known corrections (wrong ← right): ${fixesText(800)}\n` : ''}- If a word is clearly a recognition error, write what was obviously meant.
+- Remove stutters and exact repetitions. Do not add speaker labels.
+- Clear, natural Hebrew in the spirit of the Hasidic world (השי"ת, ז"ל, זצ"ל etc.).
+Output ONLY the translated lines.\n\n${parts[i]}`;
+    out.push(await gemText(prompt, 'translate', onProgress));
+  }
+  return parseTimedLines(out.join('\n'), segs.length ? segs[segs.length - 1].end : 0);
+}
+let YI_TWO_STEP = true;
+// ---- מקור לנוסח: עדיף היידיש המקורית, בלי תוויות "דובר" ובלי חזרות ----
+{ const _ns5 = nusachSource; nusachSource = function (rec, kind) {
+  const r = Object.assign({}, rec);
+  const yo = rec.extras && rec.extras.yiOrig;
+  if (yo && yo.length) r.segments = yo;
+  r.segments = cleanSegs(r.segments && r.segments.length ? r.segments : [{ start: 0, end: 0, text: rec.text || '' }], false);
+  return _ns5.call(this, r, kind);
+}; }
+// ---- מודל חזק יותר לנוסח (Pro) אם יש בחשבון – אחרת Flash ----
+let ALL_GEM_MODELS = null;
+async function gemProModels() {
+  if (!ALL_GEM_MODELS) { try { const res = await gemFetch('/models?pageSize=200'); ALL_GEM_MODELS = (res.models || []).filter((m) => (m.supportedGenerationMethods || []).includes('generateContent')).map((m) => m.name.replace(/^models\//, '')); } catch (e) { ALL_GEM_MODELS = []; } }
+  return ALL_GEM_MODELS.filter((n) => /^gemini-(\d+(\.\d+)?-pro|pro-latest)$/.test(n) && !GEM_DAY_OUT.has(n)).sort((a, b) => (parseFloat(b.split('-')[1]) || 99) - (parseFloat(a.split('-')[1]) || 99)).slice(0, 2);
+}
+{ const _gt5 = gemText; gemText = async function (prompt, kind, onProgress) {
+  if ((kind === 'nusach' || kind === 'proof') && !LS.get('noPro_' + gemQuotaDay(), false)) {
+    for (const model of await gemProModels()) {
+      try {
+        onProgress && onProgress('✍️ כותב עם המודל המתקדם…');
+        const res = await gemFetch(`/models/${model}:generateContent`, { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 32000 } }, kind);
+        const c = res.candidates && res.candidates[0];
+        const txt = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
+        if (txt) return txt.replace(/^```\w*\n?|```$/g, '').trim();
+      } catch (err) { console.warn('pro model unavailable', model, err.message); if (err.status === 429 || err.status === 403 || err.status === 404 || err.status === 400) { GEM_DAY_OUT.add(model); } }
+    }
+    LS.set('noPro_' + gemQuotaDay(), true);
+  }
+  return _gt5.apply(this, arguments);
+}; }
+// ---- הנחיות נוספות לנוסח: מילון + תיקונים שנלמדו ----
+{ const _np5 = nusachPrompt; nusachPrompt = function (kind, part, examples, ctx) {
+  const p = _np5.apply(this, arguments);
+  const add = `\n===== SPELLING OF NAMES AND SEFARIM (use exactly) =====\n${glossaryText(2200)}\n` +
+    (FIXES && FIXES.length ? `===== CORRECTIONS THAT THE EDITORS MADE BEFORE – never repeat these mistakes (wrong ← right) =====\n${fixesText(2200)}\n` : '') +
+    `===== QUALITY RULES =====
+- The speaker repeats himself while talking – write each idea ONCE, in its best wording, in the logical order of the talk.
+- Spoken digressions (announcements, thanks, "סיום מסכת", stories told only as an aside) are kept short, unless they are part of the Torah message.
+- Every quote must be correct in its original language. Never invent a quote or a source. If the transcript is garbled at some point, reconstruct the obvious meaning; if it is impossible – leave that detail out.
+- Pure Rabbinic Hebrew. Yiddish words only in quotes, when the examples also do so ("צו בייגען דעם הימעל").\n`;
+  const at = p.lastIndexOf('===== THE ');
+  return at > 0 ? p.slice(0, at) + add + p.slice(at) : p + add;
+}; }
+// ---- מעבר הגהה: עורך שני בודק את הנוסח מול ההקלטה ומתקן ----
+async function proofNusach(rec, kind, onProgress) {
+  const n = rec.extras && rec.extras.nusach; if (!n || !n[kind]) return false;
+  const src = nusachSource(rec, kind).text;
+  const prompt = `You are the chief proofreader of the Biala Rebbe's printed Torah talks. Below is the TRANSCRIPT of the talk and a DRAFT written from it.
+Return the DRAFT corrected – the full text, same structure and line markers (#, @, >, ##, **bold**), same style. Fix ONLY real problems:
+1. Anything that is NOT in the transcript (invented ideas, stories, sources) – remove it.
+2. Ideas from the transcript that were distorted – fix them to match what was said.
+3. Names of tzaddikim, places and sefarim – correct spelling (list below).
+4. Quotes of verses / Chazal – exact wording; wrong source references – fix or remove.
+5. Repetitions – keep one.
+6. Grammar, Rabbinic Hebrew, abbreviations as in the printed booklets.
+Do NOT shorten the text and do NOT rewrite good sentences. Output ONLY the corrected text.
+Names: ${glossaryText(1500)}
+${FIXES && FIXES.length ? 'Known corrections (wrong ← right): ' + fixesText(1200) + '\n' : ''}
+===== TRANSCRIPT =====
+${src.slice(0, 60000)}
+
+===== DRAFT =====
+${n[kind]}`;
+  onProgress && onProgress('🔎 הגהה: בודק את הנוסח מול ההקלטה…');
+  const out = await gemText(prompt, 'proof', onProgress);
+  if (!out || out.length < n[kind].length * 0.6) return false;
+  n[kind] = out; n[kind + 'Proof'] = Date.now();
+  return true;
+}
+{ const _mn5 = makeNusach; makeNusach = async function (rec, kind = 'before', o = {}) {
+  await loadFixes();
+  await _mn5.call(this, rec, kind, o);
+  const n = rec.extras && rec.extras.nusach;
+  if (o._retry || !n || !n[kind] || !(n[kind + 'At'] > Date.now() - 15 * 60 * 1000) || n[kind + 'Proof'] > n[kind + 'At']) return;
+  NUSACH_BUSY[rec.id + kind] = '🔎 הגהה…';
+  try {
+    const prog = (p) => { NUSACH_BUSY[rec.id + kind] = p; if (Detail.rec && Detail.rec.id === rec.id) renderNusach(); };
+    if (await proofNusach(rec, kind, prog)) { try { fixParashaLine(rec, kind); } catch (e) {} await saveRec(rec, ['extras']); }
+  } catch (e) { console.warn('proof failed', e); }
+  finally { delete NUSACH_BUSY[rec.id + kind]; if (Detail.rec && Detail.rec.id === rec.id) renderNusach(); }
+}; }
+// ---- לומדים מתיקונים של כל המשתמשים: מילה שגויה ← מילה נכונה ----
+function wordFixes(a, b) {
+  const A = String(a || '').split(/\s+/), B = String(b || '').split(/\s+/);
+  if (A.length > 4000 || B.length > 4000) return [];
+  const n = A.length, m = B.length, W = m + 1, L = new Uint16Array((n + 1) * (m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i * W + j] = A[i] === B[j] ? L[(i + 1) * W + j + 1] + 1 : Math.max(L[(i + 1) * W + j], L[i * W + j + 1]);
+  const out = []; let i = 0, j = 0, da = [], db = [];
+  const flush = () => { const w = da.join(' ').trim(), r = db.join(' ').trim(); if (w && r && w !== r && da.length <= 4 && db.length <= 5 && w.replace(/[^א-ת]/g, '').length >= 2) out.push([w, r]); da = []; db = []; };
+  while (i < n && j < m) { if (A[i] === B[j]) { flush(); i++; j++; } else if (L[(i + 1) * W + j] >= L[i * W + j + 1]) da.push(A[i++]); else db.push(B[j++]); }
+  flush();
+  return out.slice(0, 60);
+}
+async function learnFixes(before, after) {
+  const fx = wordFixes(before, after); if (!fx.length) return 0;
+  let n = 0; for (const [w, r] of fx) { try { const { error } = await sb.rpc('add_nusach_fix', { p_wrong: w.slice(0, 120), p_right: r.slice(0, 160) }); if (!error) n++; } catch (e) {} }
+  await loadFixes(true); return n;
+}
+document.addEventListener('click', (e) => {
+  if (!NEDIT_CTX || !e.target.closest('.modal-bg [data-ok]') || !document.querySelector('#nEditTa')) return;
+  const ctx = NEDIT_CTX, after = document.querySelector('#nEditTa').value;
+  setTimeout(() => { learnFixes(ctx.before, after).then((k) => { if (k) toast(`🧠 נלמדו ${k} תיקוני מילים – המערכת לא תחזור על הטעויות האלה`, 5000); }); }, 2000);
+}, true);
+// תיקון משפט בתמלול (לחיצה כפולה) – גם ממנו לומדים
+{ const _sr5 = saveRec; saveRec = async function (rec, fields) {
+  try {
+    if (fields && fields.includes('segments') && !fields.includes('status') && rec && rec.id && SEG_SNAP[rec.id]) {
+      const old = SEG_SNAP[rec.id]; const now = (rec.segments || []).map((s) => s.text);
+      if (old.length === now.length) { const ch = []; for (let i = 0; i < now.length; i++) if (old[i] !== now[i]) ch.push(i); if (ch.length && ch.length <= 3) ch.forEach((i) => learnFixes(old[i], now[i])); }
+    }
+    if (rec && rec.segments) SEG_SNAP[rec.id] = rec.segments.map((s) => s.text);
+  } catch (e) {}
+  return _sr5.apply(this, arguments);
+}; }
+const SEG_SNAP = {};
+{ const _do5 = Detail.open; Detail.open = async function () { const x = await _do5.apply(this, arguments); try { if (this.rec && this.rec.segments) SEG_SNAP[this.rec.id] = this.rec.segments.map((s) => s.text); } catch (e) {} loadFixes(); return x; }; }
+
+/* ---------- העתקה והדבקה של הקלטות ---------- */
+function recClip() { return LS.get('recClip', null); }
+async function copyRecTo(id, folderId) {
+  const { data: row, error } = await sb.from('recordings').select('*').eq('id', id).single();
+  if (error || !row) throw new Error((error && error.message) || 'ההקלטה לא נמצאה');
+  const nid = uuid();
+  let path = null;
+  if (row.file_path) {
+    const ext = (row.file_path.match(/\.[a-z0-9]+$/i) || [''])[0];
+    path = `${ME.id}/${nid}${ext}`;
+    try { const st = sb.storage.from('audio'); const { error: e2 } = typeof st.copy === 'function' ? await st.copy(row.file_path, path) : { error: { message: 'no copy' } }; if (e2) { console.warn('copy audio', e2.message); path = row.file_path; } } catch (e2) { path = row.file_path; }
+  }
+  const nr = Object.assign({}, row, { id: nid, owner: ME.id, folder_id: folderId || null, file_path: path, title: row.title + ' (עותק)', share_token: null, share_expires: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), deleted_at: null, locked: false });
+  ['shared_with', 'fts'].forEach((k) => { if (k in nr && k === 'fts') delete nr[k]; });
+  const { error: e3 } = await sb.from('recordings').insert(nr);
+  if (e3) throw new Error(e3.message);
+  return nid;
+}
+function syncPasteBar() {
+  const clip = recClip(); let bar = $('#pasteBar');
+  const host = $('#recList'); if (!host) return;
+  if (!clip) { if (bar) bar.remove(); return; }
+  if (!bar) { host.insertAdjacentHTML('beforebegin', '<div id="pasteBar" class="paste-bar"></div>'); bar = $('#pasteBar'); }
+  const inFolder = FOLDERS.some((f) => f.id === libFolder);
+  bar.innerHTML = `📋 מוכן להדבקה: <b>${esc(clip.title || '')}</b> <span class="grow"></span>
+    <button class="btn small primary" id="pasteHere">📥 הדבקה ${inFolder ? 'לתיקייה "' + esc((FOLDERS.find((f) => f.id === libFolder) || {}).name || '') + '"' : '(לבחור תיקייה)'}</button>
+    <button class="btn small" id="pasteCancel">✕</button>`;
+}
+{ const _rl5 = renderLibrary; renderLibrary = function () { const x = _rl5.apply(this, arguments); try {
+  $$('#recList .rec-card').forEach((c) => { const id = c.dataset.rec; const r = c.querySelector('[data-openrec]'); if (r && !c.querySelector('[data-copyrec]')) r.insertAdjacentHTML('beforebegin', `<button class="btn small" data-copyrec="${id}" title="העתקה – אחר כך 'הדבקה' בתיקייה אחרת">📋</button>`); });
+  syncPasteBar();
+} catch (e) {} return x; }; }
+document.addEventListener('click', async (e) => {
+  const c = e.target.closest('[data-copyrec], #dCopyRec');
+  if (c) { e.stopPropagation(); const id = c.dataset.copyrec || (Detail.rec && Detail.rec.id); const r = RECS.get(id); LS.set('recClip', { id, title: r ? r.title : '' }); toast('📋 ההקלטה הועתקה – פתח תיקייה בספרייה ולחץ "📥 הדבקה"', 5000); try { syncPasteBar(); } catch (er) {} return; }
+  if (e.target.closest('#pasteCancel')) { LS.set('recClip', null); syncPasteBar(); return; }
+  if (e.target.closest('#pasteHere')) {
+    const clip = recClip(); if (!clip) return;
+    let folderId = FOLDERS.some((f) => f.id === libFolder) ? libFolder : null;
+    if (!folderId) { folderId = await askFolder(); if (!folderId) return; }
+    try { toast('⏳ מעתיק…'); await copyRecTo(clip.id, folderId); await loadRecs(); renderLibrary(); toast('✅ ההקלטה הודבקה'); }
+    catch (err) { toast('❌ ' + err.message, 6000); }
+  }
+}, true);
+{ const _do6 = Detail.open; Detail.open = async function () { const x = await _do6.apply(this, arguments); try { const del = $('#delBtn'); if (del && !$('#dCopyRec')) del.insertAdjacentHTML('beforebegin', '<button class="btn small" id="dCopyRec" title="העתקה – ואז הדבקה בכל תיקייה">📋 העתקת ההקלטה</button> '); } catch (e) {} return x; }; }
 
 </script>
 </body>
