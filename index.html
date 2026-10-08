@@ -1023,7 +1023,7 @@ body.viewas #toTop{display:none}
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="yi" data-iv="1">🗣️ ראיון / שיחה (יידיש)</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
         <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
-          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח 'לפני העריכה' (בסגנון הדוגמאות שלכם). התמלול ביידיש נעשה מאחורי הקלעים.">📜 לפני העריכה – בלשון הקודש</button><button data-yiout="after" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח הסופי 'אחרי העריכה', מוכן עם הלוגו כמו החוברת. הכול נעשה מאחורי הקלעים.">🖨️ אחרי העריכה – בלשון הקודש</button>
+          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח 'סיכום ההקלטה' (בסגנון הדוגמאות שלכם). התמלול ביידיש נעשה מאחורי הקלעים.">📜 סיכום ההקלטה – בלשון הקודש</button><button data-yiout="after" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח הסופי 'מוכן להדפסה', מוכן עם הלוגו כמו החוברת. הכול נעשה מאחורי הקלעים.">🖨️ מוכן להדפסה – בלשון הקודש</button>
         </div>
         <div class="lang-pills hidden" id="ivPills"><span style="font-weight:700;align-self:center">👥 איך לסמן את הדוברים:</span><button data-ivstyle="ab">א׳ / ב׳ / ג׳</button><button data-ivstyle="qa">שאלה / תשובה</button><span class="hint" id="ivVoices" style="align-self:center"></span></div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.8';
+const APP_VERSION = '3.9.9';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2519,12 +2519,12 @@ const Queue = {
             } catch (e) { console.warn('auto translate failed', e); }
           }
           if (res.text && rec.extras && rec.extras.wantNusach && !(rec.extras.nusach && rec.extras.nusach.before) && perm('translate')) {
-            prog('📜 כותב את הנוסח "לפני העריכה"…');
+            prog('📜 כותב את הנוסח "סיכום ההקלטה"…');
             rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'before', { silent: true }); } catch (e) { console.warn('nusach failed', e); }
           }
           if (res.text && rec.extras && rec.extras.wantAfter && !(rec.extras.nusach && rec.extras.nusach.after) && perm('translate')) {
-            prog('🖨️ כותב את הנוסח "אחרי העריכה" (עם הלוגו)…');
+            prog('🖨️ כותב את הנוסח "מוכן להדפסה" (עם הלוגו)…');
             rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'after', { silent: true }); } catch (e) { console.warn('nusach after failed', e); }
           }
@@ -6183,12 +6183,12 @@ setInterval(resumeQuotaWaits, 10 * 60 * 1000);
 { const _ea3 = enterApp; enterApp = async function () { const r = await _ea3.apply(this, arguments); setTimeout(resumeQuotaWaits, 8000); return r; }; }
 
 /* =========================================================
-   3.7 – נוסחים: "מילה במילה" / "לפני עריכה" (נוסח כתיבה) / "אחרי עריכה" (לדפוס)
+   3.7 – נוסחים: "מילה במילה" / "סיכום ההקלטה" (נוסח כתיבה) / "מוכן להדפסה" (לדפוס)
    המערכת לומדת את הסגנון מדוגמאות שנשמרות בטבלה style_examples
    ========================================================= */
 const NUSACH_KINDS = {
-  before: { icon: '📜', name: 'לפני העריכה', short: 'לפני העריכה' },
-  after: { icon: '🖨️', name: 'אחרי העריכה', short: 'אחרי העריכה' }
+  before: { icon: '📜', name: 'סיכום ההקלטה', short: 'סיכום ההקלטה' },
+  after: { icon: '🖨️', name: 'מוכן להדפסה', short: 'מוכן להדפסה' }
 };
 let STYLE_EX = null;
 async function loadStyleExamples(force) {
@@ -6238,7 +6238,7 @@ RULES:
 - Paragraphs separated by one empty line.`
     : `You are the senior editor of "דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" (מכון דא"ח ביאלה), the weekly printed booklet of the Biala Rebbe's Torah talks.
 ${ctx.direct ? `INPUT: the full word-by-word transcript of a talk spoken in Hasidic Yiddish or Hebrew (sometimes English) (it may contain speech-recognition errors and Hebrew/Aramaic quotes). There is no draft – you write the final version directly from the transcript, in Rabbinic Hebrew. Keep ALL the ideas, explanations, sources, stories and their order; remove repetitions and spoken-language noise; if a word was misrecognized, write what was obviously meant.` : `INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.`}
-OUTPUT: the final print-ready ma'amar ("אחרי עריכה") – EXACTLY like the printed examples below: the same structure, language, level of editing, length and typography markers.
+OUTPUT: the final print-ready ma'amar ("מוכן להדפסה") – EXACTLY like the printed examples below: the same structure, language, level of editing, length and typography markers.
 WHAT THE EDITORS DO (learn it from the examples):
 - Rabbinic Hebrew of the sefarim, polished and flowing. The final version is FULLER than the draft (usually ~1.5–2× longer): restore details, explanations and stories from the transcript that the draft shortened, and make every step of the argument clear.
 - They ADD: exact source references in parentheses right after a quote – e.g. (שמות יט, ב), (סנהדרין צ ע"ב), (קדוח"י ריש פרשת תצוה), (בפרשתן ד"ה וירא); connecting phrases (ויובן בהקדם..., וכוונת הדברים..., וביתר ביאור..., ועל פי זה יש לבאר...); endings like עכד"ק / עכ"ל / יעו"ש; and a closing blessing paragraph (…ובא לציון גואל… ונזכה לבנין בית המקדש במהרה בימינו אמן).
@@ -6348,7 +6348,7 @@ function renderNusach() {
   const n = (r.extras && r.extras.nusach) || {};
   const canMake = perm('translate') && !VIEW_AS;
   const isYi = r.lang === 'yi' && r.outLang !== 'he';
-  const tabs = [['verbatim', isYi ? '📝 התמלול המקורי (יידיש)' : '📝 התמלול המקורי']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 לפני העריכה'], ['after', '🖨️ אחרי העריכה']]);
+  const tabs = [['verbatim', isYi ? '📝 התמלול המקורי (יידיש)' : '📝 התמלול המקורי']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 סיכום ההקלטה'], ['after', '🖨️ מוכן להדפסה']]);
   if (!tabs.some((x) => x[0] === NUSACH_TAB)) NUSACH_TAB = 'verbatim';
   const tr = r.translations || {};
   const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${(k === 'he' ? tr.he : k !== 'verbatim' && n[k]) ? ' ✓' : ''}</button>`).join('');
@@ -6365,15 +6365,15 @@ function renderNusach() {
     const exN = (STYLE_EX || []).filter((x) => x.kind === k).length;
     if (busy) body = `<p><span class="spinner"></span> ${esc(busy)}</p>`;
     else if (txt) {
-      body = `<div class="nbar"><span class="muted">${n[k + 'At'] ? 'נכתב ' + fmtDate(n[k + 'At']) : ''}${k === 'after' && n.afterOld ? ' · ⚠️ נכתב לפני שהנוסח "לפני עריכה" עודכן' : ''}</span><span class="grow"></span>
+      body = `<div class="nbar"><span class="muted">${n[k + 'At'] ? 'נכתב ' + fmtDate(n[k + 'At']) : ''}${k === 'after' && n.afterOld ? ' · ⚠️ נכתב לפני שהנוסח "סיכום ההקלטה" עודכן' : ''}</span><span class="grow"></span>
         <button class="btn small" data-ncopy="${k}">📋 העתקה</button><button class="btn small" data-nword="${k}">📘 וורד</button><button class="btn small" data-nprint="${k}">🖨️ הדפסה / PDF</button>
         ${canMake ? `<button class="btn small can-edit" data-nedit="${k}">✏️ עריכה</button><button class="btn small can-edit" data-nmake="${k}">🔄 לכתוב מחדש</button>` : ''}
         ${canMake && ME.role !== 'viewer' ? `<button class="btn small can-edit" data-nasex="${k}" title="הנוסח הזה טוב? שמור אותו כדוגמה כדי שהמערכת תלמד ממנו">⭐ לשמור כדוגמה</button>` : ''}</div>
-        ${k === 'after' ? `<div class="bk-opts"><label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="bkPrevCover" style="width:auto" ${LS.get('bookCover', true) ? 'checked' : ''}> עם דף השער</label><span class="muted" style="font-size:.88em">✏️ כדי לתקן מילה – "עריכה". 🖨️ כדי לשמור PDF – "הדפסה / PDF".</span></div><div class="bk-prev"><iframe id="bkPrev" title="אחרי העריכה – כמו החוברת" loading="lazy"></iframe></div>` : `<div class="ntext" id="nText" dir="rtl">${/^(#|@|>)/m.test(txt) ? markedHtml(txt) : esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`}`;
+        ${k === 'after' ? `<div class="bk-opts"><label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="bkPrevCover" style="width:auto" ${LS.get('bookCover', true) ? 'checked' : ''}> עם דף השער</label><span class="muted" style="font-size:.88em">✏️ כדי לתקן מילה – "עריכה". 🖨️ כדי לשמור PDF – "הדפסה / PDF".</span></div><div class="bk-prev"><iframe id="bkPrev" title="מוכן להדפסה – כמו החוברת" loading="lazy"></iframe></div>` : `<div class="ntext" id="nText" dir="rtl">${/^(#|@|>)/m.test(txt) ? markedHtml(txt) : esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`}`;
     } else {
       const why = '';
       body = `<div class="nempty"><div style="font-size:2em">${NUSACH_KINDS[k].icon}</div><b>${NUSACH_KINDS[k].name}</b>
-        <div class="muted">${k === 'before' ? 'המערכת תכתוב את הנוסח "לפני העריכה" בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח "אחרי העריכה" – עם הלוגו והעימוד של החוברת, לפי הדוגמאות שלכם.'}</div>
+        <div class="muted">${k === 'before' ? 'המערכת תכתוב את הנוסח "סיכום ההקלטה" בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח "מוכן להדפסה" – עם הלוגו והעימוד של החוברת, לפי הדוגמאות שלכם.'}</div>
         <div class="muted" style="font-size:.9em">📚 דוגמאות שהמערכת לומדת מהן: <b>${exN}</b>${!exN ? ' – עוד אין דוגמאות מהסוג הזה (אפשר להוסיף בהגדרות ← 📚 דוגמאות נוסח)' : ''}</div>
         ${why ? `<div class="muted">${why}</div>` : ''}
         ${canMake ? `<button class="btn primary" data-nmake="${k}" ${!src.text ? 'disabled' : ''}>${NUSACH_KINDS[k].icon} לכתוב עכשיו</button>` : '<div class="muted">אין לך הרשאה ליצור נוסח</div>'}</div>`;
@@ -6383,7 +6383,7 @@ function renderNusach() {
   try { if ($('#bkPrev')) fillBookPreview(r); } catch (e) { console.warn('booklet preview', e); }
   try { syncVerbatimHide(r); } catch (e) {}
 }
-/* 3.9 – "אחרי העריכה" מוצג על המסך בדיוק כמו החוברת: שער עם הלוגו, מסגרת הכותרת, שני טורים */
+/* 3.9 – "מוכן להדפסה" מוצג על המסך בדיוק כמו החוברת: שער עם הלוגו, מסגרת הכותרת, שני טורים */
 function bookOptsFor(rec, cover) {
   const par = (rec.parasha ? 'פרשת ' + rec.parasha.replace(/^פרשת\s*/, '') : '') + (rec.hyear ? ' ' + shortYear(rec.hyear) : '');
   return { cover: cover !== undefined ? cover : LS.get('bookCover', true), par: LS.get('bookParLast_' + rec.id, par), gil: LS.get('bookGilRec_' + rec.id, LS.get('bookGil', '')), zm: LS.get('bookZm', '') };
@@ -6405,7 +6405,7 @@ function fillBookPreview(rec) {
 }
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'bkPrevCover' && Detail.rec) { LS.set('bookCover', e.target.checked); const fr = $('#bkPrev'); if (fr) fr.dataset.h = ''; fillBookPreview(Detail.rec); } });
 window.addEventListener('resize', () => { const fr = $('#bkPrev'); if (fr && fr.onload) try { fr.onload(); } catch (e) {} });
-/* בבחירה "לפני העריכה" / "אחרי העריכה" – לא מציגים את התמלול ביידיש (אפשר לפתוח אותו בלחיצה) */
+/* בבחירה "סיכום ההקלטה" / "מוכן להדפסה" – לא מציגים את התמלול ביידיש (אפשר לפתוח אותו בלחיצה) */
 function syncVerbatimHide(rec) {
   const m = rec && rec.extras && rec.extras.outMode;
   const hide = (m === 'before' || m === 'after') && rec.status === 'done' && !LS.get('showVerb_' + rec.id, false);
@@ -6466,10 +6466,10 @@ document.addEventListener('click', async (e) => {
 
 /* ---------- בהעלאה: "גם נוסח כתיבה" ---------- */
 function syncNusachPill() {
-  return;   // 3.9: "לפני העריכה" / "אחרי העריכה" הם עכשיו חלק מהבחירה "לכתוב את התמלול ב:"
+  return;   // 3.9: "סיכום ההקלטה" / "מוכן להדפסה" הם עכשיו חלק מהבחירה "לכתוב את התמלול ב:"
   const host = $('#yiOutPills'); if (!host) return;
   if (!$('#nusBefore')) {
-    host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'לפני עריכה' בלשון הקודש, בסגנון שלימדנו אותה">📜 לפני עריכה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'אחרי עריכה', מוכן להדפסה עם הלוגו">🖨️ אחרי עריכה</button>`);
+    host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'סיכום ההקלטה' בלשון הקודש, בסגנון שלימדנו אותה">📜 סיכום ההקלטה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'מוכן להדפסה' עם הלוגו">🖨️ מוכן להדפסה</button>`);
   }
   $('#nusBefore').classList.toggle('active', !!LS.get('autoNusach', false));
   $('#nusAfter').classList.toggle('active', !!LS.get('autoNusachAfter', false));
@@ -6479,7 +6479,7 @@ document.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
   const key = b.id === 'nusBefore' ? 'autoNusach' : 'autoNusachAfter';
   LS.set(key, !LS.get(key, false)); syncNusachPill();
-  const on = [LS.get('autoNusach', false) && '"לפני עריכה"', LS.get('autoNusachAfter', false) && '"אחרי עריכה"'].filter(Boolean);
+  const on = [LS.get('autoNusach', false) && '"סיכום ההקלטה"', LS.get('autoNusachAfter', false) && '"מוכן להדפסה"'].filter(Boolean);
   toast(on.length ? '✍️ אחרי התמלול ייכתב גם: ' + on.join(' + ') : 'רק תמלול – בלי נוסחים');
 }, true);
 { const _sl = syncLangPills; syncLangPills = function () { const x = _sl.apply(this, arguments); try { syncNusachPill(); } catch (e) {} return x; }; }
@@ -6499,11 +6499,11 @@ async function openStyleExamples() {
   const row = (x) => `<div class="act-row"><span class="badge">${NUSACH_KINDS[x.kind] ? NUSACH_KINDS[x.kind].icon + ' ' + NUSACH_KINDS[x.kind].short : x.kind}</span><b class="grow">${esc(x.title)}</b><span class="muted" style="font-size:.85em">${x.source_text ? 'מקור + נוסח' : 'נוסח בלבד'} · ${Math.round(x.target_text.length / 1000)}K תווים</span><button class="btn small" data-sexview="${x.id}">👁️</button><button class="btn small danger" data-sexdel="${x.id}">🗑️</button></div>`;
   modal(`<h3>📚 דוגמאות נוסח – מהן המערכת לומדת את הסגנון</h3>
     <p class="muted">כשכותבים נוסח, המערכת מקבלת כמה דוגמאות מכאן (קודם מאותה פרשה, אם יש) וכותבת בדיוק באותו סגנון. כמה שיותר דוגמאות טובות – יותר מדויק.</p>
-    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "לפני עריכה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "אחרי עריכה"</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
+    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "סיכום ההקלטה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "מוכן להדפסה"</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
     ${list.length ? list.map(row).join('') : '<div class="empty"><b>אין עדיין דוגמאות</b></div>'}
     <details style="margin-top:1em"><summary style="font-weight:700;cursor:pointer">➕ הוספת דוגמה חדשה</summary>
       <div class="col" style="gap:.5em;margin-top:.5em">
-        <label>סוג <select id="sexKind"><option value="before">📜 לפני עריכה</option><option value="after">🖨️ אחרי עריכה</option></select></label>
+        <label>סוג <select id="sexKind"><option value="before">📜 סיכום ההקלטה</option><option value="after">🖨️ מוכן להדפסה</option></select></label>
         <label>שם (למשל: פרשת נח תשפ"ו) <input id="sexTitle"></label>
         <label>הנוסח הכתוב (להדביק כאן מהוורד) <textarea id="sexText" rows="8" dir="rtl"></textarea></label>
         <label>(לא חובה) מקור – מה שנאמר / הגרסה הקודמת <textarea id="sexSrc" rows="4" dir="rtl"></textarea></label>
@@ -7189,7 +7189,7 @@ function syncTrPills() {
   host.classList.remove('hidden');
   const L = OUT_LN[lang], F = OUT_FL[lang];
   const opts = [['same', `${F} ${L} ← ${L}`]].concat(['he', 'yi', 'en'].filter((x) => x !== lang).map((x) => [x, `${OUT_FL[x]} ${L} ← ${OUT_LN[x]}`]))
-    .concat([['before', '📜 לפני העריכה – בלשון הקודש'], ['after', '🖨️ אחרי העריכה – בלשון הקודש']]);
+    .concat([['before', '📜 סיכום ההקלטה – בלשון הקודש'], ['after', '🖨️ מוכן להדפסה – בלשון הקודש']]);
   const cur = outModeFor(lang);
   grp.innerHTML = opts.map(([k, l]) => `<button type="button" data-outm="${k}" class="${cur === k ? 'active' : ''}">${l}</button>`).join('');
 }
@@ -8027,8 +8027,8 @@ document.addEventListener('click', async (e) => {
     const h = document.querySelector('.modal-bg h3');
     if (h && !$('#guideBox')) h.insertAdjacentHTML('afterend', `<div id="guideBox" style="background:#fff7ed;border:2px solid #fb923c;border-radius:12px;padding:.6em .8em;margin:.5em 0">
       <b>📘 מדריכי הכתיבה – לפיהם המערכת כותבת</b>
-      <div class="muted" style="font-size:.88em;margin:.2em 0 .4em">נכתבו מתוך כל הדוגמאות: איך כותבים "לפני עריכה", ואיך "אחרי עריכה" – כותרות, מה מוסיפים ומה לא. אפשר לשנות.</div>
-      <div class="row" style="gap:.4em;flex-wrap:wrap"><button class="btn small" data-guide="before">📜 מדריך "לפני עריכה"</button><button class="btn small" data-guide="after">🖨️ מדריך "אחרי עריכה"</button>
+      <div class="muted" style="font-size:.88em;margin:.2em 0 .4em">נכתבו מתוך כל הדוגמאות: איך כותבים "סיכום ההקלטה", ואיך "מוכן להדפסה" – כותרות, מה מוסיפים ומה לא. אפשר לשנות.</div>
+      <div class="row" style="gap:.4em;flex-wrap:wrap"><button class="btn small" data-guide="before">📜 מדריך "סיכום ההקלטה"</button><button class="btn small" data-guide="after">🖨️ מדריך "מוכן להדפסה"</button>
       <span class="badge">📜 ${cnt('before')} דוגמאות לפני</span><span class="badge">🖨️ ${cnt('after')} דוגמאות אחרי</span><span class="badge">🗣️ ${cnt('yi')} דוגמאות כתיב יידיש</span></div></div>`);
     if (!isEd) $$('[data-guide]').forEach((b) => (b.title = 'צפייה בלבד'));
   } catch (e) { console.warn(e); }
@@ -8039,13 +8039,13 @@ document.addEventListener('click', async (e) => {
   e.stopPropagation();
   const k = b.dataset.guide, isEd = ME.role === 'admin' || ME.role === 'editor';
   let val = null;
-  await modal(`<h3>${k === 'before' ? '📜 מדריך כתיבה – לפני עריכה' : '🖨️ מדריך כתיבה – אחרי עריכה'}</h3>
+  await modal(`<h3>${k === 'before' ? '📜 מדריך כתיבה – סיכום ההקלטה' : '🖨️ מדריך כתיבה – מוכן להדפסה'}</h3>
     <p class="muted">המערכת קוראת את המדריך הזה לפני כל כתיבת נוסח. ${isEd ? 'אפשר לתקן ולהוסיף כללים, ואז "שמירה".' : ''}</p>
     <textarea id="guideTa" rows="18" dir="rtl" style="width:100%" ${isEd ? '' : 'readonly'}>${esc(guideText(k))}</textarea>`,
   { okText: isEd ? 'שמירה' : 'סגירה', cancelText: isEd ? 'ביטול' : '', wide: true, onOk: (bg) => { val = bg.querySelector('#guideTa').value.trim(); } });
   if (!isEd || !val || val === guideText(k)) return;
   await sb.from('style_examples').delete().eq('kind', 'guide_' + k);
-  const { error } = await sb.from('style_examples').insert({ kind: 'guide_' + k, title: k === 'before' ? 'מדריך כתיבה – לפני עריכה' : 'מדריך כתיבה – אחרי עריכה', target_text: val, created_by: ME.id });
+  const { error } = await sb.from('style_examples').insert({ kind: 'guide_' + k, title: k === 'before' ? 'מדריך כתיבה – סיכום ההקלטה' : 'מדריך כתיבה – מוכן להדפסה', target_text: val, created_by: ME.id });
   if (error) return toast('❌ ' + error.message);
   await loadStyleExamples(true); toast('✅ המדריך נשמר – מעכשיו המערכת כותבת לפיו');
 }, true);
@@ -8072,6 +8072,226 @@ async function autoLinkExamples() {
   setInterval(() => autoLinkExamples().catch(() => {}), 10 * 60 * 1000);
   return x;
 }; }
+
+
+/* =========================================================
+   3.9.9 – שמות חדשים: "סיכום ההקלטה" / "מוכן להדפסה" ·
+   PDF אמיתי שיורד תמיד (בלי חלון הדפסה) · הדפסה ישירה בלי חלון קופץ
+   ========================================================= */
+try { NUSACH_KINDS.before.name = NUSACH_KINDS.before.short = 'סיכום ההקלטה'; NUSACH_KINDS.after.name = NUSACH_KINDS.after.short = 'מוכן להדפסה'; } catch (e) {}
+
+/* ---------- כפתורים: וורד · PDF · הדפסה ---------- */
+{ const _rn9 = renderNusach; renderNusach = function () {
+  const x = _rn9.apply(this, arguments);
+  try {
+    $$('#dNusach [data-nprint]').forEach((b) => {
+      const k = b.dataset.nprint;
+      b.insertAdjacentHTML('beforebegin', `<button class="btn small" data-npdf="${k}" title="הורדת קובץ PDF">📄 PDF</button>`);
+      b.outerHTML = `<button class="btn small" data-nprint2="${k}" title="הדפסה ישירה">🖨️ הדפסה</button>`;
+    });
+    const tip = $('#dNusach .bk-opts .muted'); if (tip) tip.textContent = '✏️ לתקן – "עריכה" · 📄 להוריד – PDF או וורד · 🖨️ להדפיס – "הדפסה"';
+  } catch (e) {}
+  return x;
+}; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-npdf],[data-nprint2]'); if (!b || !Detail.rec) return;
+  e.stopPropagation(); e.preventDefault();
+  const r = Detail.rec, k = b.dataset.npdf || b.dataset.nprint2;
+  if (!r.extras || !r.extras.nusach || !r.extras.nusach[k]) return toast('אין עדיין טקסט');
+  if (b.dataset.nprint2) return printNusachDirect(r, k);
+  if (b.disabled) return;
+  const old = b.textContent; b.disabled = true; b.textContent = '⏳ מכין PDF…';
+  try {
+    const blob = await nusachPdf(r, k, (p) => { b.textContent = '⏳ ' + p; });
+    download(blob, safeName(r.title + ' - ' + NUSACH_KINDS[k].short) + '.pdf');
+    toast('📄 קובץ ה-PDF ירד ✅');
+  } catch (err) { console.error(err); toast('❌ לא הצלחתי להכין PDF: ' + (err.message || err) + ' – אפשר "הדפסה" ← "שמירה כ-PDF"', 8000); }
+  finally { b.disabled = false; b.textContent = old; }
+}, true);
+
+/* ---------- הדפסה ישירה – בתוך מסגרת נסתרת, בלי חלון קופץ ---------- */
+function printNusachDirect(rec, k) {
+  const marked = k === 'after' || /^(#|@|>)/m.test(rec.extras.nusach[k]);
+  const html = marked && k === 'after' ? bookletHtml(rec, bookOptsFor(rec)) : nusachHtmlDoc(rec, k);
+  $$('#printFrame').forEach((f) => f.remove());
+  const f = document.createElement('iframe'); f.id = 'printFrame';
+  f.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden';
+  document.body.appendChild(f);
+  let done = false;
+  const go = () => { if (done) return; done = true; try { f.contentWindow.focus(); f.contentWindow.print(); } catch (er) { toast('❌ ההדפסה לא נפתחה – נסה שוב'); } };
+  f.onload = () => { const d = f.contentDocument; (d && d.fonts && d.fonts.ready ? Promise.race([d.fonts.ready, sleep(3000)]) : Promise.resolve()).then(() => setTimeout(go, 300)); };
+  setTimeout(go, 5000); // גם אם תמונה או גופן לא נטענו (למשל חסומים) – מדפיסים
+  f.srcdoc = html;
+  toast('🖨️ פותח הדפסה…');
+}
+
+/* ---------- PDF אמיתי – בלי ספריות חיצוניות: מחלקים לעמודים, מצלמים כל עמוד בדפדפן עצמו, ובונים קובץ PDF ---------- */
+const PDF_CSS = `
+.pdfp{position:relative;width:794px;height:1123px;background:#fff;color:#000;direction:rtl;font-family:'Frank Ruhl Libre','David','Times New Roman',serif;overflow:hidden;box-sizing:border-box}
+.pdfp *{box-sizing:border-box}
+.pdfp .hd{position:absolute;top:34px;left:49px;right:49px;text-align:center;font-weight:700;font-size:13px;border-bottom:1.7px solid #444;padding-bottom:6px}
+.pdfp .ft{position:absolute;bottom:26px;left:49px;font-size:12px;color:#333}
+.pdfp .top{position:absolute;top:64px;left:49px;right:49px}
+.pdfp .cols{position:absolute;left:49px;right:49px;bottom:57px;display:flex;gap:26px}
+.pdfp .col{flex:1;height:100%;overflow:hidden;text-align:justify;font-size:16px;line-height:1.42}
+.pdfp .col + .col{border-right:.6px solid #bbb;padding-right:13px;margin-right:-13px}
+.pdfp .col p{margin:0 0 8px}
+.pdfp .col p.cut{text-align-last:justify;margin-bottom:0}
+.pdfp .col h3{background:#dcdcdc;text-align:center;font-weight:700;font-size:16.5px;line-height:1.3;padding:6px 9px;margin:11px 0 9px}
+.pdfp .col h3:first-child{margin-top:0}
+.pdfp .col .vrs{background:#e9e9e9;font-weight:700;text-align:center;padding:4px 7px;margin:7px 0}
+.pdfp .col .rv2{text-align:center;font-weight:700;margin:7px 0}
+.pdfp .src{font-size:11.5px}
+.pdfp .banner{width:92%;margin:0 auto 9px}
+.pdfp .banner img{display:block;width:100%}
+.pdfp .verse{background:#e3e3e3;font-weight:700;text-align:center;font-size:14.5px;padding:6px 11px;margin:0 0 11px}
+.pdfp.simple{font-family:'David','Frank Ruhl Libre','Times New Roman',serif}
+.pdfp.simple .cols{left:76px;right:76px;bottom:76px}
+.pdfp.simple .top{left:76px;right:76px;top:76px}
+.pdfp.simple .col{font-size:19px;line-height:1.7}
+.pdfp.simple .col p{margin:0 0 11px;text-indent:1.2em}
+.pdfp.simple .col p.cont{text-indent:0}
+.pdfp.simple .t1{text-align:center;font-weight:700;font-size:25px;margin:0 0 4px}
+.pdfp.simple .t2{text-align:center;color:#555;font-size:15px;margin-bottom:15px}`;
+// מפצלים טקסט מסומן (עם **מודגש**) לפי מספר מילים, בלי לשבור את ההדגשה
+function splitMarked(t, n) {
+  const w = String(t).split(/(\s+)/); let cnt = 0, i = 0;
+  for (; i < w.length; i++) { if (!/^\s+$/.test(w[i]) && w[i]) { if (cnt === n) break; cnt++; } }
+  let a = w.slice(0, i).join('').trim(), b = w.slice(i).join('').trim();
+  if (((a.match(/\*\*/g) || []).length) % 2) { a += '**'; b = '**' + b; }
+  return [a, b];
+}
+function blobToDataUrl(b) { return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); }); }
+// הגופן של החוברת מוטמע בתוך העמוד (אם אפשר להוריד אותו). אם לא – דוד / Times של המחשב
+let PDF_FONT_CSS = null;
+async function pdfFontCss() {
+  if (PDF_FONT_CSS !== null) return PDF_FONT_CSS;
+  PDF_FONT_CSS = '';
+  try {
+    const css = await (await fetch('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&display=swap')).text();
+    const faces = css.split('@font-face').slice(1).filter((f) => /U\+0590|hebrew/i.test(f) || /U\+0000-00FF/.test(f));
+    const out = [];
+    for (const f of faces) {
+      const url = (f.match(/url\(([^)]+)\)/) || [])[1]; if (!url) continue;
+      const data = await blobToDataUrl(await (await fetch(url)).blob());
+      out.push('@font-face' + f.replace(url, data).replace(/\}\s*$/, '}'));
+    }
+    PDF_FONT_CSS = out.join('\n');
+  } catch (e) { console.warn('pdf font', e); PDF_FONT_CSS = ''; }
+  return PDF_FONT_CSS;
+}
+// מצלמים עמוד: מכניסים אותו לתמונת SVG ומציירים על קנבס – הדפדפן עצמו מצייר את הטקסט (עברית מושלמת)
+async function pageToJpeg(page, fontCss, scale = 2) {
+  const W = 794, H = 1123;
+  const xhtml = new XMLSerializer().serializeToString(page);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * scale}" height="${H * scale}" viewBox="0 0 ${W} ${H}"><foreignObject x="0" y="0" width="${W}" height="${H}"><div xmlns="http://www.w3.org/1999/xhtml"><style>${(fontCss + PDF_CSS).replace(/&/g, '&amp;').replace(/</g, '&lt;')}</style>${xhtml}</div></foreignObject></svg>`;
+  const img = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+  await sleep(30);
+  const c = document.createElement('canvas'); c.width = W * scale; c.height = H * scale;
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
+  return canvasJpeg(c);
+}
+async function canvasJpeg(c, q = 0.9) {
+  const b = await new Promise((res) => c.toBlob(res, 'image/jpeg', q));
+  return { bytes: new Uint8Array(await b.arrayBuffer()), w: c.width, h: c.height };
+}
+// כותבים קובץ PDF פשוט: כל עמוד = תמונה אחת בגודל A4
+function jpegsToPdf(imgs) {
+  const enc = new TextEncoder(); const parts = []; const offs = []; let len = 0;
+  const push = (x) => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  push('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  const n = imgs.length, PW = 595.28, PH = 841.89;
+  const obj = (id, body) => { offs[id] = len; push(`${id} 0 obj\n`); body(); push('\nendobj\n'); };
+  obj(1, () => push('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => push(`<< /Type /Pages /Count ${n} /Kids [${imgs.map((_, i) => `${3 + i * 3} 0 R`).join(' ')}] >>`));
+  imgs.forEach((im, i) => {
+    const p = 3 + i * 3, cs = p + 1, xo = p + 2;
+    const content = `q ${PW} 0 0 ${PH} 0 0 cm /Im0 Do Q`;
+    obj(p, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im0 ${xo} 0 R >> >> /Contents ${cs} 0 R >>`));
+    obj(cs, () => push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`));
+    obj(xo, () => { push(`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.bytes.length} >>\nstream\n`); push(im.bytes); push('\nendstream'); });
+  });
+  const total = 3 + n * 3, xref = len;
+  let x = `xref\n0 ${total}\n0000000000 65535 f \n`;
+  for (let i = 1; i < total; i++) x += String(offs[i]).padStart(10, '0') + ' 00000 n \n';
+  push(x + `trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(parts, { type: 'application/pdf' });
+}
+async function nusachPdf(rec, k, prog) {
+  prog && prog('מכין…');
+  await bkFonts();
+  const fontCss = await pdfFontCss();
+  const txt = rec.extras.nusach[k];
+  const booklet = k === 'after' || /^(#|@|>)/m.test(txt);
+  const opts = booklet ? bookOptsFor(rec) : {};
+  let blocks, head = '';
+  if (booklet) {
+    const bl = parseMarked(txt);
+    const titles = bl.filter((b) => b.k === 'title'), reva = bl.find((b) => b.k === 'reva');
+    const fv = bl.findIndex((b) => b.k === 'verse'); const verse = fv >= 0 && fv < 6 ? bl[fv] : null;
+    blocks = bl.filter((b) => !(b.k === 'title' || b === reva || b === verse));
+    let bannerUrl = '';
+    try { const bn = await bannerPng(titles.length ? titles.map((x) => x.t) : [rec.title || ''], reva && reva.t); bannerUrl = await blobToDataUrl(bn.blob); } catch (e) { console.warn('banner', e); }
+    head = (bannerUrl ? `<div class="banner"><img src="${bannerUrl}"/></div>` : `<div style="text-align:center;font-weight:900;font-size:21px;margin-bottom:11px">${titles.map((x) => inlineMarked(x.t)).join('<br/>') || esc(rec.title)}${reva ? `<div style="font-size:15px;margin-top:4px">${inlineMarked(reva.t)}</div>` : ''}</div>`) + (verse ? `<div class="verse">${inlineMarked(verse.t)}</div>` : '');
+  } else {
+    blocks = txt.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean).map((p) => ({ k: 'p', t: p.replace(/\n/g, ' ') }));
+    head = `<div class="t1">${esc(rec.title || '')}</div><div class="t2">${esc([rec.parasha, rec.hyear, rec.occasion].filter(Boolean).join(' · '))}</div>`;
+  }
+  const blockHtml = (b, cls) => b.k === 'h' || b.k === 'title' ? `<h3>${inlineMarked(b.t)}</h3>` : b.k === 'verse' ? `<div class="vrs">${inlineMarked(b.t)}</div>` : b.k === 'reva' ? `<div class="rv2">${inlineMarked(b.t)}</div>` : `<p class="${cls || ''}">${inlineMarked(b.t, booklet)}</p>`;
+  const stage = document.createElement('div');
+  stage.style.cssText = 'position:fixed;left:-30000px;top:0;z-index:-1';
+  stage.innerHTML = `<style>${fontCss}${PDF_CSS}</style>`;
+  document.body.appendChild(stage);
+  const pages = [];
+  const setTop = (p) => { const top = p.querySelector('.top'); p.querySelector('.cols').style.top = (top.offsetTop + top.offsetHeight + 8) + 'px'; };
+  const newPage = (first) => {
+    const p = document.createElement('div'); p.className = 'pdfp' + (booklet ? '' : ' simple');
+    p.innerHTML = (booklet ? `<div class="hd">${esc(BOOK_HEAD)}</div>` : '') + `<div class="ft"></div>` + (first ? `<div class="top">${head}</div>` : '') + `<div class="cols">${booklet ? '<div class="col"></div><div class="col"></div>' : '<div class="col"></div>'}</div>`;
+    stage.appendChild(p); pages.push(p);
+    if (first) setTop(p); else p.querySelector('.cols').style.top = booklet ? '64px' : '76px';
+    return [...p.querySelectorAll('.col')];
+  };
+  try {
+    let cols = newPage(true);
+    const im = stage.querySelector('.banner img'); if (im && !im.complete) await new Promise((r) => { im.onload = im.onerror = r; setTimeout(r, 3000); });
+    try { await document.fonts.ready; } catch (e) {}
+    setTop(pages[0]);
+    let ci = 0;
+    const over = (c) => c.scrollHeight > c.clientHeight + 1;
+    const nextCol = () => { ci++; if (ci >= cols.length) { cols = newPage(false); ci = 0; } };
+    const queue = blocks.slice(); let guard = 0;
+    prog && prog('מחלק לעמודים…');
+    while (queue.length && guard++ < 20000) {
+      const b = queue.shift(), c = cols[ci];
+      const tmp = document.createElement('div'); tmp.innerHTML = blockHtml(b, b.cont ? 'cont' : ''); const el = tmp.firstElementChild;
+      c.appendChild(el);
+      if (b.k === 'h' && !over(c)) { // כותרת לא נשארת לבד בתחתית הטור
+        if (c.clientHeight - (el.offsetTop + el.offsetHeight - c.offsetTop) < 50 && c.children.length > 1) { el.remove(); nextCol(); queue.unshift(b); }
+        continue;
+      }
+      if (!over(c)) continue;
+      el.remove();
+      if (b.k === 'p') {
+        const words = String(b.t).split(/\s+/).filter(Boolean).length;
+        let lo = 1, hi = words - 1, best = 0;
+        while (lo <= hi) { const mid = (lo + hi) >> 1; const [a] = splitMarked(b.t, mid); el.innerHTML = inlineMarked(a, booklet); el.className = 'cut' + (b.cont ? ' cont' : ''); c.appendChild(el); const ok = !over(c); el.remove(); if (ok) { best = mid; lo = mid + 1; } else hi = mid - 1; }
+        if (best >= 4) { const [a, rest] = splitMarked(b.t, best); el.innerHTML = inlineMarked(a, booklet); el.className = 'cut' + (b.cont ? ' cont' : ''); c.appendChild(el); queue.unshift({ k: 'p', t: rest, cont: true }); nextCol(); continue; }
+      }
+      if (c.children.length === 0) { c.appendChild(el); nextCol(); continue; } // בלוק ענק – שלא ניתקע
+      nextCol(); queue.unshift(b);
+    }
+    if (pages.length > 1) { const last = pages[pages.length - 1]; if (![...last.querySelectorAll('.col')].some((c) => c.children.length)) { last.remove(); pages.pop(); } }
+    const startNo = booklet && opts.cover ? 2 : 1;
+    pages.forEach((p, i) => { p.querySelector('.ft').textContent = 'עמוד ' + (i + startNo); });
+    const imgs = [];
+    if (booklet && opts.cover) {
+      prog && prog('דף השער…');
+      try { const img = await loadImg(URL.createObjectURL(await coverPng(opts))); const c = document.createElement('canvas'); c.width = 1588; c.height = 2246; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); imgs.push(await canvasJpeg(c, 0.88)); } catch (e) { console.warn('cover', e); }
+    }
+    for (let i = 0; i < pages.length; i++) { prog && prog(`עמוד ${i + 1} מתוך ${pages.length}…`); imgs.push(await pageToJpeg(pages[i], fontCss)); }
+    return jpegsToPdf(imgs);
+  } finally { stage.remove(); }
+}
 
 </script>
 </body>
