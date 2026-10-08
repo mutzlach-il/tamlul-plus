@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.6';
+const APP_VERSION = '3.9.7';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -7736,6 +7736,62 @@ const TEXT_SNAP = {};
   return _sr6.apply(this, arguments);
 }; }
 { const _do7 = Detail.open; Detail.open = async function () { const x = await _do7.apply(this, arguments); try { if (this.rec) TEXT_SNAP[this.rec.id] = this.rec.text || ''; } catch (e) {} return x; }; }
+
+
+/* =========================================================
+   3.9.7 – קישור דוגמת נוסח להקלטה שלה: המערכת לומדת מזוג אמיתי (מה שנאמר ← מה שנכתב)
+   ========================================================= */
+function recVerbatim(r) {
+  const yo = r.extras && r.extras.yiOrig;
+  const segs = yo && yo.length ? yo : (r.segments || []);
+  const t = segs.length ? segs.map((s) => s.text).join('\n') : (r.text || '');
+  return cleanSegs([{ start: 0, end: 0, text: t }], false)[0].text.replace(/\[⏸️[^\]]*\]/g, '').trim();
+}
+async function linkExampleToRec(exId) {
+  const ex = (STYLE_EX || []).find((x) => x.id === exId); if (!ex) return;
+  const recs = [...RECS.values()].filter((r) => r.status === 'done' && !r.deletedAt).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 300);
+  const words = (ex.title || '').split(/\s+/).filter((w) => w.length > 1);
+  const score = (r) => words.filter((w) => (r.title || '').includes(w) || (r.parasha || '').includes(w)).length;
+  recs.sort((a, b) => score(b) - score(a));
+  let chosen = null;
+  await modal(`<h3>🔗 לקשר את הדוגמה "${esc(ex.title)}" להקלטה שלה</h3>
+    <p class="muted">בחר את ההקלטה שממנה נכתב הנוסח הזה. המערכת תשמור את התמלול שלה ליד הנוסח – וכך תלמד בדיוק איך הופכים את מה שנאמר למה שנכתב.</p>
+    <input id="lxQ" placeholder="🔍 חיפוש לפי שם" style="width:100%;margin-bottom:.4em">
+    <select id="lxSel" size="10" style="width:100%">${recs.map((r) => `<option value="${r.id}">${esc(r.title)} · ${LANGS[r.lang] || ''} · ${fmtTime(r.duration)}</option>`).join('')}</select>`,
+  { okText: 'קישור', wide: true, onOk: (bg) => { chosen = bg.querySelector('#lxSel').value; } });
+  if (!chosen) return;
+  let r = RECS.get(chosen); try { r = await fullRec(chosen); } catch (e) {}
+  const src = recVerbatim(r);
+  if (src.length < 100) return toast('להקלטה הזאת אין עדיין תמלול');
+  const { error } = await sb.from('style_examples').update({ source_text: src.slice(0, 40000), rec_id: r.id }).eq('id', ex.id);
+  if (error) return toast('❌ ' + error.message);
+  await loadStyleExamples(true); toast('✅ קושר – מעכשיו זו דוגמה מלאה (הקלטה ← נוסח)');
+  $$('.modal-bg').forEach((m) => m.remove()); openStyleExamples();
+}
+document.addEventListener('input', (e) => { if (e.target.id !== 'lxQ') return; const q = e.target.value.trim(); $$('#lxSel option').forEach((o) => { o.hidden = q && !o.textContent.includes(q); }); });
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-sexlink]'); if (b) { e.stopPropagation(); linkExampleToRec(b.dataset.sexlink); } }, true);
+{ const _os7 = openStyleExamples; openStyleExamples = async function () {
+  const x = await _os7.apply(this, arguments);
+  try { $$('.modal-bg [data-sexview]').forEach((v) => { const id = v.dataset.sexview; if (v.parentElement.querySelector('[data-sexlink]')) return; const ex = (STYLE_EX || []).find((y) => y.id === id); v.insertAdjacentHTML('beforebegin', `<button class="btn small ${ex && ex.source_text ? '' : 'primary'}" data-sexlink="${id}" title="לקשר להקלטה שממנה נכתב הנוסח">${ex && ex.source_text ? '🔗✓' : '🔗 לקשר להקלטה'}</button>`); }); } catch (e) {}
+  return x;
+}; }
+// כשמייבאים קובץ ששמו זהה לשם של הקלטה – מקשרים לבד
+{ const _isf = importStyleFiles; importStyleFiles = function (kind) {
+  const r = _isf.apply(this, arguments);
+  setTimeout(async function auto() {
+    try {
+      await loadStyleExamples(true);
+      const recs = [...RECS.values()].filter((x) => x.status === 'done');
+      for (const ex of (STYLE_EX || []).filter((y) => y.kind === kind && !y.source_text)) {
+        const m = recs.find((x) => x.title && x.title.trim() === (ex.title || '').trim());
+        if (!m) continue;
+        let full = m; try { full = await fullRec(m.id); } catch (e) {}
+        const src = recVerbatim(full); if (src.length > 100) await sb.from('style_examples').update({ source_text: src.slice(0, 40000), rec_id: m.id }).eq('id', ex.id);
+      }
+    } catch (e) {}
+  }, 20000);
+  return r;
+}; }
 
 </script>
 </body>
