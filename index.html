@@ -877,6 +877,8 @@ body.viewas #toTop{display:none}
 #dNusach .bk-opts{display:flex;gap:1em;align-items:center;flex-wrap:wrap;margin:.4em 0 0}
 .qbar{height:6px;background:#0001;border-radius:4px;overflow:hidden;margin-top:4px;min-width:140px}.qbar i{display:block;height:100%;background:var(--accent,#d9b25a);transition:width .4s}
 #yiOutPills button.nus-pill.active{background:var(--accent,#d9b25a)!important;color:#222!important;border-color:var(--accent,#d9b25a)!important}
+.chk-badge{font-size:.82em;font-weight:700;padding:.15em .55em;border-radius:999px}.chk-badge.ok{background:#e3f7e8;color:#17803a}.chk-badge.warn{background:#fff1d6;color:#9a5b00}
+.bk-fields{display:flex;flex-wrap:wrap;gap:.5em .8em;align-items:flex-end;margin:.5em 0;padding:.6em .7em;border:1.5px dashed var(--accent,#d9b25a);border-radius:12px}.bk-fields label{display:flex;flex-direction:column;font-size:.85em;font-weight:700;gap:.2em}.bk-fields input{min-width:150px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@hebcal/core@5.10.1/dist/bundle.min.js"></script>
@@ -1547,7 +1549,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.2';
+const APP_VERSION = '3.9.3';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -7232,6 +7234,142 @@ async function askFolder() {
   }
   return _qa10.call(this, blob, name, lang, title, meta);
 }; }
+
+
+/* =========================================================
+   3.9.3 – הנוסח רק מההקלטה הזאת · הפרשה הנכונה · לומדים מכל תיקון
+   ========================================================= */
+const PARASHOT = ['בראשית','נח','לך לך','וירא','חיי שרה','תולדות','ויצא','וישלח','וישב','מקץ','ויגש','ויחי','שמות','וארא','בא','בשלח','יתרו','משפטים','תרומה','תצוה','תצווה','כי תשא','ויקהל','פקודי','ויקרא','צו','שמיני','תזריע','מצורע','אחרי מות','קדושים','אמור','בהר','בחקותי','בחוקותי','במדבר','נשא','בהעלותך','שלח','קרח','קורח','חקת','בלק','פנחס','מטות','מסעי','דברים','ואתחנן','עקב','ראה','שופטים','כי תצא','כי תבוא','נצבים','וילך','האזינו','וזאת הברכה'];
+function detectParasha(rec) {
+  const hay = [rec.title || '', rec.parasha ? 'פרשת ' + rec.parasha : ''];
+  for (const h of hay) {
+    const m = h.match(/פרשת\s+(.+)/); const seg = m ? m[1] : h;
+    const hits = PARASHOT.filter((p) => new RegExp('(^|[\\s"\'״,\\-–])' + p.replace(/ /g, '\\s+') + '($|[\\s"\'״,\\-–])').test(' ' + seg + ' ')).sort((a, b) => b.length - a.length);
+    if (hits.length) return hits[0];
+  }
+  return '';
+}
+function talkYear(rec) { return rec.hyear || ''; }
+let CUR_NUS_REC = null, NUS_STRICT = false;
+{ const _np = nusachPrompt; nusachPrompt = function (kind, part, examples, ctx) {
+  const p = _np.apply(this, arguments);
+  const r = CUR_NUS_REC || {};
+  const par = detectParasha(r), yr = talkYear(r);
+  const facts = `\n===== FACTS ABOUT THIS TALK (use them exactly) =====\n` +
+    (r.title ? `Recording title: ${r.title}\n` : '') +
+    (par ? `Parasha: פרשת ${par}${yr ? ' ' + yr : ''}. ${kind === 'after' ? `The @ line MUST be exactly: "@ רעוא דרעווין פרשת ${par}${yr ? ' ' + yr : ''}" (or the occasion if the talk says so) – NEVER the parasha of an example.` : ''}\n` : `Parasha: unknown – take it ONLY from what is said in the transcript; never from the examples.\n`) +
+    (r.occasion ? `Occasion: ${r.occasion}\n` : '');
+  const guard = `\n===== CRITICAL – CONTENT ONLY FROM THIS TALK =====
+The examples above are ONLY to learn the STYLE, language and structure. They are OTHER talks on OTHER topics.
+- Do NOT copy anything from the examples: no sentences, no ideas, no verses, no sources, no stories, no titles, no parasha names.
+- Every idea, verse, source, story and title in your output must come from the ${kind === 'after' && !ctx.direct ? 'draft / transcript' : 'transcript'} of THIS talk below.
+- If something is not in this talk – it must not be in your output.${NUS_STRICT ? '\n- WARNING: a previous attempt copied passages from the examples. That is forbidden. Write ONLY what this talk says.' : ''}\n`;
+  const at = p.lastIndexOf('===== THE ');
+  return at > 0 ? p.slice(0, at) + facts + guard + '\n' + p.slice(at) : p + facts + guard;
+}; }
+// לא ללמוד מהגרסה הקודמת של אותה הקלטה (כדי שהבדיקה תהיה אמיתית)
+{ const _pe = pickExamples; pickExamples = function (list, rec, kind, max) { return _pe.call(this, (list || []).filter((x) => !rec || x.rec_id !== rec.id), rec, kind, max); }; }
+// בדיקה: כמה מהנוסח מועתק מהדוגמאות ולא מההקלטה
+function copiedPct(out, examples, srcText) {
+  const norm = (s) => String(s || '').replace(/\*\*|[#@>]/g, ' ').replace(/[^֐-׿a-zA-Z0-9"' ]+/g, ' ').replace(/\s+/g, ' ').trim().split(' ');
+  const N = 7, sh = (w) => { const set = new Set(); for (let i = 0; i + N <= w.length; i++) set.add(w.slice(i, i + N).join(' ')); return set; };
+  const o = norm(out); if (o.length < N * 3) return 0;
+  const ex = new Set(); examples.forEach((x) => sh(norm(x.target_text)).forEach((s) => ex.add(s)));
+  const src = sh(norm(srcText));
+  const SAFE = /ובא לציון|בנין בית המקדש|במהרה בימינו|אמן|רעוא דרעווין|זיעוכי"א|שליט"א/;
+  let tot = 0, bad = 0;
+  for (let i = 0; i + N <= o.length; i += 2) { const s = o.slice(i, i + N).join(' '); tot++; if (ex.has(s) && !src.has(s) && !SAFE.test(s)) bad++; }
+  return tot ? Math.round(bad / tot * 1000) / 10 : 0;
+}
+function fixParashaLine(rec, kind) {
+  const n = rec.extras && rec.extras.nusach; if (!n || !n[kind]) return false;
+  const par = detectParasha(rec); if (!par) return false;
+  const yr = talkYear(rec);
+  let changed = false;
+  n[kind] = n[kind].replace(/^@ ?(.*)$/m, (line, t) => {
+    if (t.includes(par)) return line;
+    if (!/פרשת|רעו+א/.test(t)) return line;
+    changed = true; return `@ רעוא דרעווין פרשת ${par}${yr ? ' ' + yr : ''}`;
+  });
+  return changed;
+}
+{ const _mn = makeNusach; makeNusach = async function (rec, kind = 'before', o = {}) {
+  CUR_NUS_REC = rec;
+  try {
+    await _mn.call(this, rec, kind, o);
+    const n = rec.extras && rec.extras.nusach;
+    if (!n || !n[kind] || !(n[kind + 'At'] > Date.now() - 10 * 60 * 1000)) return;
+    const examples = (STYLE_EX || []).filter((x) => x.kind === kind && x.rec_id !== rec.id);
+    const srcText = nusachSource(rec, kind).text + '\n' + ((n.before && kind === 'after') ? n.before : '');
+    let pct = copiedPct(n[kind], examples, srcText);
+    if (pct > 4 && !NUS_STRICT && !o._retry) {
+      NUS_STRICT = true;
+      try { toast('🔁 בדיקה: נמצא דמיון לדוגמאות – כותב שוב רק מההקלטה…', 4000); delete NUSACH_BUSY[rec.id + kind]; await _mn.call(this, rec, kind, Object.assign({}, o, { _retry: true, silent: true })); } finally { NUS_STRICT = false; }
+      pct = copiedPct(rec.extras.nusach[kind], examples, srcText);
+    }
+    const fixed = fixParashaLine(rec, kind);
+    rec.extras.nusach[kind + 'Chk'] = { pct, at: Date.now() };
+    await saveRec(rec, ['extras']).catch(() => {});
+    if (fixed && $('#bkPrev')) $('#bkPrev').dataset.h = '';
+    if (Detail.rec && Detail.rec.id === rec.id) renderNusach();
+  } finally { CUR_NUS_REC = null; }
+}; }
+// תווית בדיקה ליד הנוסח
+{ const _rn = renderNusach; renderNusach = function () {
+  const x = _rn.apply(this, arguments);
+  try {
+    const r = Detail.rec; const k = NUSACH_TAB; const n = r && r.extras && r.extras.nusach;
+    const bar = $('#dNusach .nbar');
+    if (bar && n && n[k] && (k === 'before' || k === 'after') && !bar.querySelector('.chk-badge')) {
+      const c = n[k + 'Chk'];
+      const html = !c ? `<span class="chk-badge muted" title="נכתב לפני שהייתה בדיקה – אפשר 'לכתוב מחדש'">• לא נבדק</span>` : c.pct <= 4 ? `<span class="chk-badge ok" title="המערכת בדקה שהתוכן לא הועתק מהדוגמאות">✅ נבדק: התוכן מההקלטה הזאת</span>` : `<span class="chk-badge warn" title="חלק מהמשפטים דומים לדוגמאות – כדאי לעבור על הנוסח">⚠️ ${c.pct}% דומה לדוגמאות – כדאי לבדוק</span>`;
+      bar.firstElementChild.insertAdjacentHTML('afterend', ' ' + html);
+    }
+    if (k === 'after' && n && n.after && !$('#bkFields')) {
+      const o = bookOptsFor(r);
+      const at = (n.after.match(/^@ ?(.*)$/m) || [])[1] || '';
+      const host = $('#dNusach .bk-opts');
+      if (host) host.insertAdjacentHTML('afterend', `<div id="bkFields" class="bk-fields">
+        <label>📖 שורת הפרשה בשער <input id="bkfPar" value="${esc(o.par)}"></label>
+        <label>🔢 גיליון <input id="bkfGil" value="${esc(o.gil)}" style="max-width:110px"></label>
+        <label>🕘 זמני ק"ש (לא חובה) <input id="bkfZm" value="${esc(o.zm)}"></label>
+        <label>✍️ שורת "רעוא דרעווין" <input id="bkfAt" value="${esc(at)}"></label>
+        <button type="button" class="btn small primary" id="bkfSave">💾 עדכון החוברת</button></div>`);
+    }
+  } catch (e) { console.warn(e); }
+  return x;
+}; }
+{ const _bo = bookOptsFor; bookOptsFor = function (rec, cover) {
+  const o = _bo.apply(this, arguments);
+  if (!LS.get('bookParLast_' + rec.id, '')) { const p = detectParasha(rec); if (p) o.par = 'פרשת ' + p + (rec.hyear ? ' ' + shortYear(rec.hyear) : ''); }
+  return o;
+}; }
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#bkfSave') || !Detail.rec) return;
+  const r = Detail.rec;
+  LS.set('bookParLast_' + r.id, $('#bkfPar').value.trim()); LS.set('bookGilRec_' + r.id, $('#bkfGil').value.trim()); if ($('#bkfGil').value.trim()) LS.set('bookGil', $('#bkfGil').value.trim()); LS.set('bookZm', $('#bkfZm').value.trim());
+  const at = $('#bkfAt').value.trim(); const n = r.extras.nusach;
+  if (at) { if (/^@/m.test(n.after)) n.after = n.after.replace(/^@ ?.*$/m, '@ ' + at); else n.after = n.after.replace(/^((?:# .*\n\n?)*)/, `$1@ ${at}\n\n`); n.afterAt = Date.now(); await saveRec(r, ['extras']); }
+  const fr = $('#bkPrev'); if (fr) fr.dataset.h = '';
+  renderNusach(); toast('✅ החוברת עודכנה');
+});
+/* ---------- לומדים מכל תיקון: כשמתקנים נוסח – הוא נשמר אוטומטית כדוגמה ---------- */
+let NEDIT_CTX = null;
+document.addEventListener('click', (e) => { const t = e.target.closest('[data-nedit]'); if (t && Detail.rec) NEDIT_CTX = { rec: Detail.rec, k: t.dataset.nedit, before: (Detail.rec.extras.nusach || {})[t.dataset.nedit] }; }, true);
+document.addEventListener('click', (e) => {
+  if (!NEDIT_CTX || !e.target.closest('.modal-bg [data-ok]') || !document.querySelector('#nEditTa')) return;
+  const ctx = NEDIT_CTX; NEDIT_CTX = null;
+  setTimeout(async () => {
+    try {
+      const r = ctx.rec, k = ctx.k, txt = (r.extras.nusach || {})[k];
+      if (!txt || txt === ctx.before || !(ME.role === 'admin' || ME.role === 'editor')) return;
+      const src = k === 'before' ? nusachSource(r, 'before').text : (r.extras.nusach.before || nusachSource(r, 'before').text || null);
+      await sb.from('style_examples').delete().eq('rec_id', r.id).eq('kind', k);
+      const { error } = await sb.from('style_examples').insert({ kind: k, title: r.title, source_text: src ? src.slice(0, 30000) : null, target_text: txt, rec_id: r.id, created_by: ME.id });
+      if (!error) { await loadStyleExamples(true); toast('🧠 המערכת למדה מהתיקון שלך – בפעם הבאה היא תכתוב כך', 5000); }
+    } catch (er) { console.warn('learn from edit', er); }
+  }, 1500);
+}, true);
 
 </script>
 </body>
