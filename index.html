@@ -1020,7 +1020,7 @@ body.viewas #toTop{display:none}
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="yi" data-iv="1">🗣️ ראיון / שיחה (יידיש)</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
         <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
-          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="המערכת מתמללת מאחורי הקלעים וכותבת רק את הנוסח 'לפני העריכה' – בסגנון הדוגמאות שלכם">📜 יידיש ← לפני העריכה</button><button data-yiout="after" title="המערכת עושה הכול מאחורי הקלעים ומוציאה רק את הנוסח 'אחרי העריכה' – מוכן עם הלוגו, כמו החוברת">🖨️ יידיש ← אחרי העריכה</button>
+          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח 'לפני העריכה' (בסגנון הדוגמאות שלכם). התמלול ביידיש נעשה מאחורי הקלעים.">📜 לפני העריכה – בלשון הקודש</button><button data-yiout="after" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח הסופי 'אחרי העריכה', מוכן עם הלוגו כמו החוברת. הכול נעשה מאחורי הקלעים.">🖨️ אחרי העריכה – בלשון הקודש</button>
         </div>
         <div class="lang-pills hidden" id="ivPills"><span style="font-weight:700;align-self:center">👥 איך לסמן את הדוברים:</span><button data-ivstyle="ab">א׳ / ב׳ / ג׳</button><button data-ivstyle="qa">שאלה / תשובה</button><span class="hint" id="ivVoices" style="align-self:center"></span></div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
@@ -1547,7 +1547,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.0';
+const APP_VERSION = '3.9.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -6211,6 +6211,7 @@ RULES:
 - Use the same expressions and abbreviations the examples use (e.g. השי"ת, ע"ה, ח"ו, זיעוכי"א, זצללה"ה, כ"ק אאזמו"ר וכו') and the same way of opening a paragraph and citing sources.
 - Quote verses and Chazal correctly in their original Hebrew/Aramaic. If a source reference is unclear, do not invent page numbers.
 - If a word was misrecognized, write what was obviously meant from the context.
+- Write ONLY in Rabbinic Hebrew (לשון הקודש) – never in Yiddish, even though the talk was spoken in Yiddish.
 - Paragraphs separated by one empty line.`
     : `You are the senior editor of "דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" (מכון דא"ח ביאלה), the weekly printed booklet of the Biala Rebbe's Torah talks.
 ${ctx.direct ? `INPUT: the full word-by-word transcript of a talk spoken in Hasidic Yiddish (it may contain speech-recognition errors and Hebrew/Aramaic quotes). There is no draft – you write the final version directly from the transcript, in Rabbinic Hebrew. Keep ALL the ideas, explanations, sources, stories and their order; remove repetitions and spoken-language noise; if a word was misrecognized, write what was obviously meant.` : `INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.`}
@@ -6226,7 +6227,8 @@ FORMAT – use exactly these line markers, each block separated by an empty line
 > the opening verse with its reference, e.g. > ואתה תצוה את בני ישראל... (כז, כ).
 ## a sub-heading (a short sentence that states the point of the next section – every 2–4 paragraphs, 5–8 sub-headings in a full ma'amar)
 plain paragraphs (no marker) for the body text.
-No other markdown, no bullet points, no timestamps.`;
+No other markdown, no bullet points, no timestamps.
+Write ONLY in Rabbinic Hebrew (לשון הקודש) – never in Yiddish, even though the talk was spoken in Yiddish.`;
   const start = ctx.index === 0
     ? (kind === 'before' ? 'Start like the examples (בס"ד, then the opening verse / topic line).' : 'Start with the # title lines, then the @ line, then the > opening verse.')
     : `This is part ${ctx.index + 1} of ${ctx.total} of the same talk. Continue the written text seamlessly from where the previous part ended (do NOT write בס"ד or an opening again). The previous part ended with:\n«${ctx.prevTail}»`;
