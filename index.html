@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.9';
+const APP_VERSION = '3.9.10';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8292,6 +8292,88 @@ async function nusachPdf(rec, k, prog) {
     return jpegsToPdf(imgs);
   } finally { stage.remove(); }
 }
+
+
+/* =========================================================
+   3.9.10 – המנהל רואה בזמן אמת את התור של משתמש אחר ("צפייה כמשתמש"):
+   מה עולה, כמה אחוז, כמה זמן זה רץ ומה המערכת אומרת עכשיו
+   ========================================================= */
+// 1) אצל המשתמש עצמו: כל כמה שניות שומרים בענן את מצב התמלול (רק אם השתנה)
+const PROG_SENT = {};
+setInterval(() => {
+  try {
+    if (typeof VIEW_AS !== 'undefined' && VIEW_AS) return;
+    if (!ME || !Queue) return;
+    const ids = new Set([...(Queue.items || []), ...Object.keys(Queue.progress || {})]);
+    ids.forEach((id) => {
+      const r = RECS.get(id); if (!r || !(r.status === 'queued' || r.status === 'processing')) return;
+      const p = String(Queue.progress[id] || (r.status === 'queued' ? '⏳ ממתין בתור' : '…')).slice(0, 300);
+      const last = PROG_SENT[id];
+      if (last && last.p === p && Date.now() - last.t < 60000) return; // בלי שינוי – פעם בדקה בלבד (סימן חיים)
+      PROG_SENT[id] = { p, t: Date.now() };
+      sb.from('recordings').update({ progress: p, updated_at: new Date().toISOString() }).eq('id', id).then(() => {}, () => {});
+    });
+  } catch (e) {}
+}, 5000);
+
+// 2) אצל המנהל, במצב "צפייה כמשתמש": התור של המשתמש נטען מהענן ומתעדכן כל 5 שניות
+let VA_Q = { rows: [], t: 0, timer: null };
+async function vaLoadQueue() {
+  if (!VIEW_AS) return;
+  const uid = VIEW_AS.user.id, since = new Date(Date.now() - 12 * 3600e3).toISOString();
+  const cols = 'id,title,lang,status,progress,error,duration,size,created_at,updated_at';
+  const [a, b] = await Promise.all([
+    sb.from('recordings').select(cols).eq('owner', uid).is('deleted_at', null).in('status', ['queued', 'processing']).limit(30),
+    sb.from('recordings').select(cols).eq('owner', uid).is('deleted_at', null).gte('updated_at', since).order('updated_at', { ascending: false }).limit(15)
+  ]);
+  const m = new Map(); [...(a.data || []), ...(b.data || [])].forEach((r) => m.set(r.id, r));
+  VA_Q.rows = [...m.values()].sort((x, y) => String(y.created_at).localeCompare(String(x.created_at)));
+  VA_Q.t = Date.now();
+  renderQueue();
+}
+function agoHe(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return `${s} שניות`;
+  const m = Math.round(s / 60); if (m < 60) return m === 1 ? 'דקה' : `${m} דקות`;
+  const h = Math.floor(m / 60), mm = m % 60; return `${h === 1 ? 'שעה' : h + ' שעות'}${mm ? ' ו-' + mm + ' דק\'' : ''}`;
+}
+{ const _rq10 = renderQueue; renderQueue = function () {
+  if (!VIEW_AS) return _rq10.apply(this, arguments);
+  const box = $('#queueList'); if (!box) return;
+  const rows = VA_Q.rows || [];
+  const active = rows.filter((r) => r.status === 'queued' || r.status === 'processing');
+  $('#queueCount').textContent = active.length ? `${active.length} בתהליך` : '';
+  const who = esc(VIEW_AS.user.display_name || VIEW_AS.user.email || '');
+  const head = `<div class="muted" style="font-size:.85em;margin-bottom:.4em">👁️ התור של ${who} – מתעדכן לבד כל 5 שניות${VA_Q.t ? ' · עודכן לפני ' + agoHe(Date.now() - VA_Q.t) : ''}</div>`;
+  if (!rows.length) { box.innerHTML = head + `<div class="empty"><span class="em-ic">🎧</span><b>אין אצלו עכשיו הקלטות בתמלול</b>ב-12 השעות האחרונות הוא לא העלה כלום</div>`; return; }
+  box.innerHTML = head + rows.map((r) => {
+    const run = r.status === 'queued' || r.status === 'processing';
+    const started = r.created_at ? Date.now() - new Date(r.created_at).getTime() : 0;
+    const quiet = r.updated_at ? Date.now() - new Date(r.updated_at).getTime() : 0;
+    let st;
+    if (run) {
+      const p = r.progress || (r.status === 'queued' ? '⏳ ממתין בתור' : 'מתחיל…');
+      const pc = String(p).match(/(\d{1,3})%/);
+      st = `<span class="spinner"></span><span><span class="badge">${esc(p)}</span>${pc ? `<div class="qbar"><i style="width:${Math.min(100, +pc[1])}%"></i></div>` : ''}</span>`;
+    } else if (r.status === 'done') st = '<span class="badge ok">הושלם ✓</span>';
+    else st = `<span class="badge err" title="${esc(r.error || '')}">נכשל</span>`;
+    const info = [LANGS[r.lang] || '', r.duration ? 'אורך ' + fmtTime(r.duration) : '', r.size ? Math.round(r.size / 1048576) + 'MB' : ''].filter(Boolean).join(' · ');
+    const timing = run ? `⏱️ רץ כבר ${agoHe(started)}${quiet > 3 * 60000 ? ` · <b style="color:#c2410c">⚠️ אין עדכון כבר ${agoHe(quiet)} – אולי הוא סגר את האתר או שהמחשב נרדם</b>` : ' · עדכון אחרון לפני ' + agoHe(quiet)}` : `${r.status === 'done' ? '✓ הסתיים' : '✕ נכשל'} לפני ${agoHe(quiet)}`;
+    return `<div class="queue-item">
+      <div class="grow"><div><b>${esc(r.title)}</b> <span class="muted" style="font-size:.85em">· ${info}</span></div>
+      <div class="muted" style="font-size:.85em">${timing}</div>
+      ${r.status === 'error' ? `<div class="err-text" style="font-size:.85em">${esc(r.error || '')}</div>` : ''}</div>
+      ${st}
+      ${r.status === 'done' ? `<button class="btn small" data-vaqopen="${r.id}">פתיחה</button>` : ''}
+    </div>`;
+  }).join('');
+}; }
+{ const _ev10 = enterViewAs; enterViewAs = async function () {
+  const x = await _ev10.apply(this, arguments);
+  if (VIEW_AS) { await vaLoadQueue().catch(() => {}); clearInterval(VA_Q.timer); VA_Q.timer = setInterval(() => { if (!VIEW_AS) return clearInterval(VA_Q.timer); vaLoadQueue().catch(() => {}); }, 5000); }
+  return x;
+}; }
+document.addEventListener('click', async (e) => { const o = e.target.closest('[data-vaqopen]'); if (!o) return; const id = o.dataset.vaqopen; try { if (!RECS.has(id)) { const { data } = await sb.from('recordings').select('*').eq('id', id).single(); if (data) RECS.set(id, fromRow(data)); } } catch (er) {} Detail.open(id); });
 
 </script>
 </body>
