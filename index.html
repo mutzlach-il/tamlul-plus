@@ -1029,7 +1029,7 @@ body.viewas #toTop{display:none}
         </select>
       </div>
       <div class="row" style="margin-bottom:14px">
-        <span style="font-weight:700">📁 לאיזו תיקייה לשמור?</span>
+        <span style="font-weight:700">📁 לאיזו תיקייה לשמור? <span style="color:#d33">*חובה</span></span>
         <select id="upFolder" style="width:auto;min-width:180px"></select>
       </div>
       <div class="home-grid">
@@ -1547,7 +1547,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.1';
+const APP_VERSION = '3.9.2';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2412,7 +2412,7 @@ const Queue = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
       lang, yiOut: lang === 'yi' ? ({ before: 'yi', after: 'yi', en: 'yi' }[LS.get('yiOut', 'both')] || LS.get('yiOut', 'both')) : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
       speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
-      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {}, meta.outMode ? { outMode: meta.outMode } : {}, meta.wantEn ? { wantEn: true } : {})
+      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {}, meta.outMode ? { outMode: meta.outMode } : {}, meta.wantEn ? { wantEn: true } : {}, meta.wantTr ? { wantTr: meta.wantTr } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
       speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate, series: rec.series, series_no: rec.seriesNo, extras: rec.extras });
@@ -2494,6 +2494,15 @@ const Queue = {
               const en = await geminiTranslateText(src, 'en').catch(() => translateText(src, 'en'));
               rec.translations = Object.assign({}, rec.translations, { en });
             } catch (e) { console.warn('auto translate en failed', e); }
+          }
+          if (res.text && rec.extras && rec.extras.wantTr && rec.extras.wantTr !== rec.lang && !(rec.translations && rec.translations[rec.extras.wantTr]) && perm('translate')) {
+            const to = rec.extras.wantTr;
+            prog(`מתרגם ל${LANGS[to] || to}…`);
+            try {
+              const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
+              const tx = await geminiTranslateText(src, to).catch(() => translateText(src, to));
+              rec.translations = Object.assign({}, rec.translations, { [to]: tx });
+            } catch (e) { console.warn('auto translate failed', e); }
           }
           if (res.text && rec.extras && rec.extras.wantNusach && !(rec.extras.nusach && rec.extras.nusach.before) && perm('translate')) {
             prog('📜 כותב את הנוסח "לפני העריכה"…');
@@ -2638,7 +2647,7 @@ async function uploadMetaDialog(files, extra = {}) {
   const ok = await modal(`<h3>📝 פרטים לכל קובץ (${files.length})</h3><p class="hint">אפשר לשנות שם, לבחור תיקייה ולרשום פרטים. הפרשה והשנה מתמלאות לבד לפי התאריך אם משאירים ריק.</p>
     ${files.length > 1 ? '<button type="button" class="btn small" id="umCopy">⬇️ להעתיק את הפרטים של הקובץ הראשון לכולם</button>' : ''}
     <div style="max-height:60vh;overflow:auto">${files.map((f, i) => `<div class="up-row" data-um="${i}">
-      <div class="row"><b>${i + 1}.</b> <input type="text" data-umt value="${esc(f.name.replace(/\.[^.]+$/, ''))}" class="grow" style="width:auto"> <select data-umf style="width:auto;max-width:180px">${folderOptions(def.folderId, '— בלי תיקייה —')}</select></div>
+      <div class="row"><b>${i + 1}.</b> <input type="text" data-umt value="${esc(f.name.replace(/\.[^.]+$/, ''))}" class="grow" style="width:auto"> <select data-umf style="width:auto;max-width:180px">${folderOptions(def.folderId, '— בחר תיקייה (חובה) —')}</select></div>
       <div class="muted" style="font-size:.8em">${esc(f.name)} · ${(f.size / 1048576).toFixed(1)}MB ${isVideoFile(f, f.name) ? '· 🎬 סרטון' : ''}</div>
       ${metaFormHtml(extra, 'u' + i + '_')}
       <div class="row" style="margin-top:.3em;font-size:.9em">✂️ חיתוך: מ- <input type="text" data-umfrom placeholder="00:00" style="width:80px"> עד <input type="text" data-umto placeholder="סוף" style="width:80px"> <span class="muted">(דקות:שניות – לא חובה)</span></div></div>`).join('')}</div>`,
@@ -2805,7 +2814,7 @@ function folderOptions(sel, emptyLabel = 'ללא תיקייה') {
   return `<option value="">${emptyLabel}</option>` + folderTree().map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${'\u00a0\u00a0'.repeat(folderDepth(f))}${folderIcon(f)} ${esc(f.name)}${f.owner !== ME.id ? ' (' + esc(personName(f.owner) || 'משותף') + ')' : ''}</option>`).join('');
 }
 function fillUpFolder() {
-  const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בלי תיקייה —');
+  const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בחר תיקייה (חובה) —');
   const np = $('#newFolderParent'); if (np) np.innerHTML = folderOptions(np.value, '— ראשית —').replace('— ראשית —', '📂 תיקייה ראשית');
 }
 function highlight(text, q) {
@@ -6201,7 +6210,7 @@ function nusachPrompt(kind, part, examples, ctx) {
   const ex = examples.map((x, i) => (x.source_text ? `### דוגמה ${i + 1} – ${x.title}\n[המקור]\n${x.source_text.slice(0, 14000)}\n\n[הנוסח הכתוב]\n${x.target_text}` : `### דוגמה ${i + 1} – ${x.title}\n${x.target_text}`)).join('\n\n');
   const task = kind === 'before'
     ? `You are the editor who writes up the Torah talks (שיחות / דרשות) of the Biala Rebbe (חסידות ביאלה, בני ברק).
-INPUT: a word-by-word transcript of a talk spoken in Hasidic Yiddish (it may contain speech-recognition errors and Hebrew/Aramaic quotes).
+INPUT: a word-by-word transcript of a talk spoken in Hasidic Yiddish or Hebrew (sometimes English) (it may contain speech-recognition errors and Hebrew/Aramaic quotes).
 OUTPUT: the written version ("נוסח כתיבה") in Rabbinic Hebrew – the language of Hasidic sefarim – EXACTLY in the style of the examples below.
 RULES:
 - Keep ALL the ideas, explanations, sources, stories and their order. Do not skip content and do not invent anything that was not said.
@@ -6214,7 +6223,7 @@ RULES:
 - Write ONLY in Rabbinic Hebrew (לשון הקודש) – never in Yiddish, even though the talk was spoken in Yiddish.
 - Paragraphs separated by one empty line.`
     : `You are the senior editor of "דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" (מכון דא"ח ביאלה), the weekly printed booklet of the Biala Rebbe's Torah talks.
-${ctx.direct ? `INPUT: the full word-by-word transcript of a talk spoken in Hasidic Yiddish (it may contain speech-recognition errors and Hebrew/Aramaic quotes). There is no draft – you write the final version directly from the transcript, in Rabbinic Hebrew. Keep ALL the ideas, explanations, sources, stories and their order; remove repetitions and spoken-language noise; if a word was misrecognized, write what was obviously meant.` : `INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.`}
+${ctx.direct ? `INPUT: the full word-by-word transcript of a talk spoken in Hasidic Yiddish or Hebrew (sometimes English) (it may contain speech-recognition errors and Hebrew/Aramaic quotes). There is no draft – you write the final version directly from the transcript, in Rabbinic Hebrew. Keep ALL the ideas, explanations, sources, stories and their order; remove repetitions and spoken-language noise; if a word was misrecognized, write what was obviously meant.` : `INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.`}
 OUTPUT: the final print-ready ma'amar ("אחרי עריכה") – EXACTLY like the printed examples below: the same structure, language, level of editing, length and typography markers.
 WHAT THE EDITORS DO (learn it from the examples):
 - Rabbinic Hebrew of the sefarim, polished and flowing. The final version is FULLER than the draft (usually ~1.5–2× longer): restore details, explanations and stories from the transcript that the draft shortened, and make every step of the argument clear.
@@ -7148,6 +7157,82 @@ window.addEventListener('focus', async () => { if (!entered || !ME) return; Idle
     if (await loadMe()) enterApp();
   } else showAuth(msg);
 })();
+
+/* =========================================================
+   3.9.2 – תרגום גם מעברית ומאנגלית + חובה לבחור תיקייה
+   ========================================================= */
+const OUT_LN = { he: 'עברית', yi: 'יידיש', en: 'אנגלית' };
+const OUT_FL = { he: '🇮🇱', yi: '📜', en: '🇺🇸' };
+function outModeFor(lang) { return LS.get('outMode_' + lang, 'same'); }
+function syncTrPills() {
+  const host = $('#yiOutPills'); if (!host) return;
+  const lang = $('#langSel').value;
+  let grp = $('#trPills');
+  if (!grp) { host.insertAdjacentHTML('beforeend', '<span id="trPills" style="display:contents"></span>'); grp = $('#trPills'); }
+  const other = lang === 'he' || lang === 'en';
+  $$('#yiOutPills [data-yiout]').forEach((b) => b.classList.toggle('hidden', other));
+  if (!other) { grp.innerHTML = ''; return; }
+  host.classList.remove('hidden');
+  const L = OUT_LN[lang], F = OUT_FL[lang];
+  const opts = [['same', `${F} ${L} ← ${L}`]].concat(['he', 'yi', 'en'].filter((x) => x !== lang).map((x) => [x, `${OUT_FL[x]} ${L} ← ${OUT_LN[x]}`]))
+    .concat([['before', '📜 לפני העריכה – בלשון הקודש'], ['after', '🖨️ אחרי העריכה – בלשון הקודש']]);
+  const cur = outModeFor(lang);
+  grp.innerHTML = opts.map(([k, l]) => `<button type="button" data-outm="${k}" class="${cur === k ? 'active' : ''}">${l}</button>`).join('');
+}
+{ const _sl9 = syncLangPills; syncLangPills = function () { const x = _sl9.apply(this, arguments); try { syncTrPills(); } catch (e) { console.warn(e); } return x; }; }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-outm]'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  LS.set('outMode_' + $('#langSel').value, b.dataset.outm); syncTrPills();
+}, true);
+{ const _qa9 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) {
+  if (lang === 'he' || lang === 'en') {
+    const m = outModeFor(lang);
+    if (m === 'before') meta = Object.assign({}, meta, { wantNusach: true, outMode: 'before' });
+    else if (m === 'after') meta = Object.assign({}, meta, { wantAfter: true, outMode: 'after' });
+    else if (m !== 'same' && m !== lang && OUT_LN[m]) meta = Object.assign({}, meta, { wantTr: m });
+  }
+  return _qa9.call(this, blob, name, lang, title, meta);
+}; }
+
+/* ---------- חובה לבחור תיקייה לפני ששומרים הקלטה ---------- */
+let FOLDER_ASK = null;
+async function askFolder() {
+  if (FOLDER_ASK) return FOLDER_ASK;
+  FOLDER_ASK = (async () => {
+    for (let tries = 0; tries < 5; tries++) {
+      let chosen = null;
+      await modal(`<h3>📁 לאיזו תיקייה לשמור את ההקלטה?</h3>
+        <p class="muted">כדי שהכול יהיה מסודר וקל למצוא – כל הקלטה נשמרת בתיקייה.</p>
+        ${FOLDERS.length ? `<label>בחר תיקייה <select id="afSel" style="width:100%">${folderOptions('', '— בחר תיקייה —')}</select></label><div class="muted" style="margin:.5em 0 .2em">או</div>` : '<div class="muted">עוד אין תיקיות – תן שם לתיקייה הראשונה:</div>'}
+        <label>📂 תיקייה חדשה – שם: <input id="afNew" placeholder='למשל: שיחות קודש תשפ"ז'></label>`,
+      { okText: 'שמירה בתיקייה', cancelText: '', onOk: async (bg) => {
+        const nn = (bg.querySelector('#afNew') || {}).value; const sel = (bg.querySelector('#afSel') || {}).value;
+        if (nn && nn.trim()) {
+          const name = nn.trim();
+          const ex = FOLDERS.find((f) => f.name === name && f.owner === ME.id && !f.parent_id);
+          if (ex) chosen = ex.id;
+          else { const { data, error } = await sb.from('folders').insert({ name, owner: ME.id, parent_id: null }).select().single(); if (error) { toast('❌ ' + error.message, 5000); return; } chosen = data.id; await loadFolders(); try { fillUpFolder(); } catch (e) {} }
+        } else if (sel) chosen = sel;
+      } });
+      if (chosen) { const s = $('#upFolder'); if (s) { try { fillUpFolder(); } catch (e) {} s.value = chosen; } return chosen; }
+      toast('📁 צריך לבחור תיקייה (או לתת שם לתיקייה חדשה)', 3500);
+    }
+    return null;
+  })();
+  try { return await FOLDER_ASK; } finally { setTimeout(() => { FOLDER_ASK = null; }, 1500); }
+}
+{ const _qa10 = Queue.add; Queue.add = async function (blob, name, lang, title, meta = {}) {
+  if (typeof VIEW_AS !== 'undefined' && VIEW_AS) return _qa10.apply(this, arguments);
+  const has = meta.folderId !== undefined && meta.folderId !== null && meta.folderId !== '' ? true : (meta.folderId === undefined && !!($('#upFolder') && $('#upFolder').value));
+  if (!has) {
+    const f = await askFolder();
+    if (!f) { toast('❌ ההקלטה לא נשמרה – לא נבחרה תיקייה', 6000); return null; }
+    meta = Object.assign({}, meta, { folderId: f });
+  }
+  return _qa10.call(this, blob, name, lang, title, meta);
+}; }
+
 </script>
 </body>
 </html>
