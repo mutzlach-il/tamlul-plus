@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.7';
+const APP_VERSION = '3.9.8';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -7791,6 +7791,286 @@ document.addEventListener('click', (e) => { const b = e.target.closest('[data-se
     } catch (e) {}
   }, 20000);
   return r;
+}; }
+
+
+/* =========================================================
+   3.9.8 – לומדים מהר מכל מי שמתקן: מי תיקן · יידיש לחוד ועברית לחוד · תיקון פעיל מיד ·
+   תיקון מאושר מוחלף אוטומטית · כתיב יידיש נלמד מכל הקלטה שתוקנה · מדריכי כתיבה לפני/אחרי עריכה
+   ========================================================= */
+const GUIDE_DEFAULT = {
+  before: `מדריך כתיבה – "לפני עריכה" (נוסח ראשון של השיחה)
+מה זה: השיחה כפי שנאמרה, כתובה בלשון הקודש של ספרי החסידות, כמאמר רצוף אחד – עדיין לא הנוסח לדפוס.
+מבנה: שורה ראשונה בס"ד (אם יש), אחריה שורת הנושא "רעווא דרעווין פרשת ___ תשפ"_" או שם המאורע (נעילת החג שבועות תשפ"ב וכו'), אחריה הפסוק הפותח עם מקומו בסוגריים קצרים, למשל (מז, כח-כט). אחר כך פסקאות רצופות – בלי כותרות משנה, בלי סימנים, בלי הדגשות, בלי נקודות ומספרים. סיום: פסקת ברכה קצרה כמו שנאמרה ("יעזור ד' / יתן ד' שנזכה... ובא לציון גואל... ונזכה לבנין בית המקדש במהרה בימינו אמן").
+אורך: בערך חצי ממספר המילים שנאמרו (שיחה של 15–20 דקות = 900–1,300 מילים). כל רעיון, מקור, סיפור וקושיא נשארים בסדר שנאמרו; רק החזרות, מילות המילוי והגמגומים יורדים.
+לשון: עברית רבנית של ספרים – לא עברית מדוברת ולא תרגום מילולי מיידיש. פתיחות פסקה: יש להבין... / והקשו בספה"ק... / ויובן בהקדם... / וביאר דהנה... / וזהו... / והנה... / וכן מובא... / ובפרט... / ובזכות זה... . שם ה': ד' או השי"ת. קיצורים: ע"ה, ח"ו, רח"ל, ע"כ, עה"פ, וכמ"ש, ר"ת, מסי"נ, ספה"ק, בב"א, ע"י, עי"ז. תארי האדמו"רים בדיוק כמו ברשימה.
+לא עושים: לא מוסיפים מקורות שלא נאמרו ולא מספרי דפים מהראש; לא מוסיפים רעיונות, סיפורים או הסברים; לא מוסיפים כותרות (זה תפקיד "אחרי עריכה").`,
+  after: `מדריך כתיבה – "אחרי עריכה" (הנוסח לדפוס, חוברת "דברי אלוקים חיים")
+מבנה, כל חלק מופרד בשורה ריקה: (1) # שורות כותרת – 2–4 שורות קצרות בראש המאמר שמסכמות את המסר הראשי. (2) @ רעוא דרעווין פרשת ___ תשפ"_ (או שם המאורע). (3) > הפסוק הפותח. (4) גוף המאמר בפסקאות רגילות. (5) ## כותרות משנה – משפט אחד שאומר את הנקודה של הקטע הבא, כל 2–4 פסקאות, 6–8 כותרות במאמר רגיל (עד 12 בארוך), למשל "## עבודת ימי השובבי"ם". (6) סיום: פסקת ברכה וקבלה מעשית "...יעזור ד' שנזכה... ובא לציון גואל ולשבי פשע ביעקב, ונזכה לבנין בית המקדש במהרה בימינו, אמן."
+אורך: פי 1.7–1.9 מנוסח "לפני עריכה" (ויחי 1,024←1,896 מילים; שמות 1,066←1,811). נוסח מודפס רגיל 1,800–2,300 מילים.
+מוסיפים – רק מתוך מה שנאמר בהקלטה: מראי מקומות מדויקים בסוגריים מיד אחרי ציטוט – (בראשית כד, א), (עבודה זרה י ע"ב), (זוהר ח"א קכט ע"א), (תולדות אדם ויחי, ד"ה ויחי יעקב) – דף כותבים "י ע"ב" ולא "י:"; ציטוט בלשונו: "וז"ל: ..." ובסוף עכ"ל / עכד"ק / יעו"ש; פרטים, הסברים וסיפורים שהנוסח הראשון קיצר – מתוך ההקלטה המלאה; מילות קישור: ויובן בהקדם... / וביתר ביאור... / וכוונת הדברים... / נמצא ש... / ובזה יובן... / והנראה... ; הדגשה **...** לשם הצדיק או הספר שמביאים ממנו בתחילת הדבר: **אאמו"ר זצ"ל זיעוכי"א**, **בזוהר הקדוש**.
+משנים: "השם" ← "השי"ת"; "ד'" ← לרוב "ה'" או "השי"ת"; משפטים ארוכים של פסיקים מתחלקים למשפטים עם נקודות.
+לא עושים (חשוב מאוד): לא מוסיפים רעיון, סיפור, מקור או פירוש שהאדמו"ר לא הביא – כל התוכן מההקלטה הזו בלבד; לא כותבים מראה מקום כשלא בטוחים (עדיף בלי); לא מעתיקים משיחה אחרת; בלי נקודות, מספור, חותמות זמן, ובלי סימנים חוץ מ-# @ > ## ו-**.`
+};
+function guideText(kind) {
+  const g = (STYLE_EX || []).filter((x) => x.kind === 'guide_' + kind && x.target_text).slice(-1)[0];
+  return g ? g.target_text : GUIDE_DEFAULT[kind] || '';
+}
+// המדריך נכנס לכל כתיבת נוסח, לפני הדוגמאות
+{ const _np8 = nusachPrompt; nusachPrompt = function (kind, part, examples, ctx) {
+  const p = _np8.apply(this, arguments);
+  const g = guideText(kind); if (!g) return p;
+  const add = `\n===== THE HOUSE STYLE GUIDE (written by the editors – follow it exactly) =====\n${g}\n`;
+  const at = p.indexOf('===== EXAMPLES');
+  return at > 0 ? p.slice(0, at) + add + '\n' + p.slice(at) : p + add;
+}; }
+// מדריכים לא נכנסים כדוגמאות
+{ const _pe8 = pickExamples; pickExamples = function (list, rec, kind, maxChars) { return _pe8.call(this, (list || []).filter((x) => !String(x.kind).startsWith('guide_')), rec, kind, maxChars); }; }
+
+/* ---------- תיקונים: יידיש לחוד, עברית לחוד, פעילים מיד ---------- */
+let FIX_KIND = 'he';
+loadFixes = async function (force) {
+  if (FIXES && !force && FIXES._at > Date.now() - 5 * 60 * 1000) return FIXES;
+  let data = null;
+  try { const r = await sb.from('nusach_fixes').select('id,wrong,right,hits,kind,confirmed,updated_at').order('hits', { ascending: false }).order('updated_at', { ascending: false }).limit(600); data = r.data; if (r.error) throw r.error; }
+  catch (e) { try { const r = await sb.from('nusach_fixes').select('wrong,right,hits').order('hits', { ascending: false }).limit(400); data = r.data; } catch (e2) {} }
+  FIXES = (data || []).filter((f) => (f.hits || 0) >= 1); FIXES._at = Date.now();
+  return FIXES;
+};
+fixesText = function (max = 2500) {
+  let s = '';
+  for (const f of (FIXES || [])) {
+    if (f.kind && f.kind !== 'all' && f.kind !== FIX_KIND) continue;
+    const l = `${f.wrong} ← ${f.right}`; if ((s + l).length > max) break; s += (s ? ' | ' : '') + l;
+  }
+  return s;
+};
+{ const _gp8 = gemPrompt; gemPrompt = function (lang) {
+  const yi = lang === 'yi' || lang === 'auto';
+  const old = FIX_KIND; FIX_KIND = yi ? 'yi' : 'he';
+  try {
+    let p = _gp8.apply(this, arguments);
+    if (yi) {
+      // עוד דוגמאות כתיב – מכל הקלטה ביידיש שמישהו תיקן (החדשות קודם)
+      const exs = (STYLE_EX || []).filter((x) => x.kind === 'yi' && x.target_text);
+      const more = exs.slice(0, -1).reverse().slice(0, 3);
+      if (more.length) p += `\nMORE CORRECTED YIDDISH (how the editors fixed earlier transcripts – copy the SPELLING and the way names/quotes are written, NOT the content):\n` + more.map((x) => '«' + x.target_text.slice(0, 900) + '»').join('\n');
+    }
+    return p;
+  } finally { FIX_KIND = old; }
+}; }
+// תיקון שאושר (✅) או שחזר 3 פעמים – מוחלף אוטומטית בטקסט, בלי לחכות למודל
+function autoFix(text, kind) {
+  let t = String(text || ''); if (!t || !FIXES) return t;
+  for (const f of FIXES) {
+    if (!(f.confirmed || (f.hits || 0) >= 3)) continue;
+    if (f.kind && f.kind !== 'all' && f.kind !== kind) continue;
+    const w = String(f.wrong || '').trim(); if (w.length < 4 && !/\s/.test(w)) continue;
+    const re = new RegExp('(^|[\\s"\'״׳(\\[,.:;!?־-])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=$|[\\s"\'״׳)\\],.:;!?־-])', 'g');
+    t = t.replace(re, (m, pre) => pre + f.right);
+  }
+  return t;
+}
+{ const _tb8 = transcribeBlob; transcribeBlob = async function (blob, name, lang) {
+  try { await loadFixes(); } catch (e) {}
+  const res = await _tb8.apply(this, arguments);
+  try {
+    if (res && res.segments && res.segments.length) {
+      const k = lang === 'yi' || lang === 'auto' ? 'yi' : 'he';
+      res.segments = res.segments.map((s) => Object.assign({}, s, { text: autoFix(s.text, k) }));
+      res.text = res.segments.map((s) => s.text).join(' ');
+    }
+  } catch (e) { console.warn('autofix', e); }
+  return res;
+}; }
+{ const _gt8 = gemText; gemText = async function (prompt, kind) {
+  const out = await _gt8.apply(this, arguments);
+  return (kind === 'nusach' || kind === 'proof') && typeof out === 'string' ? autoFix(out, 'he') : out;
+}; }
+
+/* ---------- כל תיקון נרשם: מה, מי, באיזו הקלטה ---------- */
+function fixKindFor(rec) {
+  if (document.querySelector('#nEditTa')) return 'he';
+  if (!rec) return 'all';
+  const yo = rec.extras && rec.extras.yiOrig && rec.extras.yiOrig.length;
+  return rec.lang === 'yi' && !yo && rec.outLang !== 'he' ? 'yi' : 'he';
+}
+learnFixes = async function (before, after, kind) {
+  const fx = wordFixes(before, after); if (!fx.length) return 0;
+  const rec = Detail.rec; const k = kind || fixKindFor(rec);
+  let n = 0;
+  for (const [w, r] of fx) {
+    try {
+      let { error } = await sb.rpc('add_nusach_fix2', { p_wrong: w.slice(0, 120), p_right: r.slice(0, 160), p_kind: k, p_rec: rec ? rec.id : null, p_rec_title: rec ? rec.title : null });
+      if (error) ({ error } = await sb.rpc('add_nusach_fix', { p_wrong: w.slice(0, 120), p_right: r.slice(0, 160) }));
+      if (!error) n++;
+    } catch (e) {}
+  }
+  await loadFixes(true); return n;
+};
+
+/* ---------- כתיב היידיש: הקלטה שתוקנה הופכת לדוגמה לכל ההקלטות הבאות ---------- */
+const YI_FIRST = {}, YI_EDITS = {}, YI_TIMER = {};
+{ const _do8 = Detail.open; Detail.open = async function () {
+  const x = await _do8.apply(this, arguments);
+  try { const r = this.rec; if (r && r.segments && !YI_FIRST[r.id]) YI_FIRST[r.id] = r.segments.map((s) => s.text).join('\n'); } catch (e) {}
+  return x;
+}; }
+{ const _sr8 = saveRec; saveRec = async function (rec, fields) {
+  let changed = 0;
+  try {
+    if (fields && fields.includes('segments') && rec && rec.id && SEG_SNAP[rec.id] && fixKindFor(rec) === 'yi') {
+      const old = SEG_SNAP[rec.id], now = (rec.segments || []).map((s) => s.text);
+      for (let i = 0; i < Math.min(old.length, now.length); i++) if (old[i] !== now[i]) changed++;
+    }
+  } catch (e) {}
+  const res = await _sr8.apply(this, arguments);
+  if (changed && !VIEW_AS) {
+    YI_EDITS[rec.id] = (YI_EDITS[rec.id] || 0) + changed;
+    clearTimeout(YI_TIMER[rec.id]);
+    YI_TIMER[rec.id] = setTimeout(() => learnYiExample(rec).catch((e) => console.warn('learn yi', e)), 8000);
+  }
+  return res;
+}; }
+async function learnYiExample(rec) {
+  if ((YI_EDITS[rec.id] || 0) < 2) return;
+  const now = (rec.segments || []).map((s) => s.text).join('\n').trim();
+  if (now.length < 200) return;
+  await loadStyleExamples();
+  const prev = (STYLE_EX || []).find((x) => x.kind === 'yi' && x.rec_id === rec.id);
+  const src = prev && prev.source_text ? prev.source_text : (YI_FIRST[rec.id] || '');
+  // שומרים את האזור שתוקן הכי הרבה (עד 6000 תווים) – שם רואים הכי טוב איך כותבים
+  const { error } = await sb.rpc('learn_example', { p_kind: 'yi', p_rec: rec.id, p_title: (rec.title || 'הקלטה') + ' – כתיב מתוקן', p_src: src.slice(0, 40000), p_target: now.slice(0, 60000) });
+  if (error) return console.warn('learn_example', error.message);
+  await loadStyleExamples(true);
+  if (!prev) toast('🧠 ההקלטה המתוקנת נשמרה כדוגמה – מעכשיו המערכת תכתוב יידיש כמו שתיקנת', 5000);
+}
+// לימוד מילים מתיקון נוסח (✏️) – שומרים את הנוסח שלפני התיקון לפני שמישהו אחר מאפס אותו
+let NCTX8 = null;
+document.addEventListener('click', (e) => { const t = e.target.closest('[data-nedit]'); if (t && Detail.rec) NCTX8 = { rec: Detail.rec, k: t.dataset.nedit, before: ((Detail.rec.extras || {}).nusach || {})[t.dataset.nedit] || '' }; }, true);
+document.addEventListener('click', (e) => {
+  if (!NCTX8 || !e.target.closest('.modal-bg [data-ok]') || !document.querySelector('#nEditTa')) return;
+  const c = NCTX8, after = document.querySelector('#nEditTa').value;
+  if (!c.before || after === c.before || VIEW_AS) return;
+  setTimeout(() => { learnFixes(c.before, after, 'he').then((k) => { if (k) toast(`🧠 נלמדו ${k} תיקוני מילים מהנוסח – נרשם בשמך`, 5000); }); }, 2500);
+}, true);
+// לימוד נוסח (✏️) – גם ממשתמשים שאינם עורכים
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.modal-bg [data-ok]') || !document.querySelector('#nEditTa')) return;
+  if (ME && (ME.role === 'admin' || ME.role === 'editor')) return; // לעורכים זה כבר קורה
+  const r = Detail.rec; const k = (NCTX8 && NCTX8.k) || NUSACH_TAB;
+  setTimeout(async () => {
+    try {
+      const txt = r && r.extras && r.extras.nusach && r.extras.nusach[k];
+      if (!txt || (k !== 'before' && k !== 'after')) return;
+      const src = k === 'before' ? nusachSource(r, 'before').text : (r.extras.nusach.before || '');
+      const { error } = await sb.rpc('learn_example', { p_kind: k, p_rec: r.id, p_title: r.title, p_src: (src || '').slice(0, 30000), p_target: txt });
+      if (!error) { await loadStyleExamples(true); toast('🧠 המערכת למדה מהתיקון שלך', 4000); }
+    } catch (er) {}
+  }, 1800);
+}, true);
+
+/* ---------- הסבר קטן למשתמשים: איך מתקנים ---------- */
+{ const _do9 = Detail.open; Detail.open = async function () {
+  const x = await _do9.apply(this, arguments);
+  try {
+    const t = $('#dTranscript'); const r = this.rec;
+    if (t && r && r.status === 'done' && !VIEW_AS && !$('#learnHint')) t.insertAdjacentHTML('beforebegin', `<div id="learnHint" class="muted" style="background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:.45em .7em;margin:.4em 0;font-size:.9em">🧠 ראית טעות? <b>לחיצה כפולה על המשפט</b> ← לתקן ← לשמור. המערכת לומדת מכל תיקון של כל משתמש, ולא תחזור על הטעות.</div>`);
+  } catch (e) {}
+  return x;
+}; }
+
+/* ---------- ניהול התיקונים: מי תיקן, איפה, יומן ---------- */
+openFixes = async function (tab) {
+  const isEd = ME.role === 'admin' || ME.role === 'editor';
+  let data = []; try { const r = await sb.from('nusach_fixes').select('id,wrong,right,hits,kind,confirmed,last_by_name,rec_title,updated_at').order('updated_at', { ascending: false }).limit(400); data = r.data || []; } catch (e) {}
+  const KN = { yi: '🗣️ יידיש', he: '📜 עברית', all: '🌐 הכל', off: '⏸️ מושהה – ✅ להפעיל' };
+  const rows = data.map((f) => `<div class="act-row" style="flex-wrap:wrap"><b class="grow" dir="rtl">${esc(f.wrong)} ← ${esc(f.right)}</b><span class="badge">${KN[f.kind] || KN.all}</span><span class="badge ${f.confirmed || f.hits >= 3 ? 'ok' : ''}" title="כמה פעמים תוקן כך">${f.hits}×${f.confirmed ? ' · מאושר – מוחלף לבד' : f.hits >= 3 ? ' · מוחלף לבד' : ' · פעיל'}</span><span class="muted" style="font-size:.82em;width:100%">${f.last_by_name ? '👤 ' + esc(f.last_by_name) : ''}${f.rec_title ? ' · 🎙️ ' + esc(f.rec_title) : ''}${f.updated_at ? ' · ' + new Date(f.updated_at).toLocaleDateString('he-IL') : ''}</span>${isEd ? `<button class="btn small" data-fixup="${f.id}" title="לאשר – יוחלף אוטומטית בכל תמלול">✅</button><button class="btn small danger" data-fixdel="${f.id}" title="תיקון לא נכון – למחוק">🗑️</button>` : ''}</div>`).join('');
+  const nYi = data.filter((f) => f.kind === 'yi').length, nHe = data.filter((f) => f.kind === 'he').length;
+  modal(`<h3>🧠 תיקונים שהמערכת למדה (${data.length})</h3>
+    <p class="muted">כל תיקון של כל משתמש – בתמלול היידיש, בתרגום או בנוסח – נרשם כאן מיד, עם שם מי שתיקן, ונכנס לפעולה מיד. תיקון שאישרת ב-✅ (או שחזר 3 פעמים) מוחלף אוטומטית בכל תמלול חדש. תיקון לא נכון – 🗑️.</p>
+    <div class="row" style="gap:.4em;flex-wrap:wrap;margin:.3em 0"><span class="badge">🗣️ יידיש: ${nYi}</span><span class="badge">📜 עברית: ${nHe}</span>${isEd ? '<button class="btn small" id="fxLog">📒 יומן – מי תיקן מה</button>' : ''}</div>
+    <div class="row" style="gap:.4em;margin:.4em 0;flex-wrap:wrap"><input id="fxW" placeholder="מילה שגויה" style="width:auto"> ← <input id="fxR" placeholder="מילה נכונה" style="width:auto"><select id="fxK" style="width:auto"><option value="yi">🗣️ ביידיש</option><option value="he">📜 בעברית</option><option value="all">🌐 בשניהם</option></select><button class="btn small primary" id="fxAdd2">➕ הוספה</button></div>
+    ${rows || '<div class="empty"><b>עוד אין תיקונים</b></div>'}`, { okText: 'סגירה', cancelText: '', wide: true });
+};
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('#fxAdd2')) {
+    e.stopPropagation();
+    const w = $('#fxW').value.trim(), r = $('#fxR').value.trim(), k = $('#fxK').value; if (!w || !r) return;
+    await sb.rpc('add_nusach_fix2', { p_wrong: w, p_right: r, p_kind: k, p_rec: null, p_rec_title: 'הוספה ידנית' });
+    const { data } = await sb.from('nusach_fixes').select('id').eq('wrong', w).eq('right', r).limit(1);
+    if (data && data[0]) await sb.rpc('add_nusach_fix_set', { p_id: data[0].id });
+    toast('✅ נוסף ומאושר'); const m = e.target.closest('.modal-bg'); if (m) m.remove(); await loadFixes(true); return openFixes();
+  }
+  if (e.target.closest('#fxLog')) {
+    const { data } = await sb.from('nusach_fix_log').select('*').order('created_at', { ascending: false }).limit(300);
+    const byUser = {}; (data || []).forEach((l) => { byUser[l.user_name || '?'] = (byUser[l.user_name || '?'] || 0) + 1; });
+    modal(`<h3>📒 יומן תיקונים – מי תיקן מה</h3>
+      <div class="row" style="gap:.4em;flex-wrap:wrap;margin:.3em 0">${Object.entries(byUser).sort((a, b) => b[1] - a[1]).map(([u, n]) => `<span class="badge">👤 ${esc(u)}: ${n}</span>`).join('')}</div>
+      ${(data || []).map((l) => `<div class="act-row" style="flex-wrap:wrap"><b class="grow" dir="rtl">${esc(l.wrong)} ← ${esc(l.right)}</b><span class="muted" style="font-size:.82em">👤 ${esc(l.user_name || '')} · ${l.kind === 'yi' ? '🗣️' : '📜'} · ${esc(l.rec_title || '')} · ${new Date(l.created_at).toLocaleString('he-IL')}</span></div>`).join('') || '<div class="empty">ריק</div>'}`, { okText: 'סגירה', cancelText: '', wide: true });
+  }
+});
+
+/* ---------- חלון הדוגמאות: מדריכי הכתיבה, ומי לימד כל דוגמה ---------- */
+{ const _os8 = openStyleExamples; openStyleExamples = async function () {
+  const x = await _os8.apply(this, arguments);
+  try {
+    const isEd = ME.role === 'admin' || ME.role === 'editor';
+    $$('.modal-bg [data-sexview]').forEach((v) => {
+      const ex = (STYLE_EX || []).find((y) => y.id === v.dataset.sexview); if (!ex) return;
+      const row = v.closest('.act-row');
+      if (String(ex.kind).startsWith('guide_')) { row && row.remove(); return; }
+      if (ex.kind === 'yi') { const b = row && row.querySelector('.badge'); if (b) b.textContent = '🗣️ כתיב יידיש'; }
+      if (ex.by_name && row && !row.querySelector('.byname')) v.insertAdjacentHTML('beforebegin', `<span class="badge byname" title="נלמד מתיקון של">👤 ${esc(ex.by_name)}</span>`);
+    });
+    const cnt = (k) => (STYLE_EX || []).filter((y) => y.kind === k).length;
+    const h = document.querySelector('.modal-bg h3');
+    if (h && !$('#guideBox')) h.insertAdjacentHTML('afterend', `<div id="guideBox" style="background:#fff7ed;border:2px solid #fb923c;border-radius:12px;padding:.6em .8em;margin:.5em 0">
+      <b>📘 מדריכי הכתיבה – לפיהם המערכת כותבת</b>
+      <div class="muted" style="font-size:.88em;margin:.2em 0 .4em">נכתבו מתוך כל הדוגמאות: איך כותבים "לפני עריכה", ואיך "אחרי עריכה" – כותרות, מה מוסיפים ומה לא. אפשר לשנות.</div>
+      <div class="row" style="gap:.4em;flex-wrap:wrap"><button class="btn small" data-guide="before">📜 מדריך "לפני עריכה"</button><button class="btn small" data-guide="after">🖨️ מדריך "אחרי עריכה"</button>
+      <span class="badge">📜 ${cnt('before')} דוגמאות לפני</span><span class="badge">🖨️ ${cnt('after')} דוגמאות אחרי</span><span class="badge">🗣️ ${cnt('yi')} דוגמאות כתיב יידיש</span></div></div>`);
+    if (!isEd) $$('[data-guide]').forEach((b) => (b.title = 'צפייה בלבד'));
+  } catch (e) { console.warn(e); }
+  return x;
+}; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-guide]'); if (!b) return;
+  e.stopPropagation();
+  const k = b.dataset.guide, isEd = ME.role === 'admin' || ME.role === 'editor';
+  let val = null;
+  await modal(`<h3>${k === 'before' ? '📜 מדריך כתיבה – לפני עריכה' : '🖨️ מדריך כתיבה – אחרי עריכה'}</h3>
+    <p class="muted">המערכת קוראת את המדריך הזה לפני כל כתיבת נוסח. ${isEd ? 'אפשר לתקן ולהוסיף כללים, ואז "שמירה".' : ''}</p>
+    <textarea id="guideTa" rows="18" dir="rtl" style="width:100%" ${isEd ? '' : 'readonly'}>${esc(guideText(k))}</textarea>`,
+  { okText: isEd ? 'שמירה' : 'סגירה', cancelText: isEd ? 'ביטול' : '', wide: true, onOk: (bg) => { val = bg.querySelector('#guideTa').value.trim(); } });
+  if (!isEd || !val || val === guideText(k)) return;
+  await sb.from('style_examples').delete().eq('kind', 'guide_' + k);
+  const { error } = await sb.from('style_examples').insert({ kind: 'guide_' + k, title: k === 'before' ? 'מדריך כתיבה – לפני עריכה' : 'מדריך כתיבה – אחרי עריכה', target_text: val, created_by: ME.id });
+  if (error) return toast('❌ ' + error.message);
+  await loadStyleExamples(true); toast('✅ המדריך נשמר – מעכשיו המערכת כותבת לפיו');
+}, true);
+
+/* ---------- קישור אוטומטי: דוגמה בלי הקלטה ← הקלטה עם אותו שם (גם כשמעלים את ההקלטה אחר כך) ---------- */
+async function autoLinkExamples() {
+  if (!ME || !(ME.role === 'admin' || ME.role === 'editor')) return 0;
+  await loadStyleExamples(true);
+  const norm = (s) => String(s || '').replace(/["'״׳]/g, '').replace(/\s+/g, ' ').trim();
+  const recs = [...RECS.values()].filter((x) => x.status === 'done' && !x.deletedAt);
+  let n = 0;
+  for (const ex of (STYLE_EX || []).filter((y) => (y.kind === 'before' || y.kind === 'after') && !y.source_text)) {
+    const m = recs.find((x) => norm(x.title) === norm(ex.title)); if (!m) continue;
+    let full = m; try { full = await fullRec(m.id); } catch (e) {}
+    const src = recVerbatim(full);
+    if (src.length > 100) { const { error } = await sb.from('style_examples').update({ source_text: src.slice(0, 40000), rec_id: m.id }).eq('id', ex.id); if (!error) n++; }
+  }
+  if (n) { await loadStyleExamples(true); toast(`🔗 ${n} דוגמאות קושרו להקלטות שלהן – המערכת לומדת מהן עכשיו זוג מלא`, 5000); }
+  return n;
+}
+{ const _ea8 = enterApp; enterApp = async function () {
+  const x = await _ea8.apply(this, arguments);
+  setTimeout(() => autoLinkExamples().catch(() => {}), 12000);
+  setInterval(() => autoLinkExamples().catch(() => {}), 10 * 60 * 1000);
+  return x;
 }; }
 
 </script>
