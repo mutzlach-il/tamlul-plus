@@ -872,6 +872,10 @@ body.viewas #toTop{display:none}
 .ntext .m-verse{background:#e9e6f5;text-align:center;font-weight:700;padding:.35em .6em;border-radius:8px;margin:.4em 0 .8em}
 .ntext .m-h{background:#e4e4ea;text-align:center;font-weight:800;padding:.35em .6em;border-radius:8px;margin:1em 0 .5em;font-size:1.02em}
 .ntext .src{font-size:.78em}
+#dNusach .bk-prev{background:#9a9a9a;border-radius:10px;overflow:hidden;margin-top:.5em}
+#dNusach .bk-prev iframe{display:block;width:100%;height:900px;border:0;background:#9a9a9a}
+#dNusach .bk-opts{display:flex;gap:1em;align-items:center;flex-wrap:wrap;margin:.4em 0 0}
+.qbar{height:6px;background:#0001;border-radius:4px;overflow:hidden;margin-top:4px;min-width:140px}.qbar i{display:block;height:100%;background:var(--accent,#d9b25a);transition:width .4s}
 #yiOutPills button.nus-pill.active{background:var(--accent,#d9b25a)!important;color:#222!important;border-color:var(--accent,#d9b25a)!important}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
@@ -1016,7 +1020,7 @@ body.viewas #toTop{display:none}
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="yi" data-iv="1">🗣️ ראיון / שיחה (יידיש)</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
         <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
-          <button data-yiout="yi">📜 כתיבה ביידיש</button><button data-yiout="he">🇮🇱 ישר לעברית</button><button data-yiout="both">📜+🇮🇱 גם וגם</button>
+          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="המערכת מתמללת מאחורי הקלעים וכותבת רק את הנוסח 'לפני העריכה' – בסגנון הדוגמאות שלכם">📜 יידיש ← לפני העריכה</button><button data-yiout="after" title="המערכת עושה הכול מאחורי הקלעים ומוציאה רק את הנוסח 'אחרי העריכה' – מוכן עם הלוגו, כמו החוברת">🖨️ יידיש ← אחרי העריכה</button>
         </div>
         <div class="lang-pills hidden" id="ivPills"><span style="font-weight:700;align-self:center">👥 איך לסמן את הדוברים:</span><button data-ivstyle="ab">א׳ / ב׳ / ג׳</button><button data-ivstyle="qa">שאלה / תשובה</button><span class="hint" id="ivVoices" style="align-self:center"></span></div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
@@ -1543,7 +1547,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.8.1';
+const APP_VERSION = '3.9.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2235,6 +2239,21 @@ async function geminiSubChunks(audio, st, en, lang, onProgress, opts = {}) {
   return out;
 }
 const GEM_MAX_INLINE = 5 * 1024 * 1024;
+async function chunkPiece(audio, st, en) {
+  const samples = await resampleMono16k(audio, st, en);
+  if (S('gem_chunk_fmt', 'mp3') !== 'wav') {
+    try {
+      if (!window.lamejs) await loadScript('https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js');
+      const enc = new lamejs.Mp3Encoder(1, 16000, 48), outB = [], block = 1152, pcm = new Int16Array(samples.length);
+      for (let i = 0; i < samples.length; i++) { const v = Math.max(-1, Math.min(1, samples[i])); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
+      for (let i = 0; i < pcm.length; i += block) { const b = enc.encodeBuffer(pcm.subarray(i, Math.min(pcm.length, i + block))); if (b.length) outB.push(new Uint8Array(b)); }
+      const fin = enc.flush(); if (fin.length) outB.push(new Uint8Array(fin));
+      const mp3 = new Blob(outB, { type: 'audio/mp3' });
+      if (mp3.size > 1000) return { blob: mp3, mime: 'audio/mp3' };
+    } catch (e) { console.warn('mp3 chunk failed – using wav', e); }
+  }
+  return { blob: encodeWav(samples), mime: 'audio/wav' };
+}
 const GEM_CHUNK_SEC = 120;   // השרת החינמי מוגבל ל-150 שניות לבקשה – לכן חלקים של 2 דקות
 async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   const ext = guessExt(blob, name);
@@ -2266,38 +2285,49 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
   const parts = Math.ceil(total / GEM_CHUNK_SEC);
   const out = { text: '', segments: [], duration: total, language: lang };
   const missing = []; let dayOut = false, busyRow = 0;
-  for (let i = 0; i < parts; i++) {
+  // 3.9 – מהיר יותר: כמה חלקים במקביל, וכל חלק נשלח כ-MP3 קטן (פי 5 פחות מ-WAV)
+  const isIv = !!(opts.rec && opts.rec.extras && opts.rec.extras.interview);
+  const CONC = isIv ? 1 : Math.max(1, Math.min(4, parseInt(S('gem_parallel', '3'), 10) || 3));
+  const results = new Array(parts); let doneN = 0, nextI = 0;
+  const report = () => onProgress && onProgress(parts > 1 ? `Gemini מתמלל… ${doneN} מתוך ${parts} חלקים (${Math.round(doneN / parts * 100)}%)` : 'Gemini מתמלל…');
+  report();
+  const doChunk = async (i) => {
     const st = i * GEM_CHUNK_SEC, en = Math.min(total, st + GEM_CHUNK_SEC);
-    onProgress && onProgress(`Gemini מתמלל חלק ${i + 1} מתוך ${parts}…`);
-    const isIv = !!(opts.rec && opts.rec.extras && opts.rec.extras.interview);
     const cacheKey = blob.size + ':' + lang + ':' + (opts.out || '') + ':' + (isIv ? 'iv:' : '') + i;
     const lsKey = opts.rec && opts.rec.id ? 'gc_' + opts.rec.id + '_' + cacheKey : null;
     let segs = GEM_CHUNK_CACHE.get(cacheKey) || (lsKey && LS.get(lsKey, null));
     if (!segs) {
-      if (dayOut || busyRow >= 2) { missing.push(i); out.segments.push({ start: st, end: en, text: `[⏸️ חלק ${i + 1} (${fmtTime(st)}–${fmtTime(en)}) עוד לא תומלל]` }); continue; }
-      const wav = encodeWav(await resampleMono16k(audio, st, en));
-      opts.deadline = Date.now() + 6 * 60 * 1000;   // לא יותר מ-6 דקות לחלק אחד – אחר כך ממשיכים הלאה
-      try { segs = await retrying(() => geminiTranscribeOne(wav, 'audio/wav', lang, en - st, opts), ` חלק ${i + 1}`); }
+      if (dayOut || busyRow >= 2) { results[i] = { miss: true, st, en }; return; }
+      const piece = await chunkPiece(audio, st, en);
+      const o = Object.assign({}, opts, { deadline: Date.now() + 6 * 60 * 1000 });   // לא יותר מ-6 דקות לחלק אחד
+      try { segs = await retrying(() => geminiTranscribeOne(piece.blob, piece.mime, lang, en - st, o), ` חלק ${i + 1}`); }
       catch (err0) {
         let err = err0;
         if (/לא החזיר/.test(err.message) && !err.dayQuota) {
-          try { segs = (await geminiSubChunks(audio, st, en, lang, (p) => onProgress && onProgress(`חלק ${i + 1}: ${p}`), opts)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st })); }
+          try { segs = (await geminiSubChunks(audio, st, en, lang, (pp) => onProgress && onProgress(`חלק ${i + 1}: ${pp}`), o)).map((x) => Object.assign({}, x, { start: x.start - st, end: x.end - st })); }
           catch (e2) { err = e2; segs = null; }
         }
         if (!segs) {
           if (err.status === 403 || (err.status === 400 && /API key|permission/i.test(err.message))) throw err;
           console.warn('chunk failed – skipping for now', i, err.message);
           if (err.dayQuota) dayOut = true; else busyRow++;
-          missing.push(i); out.segments.push({ start: st, end: en, text: `[⏸️ חלק ${i + 1} (${fmtTime(st)}–${fmtTime(en)}) עוד לא תומלל]` });
-          delete opts.deadline; continue;
+          results[i] = { miss: true, st, en }; return;
         }
       }
-      delete opts.deadline; busyRow = 0;
+      busyRow = 0;
       GEM_CHUNK_CACHE.set(cacheKey, segs);
       if (lsKey) try { LS.set(lsKey, segs); } catch (e) {}
     }
+    results[i] = { segs, st, en };
     if (isIv) opts.prevTail = segs.slice(-5).map((x) => x.text).join('\n');
-    segs.forEach((s) => out.segments.push({ start: Math.min(en, s.start + st), end: Math.min(en, s.end + st), text: s.text }));
+    doneN++; report();
+  };
+  const worker = async () => { while (nextI < parts) { const i = nextI++; await doChunk(i); } };
+  await Promise.all(Array.from({ length: Math.min(CONC, parts) }, worker));
+  for (let i = 0; i < parts; i++) {
+    const r = results[i] || { miss: true, st: i * GEM_CHUNK_SEC, en: Math.min(total, (i + 1) * GEM_CHUNK_SEC) };
+    if (r.miss) { missing.push(i); out.segments.push({ start: r.st, end: r.en, text: `[⏸️ חלק ${i + 1} (${fmtTime(r.st)}–${fmtTime(r.en)}) עוד לא תומלל]` }); continue; }
+    r.segs.forEach((s) => out.segments.push({ start: Math.min(r.en, s.start + r.st), end: Math.min(r.en, s.end + r.st), text: s.text }));
   }
   out.text = out.segments.map((s) => s.text).join(' ');
   if (missing.length) {
@@ -2380,9 +2410,9 @@ const Queue = {
     const when = meta.recDate ? new Date(meta.recDate + 'T12:00:00').getTime() : Date.now();
     const rec = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
-      lang, yiOut: lang === 'yi' ? LS.get('yiOut', 'both') : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
+      lang, yiOut: lang === 'yi' ? ({ before: 'yi', after: 'yi', en: 'yi' }[LS.get('yiOut', 'both')] || LS.get('yiOut', 'both')) : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
       speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
-      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {})
+      series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {}, meta.outMode ? { outMode: meta.outMode } : {}, meta.wantEn ? { wantEn: true } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
       speaker: rec.speaker, category: rec.category, parasha: rec.parasha, hyear: rec.hyear, occasion: rec.occasion, rec_date: rec.recDate, series: rec.series, series_no: rec.seriesNo, extras: rec.extras });
@@ -2409,11 +2439,12 @@ const Queue = {
     }
     if (!rec.filePath) {
       if (blob.size <= STORAGE_MAX) {
-        prog('☁️ שומר את ההקלטה בענן…');
         const ext = guessExt(blob, rec.fileName), path = `${ME.id}/${rec.id}.${ext}`;
-        const { error: ue } = await sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true });
-        if (ue) toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + ue.message, 6000);
-        else { rec.filePath = path; await saveRec(rec, ['filePath']).catch(() => {}); }
+        // 3.9: השמירה בענן רצה ברקע – התמלול מתחיל מיד ולא מחכה לה
+        rec._upP = sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true }).then(async ({ error: ue }) => {
+          if (ue) toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + ue.message, 6000);
+          else { rec.filePath = path; await saveRec(rec, ['filePath']).catch(() => {}); }
+        }).catch((e) => console.warn('upload', e));
       } else toast('⚠️ הקובץ גדול מדי לשמירה בענן (מעל 50MB) – התמלול יישמר, אבל השמע יישאר רק במחשב הזה', 7000);
     }
     return blob;
@@ -2456,13 +2487,22 @@ const Queue = {
               rec.translations = Object.assign({}, rec.translations, { he });
             } catch (e) { console.warn('auto translate failed', e); }
           }
+          if (rec.lang === 'yi' && res.text && rec.extras && rec.extras.wantEn && !(rec.translations && rec.translations.en) && perm('translate')) {
+            prog('🇺🇸 מתרגם לאנגלית…');
+            try {
+              const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
+              const en = await geminiTranslateText(src, 'en').catch(() => translateText(src, 'en'));
+              rec.translations = Object.assign({}, rec.translations, { en });
+            } catch (e) { console.warn('auto translate en failed', e); }
+          }
           if (res.text && rec.extras && rec.extras.wantNusach && !(rec.extras.nusach && rec.extras.nusach.before) && perm('translate')) {
-            prog('✍️ כותב נוסח כתיבה (לפני עריכה)…');
+            prog('📜 כותב את הנוסח "לפני העריכה"…');
             rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'before', { silent: true }); } catch (e) { console.warn('nusach failed', e); }
           }
-          if (res.text && rec.extras && rec.extras.wantAfter && rec.extras.nusach && rec.extras.nusach.before && !rec.extras.nusach.after && perm('translate')) {
-            prog('🖨️ כותב את הנוסח הסופי (אחרי עריכה)…');
+          if (res.text && rec.extras && rec.extras.wantAfter && !(rec.extras.nusach && rec.extras.nusach.after) && perm('translate')) {
+            prog('🖨️ כותב את הנוסח "אחרי העריכה" (עם הלוגו)…');
+            rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'after', { silent: true }); } catch (e) { console.warn('nusach after failed', e); }
           }
           if (res.text && looksDefaultTitle(rec)) {
@@ -2478,6 +2518,7 @@ const Queue = {
           if (err.partial && err.partial.segments && err.partial.segments.length) { rec.text = err.partial.text; rec.segments = err.partial.segments; rec.duration = err.partial.duration || rec.duration; }
           if (/^⏸️/.test(rec.error)) LS.set('pauseAt_' + rec.id, Date.now());
         }
+        if (rec._upP) { this.progress[id] = '☁️ מסיים לשמור את ההקלטה בענן…'; renderQueue(); try { await rec._upP; } catch (e) {} delete rec._upP; }
         delete this.progress[id];
         try {
           await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited']);
@@ -2512,7 +2553,7 @@ function renderQueue() {
   $('#queueList').innerHTML = shown.map((r) => {
     let st;
     const p = Queue.progress[r.id];
-    if (p) st = `<span class="spinner"></span><span class="badge">${esc(p)}</span>`;
+    if (p) { const pc = String(p).match(/(\d{1,3})%/); st = `<span class="spinner"></span><span><span class="badge">${esc(p)}</span>${pc ? `<div class="qbar"><i style="width:${Math.min(100, +pc[1])}%"></i></div>` : ''}</span>`; }
     else if (r.status === 'queued' || r.status === 'processing') st = '<span class="badge warn">ממתין</span>';
     else if (r.status === 'done') st = '<span class="badge ok">הושלם ✓</span>';
     else st = `<span class="badge err" title="${esc(r.error)}">נכשל</span>`;
@@ -6123,8 +6164,8 @@ setInterval(resumeQuotaWaits, 10 * 60 * 1000);
    המערכת לומדת את הסגנון מדוגמאות שנשמרות בטבלה style_examples
    ========================================================= */
 const NUSACH_KINDS = {
-  before: { icon: '📜', name: 'נוסח כתיבה (לפני עריכה)', short: 'לפני עריכה' },
-  after: { icon: '🖨️', name: 'נוסח סופי (אחרי עריכה – לדפוס)', short: 'אחרי עריכה' }
+  before: { icon: '📜', name: 'לפני העריכה', short: 'לפני העריכה' },
+  after: { icon: '🖨️', name: 'אחרי העריכה', short: 'אחרי העריכה' }
 };
 let STYLE_EX = null;
 async function loadStyleExamples(force) {
@@ -6137,6 +6178,7 @@ function nusachSource(rec, kind) {
   const ex = rec.extras || {};
   const segs = rec.segments && rec.segments.length ? rec.segments.map((s) => s.text).join('\n') : (rec.text || '');
   const verb = segs.replace(/\[⏸️[^\]]*\]/g, '').trim();
+  if (kind === 'after' && !(ex.nusach && ex.nusach.before)) return { text: verb, from: 'verbatim', whole: verb.length <= 60000, direct: true };
   if (kind === 'after' && ex.nusach && ex.nusach.before) return { text: `[הטיוטה – "לפני עריכה"]\n${ex.nusach.before}${verb ? `\n\n[התמלול המלא מילה במילה (יידיש) – להשלמת פרטים שהושמטו בטיוטה]\n${verb.slice(0, 45000)}` : ''}`, from: 'before', whole: true };
   return { text: verb, from: 'verbatim' };
 }
@@ -6171,7 +6213,7 @@ RULES:
 - If a word was misrecognized, write what was obviously meant from the context.
 - Paragraphs separated by one empty line.`
     : `You are the senior editor of "דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" (מכון דא"ח ביאלה), the weekly printed booklet of the Biala Rebbe's Torah talks.
-INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.
+${ctx.direct ? `INPUT: the full word-by-word transcript of a talk spoken in Hasidic Yiddish (it may contain speech-recognition errors and Hebrew/Aramaic quotes). There is no draft – you write the final version directly from the transcript, in Rabbinic Hebrew. Keep ALL the ideas, explanations, sources, stories and their order; remove repetitions and spoken-language noise; if a word was misrecognized, write what was obviously meant.` : `INPUT: (1) the first written draft ("לפני עריכה") of a talk, and (2) the full word-by-word Yiddish transcript of the same talk.`}
 OUTPUT: the final print-ready ma'amar ("אחרי עריכה") – EXACTLY like the printed examples below: the same structure, language, level of editing, length and typography markers.
 WHAT THE EDITORS DO (learn it from the examples):
 - Rabbinic Hebrew of the sefarim, polished and flowing. The final version is FULLER than the draft (usually ~1.5–2× longer): restore details, explanations and stories from the transcript that the draft shortened, and make every step of the argument clear.
@@ -6188,7 +6230,7 @@ No other markdown, no bullet points, no timestamps.`;
   const start = ctx.index === 0
     ? (kind === 'before' ? 'Start like the examples (בס"ד, then the opening verse / topic line).' : 'Start with the # title lines, then the @ line, then the > opening verse.')
     : `This is part ${ctx.index + 1} of ${ctx.total} of the same talk. Continue the written text seamlessly from where the previous part ended (do NOT write בס"ד or an opening again). The previous part ended with:\n«${ctx.prevTail}»`;
-  return `${task}\n${start}\nOutput ONLY the Hebrew text.\n\n===== EXAMPLES OF THE STYLE =====\n${ex || '(no examples yet)'}\n\n===== THE ${kind === 'before' ? 'TRANSCRIPT' : 'DRAFT'} TO WRITE UP =====\n${part}`;
+  return `${task}\n${start}\nOutput ONLY the Hebrew text.\n\n===== EXAMPLES OF THE STYLE =====\n${ex || '(no examples yet)'}\n\n===== THE ${kind === 'before' || ctx.direct ? 'TRANSCRIPT' : 'DRAFT'} TO WRITE UP =====\n${part}`;
 }
 async function gemText(prompt, kind, onProgress) {
   const models = (await geminiModels()).filter((m) => !GEM_DAY_OUT.has(m));
@@ -6217,25 +6259,25 @@ const NUSACH_BUSY = {};
 async function makeNusach(rec, kind = 'before', { silent = false } = {}) {
   if (NUSACH_BUSY[rec.id + kind]) return;
   const src = nusachSource(rec, kind);
-  if (!src.text || src.text.length < 40) { if (!silent) toast('אין עדיין תמלול מילה במילה – קודם צריך לתמלל'); return; }
+  if (!src.text || src.text.length < 40) { if (!silent) toast('אין עדיין תמלול – קודם צריך לתמלל'); return; }
   NUSACH_BUSY[rec.id + kind] = '…';
   const prog = (p) => { NUSACH_BUSY[rec.id + kind] = p; if (Detail.rec && Detail.rec.id === rec.id) renderNusach(); };
   try {
     prog('טוען דוגמאות נוסח…');
     const examples = pickExamples(await loadStyleExamples(), rec, kind);
-    const parts = src.whole ? [src.text] : splitText(src.text, 16000);
+    const parts = src.whole ? [src.text] : splitText(src.text, kind === 'after' ? 30000 : 16000);
     const out = [];
     for (let i = 0; i < parts.length; i++) {
       prog(parts.length > 1 ? `כותב את הנוסח – חלק ${i + 1} מתוך ${parts.length}…` : 'כותב את הנוסח… (בערך דקה)');
       const prevTail = out.length ? out[out.length - 1].slice(-600) : '';
-      out.push(await gemText(nusachPrompt(kind, parts[i], examples, { index: i, total: parts.length, prevTail }), 'nusach', prog));
+      out.push(await gemText(nusachPrompt(kind, parts[i], examples, { index: i, total: parts.length, prevTail, direct: !!src.direct }), 'nusach', prog));
     }
     rec.extras = Object.assign({}, rec.extras);
     rec.extras.nusach = Object.assign({}, rec.extras.nusach, { [kind]: out.join('\n\n'), [kind + 'At']: Date.now(), [kind + 'Ex']: examples.length });
     if (kind === 'before' && rec.extras.nusach.after) rec.extras.nusach.afterOld = true;
     await saveRec(rec, ['extras']);
     try { logAct && logAct('nusach', rec.title + ' · ' + NUSACH_KINDS[kind].short, rec.id); } catch (e) {}
-    if (!silent) toast(`${NUSACH_KINDS[kind].icon} ה${NUSACH_KINDS[kind].short.replace('לפני', 'נוסח לפני').replace('אחרי', 'נוסח אחרי')} מוכן ✅`);
+    if (!silent) toast(`${NUSACH_KINDS[kind].icon} "${NUSACH_KINDS[kind].short}" מוכן ✅`);
   } catch (err) {
     console.error(err);
     if (!silent) toast('❌ ' + (err.message || err), 7000);
@@ -6281,7 +6323,7 @@ function renderNusach() {
   const n = (r.extras && r.extras.nusach) || {};
   const canMake = perm('translate') && !VIEW_AS;
   const isYi = r.lang === 'yi' && r.outLang !== 'he';
-  const tabs = [['verbatim', isYi ? '📝 מילה במילה (יידיש)' : '📝 מילה במילה']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 לפני עריכה'], ['after', '🖨️ אחרי עריכה']]);
+  const tabs = [['verbatim', isYi ? '📝 התמלול המקורי (יידיש)' : '📝 התמלול המקורי']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 לפני העריכה'], ['after', '🖨️ אחרי העריכה']]);
   if (!tabs.some((x) => x[0] === NUSACH_TAB)) NUSACH_TAB = 'verbatim';
   const tr = r.translations || {};
   const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${(k === 'he' ? tr.he : k !== 'verbatim' && n[k]) ? ' ✓' : ''}</button>`).join('');
@@ -6302,20 +6344,61 @@ function renderNusach() {
         <button class="btn small" data-ncopy="${k}">📋 העתקה</button><button class="btn small" data-nword="${k}">📘 וורד</button><button class="btn small" data-nprint="${k}">🖨️ הדפסה / PDF</button>
         ${canMake ? `<button class="btn small can-edit" data-nedit="${k}">✏️ עריכה</button><button class="btn small can-edit" data-nmake="${k}">🔄 לכתוב מחדש</button>` : ''}
         ${canMake && ME.role !== 'viewer' ? `<button class="btn small can-edit" data-nasex="${k}" title="הנוסח הזה טוב? שמור אותו כדוגמה כדי שהמערכת תלמד ממנו">⭐ לשמור כדוגמה</button>` : ''}</div>
-        <div class="ntext ${k === 'after' ? 'marked' : ''}" id="nText" dir="rtl">${k === 'after' || /^(#|@|>)/m.test(txt) ? markedHtml(txt) : esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`;
+        ${k === 'after' ? `<div class="bk-opts"><label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="bkPrevCover" style="width:auto" ${LS.get('bookCover', true) ? 'checked' : ''}> עם דף השער</label><span class="muted" style="font-size:.88em">✏️ כדי לתקן מילה – "עריכה". 🖨️ כדי לשמור PDF – "הדפסה / PDF".</span></div><div class="bk-prev"><iframe id="bkPrev" title="אחרי העריכה – כמו החוברת" loading="lazy"></iframe></div>` : `<div class="ntext" id="nText" dir="rtl">${/^(#|@|>)/m.test(txt) ? markedHtml(txt) : esc(txt).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>').replace(/^/, '<p>') + '</p>'}</div>`}`;
     } else {
-      const why = k === 'after' && !n.before ? 'כדאי קודם לכתוב את הנוסח "לפני עריכה" – ממנו נכתב הנוסח הסופי.' : '';
+      const why = '';
       body = `<div class="nempty"><div style="font-size:2em">${NUSACH_KINDS[k].icon}</div><b>${NUSACH_KINDS[k].name}</b>
-        <div class="muted">${k === 'before' ? 'המערכת תכתוב מהתמלול מילה במילה מאמר בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח הסופי לדפוס – לפי הדוגמאות של "אחרי עריכה".'}</div>
+        <div class="muted">${k === 'before' ? 'המערכת תכתוב את הנוסח "לפני העריכה" בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח "אחרי העריכה" – עם הלוגו והעימוד של החוברת, לפי הדוגמאות שלכם.'}</div>
         <div class="muted" style="font-size:.9em">📚 דוגמאות שהמערכת לומדת מהן: <b>${exN}</b>${!exN ? ' – עוד אין דוגמאות מהסוג הזה (אפשר להוסיף בהגדרות ← 📚 דוגמאות נוסח)' : ''}</div>
         ${why ? `<div class="muted">${why}</div>` : ''}
         ${canMake ? `<button class="btn primary" data-nmake="${k}" ${!src.text ? 'disabled' : ''}>${NUSACH_KINDS[k].icon} לכתוב עכשיו</button>` : '<div class="muted">אין לך הרשאה ליצור נוסח</div>'}</div>`;
     }
   }
   box.innerHTML = `<div class="ntabs"><b style="align-self:center">✍️ נוסחים:</b>${tabHtml}</div>${body}`;
+  try { if ($('#bkPrev')) fillBookPreview(r); } catch (e) { console.warn('booklet preview', e); }
+  try { syncVerbatimHide(r); } catch (e) {}
 }
+/* 3.9 – "אחרי העריכה" מוצג על המסך בדיוק כמו החוברת: שער עם הלוגו, מסגרת הכותרת, שני טורים */
+function bookOptsFor(rec, cover) {
+  const par = (rec.parasha ? 'פרשת ' + rec.parasha.replace(/^פרשת\s*/, '') : '') + (rec.hyear ? ' ' + shortYear(rec.hyear) : '');
+  return { cover: cover !== undefined ? cover : LS.get('bookCover', true), par: LS.get('bookParLast_' + rec.id, par), gil: LS.get('bookGilRec_' + rec.id, LS.get('bookGil', '')), zm: LS.get('bookZm', '') };
+}
+function fillBookPreview(rec) {
+  const fr = $('#bkPrev'); if (!fr) return;
+  const html = bookletHtml(rec, bookOptsFor(rec)).replace('</style>', `@media screen{html,body{background:#9a9a9a!important}body{padding:4mm 0}.cover,.page-wrap{margin:0 auto 6mm!important}}</style>`);
+  if (fr.dataset.h === String(html.length) + (rec.extras.nusach.afterAt || '')) return;
+  fr.dataset.h = String(html.length) + (rec.extras.nusach.afterAt || '');
+  fr.onload = () => {
+    try {
+      const d = fr.contentDocument; if (!d) return;
+      const fit = () => { const w = fr.clientWidth || 800; const z = Math.min(1, (w - 8) / 820); d.documentElement.style.zoom = z; fr.style.height = Math.ceil(d.documentElement.scrollHeight * z + 20) + 'px'; };
+      fit(); setTimeout(fit, 600); setTimeout(fit, 2000);
+      (d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve()).then(fit);
+    } catch (e) {}
+  };
+  fr.srcdoc = html;
+}
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'bkPrevCover' && Detail.rec) { LS.set('bookCover', e.target.checked); const fr = $('#bkPrev'); if (fr) fr.dataset.h = ''; fillBookPreview(Detail.rec); } });
+window.addEventListener('resize', () => { const fr = $('#bkPrev'); if (fr && fr.onload) try { fr.onload(); } catch (e) {} });
+/* בבחירה "לפני העריכה" / "אחרי העריכה" – לא מציגים את התמלול ביידיש (אפשר לפתוח אותו בלחיצה) */
+function syncVerbatimHide(rec) {
+  const m = rec && rec.extras && rec.extras.outMode;
+  const hide = (m === 'before' || m === 'after') && rec.status === 'done' && !LS.get('showVerb_' + rec.id, false);
+  const els = [$('#dTranscript'), $('.fbar.reading-keep'), $('#dTranscript') && $('#dTranscript').parentNode.querySelector('.hint.can-edit')].filter(Boolean);
+  els.forEach((el) => el.classList.toggle('hidden', hide));
+  let b = $('#showVerbBtn');
+  if ((m === 'before' || m === 'after') && rec.status === 'done') {
+    if (!b) { $('#dTranscript').insertAdjacentHTML('beforebegin', '<button type="button" class="btn small" id="showVerbBtn" style="margin:.5em 0"></button>'); b = $('#showVerbBtn'); }
+    b.textContent = hide ? '📝 להציג גם את התמלול המקורי (יידיש)' : '🙈 להסתיר את התמלול המקורי';
+  } else if (b) b.remove();
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#showVerbBtn') || !Detail.rec) return;
+  const k = 'showVerb_' + Detail.rec.id; LS.set(k, !LS.get(k, false)); syncVerbatimHide(Detail.rec);
+});
+{ const _rt9 = Detail.renderTranscript; Detail.renderTranscript = function () { const x = _rt9.apply(this, arguments); try { syncVerbatimHide(this.rec); } catch (e) {} return x; }; }
 { const _dr = Detail.renderTranslations; Detail.renderTranslations = function () { const x = _dr.apply(this, arguments); try { renderNusach(); } catch (e) { console.warn(e); } return x; }; }
-{ const _do = Detail.open; Detail.open = function () { NUSACH_TAB = 'verbatim'; if (!STYLE_EX) loadStyleExamples().then(() => { try { renderNusach(); } catch (e) {} }); return _do.apply(this, arguments); }; }
+{ const _do = Detail.open; Detail.open = function (id) { const _r = RECS.get(id); const _m = _r && _r.extras && _r.extras.outMode; NUSACH_TAB = _m === 'before' || _m === 'after' ? _m : 'verbatim'; if (!STYLE_EX) loadStyleExamples().then(() => { try { renderNusach(); } catch (e) {} }); return _do.apply(this, arguments); }; }
 
 function nusachHtmlDoc(rec, k) {
   const txt = rec.extras.nusach[k];
@@ -6335,7 +6418,7 @@ async function nusachDocx(rec, k) {
 document.addEventListener('click', async (e) => {
   const t = e.target.closest('[data-ntab],[data-nmake],[data-ncopy],[data-nword],[data-nprint],[data-nedit],[data-nasex]'); if (!t || !Detail.rec) return;
   const r = Detail.rec;
-  if (t.dataset.ntab) { NUSACH_TAB = t.dataset.ntab; if (NUSACH_TAB === 'verbatim') { const tr = $('#dTranscript'); tr && tr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } return renderNusach(); }
+  if (t.dataset.ntab) { NUSACH_TAB = t.dataset.ntab; if (NUSACH_TAB === 'verbatim') { LS.set('showVerb_' + r.id, true); syncVerbatimHide(r); const tr = $('#dTranscript'); tr && tr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } return renderNusach(); }
   if (t.dataset.nmake) { const k = t.dataset.nmake; if (r.extras && r.extras.nusach && r.extras.nusach[k] && !(await confirmBox('לכתוב את הנוסח מחדש? הנוסח הנוכחי יוחלף (כולל תיקונים שעשית בו).', 'כן, לכתוב מחדש'))) return; return makeNusach(r, k); }
   const k = t.dataset.ncopy || t.dataset.nword || t.dataset.nprint || t.dataset.nedit || t.dataset.nasex;
   const txt = r.extras && r.extras.nusach && r.extras.nusach[k]; if (!txt) return;
@@ -6358,6 +6441,7 @@ document.addEventListener('click', async (e) => {
 
 /* ---------- בהעלאה: "גם נוסח כתיבה" ---------- */
 function syncNusachPill() {
+  return;   // 3.9: "לפני העריכה" / "אחרי העריכה" הם עכשיו חלק מהבחירה "לכתוב את התמלול ב:"
   const host = $('#yiOutPills'); if (!host) return;
   if (!$('#nusBefore')) {
     host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'לפני עריכה' בלשון הקודש, בסגנון שלימדנו אותה">📜 לפני עריכה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'אחרי עריכה', מוכן להדפסה עם הלוגו">🖨️ אחרי עריכה</button>`);
@@ -6374,7 +6458,15 @@ document.addEventListener('click', (e) => {
   toast(on.length ? '✍️ אחרי התמלול ייכתב גם: ' + on.join(' + ') : 'רק תמלול – בלי נוסחים');
 }, true);
 { const _sl = syncLangPills; syncLangPills = function () { const x = _sl.apply(this, arguments); try { syncNusachPill(); } catch (e) {} return x; }; }
-{ const _qa3 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) { if (lang === 'yi') { const wb = LS.get('autoNusach', false), wa = LS.get('autoNusachAfter', false); if (wb || wa) meta = Object.assign({}, meta, { wantNusach: true, wantAfter: wa }); } return _qa3.call(this, blob, name, lang, title, meta); }; }
+{ const _qa3 = Queue.add; Queue.add = function (blob, name, lang, title, meta = {}) {
+  if (lang === 'yi') {
+    const mode = LS.get('yiOut', 'both');
+    if (mode === 'before') meta = Object.assign({}, meta, { wantNusach: true, outMode: 'before' });
+    else if (mode === 'after') meta = Object.assign({}, meta, { wantAfter: true, outMode: 'after' });
+    else if (mode === 'en') meta = Object.assign({}, meta, { wantEn: true, outMode: 'en' });
+  }
+  return _qa3.call(this, blob, name, lang, title, meta);
+}; }
 
 /* ---------- ניהול הדוגמאות (מנהל / עורך) ---------- */
 async function openStyleExamples() {
@@ -6513,7 +6605,7 @@ body{font-family:'Frank Ruhl Libre','David',serif;color:#000;-webkit-print-color
 .cover img{position:absolute;inset:0;width:100%;height:100%}
 .cover .par{position:absolute;top:74.6%;left:6%;right:6%;text-align:center;font-weight:900;font-size:17pt;letter-spacing:.2px}
 .cover .zm{position:absolute;top:80.4%;left:17%;right:17%;border:1.6pt solid #222;border-radius:9mm;background:#fff;text-align:center;font-weight:700;font-size:11.5pt;padding:2.2mm 3mm}
-.banner{position:relative;width:92%;margin:0 auto 2.5mm;aspect-ratio:1058/357;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3% 11%}
+.banner{position:relative;z-index:0;isolation:isolate;width:92%;margin:0 auto 2.5mm;aspect-ratio:1058/357;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3% 11%}
 .banner img{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
 .banner .t{font-weight:900;font-size:15.5pt;line-height:1.25}
 .banner .r{font-weight:700;font-size:11pt;margin-top:2.2mm}
@@ -6533,6 +6625,40 @@ ${titles.length || reva ? `<div class="banner"><img src="${abs('print-banner.png
 ${verse ? `<div class="verse">${inlineMarked(verse.t)}</div>` : ''}
 <div class="cols">${bodyHtml}</div>
 </div></body></html>`;
+}
+/* 3.9 – תמונות הלוגו לוורד: השער והמסגרת של הכותרת, עם הטקסט כבר בתוכן */
+function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => rej(new Error('לא נטענה תמונה: ' + src)); i.src = src; }); }
+const BK_FONT = "'Frank Ruhl Libre','Frank Ruehl CLM','David',serif";
+async function bkFonts() { try { if (!document.getElementById('bkFontLink')) { const l = document.createElement('link'); l.id = 'bkFontLink'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&display=swap'; document.head.appendChild(l); } await Promise.race([Promise.all([document.fonts.load("900 40px 'Frank Ruhl Libre'"), document.fonts.load("700 40px 'Frank Ruhl Libre'")]), sleep(2500)]); } catch (e) {} }
+function canvasBlob(c) { return new Promise((res) => c.toBlob((b) => res(b), 'image/png')); }
+function fitText(ctx, t, weight, size, maxW) { let s = size; do { ctx.font = `${weight} ${s}px ${BK_FONT}`; s -= 2; } while (ctx.measureText(t).width > maxW && s > 14); }
+async function coverPng(o) {
+  await bkFonts();
+  const img = await loadImg('print-cover.jpg');
+  const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0); ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000';
+  const W = c.width, H = c.height;
+  if (o.par) { const t = '• ' + o.par + (o.gil ? ' • גיליון ' + o.gil : '') + ' •'; fitText(ctx, t, 900, Math.round(H * 0.02), W * 0.86); ctx.fillText(t, W / 2, H * 0.761); }
+  if (o.zm) {
+    const x = W * 0.17, w = W * 0.66, y = H * 0.804, h = H * 0.034, r = h / 2;
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#222'; ctx.lineWidth = Math.max(2, W * 0.0028);
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#000'; fitText(ctx, o.zm, 700, Math.round(H * 0.0135), w * 0.92); ctx.fillText(o.zm, W / 2, y + h / 2);
+  }
+  return canvasBlob(c);
+}
+async function bannerPng(lines, reva) {
+  await bkFonts();
+  const img = await loadImg('print-banner.png');
+  const c = document.createElement('canvas'); c.width = 1800; c.height = Math.round(1800 * img.naturalHeight / img.naturalWidth);
+  const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, c.width, c.height); ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000';
+  const maxW = c.width * 0.76, items = lines.map((t) => ({ t: t.replace(/\*\*/g, ''), w: 900, s: 74 })).concat(reva ? [{ t: reva.replace(/\*\*/g, ''), w: 700, s: 48, gap: 18 }] : []);
+  let shrink = items.length > 3 ? 0.82 : 1; items.forEach((x) => { x.s = Math.round(x.s * shrink); });
+  const lh = (x) => x.s * 1.28 + (x.gap || 0);
+  const total = items.reduce((a, x) => a + lh(x), 0);
+  let y = c.height / 2 - total / 2;
+  items.forEach((x) => { fitText(ctx, x.t, x.w, x.s, maxW); y += (x.gap || 0); ctx.fillText(x.t, c.width / 2, y + x.s * 0.64); y += x.s * 1.28; });
+  return { blob: await canvasBlob(c), w: c.width, h: c.height };
 }
 async function bookletDocx(rec, k) {
   const dx = await libDOCX();
@@ -6554,9 +6680,27 @@ async function bookletDocx(rec, k) {
     else arr.push(new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.BOTH, spacing: { after: 80, line: 300 }, children: runs(b.t) }));
   });
   const margin = { top: 960, bottom: 850, left: 740, right: 740 };
+  // 3.9: הכותרת בתוך המסגרת המעוטרת + דף השער עם הלוגו – בדיוק כמו בחוברת
+  let coverSec = null;
+  try {
+    const titles = blocks.filter((b) => b.k === 'title').map((b) => b.t), reva = blocks.find((b) => b.k === 'reva');
+    const bn = await bannerPng(titles.length ? titles : [rec.title || ''], reva && reva.t);
+    const bw = 640, bh = Math.round(bw * bn.h / bn.w);
+    const pic = new dx.Paragraph({ alignment: dx.AlignmentType.CENTER, spacing: { after: 120 }, children: [new dx.ImageRun({ data: new Uint8Array(await bn.blob.arrayBuffer()), transformation: { width: bw, height: bh } })] });
+    // נשאיר מהראש רק את הפסוק הפותח (title / reva כבר בתוך התמונה)
+    const headKinds = []; let inH = true; blocks.forEach((b) => { if (inH && !['title', 'reva', 'verse'].includes(b.k)) inH = false; if (inH) headKinds.push(b.k); });
+    const rest = head.filter((pp, i) => headKinds[i] === 'verse');
+    head.length = 0; head.push(pic, ...rest);
+    const o = bookOptsFor(rec);
+    if (o.cover) {
+      const cv = await coverPng(o);
+      coverSec = { properties: { page: { margin: { top: 0, bottom: 0, left: 0, right: 0, header: 0, footer: 0 } } }, children: [new dx.Paragraph({ alignment: dx.AlignmentType.CENTER, children: [new dx.ImageRun({ data: new Uint8Array(await cv.arrayBuffer()), transformation: { width: 778, height: 1100 } })] })] };
+    }
+  } catch (e) { console.warn('booklet images for word', e); }
   const header = new dx.Header({ children: [new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, border: { bottom: { style: dx.BorderStyle.SINGLE, size: 8, color: '444444', space: 2 } }, children: [new dx.TextRun({ text: BOOK_HEAD, bold: true, font: 'Frank Ruehl CLM', size: 20, rightToLeft: true })] })] });
   const footer = new dx.Footer({ children: [new dx.Paragraph({ alignment: dx.AlignmentType.LEFT, children: [new dx.TextRun({ text: 'עמוד ', font: 'Frank Ruehl CLM', size: 18, rightToLeft: true }), new dx.TextRun({ children: [dx.PageNumber.CURRENT], size: 18 })] })] });
   const doc = new dx.Document({ sections: [
+    ...(coverSec ? [coverSec] : []),
     { properties: { page: { margin } }, headers: { default: header }, footers: { default: footer }, children: head.length ? head : [new dx.Paragraph({ bidirectional: true, alignment: dx.AlignmentType.CENTER, children: runs(rec.title || '', { bold: true, size: 32 }) })] },
     { properties: { type: dx.SectionType.CONTINUOUS, page: { margin }, column: { count: 2, space: 400, separate: true } }, headers: { default: header }, footers: { default: footer }, children: body }
   ] });
