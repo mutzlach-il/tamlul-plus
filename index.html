@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.5';
+const APP_VERSION = '3.9.6';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -7660,6 +7660,82 @@ document.addEventListener('click', async (e) => {
   }
 }, true);
 { const _do6 = Detail.open; Detail.open = async function () { const x = await _do6.apply(this, arguments); try { const del = $('#delBtn'); if (del && !$('#dCopyRec')) del.insertAdjacentHTML('beforebegin', '<button class="btn small" id="dCopyRec" title="העתקה – ואז הדבקה בכל תיקייה">📋 העתקת ההקלטה</button> '); } catch (e) {} return x; }; }
+
+
+/* =========================================================
+   3.9.6 – שמות האדמו"רים (כפי שהמשתמש קבע) · הקשר ההקלטה בתמלול ·
+   דוגמת כתיב ביידיש · לומדים רק תיקון שחוזר פעמיים · ניהול התיקונים
+   ========================================================= */
+const BIALA_ANCESTORS = [
+  'אאמו"ר בעל הלהבת דוד זי"ע',
+  'אזמו"ר בעל הקדושת חלקת יהושע זי"ע',
+  'אזמו"ר רבי ירחמיאל צבי משעדליץ זי"ע',
+  'אזמו"ר הדברי בינה מביאלא זי"ע',
+  'אזמו"ר רבי נתן דוד מדשלובצא זי"ע',
+  'אזמו"ר רבי ירחמיאל מפשיסחא זי"ע',
+  'אזמו"ר בעל היהודי הקדוש מפשיסחא זי"ע',
+  'אזמו"ר בעל התולדות אדם זי"ע',
+  'אזמו"ר רבי שלמה לייב לענשטנא זי"ע'
+];
+const ANCESTORS_RULE = `THE REBBE'S HOLY ANCESTORS – whenever the Rebbe speaks about one of them (by name, by his sefer, or as "מיין טאטע" / "דער טאטע ז"ל" / "אבא ז"ל" = his father, "דער זיידע" / "הסבא" = one of his grandfathers – decide from the context), write the name EXACTLY in this form:
+${BIALA_ANCESTORS.join('\n')}
+("מיין טאטע ז"ל" / "אבא ז"ל" = אאמו"ר בעל הלהבת דוד זי"ע.)`;
+// בתמלול (יידיש): שמות האדמו"רים, הקשר ההקלטה, ודוגמת כתיב
+{ const _gp6 = gemPrompt; gemPrompt = function (lang, opts = {}) {
+  let p = _gp6.apply(this, arguments);
+  if (lang === 'yi' || lang === 'auto') {
+    p += `\nNames of the Rebbe's ancestors (spell exactly so): ${BIALA_ANCESTORS.join(' · ')}.`;
+    const r = opts.rec;
+    if (r) {
+      const ctx = [r.title && 'title: ' + r.title, r.parasha && 'parasha: ' + r.parasha, r.occasion && 'occasion: ' + r.occasion, (() => { try { return 'date: ' + hebDate(recDateOf(r)); } catch (e) { return ''; } })()].filter(Boolean).join(' · ');
+      if (ctx) p += `\nRecording context (use it to understand unclear words – e.g. in Tishrei: הקפות, שמחת תורה, סוכות): ${ctx}.`;
+    }
+    const ex = (STYLE_EX || []).filter((x) => x.kind === 'yi' && x.target_text).slice(-1)[0];
+    if (ex) p += `\nSPELLING STYLE – this is how the editors write the Rebbe's Yiddish (follow this spelling, NOT the content):\n«${ex.target_text.slice(0, 1600)}»`;
+  }
+  return p;
+}; }
+// בנוסח ובתרגום: אותה רשימה
+{ const _np6 = nusachPrompt; nusachPrompt = function (kind, part, examples, ctx) {
+  const p = _np6.apply(this, arguments);
+  const at = p.lastIndexOf('===== THE ');
+  const add = `\n===== ${ANCESTORS_RULE}\n`;
+  return at > 0 ? p.slice(0, at) + add + p.slice(at) : p + add;
+}; }
+{ const _gl6 = glossaryText; glossaryText = function (max = 2500) { const base = BIALA_ANCESTORS.join(' · '); return base + ' · ' + _gl6(Math.max(200, max - base.length)); }; }
+// טעינת דוגמת היידיש מוקדם (כדי שתהיה מוכנה לתמלול)
+{ const _ea6 = enterApp; enterApp = async function () { const x = await _ea6.apply(this, arguments); setTimeout(() => { loadStyleExamples().catch(() => {}); loadFixes().catch(() => {}); }, 3000); return x; }; }
+// לומדים רק תיקון שחזר לפחות פעמיים (או שהוכנס ידנית) – כדי לא ללמוד טעות חד-פעמית שתלויה בהקשר
+{ const _lf6 = loadFixes; loadFixes = async function (force) { const all = await _lf6.call(this, force); FIXES = (all || []).filter((f) => (f.hits || 0) >= 2); return FIXES; }; }
+// ניהול התיקונים שנלמדו (בחלון "📚 דוגמאות נוסח")
+async function openFixes() {
+  const { data } = await sb.from('nusach_fixes').select('id,wrong,right,hits').order('hits', { ascending: false }).limit(300);
+  const rows = (data || []).map((f) => `<div class="act-row"><b class="grow" dir="rtl">${esc(f.wrong)} ← ${esc(f.right)}</b><span class="badge ${f.hits >= 2 ? 'ok' : ''}" title="כמה פעמים תוקן כך">${f.hits}×${f.hits >= 2 ? ' · פעיל' : ' · ממתין'}</span>${ME.role === 'admin' || ME.role === 'editor' ? `<button class="btn small" data-fixup="${f.id}" title="להפעיל מיד">✅</button><button class="btn small danger" data-fixdel="${f.id}">🗑️</button>` : ''}</div>`).join('');
+  modal(`<h3>🧠 תיקונים שהמערכת למדה</h3><p class="muted">כל פעם שמישהו מתקן מילה בתמלול או בנוסח – זה נשמר כאן. תיקון שחזר פעמיים (או שאישרת ב-✅) נכנס לפעולה, והמערכת לא חוזרת על הטעות.</p>
+    <div class="row" style="gap:.4em;margin:.4em 0"><input id="fxW" placeholder="מילה שגויה" style="width:auto"> ← <input id="fxR" placeholder="מילה נכונה" style="width:auto"><button class="btn small primary" id="fxAdd">➕ הוספה</button></div>
+    ${rows || '<div class="empty"><b>עוד אין תיקונים</b></div>'}`, { okText: 'סגירה', cancelText: '', wide: true });
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('#fixesBtn')) return openFixes();
+  const reopen = async () => { const m = e.target.closest('.modal-bg'); if (m) m.remove(); await loadFixes(true); openFixes(); };
+  const d = e.target.closest('[data-fixdel]'); if (d) { await sb.from('nusach_fixes').delete().eq('id', d.dataset.fixdel); return reopen(); }
+  const u = e.target.closest('[data-fixup]'); if (u) { await sb.rpc('add_nusach_fix_set', { p_id: +u.dataset.fixup }); return reopen(); }
+  if (e.target.closest('#fxAdd')) { const w = $('#fxW').value.trim(), r = $('#fxR').value.trim(); if (!w || !r) return; await sb.rpc('add_nusach_fix', { p_wrong: w, p_right: r }); await sb.rpc('add_nusach_fix', { p_wrong: w, p_right: r }); toast('✅ נוסף ופעיל'); return reopen(); }
+});
+{ const _os6 = openStyleExamples; openStyleExamples = async function () { const x = await _os6.apply(this, arguments); try { const h = document.querySelector('.modal-bg h3'); if (h && !$('#fixesBtn')) h.insertAdjacentHTML('afterend', '<div class="row" style="margin:.3em 0"><button class="btn small" id="fixesBtn">🧠 תיקונים שהמערכת למדה</button></div>'); } catch (e) {} return x; }; }
+// עריכה חופשית של כל התמלול – גם ממנה לומדים (רק אם השינוי קטן, כלומר תיקון ולא החלפה)
+const TEXT_SNAP = {};
+{ const _sr6 = saveRec; saveRec = async function (rec, fields) {
+  try {
+    if (fields && fields.includes('text') && !fields.includes('status') && rec && rec.id && TEXT_SNAP[rec.id] && TEXT_SNAP[rec.id] !== rec.text) {
+      const a = TEXT_SNAP[rec.id], b = rec.text || '';
+      if (Math.abs(a.length - b.length) < a.length * 0.3) learnFixes(a, b).then((k) => { if (k) toast(`🧠 נלמדו ${k} תיקונים מהעריכה שלך`, 4000); });
+    }
+    if (rec && rec.id) TEXT_SNAP[rec.id] = rec.text || '';
+  } catch (e) {}
+  return _sr6.apply(this, arguments);
+}; }
+{ const _do7 = Detail.open; Detail.open = async function () { const x = await _do7.apply(this, arguments); try { if (this.rec) TEXT_SNAP[this.rec.id] = this.rec.text || ''; } catch (e) {} return x; }; }
 
 </script>
 </body>
