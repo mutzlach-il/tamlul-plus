@@ -1510,6 +1510,7 @@ body.viewas #toTop{display:none}
           <li>עד שהמנהל מחבר – אצלם מופיעה הודעה כתומה, והתמלול לא רץ (כדי שלא ייגמרו לך הדקות). אתה, כמנהל-העל, תמיד יכול לנסות.</li>
           <li>בטבלת החסידויות רואים ליד כל חסידות אם המפתח "✓ משלה" או "על המפתח שלך".</li>
           <li><b>🎓 החומר של האדמו"ר</b> (🏛️ חסידויות ← 🎓 חומר, או ✏️ פרטים): שלושה מקומות – הקלטות, כתב בעברית, כתב ביידיש. מחברים לפי מספר בשם הקובץ, ואם אין – לפי אותו שם. כשיוצרים חסידות חדשה, החלון נפתח לבד.</li>
+          <li><b>🗑️ מחיקת חסידות</b> (🏛️ חסידויות ← 🗑️ מחיקה): מוחק את כל מה ששייך לחסידות. צריך לכתוב את השם כדי לאשר. ביאלה לא נמחקת. <b>⇄</b> למעלה ליד הלוגו – מעבר בין חסידויות.</li>
           <li><b>⛔ השבתת חסידות</b> (🏛️ חסידויות ← ⛔ השבתה): אף אחד מהחסידות – גם לא המנהל שלה – לא יכול להיכנס, עד שלוחצים ✅ הפעלה. שום דבר לא נמחק. אתה (מנהל-העל) תמיד נכנס.</li>
           <li><b>📊 סיכום חודשי</b> (🏛️ חסידויות ← 📊 סיכום חודשי): לכל חסידות – כמה דקות תמללה, כמה הקלטות, כמה פעולות בינה, כמה משתמשים פעילים, ועל איזה חשבון. בוחרים חודש, ואפשר להדפיס.</li>
         </ul></details>
@@ -1607,7 +1608,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.9';
+const APP_VERSION = '3.10.10';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9271,6 +9272,79 @@ function goTrain(id) {
 document.addEventListener('click', (e) => {
   const g = e.target.closest('[data-gotrain]'); if (g) { e.preventDefault(); return goTrain(g.dataset.gotrain); }
 });
+
+
+/* =========================================================
+   3.10.10 – חלון החומר: שלושה אזורים גדולים (לחיצה / גרירה / תיקייה שלמה),
+   מחיקת חסידות, ומעבר בין חסידויות בולט
+   ========================================================= */
+const TR_EXT = { audio: /\.(mp3|m4a|wav|ogg|opus|aac|wma|flac|mp4|webm|amr|3gp|mov|mkv)$/i, he: /\.(docx|txt)$/i, yi: /\.(docx|txt)$/i };
+function trAdd(kind, files) {
+  TR._noNum = TR._noNum || []; let n = 0;
+  [...files].forEach((f) => { if (!TR_EXT[kind].test(f.name) && !(kind === 'audio' && /^(audio|video)\//.test(f.type))) return; const k = trNum(f.name); if (!k) TR._noNum.push(f.name); else { TR[kind][k] = f; n++; } });
+  trTable();
+  $$('[data-trcount]').forEach((b) => { const k = b.dataset.trcount, c = Object.keys(TR[k]).length; b.textContent = c ? `✓ נבחרו ${c} קבצים` : 'עדיין לא נבחרו קבצים'; b.style.color = c ? '#1f7a4d' : ''; });
+  if (!n) toast('לא נמצאו כאן קבצים מתאימים' + (kind === 'audio' ? ' (הקלטות)' : ' (וורד או טקסט)'));
+}
+function trZone(kind, icon, title, sub) {
+  const acc = kind === 'audio' ? 'audio/*,video/*,.mp3,.m4a,.wav,.ogg,.opus,.aac,.wma,.flac,.mp4,.amr' : '.docx,.txt';
+  return `<div class="trz" data-trzone="${kind}" style="flex:1 1 200px;border:3px dashed #b8892b;border-radius:14px;padding:.9em;text-align:center;background:#fffaf0">
+    <div style="font-size:2em">${icon}</div><div style="font-weight:800;font-size:1.1em">${title}</div><div class="muted" style="font-size:.85em">${sub}</div>
+    <label class="btn primary" style="margin-top:.6em;cursor:pointer;display:inline-flex">📁 בחירת קבצים מהמחשב<input type="file" multiple accept="${acc}" data-trin="${kind}" style="display:none"></label>
+    <label class="btn small" style="margin-top:.4em;cursor:pointer;display:inline-flex">📂 תיקייה שלמה<input type="file" webkitdirectory directory multiple data-trin="${kind}" style="display:none"></label>
+    <div class="muted" style="font-size:.8em;margin-top:.3em">או לגרור לכאן קבצים</div>
+    <div data-trcount="${kind}" style="font-weight:800;margin-top:.3em">עדיין לא נבחרו קבצים</div></div>`;
+}
+openTrain = function () {
+  TR.audio = {}; TR.he = {}; TR.yi = {}; TR._noNum = [];
+  modal(`<h3>🎓 החומר של האדמו"ר – ${esc(typeof orgName === 'function' ? orgName() : '')}</h3>
+    <p class="muted" style="margin:.2em 0 .6em">מעלים את כל החומר – אפשר מאות קבצים בבת אחת. המערכת מחברת לבד לפי <b>המספר בשם הקובץ</b> (1 ↔ 1), ואם אין מספר – לפי <b>אותו שם</b>. לא חייבים את שלושת הסוגים.</p>
+    <div class="row" style="gap:.7em;flex-wrap:wrap;align-items:stretch">
+      ${trZone('audio', '🎙️', '1. הקלטות', 'יידיש או עברית – mp3, m4a, wav…')}
+      ${trZone('he', '🇮🇱', '2. כתב בעברית', 'קבצי וורד (docx) או טקסט')}
+      ${trZone('yi', '📜', '3. כתב ביידיש', 'קבצי וורד (docx) או טקסט')}
+    </div>
+    <div class="row" style="gap:1.2em;flex-wrap:wrap;margin:.7em 0 .2em">
+      <label>🎙️ ההקלטות הן ב: <select id="trRecLang"><option value="yi">יידיש</option><option value="he">עברית</option></select></label>
+      <label>🇮🇱 הכתב בעברית הוא: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 סיכום ההקלטה (לפני עריכה)</option></select></label>
+    </div>
+    <div id="trTable" style="margin-top:.6em;max-height:32vh;overflow:auto"></div>
+    <button class="btn primary" id="trGo" type="button" style="margin-top:.8em;width:100%;font-size:1.1em" disabled>💾 שמירה ולימוד</button>
+    <div id="trProg" style="margin-top:.6em;font-weight:700"></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const bg = [...$$('.modal-bg')].pop(); const m = bg && bg.querySelector('.modal'); if (m) m.style.maxWidth = '900px';
+  trTable();
+};
+document.addEventListener('change', (e) => { const i = e.target.closest('[data-trin]'); if (i) { trAdd(i.dataset.trin, i.files); i.value = ''; } });
+document.addEventListener('dragover', (e) => { const z = e.target.closest('[data-trzone]'); if (z) { e.preventDefault(); z.style.background = '#fde68a'; } });
+document.addEventListener('dragleave', (e) => { const z = e.target.closest('[data-trzone]'); if (z) z.style.background = '#fffaf0'; });
+document.addEventListener('drop', (e) => { const z = e.target.closest('[data-trzone]'); if (!z) return; e.preventDefault(); z.style.background = '#fffaf0'; trAdd(z.dataset.trzone, e.dataTransfer.files); });
+
+// מחיקת חסידות (רק מנהל-העל, לא ביאלה)
+{ const _ro110 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro110.apply(this, arguments);
+  $$('#orgsBox [data-orgkeys]').forEach((b) => { const id = b.dataset.orgkeys, td = b.parentElement; if (id !== 'biala' && !td.querySelector('[data-orgdel]')) td.insertAdjacentHTML('beforeend', `<button class="btn small danger" data-orgdel="${esc(id)}">🗑️ מחיקה</button>`); });
+  return r;
+}; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-orgdel]'); if (!b) return; e.preventDefault();
+  if (!isSuper()) return; const id = b.dataset.orgdel; if (id === 'biala') return;
+  const nm = ((b.closest('tr') || document).querySelector('b') || {}).textContent || id;
+  const ok = await modal(`<h3>🗑️ מחיקת "${esc(nm)}"</h3><p>נמחק <b>הכל</b>: המשתמשים של החסידות, ההקלטות, הדוגמאות והחומר. <b>אי אפשר להחזיר.</b><br>אם רק רוצים לעצור זמנית – עדיף "⛔ השבתה".</p><label>כדי לאשר – כתבו את שם החסידות: <b>${esc(nm)}</b></label><input id="odConfirm" autocomplete="off">`, { okText: '🗑️ למחוק לצמיתות', danger: true, onOk: (bg) => { if ((bg.querySelector('#odConfirm').value || '').trim() !== nm.trim()) { toast('השם לא תואם'); return false; } } });
+  if (!ok) return;
+  const { error } = await sb.from('orgs').delete().eq('id', id);
+  if (error) return toast('❌ ' + error.message, 7000);
+  toast('🗑️ החסידות נמחקה');
+  if (ORG && ORG.id === id) return switchOrg('biala');
+  renderOrgs();
+});
+// מעבר בין חסידויות – כפתור עם מילים, ובאנר למנהל-העל
+{ const _oc110 = orgChip; orgChip = function () { const r = _oc110.apply(this, arguments); const c = $('#orgChip'); if (c) c.textContent = '⇄ ' + (ORG && ORG.name ? ORG.name : 'חסידויות'); return r; }; }
+if (typeof renderMyOrg === 'function') { const _rmo110 = renderMyOrg; renderMyOrg = async function () {
+  const r = await _rmo110.apply(this, arguments);
+  const g = $('#myOrgBox [data-goorgs]'); if (g && !g.parentElement.querySelector('[data-orgswitch]')) g.insertAdjacentHTML('afterend', ` <button class="btn" data-orgswitch type="button" style="margin-top:.5em">⇄ מעבר לחסידות אחרת${ORG && ORG.id !== 'biala' ? ' (גם חזרה לביאלה)' : ''}</button>`);
+  return r;
+}; }
+document.addEventListener('click', (e) => { if (e.target.closest('[data-orgswitch]')) { e.preventDefault(); const c = $('#orgChip'); if (c) c.click(); else switchOrg('biala'); } });
 
 </script>
 </body>
