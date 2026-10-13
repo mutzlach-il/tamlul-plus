@@ -1509,6 +1509,7 @@ body.viewas #toTop{display:none}
           <li><b>🔑 חיבור החשבון</b>: המנהל של כל חסידות (חוץ מביאלה) מחבר פעם אחת מפתח מהג'ימייל שלו – יש לו הוראות צעד אחר צעד במערכת. מאותו רגע כל התמלול שלהם רץ על <b>החשבון שלו</b>, והדקות החינמיות שלך נשמרות לביאלה.</li>
           <li>עד שהמנהל מחבר – אצלם מופיעה הודעה כתומה, והתמלול לא רץ (כדי שלא ייגמרו לך הדקות). אתה, כמנהל-העל, תמיד יכול לנסות.</li>
           <li>בטבלת החסידויות רואים ליד כל חסידות אם המפתח "✓ משלה" או "על המפתח שלך".</li>
+          <li><b>🎓 החומר של האדמו"ר</b> (🏛️ חסידויות ← 🎓 חומר, או ✏️ פרטים): שלושה מקומות – הקלטות, כתב בעברית, כתב ביידיש. מחברים לפי מספר בשם הקובץ, ואם אין – לפי אותו שם. כשיוצרים חסידות חדשה, החלון נפתח לבד.</li>
           <li><b>⛔ השבתת חסידות</b> (🏛️ חסידויות ← ⛔ השבתה): אף אחד מהחסידות – גם לא המנהל שלה – לא יכול להיכנס, עד שלוחצים ✅ הפעלה. שום דבר לא נמחק. אתה (מנהל-העל) תמיד נכנס.</li>
           <li><b>📊 סיכום חודשי</b> (🏛️ חסידויות ← 📊 סיכום חודשי): לכל חסידות – כמה דקות תמללה, כמה הקלטות, כמה פעולות בינה, כמה משתמשים פעילים, ועל איזה חשבון. בוחרים חודש, ואפשר להדפיס.</li>
         </ul></details>
@@ -1606,7 +1607,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.6';
+const APP_VERSION = '3.10.7';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8723,6 +8724,7 @@ async function editOrg(id) {
   let logo = o.logo || null, cover = o.cover || null;
   const f = (k, label, ph, rows) => `<label>${label}</label>${rows ? `<textarea id="og_${k}" rows="${rows}" dir="rtl" placeholder="${esc(ph || '')}">${esc(Array.isArray(o[k]) ? o[k].join('\n') : (o[k] || ''))}</textarea>` : `<input id="og_${k}" value="${esc(o[k] || '')}" placeholder="${esc(ph || '')}">`}`;
   const pr = modal(`<h3>${isNew ? '➕ חסידות חדשה' : '✏️ ' + esc(o.name)}</h3>
+    <div style="margin:.2em 0 1em;padding:.9em 1em;border-radius:12px;background:#fff7e6;border:2px solid #f0b429"><b>🎓 החומר של האדמו"ר</b> – הקלטות ביידיש או בעברית · כתב בעברית · כתב ביידיש<div class="hint">מזה המערכת לומדת את החסידות.</div>${isNew ? '<div style="margin-top:.4em;font-weight:700">👈 אחרי שלוחצים "➕ יצירה" – נפתח מיד החלון להעלאת כל החומר.</div>' : `<button class="btn primary" type="button" data-gotrain="${esc(o.id)}" style="margin-top:.5em">🎓 העלאת החומר של האדמו"ר</button>`}</div>
     <div class="home-grid" style="gap:0 12px">
       ${isNew ? `<div><label>קוד באנגלית (לכתובת, בלי רווחים)</label><input id="og_id" dir="ltr" placeholder="belz"></div>` : ''}
       <div>${f('name', 'שם קצר (מופיע למעלה במערכת)', 'בעלזא')}</div>
@@ -8759,7 +8761,7 @@ async function editOrg(id) {
     const { error } = await sb.rpc('create_org', { p_id: o.id, p_name: o.name, p_info: info });
     if (error) return toast('❌ ' + (/duplicate|already/.test(error.message) ? 'הקוד הזה כבר קיים' : error.message), 7000);
     toast('✅ החסידות נוצרה');
-    if (await confirmBox(`החסידות "${o.name}" נוצרה. לעבור אליה עכשיו כדי להוסיף לה מנהל, דוגמאות והקלטות?`, '➡️ לעבור אליה')) return switchOrg(o.id);
+    if (await confirmBox(`החסידות "${o.name}" נוצרה ✅. עכשיו להעלות את כל החומר של האדמו"ר – הקלטות, כתב בעברית וכתב ביידיש?`, '🎓 כן, להעלות את החומר')) return goTrain(o.id);
   } else {
     const patch = { name: o.name, full_name: o.full_name, rebbe: o.rebbe, rebbe_en: o.rebbe_en, book_name: o.book_name, book_head: o.book_head, ancestors: o.ancestors, ancestors_rule: o.ancestors_rule, glossary: o.glossary, logo: o.logo, cover: o.cover, color: o.color };
     const { error } = await sb.from('orgs').update(patch).eq('id', o.id);
@@ -8910,8 +8912,9 @@ let HE_FORCE = false;
    הקבצים מתחברים לפי המספר שבשם הקובץ: הקלטה 1 ↔ עברית 1 ↔ יידיש 1
    ========================================================= */
 const TR = { audio: {}, he: {}, yi: {}, heKind: 'after' };
-function trNum(name) { const m = String(name || '').match(/\d+/); return m ? String(+m[0]) : null; }
-function trAll() { return [...new Set([...Object.keys(TR.audio), ...Object.keys(TR.he), ...Object.keys(TR.yi)])].sort((a, b) => +a - +b); }
+function trStem(name) { return String(name || '').replace(/\.[^.]+$/, '').replace(/(עברית|יידיש|אידיש|מילה במילה|hebrew|yiddish)/gi, ' ').replace(/[-_.,()]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+function trNum(name) { const m = String(name || '').match(/\d+/); return m ? String(+m[0]) : (trStem(name) || null); }
+function trAll() { return [...new Set([...Object.keys(TR.audio), ...Object.keys(TR.he), ...Object.keys(TR.yi)])].sort((a, b) => { const x = /^\d+$/.test(a), y = /^\d+$/.test(b); return x && y ? +a - +b : x ? -1 : y ? 1 : a.localeCompare(b, 'he'); }); }
 function trTable() {
   const nums = trAll(); const box = $('#trTable'); if (!box) return;
   const bad = [...(TR._noNum || [])];
@@ -8954,7 +8957,7 @@ async function trRun() {
     try {
       const yi = await trText(TR.yi[n]), he = await trText(TR.he[n]);
       const base = (TR.audio[n] || TR.he[n] || TR.yi[n]).name.replace(/\.[^.]+$/, '').replace(/[-_ ]*(עברית|יידיש|אידיש|יידיש מילה במילה)[-_ ]*/g, ' ').trim();
-      const title = `${n} – ${base}`.slice(0, 190);
+      const title = (/^\d+$/.test(n) ? `${n} – ${base}` : base).slice(0, 190);
       if (he && he.length >= 200 && !have.has(heKind + '|' + title)) {
         const { error } = await sb.from('style_examples').insert({ kind: heKind, title, source_text: yi ? yi.slice(0, 40000) : null, target_text: he.slice(0, 60000), created_by: ME.id });
         if (error) throw error; exN++;
@@ -8988,15 +8991,15 @@ async function trRun() {
 }
 function openTrain() {
   TR.audio = {}; TR.he = {}; TR.yi = {}; TR._noNum = [];
-  modal(`<h3>🎓 חומרי לימוד – ${esc(typeof orgName === 'function' ? orgName() : '')}</h3>
-    <p class="muted">מעלים כאן את החומר של החסידות, בשלושה מקומות. <b>כל קובץ צריך מספר בשם</b> – והמערכת מחברת לבד: הקלטה 1 ↔ עברית 1 ↔ יידיש 1.</p>
+  modal(`<h3>🎓 החומר של האדמו"ר – ${esc(typeof orgName === 'function' ? orgName() : '')}</h3>
+    <p class="muted">מעלים כאן את <b>כל החומר של האדמו"ר</b>, בשלושה מקומות: הקלטות, כתב בעברית, כתב ביידיש. אפשר לבחור הרבה קבצים בבת אחת. המערכת מחברת לבד לפי <b>המספר בשם הקובץ</b> (הקלטה 1 ↔ עברית 1 ↔ יידיש 1), ואם אין מספר – לפי <b>אותו שם</b>. מזה המערכת לומדת את הלשון, הסגנון, השמות והמילים של החסידות.</p>
     <div class="row" style="gap:.6em;flex-wrap:wrap;margin:.6em 0">
       <button class="btn primary" type="button" data-trpick="audio">🎙️ 1. הקלטות <span data-trcount="audio"></span></button>
       <button class="btn primary" type="button" data-trpick="he">🇮🇱 2. עברית (וורד) <span data-trcount="he"></span></button>
       <button class="btn primary" type="button" data-trpick="yi">📜 3. יידיש מילה במילה (וורד) <span data-trcount="yi"></span></button>
     </div>
     <label style="display:block;margin:.4em 0">הקבצים בעברית הם: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 סיכום ההקלטה (לפני עריכה)</option></select></label>
-    <div class="hint">דוגמה לשמות: <b dir="ltr">1 נח.mp3</b> · <b dir="ltr">1 נח עברית.docx</b> · <b dir="ltr">1 נח יידיש.docx</b>. לא חייב שיהיה כל השלושה לכל מספר.</div>
+    <div class="hint">דוגמה לשמות: <b dir="ltr">1 נח.mp3</b> · <b dir="ltr">1 נח עברית.docx</b> · <b dir="ltr">1 נח יידיש.docx</b>. לא חייב שיהיה כל השלושה – אפשר להעלות רק עברית, רק יידיש, או רק הקלטות.</div>
     <div id="trTable" style="margin-top:.8em;max-height:40vh;overflow:auto"></div>
     <button class="btn primary" id="trGo" type="button" style="margin-top:.8em;width:100%" disabled>💾 שמירה ולימוד</button>
     <div id="trProg" style="margin-top:.6em;font-weight:700"></div>`, { okText: 'סגירה', cancelText: '', wide: true });
@@ -9243,6 +9246,30 @@ document.addEventListener('click', async (e) => {
   showAuth('המערכת של החסידות הושבתה זמנית. פנו למנהל המערכת.');
   return false;
 }; }
+
+
+/* =========================================================
+   3.10.7 – 🎓 החומר של האדמו"ר: גישה ישירה מטבלת החסידויות ומטופס החסידות
+   ========================================================= */
+function goTrain(id) {
+  $$('.modal-bg').forEach((m) => m.remove());
+  if (!id || (ORG && id === ORG.id)) return openTrain();
+  try { sessionStorage.setItem('tp_openTrain', id); } catch (e) {}
+  return switchOrg(id);
+}
+{ const _lm107 = loadMe; loadMe = async function () {
+  const ok = await _lm107.apply(this, arguments);
+  try { const t = sessionStorage.getItem('tp_openTrain'); if (ok && t) { sessionStorage.removeItem('tp_openTrain'); if (ORG && ORG.id === t) setTimeout(() => openTrain(), 900); } } catch (e) {}
+  return ok;
+}; }
+{ const _ro107 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro107.apply(this, arguments);
+  $$('#orgsBox [data-orgkeys]').forEach((b) => { const td = b.parentElement; if (!td.querySelector('[data-gotrain]')) td.insertAdjacentHTML('afterbegin', `<button class="btn small" data-gotrain="${esc(b.dataset.orgkeys)}" style="background:#b8892b;color:#fff">🎓 חומר</button>`); });
+  return r;
+}; }
+document.addEventListener('click', (e) => {
+  const g = e.target.closest('[data-gotrain]'); if (g) { e.preventDefault(); return goTrain(g.dataset.gotrain); }
+});
 
 </script>
 </body>
