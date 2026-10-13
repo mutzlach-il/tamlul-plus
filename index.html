@@ -1607,7 +1607,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.7';
+const APP_VERSION = '3.10.9';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8726,17 +8726,17 @@ async function editOrg(id) {
   const pr = modal(`<h3>${isNew ? '➕ חסידות חדשה' : '✏️ ' + esc(o.name)}</h3>
     <div style="margin:.2em 0 1em;padding:.9em 1em;border-radius:12px;background:#fff7e6;border:2px solid #f0b429"><b>🎓 החומר של האדמו"ר</b> – הקלטות ביידיש או בעברית · כתב בעברית · כתב ביידיש<div class="hint">מזה המערכת לומדת את החסידות.</div>${isNew ? '<div style="margin-top:.4em;font-weight:700">👈 אחרי שלוחצים "➕ יצירה" – נפתח מיד החלון להעלאת כל החומר.</div>' : `<button class="btn primary" type="button" data-gotrain="${esc(o.id)}" style="margin-top:.5em">🎓 העלאת החומר של האדמו"ר</button>`}</div>
     <div class="home-grid" style="gap:0 12px">
-      ${isNew ? `<div><label>קוד באנגלית (לכתובת, בלי רווחים)</label><input id="og_id" dir="ltr" placeholder="belz"></div>` : ''}
+      ${isNew ? `<div style="display:none"><input id="og_id" dir="ltr"></div>` : ''}
       <div>${f('name', 'שם קצר (מופיע למעלה במערכת)', 'בעלזא')}</div>
-      <div>${f('full_name', 'שם מלא', 'חסידות בעלזא')}</div>
+      <div style="display:none">${f('full_name', 'שם מלא', 'חסידות בעלזא')}</div>
       <div>${f('rebbe', 'האדמו"ר (כפי שכותבים)', 'כ"ק מרן אדמו"ר שליט"א מבעלזא')}</div>
-      <div>${f('rebbe_en', 'האדמו"ר באנגלית (בשביל המערכת)', 'the Belzer Rebbe')}</div>
+      <div style="display:none">${f('rebbe_en', '', '')}</div>
       <div>${f('book_name', 'שם החוברת', 'דברי תורה')}</div>
-      <div>${f('book_head', 'הכותרת בראש כל עמוד בחוברת', 'מכ"ק מרן אדמו"ר שליט"א')}</div>
+      <div style="display:none">${f('book_head', '', '')}</div>
       <div><label>צבע</label><input type="color" id="og_color" value="${esc(o.color || '#4f46e5')}" style="height:42px"></div>
     </div>
     ${f('ancestors', 'שמות האדמו"רים (שורה לכל אחד – בדיוק כפי שכותבים)', 'אאמו"ר ... זי"ע', 5)}
-    ${f('ancestors_rule', 'הסבר למערכת (לא חובה) – למשל: "מיין טאטע" = ...', '', 2)}
+    <div style="display:none">${f('ancestors_rule', '', '', 2)}</div>
     ${f('glossary', 'מילון: שמות, ספרים ומקומות שחוזרים בשיחות (מופרד בפסיקים או בשורות)', '', 4)}
     <div class="row" style="gap:1em;flex-wrap:wrap;margin-top:.6em;align-items:flex-start">
       <div><label>🖼️ לוגו</label><div class="row" style="gap:.4em"><img id="og_logoPrev" src="${esc(logo || 'logo-crown.png')}" style="height:56px;width:56px;object-fit:contain;border:1px solid #ddd;border-radius:8px"><input type="file" id="og_logo" accept="image/*" style="width:auto"></div></div>
@@ -8745,7 +8745,7 @@ async function editOrg(id) {
       const v = (k) => (bg.querySelector('#og_' + k) || {}).value;
       o = Object.assign({}, o, { name: v('name').trim(), full_name: v('full_name').trim(), rebbe: v('rebbe').trim(), rebbe_en: v('rebbe_en').trim(), book_name: v('book_name').trim(), book_head: v('book_head').trim(), color: v('color'),
         ancestors: v('ancestors').split('\n').map((x) => x.trim()).filter(Boolean), ancestors_rule: v('ancestors_rule').trim(), glossary: v('glossary').trim(), logo, cover });
-      if (isNew) o.id = (v('id') || '').trim().toLowerCase();
+      if (isNew) o.id = (v('id') || '').trim().toLowerCase() || ('org' + Date.now().toString(36));
       if (!o.name) { toast('צריך שם'); return false; }
       if (isNew && !/^[a-z0-9-]{2,30}$/.test(o.id)) { toast('קוד באנגלית: אותיות קטנות, מספרים ומקף בלבד'); return false; }
     } });
@@ -8948,7 +8948,7 @@ async function trAudioDuration(file) {
 }
 async function trRun() {
   const nums = trAll(); if (!nums.length) return;
-  const heKind = $('#trHeKind').value; TR.heKind = heKind;
+  const heKind = $('#trHeKind').value; TR.heKind = heKind; const recLang = ($('#trRecLang') || {}).value || 'yi';
   const prog = $('#trProg'), btn = $('#trGo'); btn.disabled = true;
   const log = []; let exN = 0, recN = 0, folderId = null;
   const have = new Set((STYLE_EX || []).map((x) => x.kind + '|' + x.title));
@@ -8978,7 +8978,7 @@ async function trRun() {
         const duration = await trAudioDuration(blob);
         const extras = { training: true, trainNo: +n };
         if (he) extras.nusach = { [heKind]: he, [heKind + 'At']: Date.now() };
-        const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: base, file_name: fname, file_path: filePath, mime: blob.type || '', size: blob.size, lang: 'yi', yi_out: 'yi', out_lang: 'yi', status: 'done', text: yi || '', segments: [], duration, folder_id: folderId, extras });
+        const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: base, file_name: fname, file_path: filePath, mime: blob.type || '', size: blob.size, lang: recLang, yi_out: recLang === 'yi' ? 'yi' : 'he', out_lang: recLang, status: 'done', text: recLang === 'yi' ? (yi || '') : (he || yi || ''), segments: [], duration, folder_id: folderId, extras });
         if (error) throw error; recN++;
       }
     } catch (e) { console.warn(e); log.push(`${n}: ${e.message || e}`); }
@@ -8994,10 +8994,11 @@ function openTrain() {
   modal(`<h3>🎓 החומר של האדמו"ר – ${esc(typeof orgName === 'function' ? orgName() : '')}</h3>
     <p class="muted">מעלים כאן את <b>כל החומר של האדמו"ר</b>, בשלושה מקומות: הקלטות, כתב בעברית, כתב ביידיש. אפשר לבחור הרבה קבצים בבת אחת. המערכת מחברת לבד לפי <b>המספר בשם הקובץ</b> (הקלטה 1 ↔ עברית 1 ↔ יידיש 1), ואם אין מספר – לפי <b>אותו שם</b>. מזה המערכת לומדת את הלשון, הסגנון, השמות והמילים של החסידות.</p>
     <div class="row" style="gap:.6em;flex-wrap:wrap;margin:.6em 0">
-      <button class="btn primary" type="button" data-trpick="audio">🎙️ 1. הקלטות <span data-trcount="audio"></span></button>
+      <button class="btn primary" type="button" data-trpick="audio">🎙️ 1. הקלטות (יידיש או עברית) <span data-trcount="audio"></span></button>
       <button class="btn primary" type="button" data-trpick="he">🇮🇱 2. עברית (וורד) <span data-trcount="he"></span></button>
       <button class="btn primary" type="button" data-trpick="yi">📜 3. יידיש מילה במילה (וורד) <span data-trcount="yi"></span></button>
     </div>
+    <label style="display:block;margin:.4em 0">🎙️ ההקלטות הן ב: <select id="trRecLang"><option value="yi">יידיש</option><option value="he">עברית</option></select></label>
     <label style="display:block;margin:.4em 0">הקבצים בעברית הם: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 סיכום ההקלטה (לפני עריכה)</option></select></label>
     <div class="hint">דוגמה לשמות: <b dir="ltr">1 נח.mp3</b> · <b dir="ltr">1 נח עברית.docx</b> · <b dir="ltr">1 נח יידיש.docx</b>. לא חייב שיהיה כל השלושה – אפשר להעלות רק עברית, רק יידיש, או רק הקלטות.</div>
     <div id="trTable" style="margin-top:.8em;max-height:40vh;overflow:auto"></div>
