@@ -1608,7 +1608,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.10';
+const APP_VERSION = '3.10.11';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9345,6 +9345,21 @@ if (typeof renderMyOrg === 'function') { const _rmo110 = renderMyOrg; renderMyOr
   return r;
 }; }
 document.addEventListener('click', (e) => { if (e.target.closest('[data-orgswitch]')) { e.preventDefault(); const c = $('#orgChip'); if (c) c.click(); else switchOrg('biala'); } });
+
+
+/* 3.10.11 – מנהל-העל: כל כניסה חדשה נפתחת בביאלה (מעבר לחסידות אחרת נשאר עד שסוגרים את הלשונית) */
+{ const _sw111 = switchOrg; switchOrg = async function (id) { try { sessionStorage.setItem('tp_orgPick', id || ''); } catch (e) {} return _sw111.apply(this, arguments); }; }
+{ const _lm111 = loadMe; loadMe = async function () {
+  const ok = await _lm111.apply(this, arguments);
+  try {
+    if (ok && isSuper() && ORG && ORG.id !== 'biala' && !sessionStorage.getItem('tp_orgPick') && !sessionStorage.getItem('tp_openTrain')) {
+      sessionStorage.setItem('tp_orgPick', 'biala');
+      const { error } = await sb.rpc('switch_org', { p_org: 'biala' });
+      if (!error) { location.reload(); return false; }
+    }
+  } catch (e) {}
+  return ok;
+}; }
 
 </script>
 </body>
