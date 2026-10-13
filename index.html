@@ -1550,7 +1550,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.10';
+const APP_VERSION = '3.9.11';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2161,17 +2161,18 @@ async function geminiTranslateText(text, target) {
   const models = await geminiModels();
   const parts = splitText(text, 6000), out = [];
   for (const part of parts) {
-    let done = null, lastErr;
+    let done = null, lastErr, best = null;
     for (const model of models.slice(0, 4)) {
       try {
         const res = await gemFetch(`/models/${model}:generateContent`, {
-          contents: [{ role: 'user', parts: [{ text: `Translate the following speech transcript into ${LANG_EN[target]}. It may be Hasidic Yiddish, Hebrew or English and may contain recognition errors – translate the intended meaning faithfully. Keep line breaks and speaker labels, and translate the labels too (e.g. "דובר 1:"). Keep the [mm:ss] times if present. Output ONLY the translation.\n\n${part}` }] }],
+          contents: [{ role: 'user', parts: [{ text: `${target === 'he' ? HE_STRICT : ''}Translate the following speech transcript into ${LANG_EN[target]}. It may be Hasidic Yiddish, Hebrew or English and may contain recognition errors – translate the intended meaning faithfully. Keep line breaks and speaker labels, and translate the labels too (e.g. "דובר 1:"). Keep the [mm:ss] times if present. Output ONLY the translation.\n\n${part}` }] }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 20000 } }, 'translate');
         const c = res.candidates && res.candidates[0];
         done = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
-        if (done) break;
+        if (done) { done = fixArabic(done); if (target === 'he' && yiRatio(done) > 0.05) { if (!best || yiRatio(done) < yiRatio(best)) best = done; done = null; continue; } break; }
       } catch (err) { lastErr = err; if (err.status === 403) throw err; }
     }
+    if (!done) done = best;
     if (!done) throw lastErr || new Error('Gemini לא החזיר תרגום');
     out.push(done);
   }
@@ -8374,6 +8375,45 @@ function agoHe(ms) {
   return x;
 }; }
 document.addEventListener('click', async (e) => { const o = e.target.closest('[data-vaqopen]'); if (!o) return; const id = o.dataset.vaqopen; try { if (!RECS.has(id)) { const { data } = await sb.from('recordings').select('*').eq('id', id).single(); if (data) RECS.set(id, fromRow(data)); } } catch (er) {} Detail.open(id); });
+
+
+/* =========================================================
+   3.10.1 – "עברית" תמיד יוצא עברית (ולא יידיש), בלי אותיות ערביות
+   ========================================================= */
+const YI_WORDS = /(^|[\s"'(\[:,.!?–-])(איז|וואס|דער|דאס|מען|זיך|נישט|ניט|האט|אויף|פון|מיט|זאגט|געזאגט|אונז|וועט|קען|דארף|ביי|צו|אבער|ווען|אזוי|יעדן|ווייל|געווען|געווארן|האבן|זענען|מיר|איך|דו|זיי|גיין|קומען|אלע|אויך|נאר|שוין|דאך|וויל|ווערט)(?=$|[\s"'),.:;!?–-])/g;
+function yiRatio(t) { t = String(t || ''); const w = t.split(/\s+/).filter(Boolean).length || 1; return (t.match(YI_WORDS) || []).length / w; }
+const AR2HE = { 'و': 'ו', 'م': 'מ', 'ن': 'נ', 'ا': 'א', 'ل': 'ל', 'ر': 'ר', 'ب': 'ב', 'ت': 'ת', 'ي': 'י', 'ى': 'י', 'ه': 'ה', 'ة': 'ה', 'ع': 'ע', 'د': 'ד', 'ك': 'כ', 'ف': 'פ', 'ق': 'ק', 'س': 'ס', 'ش': 'ש', 'ح': 'ח', 'ج': 'ג', 'ز': 'ז', 'ط': 'ט', 'ص': 'צ', 'خ': 'ח', 'غ': 'ג', 'ذ': 'ד', 'ث': 'ת', 'ض': 'צ', 'ظ': 'ט', 'أ': 'א', 'إ': 'א', 'آ': 'א', 'ء': '' };
+function fixArabic(t) { return String(t || '').replace(/[؀-ۿ]/g, (c) => AR2HE[c] !== undefined ? AR2HE[c] : ''); }
+const HE_STRICT = 'IMPORTANT: The source is Hasidic YIDDISH written in Hebrew letters – it is NOT Hebrew, even though it uses the same alphabet. Translate EVERY sentence fully into Hebrew (לשון הקודש, clear rabbinic/modern Hebrew). The output must contain no Yiddish words at all (never write איז, וואס, דער, מען, זיך, נישט, האט, אויף, פון, מיט, זאגט...). Quotes from Torah, Chazal and Zohar stay in their original wording. Use only Hebrew letters – never Arabic letters.\n\n';
+// התרגום בשלבים (יידיש ← עברית בתמלול עצמו): אם יצא יידיש – מנסים שוב, חזק יותר
+{ const _ts = translateSegsToHe; translateSegsToHe = async function (segs, onProgress) {
+  let best = null;
+  for (let a = 0; a < 3; a++) {
+    const res = await _ts.call(this, a ? segs.map((s, i) => i === 0 ? Object.assign({}, s, { text: s.text }) : s) : segs, onProgress);
+    (res || []).forEach((s) => { s.text = fixArabic(s.text); });
+    const r = yiRatio((res || []).map((s) => s.text).join(' '));
+    if (!best || r < best.r) best = { res, r };
+    if (r <= 0.05) break;
+    onProgress && onProgress('🇮🇱 התרגום יצא חלקית ביידיש – מתרגם שוב…');
+    HE_FORCE = true;
+  }
+  HE_FORCE = false;
+  return best && best.res;
+}; }
+let HE_FORCE = false;
+{ const _gt = gemText; gemText = function (prompt, kind, prog) { if (HE_FORCE && kind === 'translate') prompt = HE_STRICT + prompt; return _gt.call(this, prompt, kind, prog); }; }
+// תרגום ישן שיצא ביידיש – נמחק, וכשלוחצים "עברית" הוא מתורגם מחדש כמו שצריך
+{ const _do11 = Detail.open; Detail.open = function (id) {
+  try {
+    const r = RECS.get(id);
+    if (r && r.translations && r.translations.he && yiRatio(r.translations.he) > 0.05) {
+      const t = Object.assign({}, r.translations); delete t.he; r.translations = t;
+      saveRec(r, ['translations']).catch(() => {});
+    }
+    if (r && r.translations && r.translations.he && /[؀-ۿ]/.test(r.translations.he)) { r.translations = Object.assign({}, r.translations, { he: fixArabic(r.translations.he) }); saveRec(r, ['translations']).catch(() => {}); }
+  } catch (e) {}
+  return _do11.apply(this, arguments);
+}; }
 
 </script>
 </body>
