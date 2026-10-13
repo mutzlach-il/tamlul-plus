@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ביאלה – מערכת תמלול הקלטות</title>
+<title>מערכת תמלול הקלטות</title>
 <meta name="description" content="תמלול הקלטות בעברית, יידיש ואנגלית">
 <meta name="theme-color" content="#5b3fd6">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -319,7 +319,7 @@ body.has-mini main{padding-bottom:80px}
    ===== עיצוב 3.1 – "מוצלח" – שכבת עיצוב חדשה (גוברת על כל מה שלמעלה) =====
    ===================================================================== */
 :root{
-  --primary:#5b3fd6; --primary-2:#9b5cf6; --accent:#d9b25a;
+  --primary:#1b2a4e; --primary-2:#2f4a8a; --accent:#c9a24a;
   --primary-soft:color-mix(in srgb,var(--primary) 11%,var(--card));
   --grad:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
   --grad-soft:linear-gradient(135deg,color-mix(in srgb,var(--primary) 14%,transparent),color-mix(in srgb,var(--primary-2) 10%,transparent));
@@ -886,7 +886,7 @@ body.viewas #toTop{display:none}
 </head>
 <body>
 <a href="#main" class="skip-link">דילוג לתוכן הראשי</a>
-<div id="splash" aria-hidden="true"><img src="logo-crown.png" alt=""><div class="t">ביאלה</div><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div>
+<div id="splash" aria-hidden="true"><img src="logo-crown.png" alt=""><div class="t">מערכת תמלול</div><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div>
 
 <!-- ============ PUBLIC VIEWER (shared link) ============ -->
 <div id="viewer" class="hidden">
@@ -928,7 +928,7 @@ body.viewas #toTop{display:none}
     <div class="auth-feat"><span class="fi">🔒</span>פרטי ומאובטח – רק מי שהמנהל מאשר</div>
   </div>
   <div class="auth-card">
-    <div class="auth-brand"><img src="logo-crown.png" alt="ביאלה" class="crown"><div><div class="auth-name">ביאלה</div><div class="auth-sub">תמלול הקלטות · עברית · יידיש · אנגלית</div></div></div>
+    <div class="auth-brand"><img src="logo-crown.png" alt="" class="crown"><div><div class="auth-name">מערכת תמלול</div><div class="auth-sub">תמלול הקלטות · עברית · יידיש · אנגלית</div></div></div>
 
     <form id="loginForm" class="hidden" autocomplete="on">
       <h2 id="loginHello">שלום, טוב לראות אותך!</h2>
@@ -1502,6 +1502,40 @@ body.viewas #toTop{display:none}
       <h2 class="admin-only" style="margin-top:1.4em">🛡️ מדריך למנהל</h2>
       <div class="card admin-only">
         <p>רק מנהל רואה את החלק הזה ואת לשונית "⚙️ ניהול". כל הרשאה נבדקת גם בשרת – משתמש רגיל לא יכול לעקוף.</p>
+        <details open><summary>🏛️ חדש: כמה חסידויות במערכת אחת (גרסה 3.10)</summary><ul>
+          <li><b>מנהל-על</b> (אתה): רואה את כל החסידויות, פותח חסידויות חדשות, ומכניס לכל אחת מפתח תמלול משלה. רק מנהל-העל רואה מפתחות ושימוש.</li>
+          <li><b>מנהל חסידות</b>: רואה ומנהל רק את האנשים, ההקלטות והדוגמאות של החסידות שלו. לא רואה חסידויות אחרות ולא מפתחות.</li>
+          <li>כל חסידות <b>נפרדת לגמרי</b>: הקלטות, תיקיות, מילון, דוגמאות, תיקוני נוסח ומשתמשים – לא מתערבבים.</li>
+          <li>כל חסידות מקבלת <b>שם, לוגו, צבע ושער חוברת</b> משלה – וכשנכנסים, המערכת נראית כמו המערכת שלה.</li>
+          <li>אותו קישור לכולם – המערכת יודעת לאיזו חסידות להכניס לפי המייל.</li>
+          <li>משתמש שנמצא בכמה חסידויות – לוחץ על <b>⇄</b> ליד השם שלמעלה ובוחר חסידות.</li>
+        </ul></details>
+        <details open><summary>➕ איך פותחים חסידות חדשה – צעד אחר צעד</summary><ol>
+          <li>⚙️ ניהול ← <b>🏛️ חסידויות</b> ← <b>➕ חסידות חדשה</b>.</li>
+          <li>כותבים <b>קוד באנגלית</b> (בלי רווחים, למשל belz) ו<b>שם</b> – ונפתחת חסידות ריקה.</li>
+          <li><b>✏️ פרטים</b>: שם מלא, האדמו"ר כפי שכותבים, שם החוברת, הכותרת בראש כל עמוד, שמות האדמו"רים (שורה לכל אחד), מילון שמות/ספרים/מקומות, לוגו ודף שער. בלי שער – המערכת מכינה שער יפה לבד.</li>
+          <li><b>🔑 מפתח</b> (לא חובה): מפתח Gemini משלהם. בלי מפתח – המערכת משתמשת במפתח שלך.</li>
+          <li>עוברים לחסידות החדשה (⇄) ← ⚙️ ניהול ← משתמשים ← <b>הזמנה</b> של המנהל שלהם עם תפקיד "מנהל". משתמש שכבר קיים במערכת – פשוט מתווסף לחסידות.</li>
+          <li>טוענים דוגמאות (ראו למטה) ולוחצים <b>🧠 ללמוד את הסגנון מכל הדוגמאות</b>.</li>
+        </ol></details>
+        <details><summary>🧠 איך המערכת לומדת את הסגנון של כל חסידות</summary><ul>
+          <li>📖 דוגמאות ← <b>📂 טעינת קבצי וורד</b>: קבצים של "סיכום ההקלטה", של "מוכן להדפסה", ו<b>🗣️ יידיש מילה במילה</b> (הקלטות שתומללו אצלכם מילה במילה – כ-10 הקלטות מספיקות להתחלה).</li>
+          <li><b>🧠 ללמוד את הסגנון</b>: המערכת קוראת את כל הדוגמאות וכותבת לעצמה מדריך כתיבה ומילון – רק של החסידות הזאת. בחסידות חדשה זה קורה גם לבד, כמה שניות אחרי שטוענים קבצים.</li>
+          <li><b>📒 מדריכי כתיבה</b>: לכל נוסח יש מדריך (מבנה, כותרות, לשון) – אפשר לערוך אותו בחלון הדוגמאות.</li>
+          <li><b>תיקונים נלמדים</b>: כל תיקון של כל משתמש נשמר. תיקון שחוזר 3 פעמים, או שאישרת ✅ – מתוקן לבד בפעם הבאה. בחלון "תיקונים" רואים מי תיקן, איפה, ואפשר לאשר או למחוק. 📒 יומן – כל התיקונים לפי הסדר.</li>
+          <li>כשמישהו מתקן נוסח או כתיב יידיש בהקלטה – זה נשמר כדוגמה חדשה, והמערכת משתפרת.</li>
+        </ul></details>
+        <details><summary>📜 הנוסחים, הורדה והדפסה</summary><ul>
+          <li><b>"סיכום ההקלטה"</b> – הנוסח בלשון הקודש לפני העריכה. <b>"מוכן להדפסה"</b> – הנוסח הסופי לחוברת. שניהם תמיד בעברית, ותמיד אפשר לערוך.</li>
+          <li>לכל נוסח: <b>📄 PDF</b> (נשמר כקובץ), <b>Word</b>, ו<b>🖨️ הדפסה</b> ישירה.</li>
+          <li>בהעלאת הקלטה ביידיש בוחרים מה לכתוב: יידיש, עברית, "סיכום ההקלטה" או "מוכן להדפסה".</li>
+          <li><b>🇮🇱 עברית</b>: התרגום נבדק שאין בו מילים ביידיש. תרגום ישן שיצא ביידיש – נמחק כשפותחים את ההקלטה, ולחיצה על "עברית" מתרגמת מחדש.</li>
+        </ul></details>
+        <details><summary>👁️ צפייה כמשתמש ומעקב</summary><ul>
+          <li>⚙️ ניהול ← משתמשים ← 👁️ <b>צפייה כמשתמש</b>: רואים את המערכת כמו שהוא רואה – כולל <b>התור שלו בזמן אמת</b>: מה עולה, כמה אחוז, כמה זמן זה רץ, ואזהרה אם אין התקדמות.</li>
+          <li>🎨 ערכת צבעים: כחול-זהב כברירת מחדל. אפשר להחליף בהגדרות.</li>
+        </ul></details>
+
         <details open><summary>🆕 חדש למנהל בגרסה 3</summary><ul>
           <li>🟢 <b>עכשיו</b>: מי מחובר, מה הוא עושה, ותור התמלול של כולם – מתעדכן כל 15 שניות.</li>
           <li>📨 <b>בקשות הצטרפות</b>: מי שאין לו גישה לוחץ "בקש גישה" – ואתה מאשר בלחיצה (נשלח לו מייל).</li>
@@ -1550,7 +1584,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.9.11';
+const APP_VERSION = '3.10.2';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -3408,7 +3442,7 @@ $('#replaceBtn').onclick = async () => {
   r.text = r.segments && r.segments.length && !r.edited ? r.segments.map((x) => x.text).join(' ') : apply(r.text || '');
   if (r.translations) Object.keys(r.translations).forEach((k) => { r.translations[k] = apply(r.translations[k]); });
   await Detail.save(['segments', 'text', 'translations']);
-  if (res.dict && res.to && isAdmin()) await sb.from('dictionary').upsert([{ term: res.to }], { onConflict: 'term', ignoreDuplicates: true });
+  if (res.dict && res.to && isAdmin()) await sb.from('dictionary').upsert([{ term: res.to }], { onConflict: 'org_id,term', ignoreDuplicates: true });
   Detail.renderTranscript(); Detail.renderTranslations(); toast(`הוחלפו ${n} מופעים ✓`);
 };
 const KBD_HELP = `<h3>⌨️ קיצורי מקלדת</h3><table class="tbl">
@@ -4836,7 +4870,7 @@ function applyLook() {
   const b = (typeof S === 'function' ? S('brand', {}) : {}) || {};
   const key = LS.get('look', '');
   let t = THEMES[key];
-  if (!t) t = (b.color && !['#4f46e5', '#5b4bdb'].includes(b.color)) ? { p: b.color, p2: b.color, a: '#d9b25a' } : THEMES.royal;
+  if (!t) t = (b.color && !['#4f46e5', '#5b4bdb'].includes(b.color)) ? { p: b.color, p2: b.color, a: '#d9b25a' } : THEMES.navy;
   const acc = LS.get('accent', '');
   const st = document.documentElement.style;
   st.setProperty('--primary', acc || t.p); st.setProperty('--primary-2', acc || t.p2); st.setProperty('--accent', t.a);
@@ -4847,7 +4881,7 @@ function applyLook() {
 { const _at = applyTheme; applyTheme = function () { _at(); applyLook(); }; }
 
 function openThemes() {
-  const cur = LS.get('look', '') || 'royal';
+  const cur = LS.get('look', '') || 'navy';
   modal(`<h3>🎨 ערכת צבעים</h3><p class="muted" style="margin:.2em 0">בחר את הצבעים שהכי נעימים לך. הבחירה נשמרת במחשב הזה.</p>
     <div class="themes">${Object.entries(THEMES).map(([k, t]) => `<button class="theme-opt ${k === cur ? 'on' : ''}" data-theme="${k}" style="--acc:${t.a}"><div class="sw" style="background:linear-gradient(135deg,${t.p},${t.p2})"></div>${t.n}</button>`).join('')}</div>
     <div class="row" style="margin-top:1em"><button class="btn" id="thDark">${document.body.classList.contains('dark') ? '☀️ מצב בהיר' : '🌙 מצב חושך'}</button><button class="btn" id="thA11y">♿ נגישות</button></div>`, { okText: 'סגירה', cancelText: '' });
@@ -6500,7 +6534,7 @@ async function openStyleExamples() {
   const row = (x) => `<div class="act-row"><span class="badge">${NUSACH_KINDS[x.kind] ? NUSACH_KINDS[x.kind].icon + ' ' + NUSACH_KINDS[x.kind].short : x.kind}</span><b class="grow">${esc(x.title)}</b><span class="muted" style="font-size:.85em">${x.source_text ? 'מקור + נוסח' : 'נוסח בלבד'} · ${Math.round(x.target_text.length / 1000)}K תווים</span><button class="btn small" data-sexview="${x.id}">👁️</button><button class="btn small danger" data-sexdel="${x.id}">🗑️</button></div>`;
   modal(`<h3>📚 דוגמאות נוסח – מהן המערכת לומדת את הסגנון</h3>
     <p class="muted">כשכותבים נוסח, המערכת מקבלת כמה דוגמאות מכאן (קודם מאותה פרשה, אם יש) וכותבת בדיוק באותו סגנון. כמה שיותר דוגמאות טובות – יותר מדויק.</p>
-    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "סיכום ההקלטה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "מוכן להדפסה"</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
+    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "סיכום ההקלטה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "מוכן להדפסה"</button><button class="btn primary" data-sexfiles="yi">🗣️ יידיש מילה במילה (ללימוד היידיש)</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
     ${list.length ? list.map(row).join('') : '<div class="empty"><b>אין עדיין דוגמאות</b></div>'}
     <details style="margin-top:1em"><summary style="font-weight:700;cursor:pointer">➕ הוספת דוגמה חדשה</summary>
       <div class="col" style="gap:.5em;margin-top:.5em">
@@ -6587,7 +6621,7 @@ document.addEventListener('click', async (e) => {
 });
 
 /* ---------- חוברת לדפוס – בדיוק כמו "דברי אלוקים חיים ושיחות קודש" ---------- */
-const BOOK_HEAD = 'דא"ח מכ"ק מרן אדמו"ר שליט"א';
+let BOOK_HEAD = 'דא"ח מכ"ק מרן אדמו"ר שליט"א';
 function shortYear(hy) { const m = String(hy || '').match(/תש(.+)$/); return m ? m[1] : (hy || ''); }
 function openBookletPrint(rec) {
   const lastG = LS.get('bookGil', '');
@@ -6904,7 +6938,7 @@ $('#dictForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const terms = $('#dictInput').value.split(/[,،\n]+/).map((t) => t.trim()).filter(Boolean);
   if (!terms.length) return;
-  const { error } = await sb.from('dictionary').upsert(terms.map((term) => ({ term })), { onConflict: 'term', ignoreDuplicates: true });
+  const { error } = await sb.from('dictionary').upsert(terms.map((term) => ({ term })), { onConflict: 'org_id,term', ignoreDuplicates: true });
   if (error) return toast('❌ ' + error.message, 5000);
   $('#dictInput').value = ''; toast(`נוספו ${terms.length} מונחים ✓`); renderDict();
 });
@@ -7678,7 +7712,7 @@ const BIALA_ANCESTORS = [
   'אזמו"ר בעל התולדות אדם זי"ע',
   'אזמו"ר רבי שלמה לייב לענשטנא זי"ע'
 ];
-const ANCESTORS_RULE = `THE REBBE'S HOLY ANCESTORS – whenever the Rebbe speaks about one of them (by name, by his sefer, or as "מיין טאטע" / "דער טאטע ז"ל" / "אבא ז"ל" = his father, "דער זיידע" / "הסבא" = one of his grandfathers – decide from the context), write the name EXACTLY in this form:
+let ANCESTORS_RULE = `THE REBBE'S HOLY ANCESTORS – whenever the Rebbe speaks about one of them (by name, by his sefer, or as "מיין טאטע" / "דער טאטע ז"ל" / "אבא ז"ל" = his father, "דער זיידע" / "הסבא" = one of his grandfathers – decide from the context), write the name EXACTLY in this form:
 ${BIALA_ANCESTORS.join('\n')}
 ("מיין טאטע ז"ל" / "אבא ז"ל" = אאמו"ר בעל הלהבת דוד זי"ע.)`;
 // בתמלול (יידיש): שמות האדמו"רים, הקשר ההקלטה, ודוגמת כתיב
@@ -8375,6 +8409,439 @@ function agoHe(ms) {
   return x;
 }; }
 document.addEventListener('click', async (e) => { const o = e.target.closest('[data-vaqopen]'); if (!o) return; const id = o.dataset.vaqopen; try { if (!RECS.has(id)) { const { data } = await sb.from('recordings').select('*').eq('id', id).single(); if (data) RECS.set(id, fromRow(data)); } } catch (er) {} Detail.open(id); });
+
+
+/* =========================================================
+   3.10.0 – כמה חסידויות במערכת אחת
+   כל משתמש נכנס עם המייל שלו → המערכת מתאימה את עצמה לחסידות שלו:
+   שם, לוגו, אדמו"רים, מילון, חוברת, דוגמאות ותיקונים – הכול נפרד לכל חסידות.
+   מנהל-על: רואה הכול, פותח חסידויות, מכניס מפתחות. מנהל חסידות: רק את שלו.
+   ========================================================= */
+let ORG = null, MY_ORGS = [];
+const BIALA_DEFAULTS = { glossary: BIALA_GLOSSARY.slice(), ancestors: BIALA_ANCESTORS.slice(), rule: ANCESTORS_RULE, head: BOOK_HEAD, guides: { before: GUIDE_DEFAULT.before, after: GUIDE_DEFAULT.after } };
+const isBiala = () => !ORG || ORG.id === 'biala';
+const isSuper = () => !!(ME && ME.is_super);
+const orgName = () => (ORG && ORG.name) || 'מערכת תמלול';
+// לוגו ברירת מחדל לחסידות בלי לוגו: האות הראשונה של השם בעיגול בצבע החסידות (לא הלוגו של ביאלה)
+function letterLogo(name, color) {
+  const ch = String(name || 'ת').trim().charAt(0) || 'ת';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><circle cx="64" cy="64" r="60" fill="${color || '#4f46e5'}"/><text x="64" y="66" font-family="Frank Ruhl Libre,David,serif" font-size="72" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle">${ch}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+const orgLogo = () => (ORG && ORG.logo) || (isBiala() ? 'logo-crown.png' : letterLogo(ORG && ORG.name, ORG && ORG.color));
+
+// ---------- מיתוג לפני הכניסה: מה שנשמר מהפעם הקודמת במכשיר הזה ----------
+function paintPreBrand() {
+  const b = LS.get('orgBrand', null);
+  const name = (b && b.name) || 'מערכת תמלול';
+  const logo = (b && b.logo) || 'logo-crown.png';
+  $$('#splash .t, .auth-name').forEach((x) => (x.textContent = name));
+  $$('#splash img, .auth-brand img').forEach((i) => (i.src = logo));
+  if (!ME) document.title = name + ' – מערכת תמלול הקלטות';
+}
+try { paintPreBrand(); } catch (e) {}
+
+// ---------- טעינת החסידות אחרי הכניסה ----------
+async function loadOrg() {
+  if (!ME) return null;
+  if (!ME.cur_org) { // חשבון ישן בלי חסידות – נכנס לראשונה שלו
+    try { const { data } = await sb.rpc('my_orgs'); if (data && data[0]) { await sb.rpc('switch_org', { p_org: data[0].id }); ME.cur_org = data[0].id; } } catch (e) {}
+  }
+  try {
+    const [{ data: o }, { data: mine }] = await Promise.all([
+      sb.from('orgs').select('id,name,full_name,rebbe,rebbe_en,book_name,book_head,ancestors,ancestors_rule,glossary,logo,color,active').eq('id', ME.cur_org).maybeSingle(),
+      sb.rpc('my_orgs')
+    ]);
+    ORG = o || { id: ME.cur_org || 'biala', name: 'ביאלה' };
+    MY_ORGS = mine || [];
+  } catch (e) { ORG = { id: 'biala', name: 'ביאלה' }; }
+  LS.set('orgBrand', { id: ORG.id, name: ORG.name, logo: isBiala() ? null : orgLogo() });
+  applyOrgContent();
+  return ORG;
+}
+{ const _lm = loadMe; loadMe = async function () {
+  // חסום בחסידות הנוכחית אבל שייך לחסידות אחרת → עובר אליה לפני הבדיקה
+  try {
+    const { data: u } = await sb.auth.getUser();
+    if (u && u.user) {
+      const { data: p } = await sb.from('profiles').select('disabled,cur_org').eq('id', u.user.id).maybeSingle();
+      if (p && p.disabled) { const { data: mine } = await sb.rpc('my_orgs'); const other = (mine || []).find((o) => o.id !== p.cur_org); if (other) await sb.rpc('switch_org', { p_org: other.id }); }
+    }
+  } catch (e) {}
+  const ok = await _lm.apply(this, arguments);
+  if (!ok) return ok;
+  await loadOrg();
+  return ok;
+}; }
+
+// ---------- התוכן של החסידות: אדמו"רים, מילון, חוברת, מדריכים ----------
+function orgList(txt) { return String(txt || '').split(/[\n,،·]+/).map((x) => x.trim()).filter(Boolean); }
+function applyOrgContent() {
+  const bi = isBiala();
+  BIALA_GLOSSARY.splice(0, BIALA_GLOSSARY.length, ...(bi ? BIALA_DEFAULTS.glossary : orgList(ORG.glossary)));
+  BIALA_ANCESTORS.splice(0, BIALA_ANCESTORS.length, ...(bi ? BIALA_DEFAULTS.ancestors : (ORG.ancestors || [])));
+  ANCESTORS_RULE = bi ? BIALA_DEFAULTS.rule : (ORG.ancestors && ORG.ancestors.length
+    ? `THE REBBE'S HOLY ANCESTORS – whenever the Rebbe speaks about one of them (by name, by his sefer, or as "מיין טאטע" / "דער טאטע ז"ל" / "אבא ז"ל" = his father, "דער זיידע" / "הסבא" = a grandfather – decide from the context), write the name EXACTLY in this form:\n${ORG.ancestors.join('\n')}${ORG.ancestors_rule ? '\n' + ORG.ancestors_rule : ''}`
+    : (ORG.ancestors_rule || ''));
+  BOOK_HEAD = bi ? BIALA_DEFAULTS.head : (ORG.book_head || ('דברי תורה מ' + (ORG.rebbe || 'כ"ק מרן אדמו"ר שליט"א')));
+  GUIDE_DEFAULT.before = bi ? BIALA_DEFAULTS.guides.before : orgText(BIALA_DEFAULTS.guides.before);
+  GUIDE_DEFAULT.after = bi ? BIALA_DEFAULTS.guides.after : orgText(BIALA_DEFAULTS.guides.after);
+  try { STYLE_EX = null; FIXES = null; } catch (e) {}
+}
+// מחליפים בהנחיות למודל כל אזכור של ביאלה – בחסידות הנוכחית
+function orgText(s) {
+  if (isBiala() || typeof s !== 'string') return s;
+  const rebEn = ORG.rebbe_en || `the Rebbe of ${ORG.name}`;
+  const full = ORG.full_name || ('חסידות ' + ORG.name);
+  const book = ORG.book_name || ('דברי תורה מ' + (ORG.rebbe || 'כ"ק מרן אדמו"ר שליט"א'));
+  return s
+    .replace(/"דברי אלוקים חיים – ושיחות קודש מכ"ק מרן אדמו"ר שליט"א" \(מכון דא"ח ביאלה\)/g, `"${book}"`)
+    .replace(/חוברת "דברי אלוקים חיים"/g, `החוברת "${book}"`)
+    .replace(/דברי אלוקים חיים/g, book)
+    .replace(/the Biala Rebbe \((?:חסידות )?ביאל[אה](?:, בני ברק)?\)/g, `${rebEn} (${full})`)
+    .replace(/Biala Rebbe/g, rebEn.replace(/^the /i, ''))
+    .replace(/חסידות ביאל[אה]/g, full)
+    .replace(/של ביאלא/g, 'של ' + ORG.name)
+    .replace(/\(נלמד מ-\d+ (?:שיחות|חוברות)[^)]*\)/g, '');
+}
+// כל קריאה למודל עוברת כאן – מחליפים את ההנחיות לחסידות הנוכחית
+{ const _api10 = api; api = async function (action, data) {
+  if (action === 'gemini' && data && data.payload && !isBiala()) {
+    try {
+      const p = JSON.parse(JSON.stringify(data.payload));
+      const fix = (o) => { if (!o || typeof o !== 'object') return; if (Array.isArray(o)) return o.forEach(fix); for (const k of Object.keys(o)) { if (k === 'text' && typeof o[k] === 'string') o[k] = orgText(o[k]); else if (typeof o[k] === 'object') fix(o[k]); } };
+      fix(p.contents); fix(p.systemInstruction); fix(p.system_instruction);
+      data = Object.assign({}, data, { payload: p });
+    } catch (e) {}
+  }
+  return _api10.call(this, action, data, arguments[2]);
+}; }
+
+// ---------- מיתוג אחרי הכניסה ----------
+{ const _ab10 = applyBrand; applyBrand = function () {
+  try {
+    const b = S('brand', {}) || {};
+    if (ORG && !b.name) SETTINGS.brand = Object.assign({}, b, { name: ORG.name, logo: b.logo || (isBiala() ? undefined : orgLogo()), color: b.color || ORG.color || undefined });
+  } catch (e) {}
+  _ab10.apply(this, arguments);
+  try {
+    const name = (S('brand', {}) || {}).name || orgName();
+    document.title = name + ' – מערכת תמלול הקלטות';
+    $$('#splash .t').forEach((x) => (x.textContent = name));
+    orgChip();
+    orgManifest();
+  } catch (e) {}
+}; }
+// כפתור החסידות בכותרת – למי שבכמה חסידויות (או מנהל-על)
+function orgChip() {
+  const logo = $('header.top .logo'); if (!logo) return;
+  let c = $('#orgChip');
+  const many = MY_ORGS.length > 1 || isSuper();
+  if (!many) { if (c) c.remove(); return; }
+  if (!c) { logo.insertAdjacentHTML('afterend', '<button class="btn small" id="orgChip" title="מעבר בין חסידויות" style="white-space:nowrap;flex:none;padding:.25em .6em">⇄</button>'); c = $('#orgChip'); }
+  c.textContent = '⇄';
+}
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#orgChip')) return;
+  if (VIEW_AS) return vaBlock('אי אפשר לעבור חסידות במצב צפייה');
+  let list = MY_ORGS; try { const { data } = await sb.rpc('my_orgs'); if (data) list = MY_ORGS = data; } catch (er) {}
+  modal(`<h3>🏛️ לאיזו חסידות לעבור?</h3>
+    <div class="col" style="gap:.4em">${list.map((o) => `<button class="btn ${o.id === ORG.id ? 'primary' : ''}" data-orgsw="${esc(o.id)}" style="justify-content:flex-start;gap:.6em">${o.logo ? `<img src="${esc(o.logo)}" style="height:26px;width:26px;object-fit:contain">` : '🏛️'} <b>${esc(o.name)}</b> <span class="muted" style="font-size:.85em">${o.role === 'admin' ? 'מנהל' : o.role === 'editor' ? 'עורך' : 'משתמש'}</span>${o.id === ORG.id ? ' ✓' : ''}</button>`).join('')}</div>`, { okText: 'סגירה', cancelText: '' });
+});
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-orgsw]'); if (!b) return;
+  await switchOrg(b.dataset.orgsw);
+});
+async function switchOrg(id) {
+  if (!id || (ORG && id === ORG.id)) { $$('.modal-bg').forEach((m) => m.remove()); return; }
+  if (Queue && Queue.running && !(await confirmBox('יש עכשיו הקלטה בתמלול. אם תעבור חסידות התמלול ייעצר ויימשך כשתחזור. לעבור בכל זאת?', 'כן, לעבור'))) return;
+  const { error } = await sb.rpc('switch_org', { p_org: id });
+  if (error) return toast('❌ ' + error.message);
+  const o = MY_ORGS.find((x) => x.id === id); if (o) LS.set('orgBrand', { id: o.id, name: o.name, logo: o.logo || null });
+  toast('עובר…'); setTimeout(() => location.reload(), 200);
+}
+// אפליקציה להתקנה בשם ובלוגו של החסידות (לא בביאלה – שם נשאר כמו היום)
+function orgManifest() {
+  if (isBiala()) return;
+  const abs = (p) => new URL(p, location.href).href;
+  const icon = ORG.logo || abs('icon-512.png');
+  const m = { name: ORG.name + ' – תמלול', short_name: ORG.name, start_url: abs('./'), scope: abs('./'), display: 'standalone', dir: 'rtl', lang: 'he', background_color: '#ffffff', theme_color: ORG.color || '#4f46e5',
+    icons: [{ src: icon, sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: abs('icon-192.png'), sizes: '192x192', type: 'image/png' }] };
+  const l = document.querySelector('link[rel=manifest]'); if (l) l.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(m));
+}
+
+// ---------- חוברת: דף שער של החסידות ----------
+async function orgCoverDataUrl() {
+  if (ORG._coverUrl) return ORG._coverUrl;
+  let cover = null;
+  try { const { data } = await sb.from('orgs').select('cover').eq('id', ORG.id).maybeSingle(); cover = data && data.cover; } catch (e) {}
+  if (cover) return (ORG._coverUrl = cover);
+  // שער אוטומטי: מסגרת, לוגו, שם החוברת והאדמו"ר – ומקום לשורת הפרשה ולזמנים (כמו בשער של ביאלה)
+  await bkFonts();
+  const W = 1240, H = 1754, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+  const col = ORG.color || '#2b2b2b';
+  x.strokeStyle = col; x.lineWidth = 14; x.strokeRect(46, 46, W - 92, H - 92); x.lineWidth = 3; x.strokeRect(78, 78, W - 156, H - 156);
+  x.direction = 'rtl'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000';
+  if (ORG.logo) { try { const im = await loadImg(ORG.logo); const s = Math.min(420 / im.width, 420 / im.height); x.drawImage(im, W / 2 - im.width * s / 2, 230, im.width * s, im.height * s); } catch (e) {} }
+  const book = ORG.book_name || 'דברי תורה';
+  fitText(x, book, 900, 110, W * 0.8); x.fillText(book, W / 2, 790);
+  x.fillStyle = col; x.fillRect(W * 0.3, 870, W * 0.4, 5); x.fillStyle = '#000';
+  const reb = ORG.rebbe || ('מכ"ק מרן אדמו"ר שליט"א');
+  fitText(x, reb, 700, 62, W * 0.8); x.fillText(reb, W / 2, 960);
+  if (ORG.full_name) { fitText(x, ORG.full_name, 700, 50, W * 0.8); x.fillText(ORG.full_name, W / 2, 1050); }
+  return (ORG._coverUrl = c.toDataURL('image/jpeg', 0.9));
+}
+{ const _cp10 = coverPng; coverPng = async function (o) {
+  if (isBiala()) return _cp10.apply(this, arguments);
+  const img = await loadImg(await orgCoverDataUrl());
+  const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0); ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000';
+  const W = c.width, H = c.height;
+  if (o.par) { const t = '• ' + o.par + (o.gil ? ' • גיליון ' + o.gil : '') + ' •'; fitText(ctx, t, 900, Math.round(H * 0.02), W * 0.86); ctx.fillText(t, W / 2, H * 0.761); }
+  if (o.zm) { fitText(ctx, o.zm, 700, Math.round(H * 0.0135), W * 0.6); ctx.fillText(o.zm, W / 2, H * 0.821); }
+  return canvasBlob(c);
+}; }
+{ const _bh10 = bookletHtml; bookletHtml = function (rec, o) {
+  let h = _bh10.apply(this, arguments);
+  if (!isBiala()) h = h.replace(new URL('print-cover.jpg', location.href).href, ORG._coverUrl || '');
+  return h;
+}; }
+
+// ---------- ניהול משתמשים לפי חסידות ----------
+{ const _api11 = api; api = async function (action, data) {
+  if (action === 'admin-update-user' && data && ('role' in data || 'disabled' in data)) {
+    const u = (USERS || []).find((x) => x.id === data.id) || {};
+    const { error } = await sb.rpc('org_set_member', { p_user: data.id, p_role: data.role || u.role || 'user', p_disabled: 'disabled' in data ? !!data.disabled : !!u.disabled });
+    if (error) throw new Error(error.message === 'cannot_demote_self' ? 'אי אפשר להוריד הרשאות מעצמך' : error.message);
+    data = Object.assign({}, data); delete data.role; delete data.disabled;
+    if (data.password && !isSuper()) { const { data: mo } = await sb.rpc('member_orgs', { p_user: data.id }); if ((mo || []).length > 1) throw new Error('המשתמש הזה שייך גם לחסידות אחרת – רק מנהל-העל יכול לשנות לו סיסמה'); }
+    if (Object.keys(data).length <= 1) return { ok: true };
+  }
+  if (action === 'admin-delete-user' && data) {
+    const { data: mo } = await sb.rpc('member_orgs', { p_user: data.id });
+    if (!isSuper() || (mo || []).length > 1) {
+      const { error } = await sb.rpc('org_remove_member', { p_user: data.id });
+      if (error) throw new Error(error.message);
+      return { ok: true, removedFromOrg: true };
+    }
+  }
+  if (action === 'admin-invite' && data && data.email) {
+    const { data: id, error } = await sb.rpc('org_add_existing', { p_email: data.email, p_role: data.role || 'user' });
+    if (error) throw new Error(error.message);
+    if (id) return { ok: true, id, existing: true };
+    // משתמש חדש: רושמים מראש לאיזו חסידות הוא שייך, ואז השרת יוצר אותו
+    await sb.from('pending_invites').upsert({ email: data.email.trim().toLowerCase(), created_at: new Date().toISOString() });
+  }
+  return _api11.apply(this, arguments);
+}; }
+// הודעות ברורות במסך המשתמשים
+{ const _ru10 = renderUsers; renderUsers = async function () {
+  await _ru10.apply(this, arguments);
+  try {
+    $$('#usersTbl [data-udel]').forEach((b) => { b.title = isSuper() ? 'מחיקה / הסרה מהחסידות' : 'הסרה מהחסידות ' + orgName(); });
+    const h = document.querySelector('[data-secbox="users"] h3'); if (h && !h.dataset.org) { h.dataset.org = 1; h.insertAdjacentHTML('beforeend', ` <span class="badge">🏛️ ${esc(orgName())}</span>`); }
+  } catch (e) {}
+}; }
+
+// ---------- מסך "חסידויות" (מנהל-על) ו"פרטי החסידות" (מנהל) ----------
+function addOrgNav() {
+  const nav = $('#setNav'); if (!nav || !ME) return;
+  if (isSuper() && !nav.querySelector('[data-sec="orgs"]')) nav.insertAdjacentHTML('afterbegin', '<button data-sec="orgs">🏛️ חסידויות</button>');
+  if (isAdmin() && !nav.querySelector('[data-sec="myorg"]')) nav.querySelector('[data-sec="brand"]')?.insertAdjacentHTML('beforebegin', '<button data-sec="myorg">🏷️ פרטי החסידות</button>');
+  const host = nav.parentElement;
+  if (!$('[data-secbox="orgs"]')) host.insertAdjacentHTML('beforeend', '<div class="card settings-sec hidden" data-secbox="orgs"><div id="orgsBox"></div></div><div class="card settings-sec hidden" data-secbox="myorg"><div id="myOrgBox"></div></div>');
+}
+{ const _rs10 = renderSettings; renderSettings = function () {
+  addOrgNav();
+  if (setSec === 'orgs' || setSec === 'myorg') {
+    if (!isAdmin()) return go('home');
+    $$('#setNav button').forEach((b) => b.classList.toggle('active', b.dataset.sec === setSec));
+    $$('[data-secbox]').forEach((b) => b.classList.toggle('hidden', b.dataset.secbox !== setSec));
+    return setSec === 'orgs' ? renderOrgs() : renderMyOrg();
+  }
+  return _rs10.apply(this, arguments);
+}; }
+{ const _go10 = go; go = function (p) { const x = _go10.apply(this, arguments); if (p === 'settings') setTimeout(() => { try { addOrgNav(); } catch (e) {} }, 30); return x; }; }
+
+const fmtMin = (s) => (s >= 3600 ? (s / 3600).toFixed(1) + ' שעות' : Math.round((s || 0) / 60) + ' דק\'');
+async function renderOrgs() {
+  const box = $('#orgsBox'); if (!box) return;
+  if (!isSuper()) { box.innerHTML = '<div class="empty">רק מנהל-העל</div>'; return; }
+  box.innerHTML = '<span class="spinner"></span>';
+  const { data, error } = await sb.rpc('super_orgs');
+  if (error) { box.innerHTML = `<div class="err-text">${esc(error.message)}</div>`; return; }
+  box.innerHTML = `<div class="row"><h3 class="grow">🏛️ החסידויות במערכת</h3><button class="btn primary" id="orgNew">➕ חסידות חדשה</button></div>
+    <div class="hint">כל חסידות נפרדת לגמרי: משתמשים, הקלטות, דוגמאות, תיקונים ולוגו. רק אתה רואה את הרשימה הזאת ואת כמות השימוש.</div>
+    <div class="tbl-wrap" style="margin-top:.6em"><table class="tbl"><tr><th>חסידות</th><th>משתמשים</th><th>הקלטות</th><th>תמלול היום</th><th>תמלול החודש</th><th>מפתח תמלול</th><th></th></tr>
+    ${(data || []).map((o) => `<tr style="${o.active ? '' : 'opacity:.5'}">
+      <td>${o.logo ? `<img src="${esc(o.logo)}" style="height:24px;width:24px;object-fit:contain;vertical-align:middle"> ` : '🏛️ '}<b>${esc(o.name)}</b> <span class="muted" dir="ltr">${esc(o.id)}</span>${o.id === ORG.id ? ' <span class="badge ok">אתה כאן</span>' : ''}</td>
+      <td>${o.members}</td><td>${o.recordings}</td><td>${fmtMin(+o.seconds_today)}</td><td>${fmtMin(+o.seconds_month)}</td>
+      <td>${o.has_gemini ? '<span class="badge ok">✓ משלה</span>' : '<span class="badge">על המפתח שלך</span>'}</td>
+      <td style="white-space:nowrap"><button class="btn small" data-orgedit="${esc(o.id)}">✏️ פרטים</button><button class="btn small" data-orgkeys="${esc(o.id)}">🔑 מפתח</button>${o.id !== ORG.id ? `<button class="btn small primary" data-orgsw="${esc(o.id)}">➡️ כניסה</button>` : ''}</td></tr>`).join('')}</table></div>
+    <div class="hint" style="margin-top:.6em">💡 כדי למנות מנהל לחסידות: "כניסה" ← ניהול ← משתמשים ← מוסיפים אותו עם תפקיד "מנהל". הוא יראה וינהל רק את החסידות הזאת.</div>`;
+}
+async function renderMyOrg() {
+  const box = $('#myOrgBox'); if (!box) return;
+  box.innerHTML = `<h3>🏷️ פרטי החסידות – ${esc(orgName())}</h3>
+    <div class="hint">השם, הלוגו, שמות האדמו"רים והמילון – המערכת משתמשת בהם בתמלול, בכתיבת הנוסח ובחוברת להדפסה.</div>
+    <button class="btn primary" data-orgedit="${esc(ORG.id)}" style="margin-top:.6em">✏️ עריכת הפרטים</button>`;
+}
+// עורך פרטי החסידות (גם יצירה חדשה)
+async function readImage(file, maxW, maxH, type, q) {
+  const img = await createImageBitmap(file); const s = Math.min(1, maxW / img.width, maxH / img.height);
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+  const x = c.getContext('2d'); if (type === 'image/jpeg') { x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); } x.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL(type, q);
+}
+async function editOrg(id) {
+  const isNew = !id;
+  let o = {};
+  if (!isNew) { const { data, error } = await sb.from('orgs').select('*').eq('id', id).maybeSingle(); if (error || !data) return toast('❌ ' + (error ? error.message : 'לא נמצא')); o = data; }
+  let logo = o.logo || null, cover = o.cover || null;
+  const f = (k, label, ph, rows) => `<label>${label}</label>${rows ? `<textarea id="og_${k}" rows="${rows}" dir="rtl" placeholder="${esc(ph || '')}">${esc(Array.isArray(o[k]) ? o[k].join('\n') : (o[k] || ''))}</textarea>` : `<input id="og_${k}" value="${esc(o[k] || '')}" placeholder="${esc(ph || '')}">`}`;
+  const pr = modal(`<h3>${isNew ? '➕ חסידות חדשה' : '✏️ ' + esc(o.name)}</h3>
+    <div class="home-grid" style="gap:0 12px">
+      ${isNew ? `<div><label>קוד באנגלית (לכתובת, בלי רווחים)</label><input id="og_id" dir="ltr" placeholder="belz"></div>` : ''}
+      <div>${f('name', 'שם קצר (מופיע למעלה במערכת)', 'בעלזא')}</div>
+      <div>${f('full_name', 'שם מלא', 'חסידות בעלזא')}</div>
+      <div>${f('rebbe', 'האדמו"ר (כפי שכותבים)', 'כ"ק מרן אדמו"ר שליט"א מבעלזא')}</div>
+      <div>${f('rebbe_en', 'האדמו"ר באנגלית (בשביל המערכת)', 'the Belzer Rebbe')}</div>
+      <div>${f('book_name', 'שם החוברת', 'דברי תורה')}</div>
+      <div>${f('book_head', 'הכותרת בראש כל עמוד בחוברת', 'מכ"ק מרן אדמו"ר שליט"א')}</div>
+      <div><label>צבע</label><input type="color" id="og_color" value="${esc(o.color || '#4f46e5')}" style="height:42px"></div>
+    </div>
+    ${f('ancestors', 'שמות האדמו"רים (שורה לכל אחד – בדיוק כפי שכותבים)', 'אאמו"ר ... זי"ע', 5)}
+    ${f('ancestors_rule', 'הסבר למערכת (לא חובה) – למשל: "מיין טאטע" = ...', '', 2)}
+    ${f('glossary', 'מילון: שמות, ספרים ומקומות שחוזרים בשיחות (מופרד בפסיקים או בשורות)', '', 4)}
+    <div class="row" style="gap:1em;flex-wrap:wrap;margin-top:.6em;align-items:flex-start">
+      <div><label>🖼️ לוגו</label><div class="row" style="gap:.4em"><img id="og_logoPrev" src="${esc(logo || 'logo-crown.png')}" style="height:56px;width:56px;object-fit:contain;border:1px solid #ddd;border-radius:8px"><input type="file" id="og_logo" accept="image/*" style="width:auto"></div></div>
+      <div><label>📄 דף שער לחוברת (לא חובה – אם אין, המערכת בונה שער לבד)</label><div class="row" style="gap:.4em"><img id="og_coverPrev" src="${esc(cover || '')}" style="height:80px;width:57px;object-fit:cover;border:1px solid #ddd;${cover ? '' : 'display:none'}"><input type="file" id="og_cover" accept="image/*" style="width:auto"></div></div>
+    </div>`, { okText: isNew ? '➕ יצירה' : 'שמירה', wide: true, onOk: (bg) => {
+      const v = (k) => (bg.querySelector('#og_' + k) || {}).value;
+      o = Object.assign({}, o, { name: v('name').trim(), full_name: v('full_name').trim(), rebbe: v('rebbe').trim(), rebbe_en: v('rebbe_en').trim(), book_name: v('book_name').trim(), book_head: v('book_head').trim(), color: v('color'),
+        ancestors: v('ancestors').split('\n').map((x) => x.trim()).filter(Boolean), ancestors_rule: v('ancestors_rule').trim(), glossary: v('glossary').trim(), logo, cover });
+      if (isNew) o.id = (v('id') || '').trim().toLowerCase();
+      if (!o.name) { toast('צריך שם'); return false; }
+      if (isNew && !/^[a-z0-9-]{2,30}$/.test(o.id)) { toast('קוד באנגלית: אותיות קטנות, מספרים ומקף בלבד'); return false; }
+    } });
+  setTimeout(() => {
+    const bg = [...$$('.modal-bg')].pop(); if (!bg) return;
+    bg.querySelector('#og_logo').onchange = async (e) => { const fl = e.target.files[0]; if (!fl) return; logo = await readImage(fl, 256, 256, 'image/png'); bg.querySelector('#og_logoPrev').src = logo; };
+    bg.querySelector('#og_cover').onchange = async (e) => { const fl = e.target.files[0]; if (!fl) return; cover = await readImage(fl, 1240, 1754, 'image/jpeg', 0.85); const p = bg.querySelector('#og_coverPrev'); p.src = cover; p.style.display = ''; };
+  }, 0);
+  const ok = await pr;
+  if (!ok || !o.name) return;
+  if (isNew) {
+    const info = { full_name: o.full_name, rebbe: o.rebbe, rebbe_en: o.rebbe_en, book_name: o.book_name, book_head: o.book_head, ancestors: o.ancestors, ancestors_rule: o.ancestors_rule, glossary: o.glossary, logo: o.logo, cover: o.cover, color: o.color };
+    const { error } = await sb.rpc('create_org', { p_id: o.id, p_name: o.name, p_info: info });
+    if (error) return toast('❌ ' + (/duplicate|already/.test(error.message) ? 'הקוד הזה כבר קיים' : error.message), 7000);
+    toast('✅ החסידות נוצרה');
+    if (await confirmBox(`החסידות "${o.name}" נוצרה. לעבור אליה עכשיו כדי להוסיף לה מנהל, דוגמאות והקלטות?`, '➡️ לעבור אליה')) return switchOrg(o.id);
+  } else {
+    const patch = { name: o.name, full_name: o.full_name, rebbe: o.rebbe, rebbe_en: o.rebbe_en, book_name: o.book_name, book_head: o.book_head, ancestors: o.ancestors, ancestors_rule: o.ancestors_rule, glossary: o.glossary, logo: o.logo, cover: o.cover, color: o.color };
+    const { error } = await sb.from('orgs').update(patch).eq('id', o.id);
+    if (error) return toast('❌ ' + error.message, 7000);
+    toast('נשמר ✓');
+    if (ORG && o.id === ORG.id) { Object.assign(ORG, patch); delete ORG._coverUrl; LS.set('orgBrand', { id: ORG.id, name: ORG.name, logo: ORG.logo || null }); applyOrgContent(); applyBrand(); }
+  }
+  if (setSec === 'orgs') renderOrgs();
+}
+document.addEventListener('click', (e) => {
+  const ed = e.target.closest('[data-orgedit]'); if (ed) return editOrg(ed.dataset.orgedit);
+  if (e.target.closest('#orgNew')) return editOrg(null);
+  const k = e.target.closest('[data-orgkeys]'); if (k) return editOrgKeys(k.dataset.orgkeys);
+});
+// מפתח תמלול לחסידות – רק מנהל-העל מכניס; המפתח נשמר בשרת ולא חוזר לדפדפן
+async function editOrgKeys(id) {
+  if (!isSuper()) return;
+  let g = null, q = null;
+  const ok = await modal(`<h3>🔑 מפתח תמלול – ${esc(id)}</h3>
+    <p class="muted">אם תכניס כאן מפתח, החסידות הזאת תשתמש בו – והמכסה החינמית שלה תהיה נפרדת משלך. אם תשאיר ריק – היא ממשיכה על המפתח שלך.<br>המפתח נשמר בשרת בלבד. אף אחד לא יכול לראות אותו אחר כך – גם לא אתה. כדי למחוק מפתח: כותבים מקף (-).</p>
+    <label>מפתח Gemini (התמלול והנוסח)</label><input type="password" id="okG" dir="ltr" autocomplete="off" placeholder="להשאיר ריק = בלי שינוי">
+    <label>מפתח Groq (לא חובה)</label><input type="password" id="okQ" dir="ltr" autocomplete="off" placeholder="להשאיר ריק = בלי שינוי">`,
+  { okText: 'שמירה', onOk: (bg) => { g = bg.querySelector('#okG').value.trim() || null; q = bg.querySelector('#okQ').value.trim() || null; } });
+  if (!ok || (!g && !q)) return;
+  const { error } = await sb.rpc('set_org_keys', { p_org: id, p_gemini: g, p_groq: q });
+  if (error) return toast('❌ ' + error.message);
+  toast('✅ נשמר בשרת'); renderOrgs();
+}
+
+/* ---------- לומדים את הסגנון של החסידות – מכל הדוגמאות שלה בלבד ----------
+   המערכת קוראת את כל הדוגמאות שהועלו לחסידות, מודדת אורך ויחס, ומוציאה:
+   (1) מדריך כתיבה מותאם לחסידות הזאת ("סיכום ההקלטה" / "מוכן להדפסה")
+   (2) מילון שמות, ספרים ומקומות שחוזרים – נוסף לפרטי החסידות */
+const wc = (t) => String(t || '').split(/\s+/).filter(Boolean).length;
+async function learnOrgStyle(kind, silent) {
+  await loadStyleExamples(true);
+  const all = (STYLE_EX || []).filter((x) => x.kind === kind && x.target_text && x.target_text.length > 300);
+  if (!all.length) { if (!silent) toast('אין עדיין דוגמאות מהסוג הזה – קודם מעלים דוגמאות'); return false; }
+  // קודם זוגות (מה שנאמר + מה שנכתב), אחר כך השאר – עד כ-70 אלף תווים
+  const sorted = all.slice().sort((a, b) => (b.source_text ? 1 : 0) - (a.source_text ? 1 : 0));
+  const picked = []; let used = 0;
+  for (const x of sorted) { const len = x.target_text.length + (x.source_text ? Math.min(8000, x.source_text.length) : 0); if (picked.length >= 2 && used + len > 70000) break; picked.push(x); used += len; if (picked.length >= 10) break; }
+  const words = all.map((x) => wc(x.target_text)).sort((a, b) => a - b);
+  const pairs = all.filter((x) => x.source_text).map((x) => +(wc(x.target_text) / Math.max(1, wc(x.source_text))).toFixed(2));
+  const before = kind === 'after' ? (STYLE_EX || []).filter((x) => x.kind === 'before') : [];
+  const stats = `מספר הדוגמאות: ${all.length}. אורך כל דוגמה במילים (מהקצרה לארוכה): ${words.join(', ')}.` +
+    (pairs.length ? ` יחס בין הנוסח הכתוב למה שנאמר בהקלטה (בדוגמאות שיש להן הקלטה): ${pairs.join(', ')}.` : '') +
+    (before.length ? ` אורך ממוצע של "סיכום ההקלטה" באותה חסידות: ${Math.round(before.reduce((a, x) => a + wc(x.target_text), 0) / before.length)} מילים.` : '');
+  const exText = picked.map((x, i) => `### דוגמה ${i + 1} – ${x.title}\n${x.source_text ? `[מה שנאמר בהקלטה – קטע]\n${x.source_text.slice(0, 8000)}\n\n[מה שנכתב]\n` : ''}${x.target_text}`).join('\n\n');
+  const what = kind === 'before'
+    ? '"סיכום ההקלטה" – הנוסח הראשון של השיחה: מה שנאמר, כתוב כמאמר רצוף בלשון ספרי החסידות'
+    : '"מוכן להדפסה" – הנוסח הסופי לחוברת המודפסת, עם הכותרות והמבנה של החוברת';
+  const prompt = `You are a senior editor. Study ALL the examples below – they are the written Torah talks of ${(ORG && ORG.rebbe_en) || 'the Rebbe'} (${(ORG && (ORG.full_name || ORG.name)) || ''}), kind: ${what}.
+Write, IN HEBREW, a precise house-style guide that another editor (or a computer) can follow to write new talks EXACTLY like these – the same structure, length, language, expressions and typography. Learn it ONLY from these examples – this chasidus has its own style; do not assume anything from other chassidusim.
+The guide must have these sections (short, concrete, with real examples quoted from the texts):
+מה זה · מבנה (מה יש בראש, איך מתחילים, כותרות – אם יש ואיך הן כתובות, איך מסיימים) · אורך (use the measured numbers below) · לשון (פתיחות פסקה שחוזרות, איך כותבים את שם ה', קיצורים, תארים של האדמו"ר ואבותיו, איך מצטטים מקורות) · מה מוסיפים לעומת מה שנאמר · מה לא עושים.
+${kind === 'after' ? 'If the examples use line markers for print (# title lines, @ subject line, > opening verse, ## sub-headings, **bold**), describe exactly when each is used.' : 'Describe whether there are headings, markers or bold – usually there are none.'}
+MEASURED: ${stats}
+After the guide, write a line "===מילון===" and then a list (comma separated) of up to 120 names of tzaddikim, sefarim, places and fixed expressions that appear in these talks, spelled exactly as in the texts.
+Output only the Hebrew guide and the list.
+
+===== EXAMPLES =====
+${exText}`;
+  if (!silent) toast('🧠 לומד את הסגנון מ-' + all.length + ' דוגמאות… (כדקה)', 6000);
+  const out = await gemText(prompt, 'nusach');
+  if (!out || out.length < 80) throw new Error('לא התקבלה תשובה מהמערכת – נסה שוב');
+  const [guide, gl] = out.split(/===\s*מילון\s*===/);
+  const title = kind === 'before' ? 'מדריך כתיבה – סיכום ההקלטה' : 'מדריך כתיבה – מוכן להדפסה';
+  await sb.from('style_examples').delete().eq('kind', 'guide_' + kind);
+  const { error } = await sb.from('style_examples').insert({ kind: 'guide_' + kind, title: title + ' (נלמד אוטומטית מ-' + all.length + ' דוגמאות)', target_text: guide.trim(), created_by: ME.id });
+  if (error) throw new Error(error.message);
+  // המילון → פרטי החסידות (בלי כפילויות)
+  if (gl && ORG && isAdmin()) {
+    const cur = orgList(ORG.glossary); const add = orgList(gl).filter((t) => t.length > 1 && t.length < 60 && !cur.includes(t));
+    if (add.length) { const glossary = cur.concat(add).join(', '); const { error: e2 } = await sb.from('orgs').update({ glossary }).eq('id', ORG.id); if (!e2) { ORG.glossary = glossary; applyOrgContent(); } }
+  }
+  await loadStyleExamples(true);
+  if (!silent) toast('✅ המערכת למדה את הסגנון – מעכשיו היא כותבת לפיו. אפשר לראות ולתקן ב"📘 מדריך"', 7000);
+  return true;
+}
+// כפתור בחלון הדוגמאות
+{ const _os10 = openStyleExamples; openStyleExamples = async function () {
+  const x = await _os10.apply(this, arguments);
+  try {
+    const box = $('#guideBox .row');
+    if (box && !$('#learnStyleBtn') && (ME.role === 'admin' || ME.role === 'editor')) box.insertAdjacentHTML('afterbegin', '<button class="btn small primary" id="learnStyleBtn" title="המערכת קוראת את כל הדוגמאות של החסידות וכותבת לעצמה מדריך סגנון ומילון">🧠 ללמוד את הסגנון מכל הדוגמאות</button>');
+  } catch (e) {}
+  return x;
+}; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('#learnStyleBtn'); if (!b) return;
+  if (!isBiala() || await confirmBox('בביאלה כבר יש מדריך שנכתב בעבודה ידנית מכל הדוגמאות. ללמוד מחדש אוטומטית ולהחליף אותו?', 'כן, ללמוד מחדש')) {
+    b.disabled = true; b.textContent = '🧠 לומד…';
+    try { for (const k of ['before', 'after']) { const n = (STYLE_EX || []).filter((x) => x.kind === k).length; if (n) await learnOrgStyle(k); } }
+    catch (er) { toast('❌ ' + er.message, 7000); }
+    finally { b.disabled = false; b.textContent = '🧠 ללמוד את הסגנון מכל הדוגמאות'; }
+  }
+});
+// חסידות חדשה: כל פעם שמעלים דוגמאות – המערכת לומדת מחדש לבד
+{ const _isf10 = importStyleFiles; importStyleFiles = function (kind) {
+  const r = _isf10.apply(this, arguments);
+  if (!isBiala()) setTimeout(() => { learnOrgStyle(kind, true).then((ok) => { if (ok) toast('🧠 המערכת למדה את הסגנון של ' + orgName() + ' מהדוגמאות החדשות', 6000); }).catch((er) => console.warn('learn style', er)); }, 45000);
+  return r;
+}; }
 
 
 /* =========================================================
