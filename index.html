@@ -1608,7 +1608,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.11';
+const APP_VERSION = '3.10.12';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9199,7 +9199,19 @@ function openMonthly() {
 document.addEventListener('change', (e) => { if (e.target.id === 'monSel') monthlyFill(e.target.value); });
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-monthly]')) { e.preventDefault(); return openMonthly(); }
-  if (e.target.closest('#monPrint')) { const w = window.open('', '_blank'); if (!w) return; w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>סיכום חודשי</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:6px;text-align:right}</style></head><body><h2>סיכום חודשי – ${esc($('#monSel').selectedOptions[0].textContent)}</h2>${$('#monBox').innerHTML}</body></html>`); w.document.close(); setTimeout(() => w.print(), 400); }
+  if (e.target.closest('#monPrint')) { const w = window.open('', '_blank'); if (!w) return; w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>סיכום חודשי</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:6px;text-align:right}
+/* 3.10.12 – כותרת צפופה יותר: הכל נכנס בשורה אחת */
+@media (min-width:761px){
+header.top{gap:.5em;padding:.45em 14px}
+nav.tabs{gap:1px;padding:3px}
+nav.tabs button{padding:.38em .62em;font-size:.93em;gap:.25em}
+#installBtn{padding:.3em .55em!important;font-size:.85em!important;margin-inline:.5em .2em}
+header.top .btn.icon,header.top .icon-btn{width:34px;height:34px;min-width:34px;padding:0}
+#orgChip{font-size:.85em}
+header.top .top-actions{gap:.25em}
+}
+@media (min-width:761px) and (max-width:1750px){#installBtn .lb{display:none}}
+</style></head><body><h2>סיכום חודשי – ${esc($('#monSel').selectedOptions[0].textContent)}</h2>${$('#monBox').innerHTML}</body></html>`); w.document.close(); setTimeout(() => w.print(), 400); }
 });
 { const _ro105 = renderOrgs; renderOrgs = async function () {
   const r = await _ro105.apply(this, arguments);
