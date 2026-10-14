@@ -1608,7 +1608,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.12';
+const APP_VERSION = '3.10.13';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9371,6 +9371,30 @@ document.addEventListener('click', (e) => { if (e.target.closest('[data-orgswitc
     }
   } catch (e) {}
   return ok;
+}; }
+
+
+/* 3.10.13 – קבצי OpenDocument (‎.odt) – גם ביידיש, גם בעברית, גם בדוגמאות */
+async function odtToText(file) {
+  const JSZip = await libZIP(); const zip = await JSZip.loadAsync(file);
+  const f = zip.file('content.xml'); if (!f) throw new Error('הקובץ ' + file.name + ' לא נקרא');
+  const doc = new DOMParser().parseFromString(await f.async('string'), 'application/xml');
+  const T = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0';
+  const walk = (n) => { let s = ''; n.childNodes.forEach((c) => { if (c.nodeType === 3) s += c.nodeValue; else if (c.nodeType === 1) { if (c.namespaceURI === T && c.localName === 's') s += ' '.repeat(+c.getAttributeNS(T, 'c') || 1); else if (c.namespaceURI === T && c.localName === 'tab') s += ' '; else if (c.namespaceURI === T && c.localName === 'line-break') s += '\n'; else s += walk(c); } }); return s; };
+  const paras = [...doc.getElementsByTagNameNS(T, 'p'), ...doc.getElementsByTagNameNS(T, 'h')].sort((a, b) => (a.compareDocumentPosition(b) & 4 ? -1 : 1)).map((p) => walk(p).trim());
+  return paras.filter(Boolean).join('\n\n');
+}
+{ const _d2t = docxToText; docxToText = async function (file) {
+  if (/\.odt$/i.test((file && file.name) || '')) return odtToText(file);
+  return _d2t.apply(this, arguments);
+}; }
+TR_EXT.he = /\.(docx|odt|txt)$/i; TR_EXT.yi = /\.(docx|odt|txt)$/i;
+{ const _tz = trZone; trZone = function () { return _tz.apply(this, arguments).replace(/accept="\.docx,\.txt"/g, 'accept=".docx,.odt,.txt"').replace(/קבצי וורד \(docx\) או טקסט/g, 'וורד (docx / odt) או טקסט'); }; }
+{ const _ta = trAdd; trAdd = function (kind, files) {
+  const bad = [...files].filter((f) => kind !== 'audio' && /\.(doc|rtf|pdf)$/i.test(f.name)).map((f) => f.name);
+  const r = _ta.apply(this, arguments);
+  if (bad.length) toast(`⚠️ ${bad.length} קבצים בפורמט שהמערכת לא קוראת (${bad.slice(0, 3).join(', ')}). פותחים בוורד ← "שמירה בשם" ← docx.`, 8000);
+  return r;
 }; }
 
 </script>
