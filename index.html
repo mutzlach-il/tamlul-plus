@@ -1609,7 +1609,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.14';
+const APP_VERSION = '3.10.16';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8763,7 +8763,7 @@ async function editOrg(id) {
     const { error } = await sb.rpc('create_org', { p_id: o.id, p_name: o.name, p_info: info });
     if (error) return toast('❌ ' + (/duplicate|already/.test(error.message) ? 'הקוד הזה כבר קיים' : error.message), 7000);
     toast('✅ החסידות נוצרה');
-    if (await confirmBox(`החסידות "${o.name}" נוצרה ✅. עכשיו להעלות את כל החומר של האדמו"ר – הקלטות, כתב בעברית וכתב ביידיש?`, '🎓 כן, להעלות את החומר')) return goTrain(o.id);
+    return orgCreatedModal(o.id, o.name);
   } else {
     const patch = { name: o.name, full_name: o.full_name, rebbe: o.rebbe, rebbe_en: o.rebbe_en, book_name: o.book_name, book_head: o.book_head, ancestors: o.ancestors, ancestors_rule: o.ancestors_rule, glossary: o.glossary, logo: o.logo, cover: o.cover, color: o.color };
     const { error } = await sb.from('orgs').update(patch).eq('id', o.id);
@@ -9043,7 +9043,7 @@ let ORG_FEAT = null, ORG_HASKEY = null;
 function FEAT() {
   if (isSuper()) return FEAT_ALL;
   const f = ORG_FEAT || {};
-  if (!Object.keys(f).length && isBiala()) return FEAT_ALL;
+  if (!Object.keys(f).length || (Object.keys(f).length === 1 && f.defLang)) return FEAT_ALL; // חסידות שעוד לא הוגדר לה "מה פתוח" – הכל פתוח
   return { langs: Array.isArray(f.langs) && f.langs.length ? f.langs : ['yi', 'he'], before: !!f.before, after: !!f.after, translate: !!f.translate };
 }
 async function loadOrgFeat() {
@@ -9477,6 +9477,40 @@ document.addEventListener('click', (e) => { if (!e.target.closest('#langPills [d
   } catch (e) {} }, 400);
   return p;
 }; }
+
+
+/* 3.10.16 – כל משתמש פעיל יכול להעלות חומר לימוד (המערכת לומדת גם מהם) */
+
+
+/* 3.10.16 – אחרי יצירת חסידות: הקישור הנפרד שלה + הוספת מנהל + העלאת חומר */
+function orgCreatedModal(id, name) {
+  const link = orgLink(id);
+  modal(`<h3>✅ החסידות "${esc(name)}" נוצרה</h3>
+    <p><b>🔗 הקישור של ${esc(name)}</b> – זה הקישור שנותנים למנהל ולאנשים של החסידות. מי שנכנס בו רואה רק את ${esc(name)} (השם והלוגו שלה), לא את ביאלה:</p>
+    <div class="row" style="gap:.4em;align-items:center;flex-wrap:wrap"><input value="${esc(link)}" dir="ltr" readonly style="flex:1;min-width:260px" onclick="this.select()"><button class="btn primary" type="button" data-copyorglink="${esc(link)}">📋 העתקה</button></div>
+    <div class="col" style="gap:.5em;margin-top:1em">
+      <button class="btn primary" type="button" data-orgadmin="${esc(id)}">👤 להוסיף את המנהל של ${esc(name)}</button>
+      <button class="btn" type="button" data-gotrain="${esc(id)}" style="background:#b8892b;color:#fff">🎓 להעלות את החומר של האדמו"ר</button>
+    </div>
+    <div class="hint" style="margin-top:.6em">את הקישור אפשר למצוא תמיד: 🏛️ חסידויות ← 🔗 קישור.</div>`, { okText: 'סגירה', cancelText: '' });
+  if (setSec === 'orgs') renderOrgs();
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-orgadmin]'); if (a) { e.preventDefault(); $$('.modal-bg').forEach((m) => m.remove()); try { sessionStorage.setItem('tp_openUsers', a.dataset.orgadmin); } catch (er) {} if (ORG && ORG.id === a.dataset.orgadmin) { go('settings'); } else switchOrg(a.dataset.orgadmin); return; }
+  const l = e.target.closest('[data-orglink]'); if (l) { e.preventDefault(); const link = orgLink(l.dataset.orglink); modal(`<h3>🔗 הקישור של ${esc(l.dataset.name || '')}</h3><p>מי שנכנס בקישור הזה רואה רק את החסידות הזאת:</p><div class="row" style="gap:.4em"><input value="${esc(link)}" dir="ltr" readonly style="flex:1" onclick="this.select()"><button class="btn primary" type="button" data-copyorglink="${esc(link)}">📋 העתקה</button></div>`, { okText: 'סגירה', cancelText: '' }); }
+});
+{ const _lm116 = loadMe; loadMe = async function () {
+  const ok = await _lm116.apply(this, arguments);
+  try { const t = sessionStorage.getItem('tp_openUsers'); if (ok && t && ORG && ORG.id === t) { sessionStorage.removeItem('tp_openUsers'); setTimeout(() => { go('settings'); toast('👤 כאן מוסיפים את המנהל: "➕ הוספת משתמש" ← תפקיד "מנהל"', 8000); }, 900); } } catch (e) {}
+  return ok;
+}; }
+{ const _ro116 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro116.apply(this, arguments);
+  $$('#orgsBox [data-orgkeys]').forEach((b) => { const td = b.parentElement; if (td.querySelector('[data-orglink]')) return; const nm = ((td.closest('tr') || document).querySelector('b') || {}).textContent || ''; td.insertAdjacentHTML('afterbegin', `<button class="btn small primary" data-orglink="${esc(b.dataset.orgkeys)}" data-name="${esc(nm)}">🔗 קישור</button>`); });
+  return r;
+}; }
+// מי שנכנס פעם בקישור של חסידות – גם בפעם הבאה רואה את החסידות שלו
+if (URL_ORG) { try { LS.set('homeOrg', URL_ORG); } catch (e) {} }
 
 </script>
 </body>
