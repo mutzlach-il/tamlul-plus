@@ -1511,6 +1511,7 @@ body.viewas #toTop{display:none}
           <li>בטבלת החסידויות רואים ליד כל חסידות אם המפתח "✓ משלה" או "על המפתח שלך".</li>
           <li><b>🎓 החומר של האדמו"ר</b> (🏛️ חסידויות ← 🎓 חומר, או ✏️ פרטים): שלושה מקומות – הקלטות, כתב בעברית, כתב ביידיש. מחברים לפי מספר בשם הקובץ, ואם אין – לפי אותו שם. כשיוצרים חסידות חדשה, החלון נפתח לבד.</li>
           <li><b>🗑️ מחיקת חסידות</b> (🏛️ חסידויות ← 🗑️ מחיקה): מוחק את כל מה ששייך לחסידות. צריך לכתוב את השם כדי לאשר. ביאלה לא נמחקת. <b>⇄</b> למעלה ליד הלוגו – מעבר בין חסידויות.</li>
+          <li><b>👥 משתמשים לפי חסידות</b>: ב"משתמשים" רואים רק את המשתמשים של החסידות שנמצאים בה (עוברים חסידות ב-⇄). שם גם <b>קישור הכניסה של החסידות</b> – מי שנכנס דרכו רואה ישר את החסידות שלו. <b>שפת האדמו"ר</b> (יידיש/עברית) – ב"⚙️ מה פתוח".</li>
           <li><b>⛔ השבתת חסידות</b> (🏛️ חסידויות ← ⛔ השבתה): אף אחד מהחסידות – גם לא המנהל שלה – לא יכול להיכנס, עד שלוחצים ✅ הפעלה. שום דבר לא נמחק. אתה (מנהל-העל) תמיד נכנס.</li>
           <li><b>📊 סיכום חודשי</b> (🏛️ חסידויות ← 📊 סיכום חודשי): לכל חסידות – כמה דקות תמללה, כמה הקלטות, כמה פעולות בינה, כמה משתמשים פעילים, ועל איזה חשבון. בוחרים חודש, ואפשר להדפיס.</li>
         </ul></details>
@@ -1608,7 +1609,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.13';
+const APP_VERSION = '3.10.14';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9043,7 +9044,7 @@ function FEAT() {
   if (isSuper()) return FEAT_ALL;
   const f = ORG_FEAT || {};
   if (!Object.keys(f).length && isBiala()) return FEAT_ALL;
-  return { langs: Array.isArray(f.langs) && f.langs.length ? f.langs : ['he'], before: !!f.before, after: !!f.after, translate: !!f.translate };
+  return { langs: Array.isArray(f.langs) && f.langs.length ? f.langs : ['yi', 'he'], before: !!f.before, after: !!f.after, translate: !!f.translate };
 }
 async function loadOrgFeat() {
   try { const { data, error } = await sb.from('orgs').select('features').eq('id', ORG.id).maybeSingle(); ORG_FEAT = !error && data ? (data.features || {}) : {}; } catch (e) { ORG_FEAT = {}; }
@@ -9395,6 +9396,86 @@ TR_EXT.he = /\.(docx|odt|txt)$/i; TR_EXT.yi = /\.(docx|odt|txt)$/i;
   const r = _ta.apply(this, arguments);
   if (bad.length) toast(`⚠️ ${bad.length} קבצים בפורמט שהמערכת לא קוראת (${bad.slice(0, 3).join(', ')}). פותחים בוורד ← "שמירה בשם" ← docx.`, 8000);
   return r;
+}; }
+
+
+/* =========================================================
+   3.10.14 – (1) משתמשים לפי חסידות  (2) קישור כניסה לחסידות (?org=)  (3) שפת ברירת מחדל לחסידות
+   ========================================================= */
+// (2) קישור עם ?org= – מסך הכניסה בשם ובלוגו של החסידות, ואחרי הכניסה עוברים אליה
+const URL_ORG = (() => { try { return (new URLSearchParams(location.search).get('org') || '').toLowerCase().replace(/[^a-z0-9-]/g, '') || null; } catch (e) { return null; } })();
+if (URL_ORG) {
+  (async () => { try {
+    for (let i = 0; i < 40 && typeof sb === 'undefined'; i++) await new Promise((r) => setTimeout(r, 100));
+    const { data } = await sb.rpc('public_orgs'); const o = (data || []).find((x) => x.id === URL_ORG);
+    if (o) { LS.set('orgBrand', { id: o.id, name: o.name, logo: o.id === 'biala' ? null : o.logo }); paintPreBrand(); }
+  } catch (e) {} })();
+}
+const orgLink = (id) => location.origin + location.pathname.replace(/index\.html$/, '') + '?org=' + encodeURIComponent(id);
+{ const _lm114 = loadMe; loadMe = async function () {
+  const ok = await _lm114.apply(this, arguments);
+  try {
+    if (ok && URL_ORG && ORG && ORG.id !== URL_ORG && !sessionStorage.getItem('tp_urlOrgDone')) {
+      sessionStorage.setItem('tp_urlOrgDone', '1'); sessionStorage.setItem('tp_orgPick', URL_ORG);
+      const mine = (MY_ORGS || []).some((o) => o.id === URL_ORG);
+      if (mine || isSuper()) { const { error } = await sb.rpc('switch_org', { p_org: URL_ORG }); if (!error) { location.replace(location.pathname); return false; } }
+    }
+  } catch (e) {}
+  return ok;
+}; }
+// (1) רשימת המשתמשים – רק של החסידות שנמצאים בה + קישור הכניסה שלה
+{ const _ru114 = renderUsers; renderUsers = async function () {
+  const r = await _ru114.apply(this, arguments);
+  try {
+    if (!ORG || !ORG.id) return r;
+    const { data: mem } = await sb.from('org_members').select('user_id').eq('org_id', ORG.id);
+    if (mem) {
+      const ids = new Set(mem.map((m) => m.user_id)); let n = 0;
+      $$('#usersTbl tr').forEach((tr) => { const b = tr.querySelector('[data-uedit],[data-udel],[data-udis]'); if (!b) return; const id = b.dataset.uedit || b.dataset.udel || b.dataset.udis; const keep = ids.has(id); tr.style.display = keep ? '' : 'none'; if (keep) n++; });
+      const box = document.querySelector('[data-secbox="users"]');
+      if (box) {
+        let el = box.querySelector('#orgUsersInfo'); if (!el) { const t = $('#usersTbl'); (t.closest('.tbl-wrap') || t).insertAdjacentHTML('beforebegin', '<div id="orgUsersInfo" style="margin:.5em 0;padding:.7em .9em;border-radius:12px;background:var(--primary-soft)"></div>'); el = box.querySelector('#orgUsersInfo'); }
+        const link = orgLink(ORG.id);
+        el.innerHTML = `<b>👥 ${n} משתמשים ב${esc(orgName())}</b> – כאן רואים ומוסיפים רק את המשתמשים של ${esc(orgName())}. כדי לנהל משתמשים של חסידות אחרת – עוברים אליה ב-⇄ למעלה.
+          <div style="margin-top:.4em">🔗 קישור הכניסה של ${esc(orgName())} (נפתח ישר בחסידות): <a href="${esc(link)}" target="_blank" dir="ltr">${esc(link)}</a> <button class="btn small" type="button" data-copyorglink="${esc(link)}">📋 העתקה</button></div>`;
+      }
+    }
+  } catch (e) {}
+  return r;
+}; }
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-copyorglink]'); if (!b) return; e.preventDefault(); try { navigator.clipboard.writeText(b.dataset.copyorglink); toast('📋 הקישור הועתק'); } catch (er) { prompt('העתיקו:', b.dataset.copyorglink); } });
+
+// (3) שפת ברירת המחדל של החסידות (למשל יידיש) – לכל חסידות בנפרד
+function orgDefLang() { const f = ORG_FEAT || {}; if (f.defLang) return f.defLang; if (isBiala()) return null; const L = f.langs || ['yi', 'he']; return L.includes('yi') ? 'yi' : L[0]; }
+function applyOrgLang() {
+  try {
+    if (!ORG || !ORG.id) return;
+    const want = LS.get('lastLang_' + ORG.id, null) || orgDefLang(); if (!want) return;
+    LS.set('lastLang', want); const sel = $('#langSel'); if (sel && [...sel.options].some((o) => o.value === want)) sel.value = want;
+    if (typeof syncLangPills === 'function') syncLangPills();
+  } catch (e) {}
+}
+{ const _lo114 = loadOrg; loadOrg = async function () { const x = await _lo114.apply(this, arguments); applyOrgLang(); return x; }; }
+document.addEventListener('click', (e) => { if (!e.target.closest('#langPills [data-lang]')) return; setTimeout(() => { try { if (ORG && ORG.id) LS.set('lastLang_' + ORG.id, ($('#langSel') || {}).value || LS.get('lastLang')); } catch (er) {} }, 50); });
+// בהעלאת החומר: אם ההקלטות ביידיש – יידיש היא שפת ברירת המחדל של החסידות
+{ const _trr114 = trRun; trRun = async function () {
+  const rl = ($('#trRecLang') || {}).value; const hasAudio = Object.keys(TR.audio || {}).length;
+  const r = await _trr114.apply(this, arguments);
+  try { if (isSuper() && ORG && ORG.id !== 'biala' && hasAudio && rl) { const { data } = await sb.from('orgs').select('features').eq('id', ORG.id).maybeSingle(); const f = Object.assign({}, (data && data.features) || {}); f.defLang = rl; const L = new Set(f.langs || ['he']); L.add(rl); f.langs = [...L]; await sb.from('orgs').update({ features: f }).eq('id', ORG.id); ORG_FEAT = f; LS.set('lastLang_' + ORG.id, rl); applyOrgLang(); } } catch (e) {}
+  return r;
+}; }
+// בחלון "⚙️ מה פתוח" – בחירת שפת ברירת המחדל
+{ const _eof = editOrgFeat; editOrgFeat = async function (id) {
+  const p = _eof.apply(this, arguments);
+  setTimeout(async () => { try {
+    const m = [...$$('.modal-bg')].pop(); if (!m || m.querySelector('#ofDefLang')) return;
+    const { data } = await sb.from('orgs').select('features').eq('id', id).maybeSingle(); const cur = (data && data.features && data.features.defLang) || '';
+    const okb = m.querySelector('[data-ok]'); if (!okb) return;
+    okb.parentElement.insertAdjacentHTML('beforebegin', `<label style="display:block;margin-top:.8em;font-weight:700">🎙️ השפה שהאדמו"ר מדבר בה (נבחרת לבד בתמלול): <select id="ofDefLang"><option value="">אוטומטי</option><option value="yi">יידיש</option><option value="he">עברית</option><option value="en">אנגלית</option></select></label>`);
+    m.querySelector('#ofDefLang').value = cur;
+    okb.addEventListener('click', async () => { const v = m.querySelector('#ofDefLang').value; try { const { data: d2 } = await sb.from('orgs').select('features').eq('id', id).maybeSingle(); const f = Object.assign({}, (d2 && d2.features) || {}); if (v) f.defLang = v; else delete f.defLang; await sb.from('orgs').update({ features: f }).eq('id', id); if (ORG && id === ORG.id) { ORG_FEAT = f; LS.set('lastLang_' + id, v || null); applyOrgLang(); } } catch (er) {} }, true);
+  } catch (e) {} }, 400);
+  return p;
 }; }
 
 </script>
