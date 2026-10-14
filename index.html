@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.11.1';
+const APP_VERSION = '3.11.2';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9115,8 +9115,9 @@ async function featAutoOn(add) {
   try {
     const { data } = await sb.from('orgs').select('features').eq('id', ORG.id).maybeSingle();
     const f = Object.assign({}, (data && data.features) || {}); const langs = new Set(f.langs || ['he']);
+    const fresh = !Object.keys(f).filter((k) => k !== 'defLang').length;
     (add.langs || []).forEach((l) => langs.add(l)); f.langs = [...langs];
-    ['translate', 'before', 'after'].forEach((k) => { if (add[k]) f[k] = true; });
+    if (fresh) ['translate', 'before', 'after'].forEach((k) => { if (add[k]) f[k] = true; });
     await sb.from('orgs').update({ features: f }).eq('id', ORG.id); ORG_FEAT = f;
   } catch (e) {}
 }
@@ -9480,7 +9481,7 @@ document.addEventListener('click', (e) => { if (!e.target.closest('#langPills [d
     const okb = m.querySelector('[data-ok]'); if (!okb) return;
     okb.parentElement.insertAdjacentHTML('beforebegin', `<label style="display:block;margin-top:.8em;font-weight:700">🎙️ השפה שהאדמו"ר מדבר בה (נבחרת לבד בתמלול): <select id="ofDefLang"><option value="">אוטומטי</option><option value="yi">יידיש</option><option value="he">עברית</option><option value="en">אנגלית</option></select></label>`);
     m.querySelector('#ofDefLang').value = cur;
-    okb.addEventListener('click', async () => { const v = m.querySelector('#ofDefLang').value; try { const { data: d2 } = await sb.from('orgs').select('features').eq('id', id).maybeSingle(); const f = Object.assign({}, (d2 && d2.features) || {}); if (v) f.defLang = v; else delete f.defLang; await sb.from('orgs').update({ features: f }).eq('id', id); if (ORG && id === ORG.id) { ORG_FEAT = f; LS.set('lastLang_' + id, v || null); applyOrgLang(); } } catch (er) {} }, true);
+    okb.addEventListener('click', async () => { const v = m.querySelector('#ofDefLang').value; await new Promise((r) => setTimeout(r, 1500)); try { const { data: d2 } = await sb.from('orgs').select('features').eq('id', id).maybeSingle(); const f = Object.assign({}, (d2 && d2.features) || {}); if (v) f.defLang = v; else delete f.defLang; await sb.from('orgs').update({ features: f }).eq('id', id); if (ORG && id === ORG.id) { ORG_FEAT = f; LS.set('lastLang_' + id, v || null); applyOrgLang(); } } catch (er) {} }, true);
   } catch (e) {} }, 400);
   return p;
 }; }
@@ -9756,6 +9757,18 @@ document.addEventListener('click', async (e) => {
       <div class="hint">${rows.filter((r) => r.extras.task !== 'done').length} עוד לא הוגהו · ${rows.filter((r) => r.extras.task === 'done').length} הוגהו</div>` : '<div class="empty">אין משימות. בכל הקלטה אפשר לשייך עורך (למעלה, ליד "מצב קריאה").</div>';
   } catch (er) { $('#tkOut').innerHTML = `<div class="err-text">${esc(er.message)}</div>`; }
 });
+
+
+/* 3.11.2 – מנהל-העל רואה בחסידות בדיוק מה שפתוח לה · כפתור "👤 מנהל" לכל חסידות */
+{ const _feat112 = FEAT; FEAT = function () {
+  if (isSuper() && !isBiala()) { const f = ORG_FEAT || {}; if (!Object.keys(f).filter((k) => k !== 'defLang').length) return FEAT_ALL; return { langs: Array.isArray(f.langs) && f.langs.length ? f.langs : ['yi', 'he'], before: !!f.before, after: !!f.after, translate: !!f.translate }; }
+  return _feat112.apply(this, arguments);
+}; }
+{ const _ro112 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro112.apply(this, arguments);
+  $$('#orgsBox [data-orgkeys]').forEach((b) => { const td = b.parentElement; if (td.querySelector('[data-orgadmin]')) return; const l = td.querySelector('[data-orglink]'); (l || b).insertAdjacentHTML(l ? 'afterend' : 'beforebegin', `<button class="btn small" data-orgadmin="${esc(b.dataset.orgkeys)}">👤 מנהל</button>`); });
+  return r;
+}; }
 
 </script>
 </body>
