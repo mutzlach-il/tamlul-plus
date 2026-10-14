@@ -1609,7 +1609,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.10.16';
+const APP_VERSION = '3.10.17';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9511,6 +9511,14 @@ document.addEventListener('click', (e) => {
 }; }
 // מי שנכנס פעם בקישור של חסידות – גם בפעם הבאה רואה את החסידות שלו
 if (URL_ORG) { try { LS.set('homeOrg', URL_ORG); } catch (e) {} }
+
+
+/* מנהל-העל לא מופיע אף פעם ברשימת המשתמשים של מנהל חסידות */
+{ const _ru116 = renderUsers; renderUsers = async function () {
+  const r = await _ru116.apply(this, arguments);
+  try { if (!isSuper()) { const sup = new Set((USERS || []).filter((u) => u.is_super).map((u) => u.id)); $$('#usersTbl tr').forEach((tr) => { const b = tr.querySelector('[data-uedit],[data-udel],[data-udis]'); if (b && sup.has(b.dataset.uedit || b.dataset.udel || b.dataset.udis)) tr.remove(); }); } } catch (e) {}
+  return r;
+}; }
 
 </script>
 </body>
