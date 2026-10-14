@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מערכת תמלול הקלטות</title>
+<script>try{var _o=(new URLSearchParams(location.search).get('org')||'').toLowerCase();if(_o&&_o!=='biala')document.documentElement.classList.add('org-link')}catch(e){}</script>
+<style>.org-link #splash img,.org-link .auth-brand img{visibility:hidden}.org-link.org-branded #splash img,.org-link.org-branded .auth-brand img{visibility:visible}</style>
 <meta name="description" content="תמלול הקלטות בעברית, יידיש ואנגלית">
 <meta name="theme-color" content="#5b3fd6">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1610,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.11.0';
+const APP_VERSION = '3.11.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8458,7 +8460,11 @@ const orgLogo = () => (ORG && ORG.logo) || (isBiala() ? 'logo-crown.png' : lette
 
 // ---------- מיתוג לפני הכניסה: מה שנשמר מהפעם הקודמת במכשיר הזה ----------
 function paintPreBrand() {
-  const b = LS.get('orgBrand', null);
+  // הקישור הרגיל = תמיד ביאלה · קישור עם ?org= = רק החסידות הזאת
+  let uo = null; try { uo = (new URLSearchParams(location.search).get('org') || '').toLowerCase() || null; } catch (e) {}
+  const b0 = LS.get('orgBrand', null);
+  const b = !uo || uo === 'biala' ? { id: 'biala', name: 'ביאלה', logo: null } : (b0 && b0.id === uo ? b0 : null);
+  if (uo && uo !== 'biala' && b && b.logo) document.documentElement.classList.add('org-branded');
   const name = (b && b.name) || 'מערכת תמלול';
   const logo = (b && b.logo) || 'logo-crown.png';
   $$('#splash .t, .auth-name').forEach((x) => (x.textContent = name));
@@ -8591,7 +8597,7 @@ function orgManifest() {
   if (isBiala()) return;
   const abs = (p) => new URL(p, location.href).href;
   const icon = ORG.logo || abs('icon-512.png');
-  const m = { name: ORG.name + ' – תמלול', short_name: ORG.name, start_url: abs('./'), scope: abs('./'), display: 'standalone', dir: 'rtl', lang: 'he', background_color: '#ffffff', theme_color: ORG.color || '#4f46e5',
+  const m = { name: ORG.name + ' – תמלול', short_name: ORG.name, start_url: abs('./') + (ORG.id && ORG.id !== 'biala' ? '?org=' + encodeURIComponent(ORG.id) : ''), scope: abs('./'), display: 'standalone', dir: 'rtl', lang: 'he', background_color: '#ffffff', theme_color: ORG.color || '#4f46e5',
     icons: [{ src: icon, sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: abs('icon-192.png'), sizes: '192x192', type: 'image/png' }] };
   const l = document.querySelector('link[rel=manifest]'); if (l) l.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(m));
 }
@@ -9419,7 +9425,7 @@ const orgLink = (id) => location.origin + location.pathname.replace(/index\.html
     if (ok && URL_ORG && ORG && ORG.id !== URL_ORG && !sessionStorage.getItem('tp_urlOrgDone')) {
       sessionStorage.setItem('tp_urlOrgDone', '1'); sessionStorage.setItem('tp_orgPick', URL_ORG);
       const mine = (MY_ORGS || []).some((o) => o.id === URL_ORG);
-      if (mine || isSuper()) { const { error } = await sb.rpc('switch_org', { p_org: URL_ORG }); if (!error) { location.replace(location.pathname); return false; } }
+      if (mine || isSuper()) { const { error } = await sb.rpc('switch_org', { p_org: URL_ORG }); if (!error) { location.replace(location.pathname + '?org=' + encodeURIComponent(URL_ORG)); return false; } }
     }
   } catch (e) {}
   return ok;
