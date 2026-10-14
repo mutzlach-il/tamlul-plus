@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.11.2';
+const APP_VERSION = '3.13.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2364,9 +2364,11 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
     let segs = GEM_CHUNK_CACHE.get(cacheKey) || (lsKey && LS.get(lsKey, null));
     if (!segs) {
       if (dayOut || busyRow >= 2) { results[i] = { miss: true, st, en }; return; }
-      const piece = await chunkPiece(audio, st, en);
+      const OV = (typeof ADV === 'function' && ADV().overlap === false) ? 0 : 10;
+      const ps = Math.max(0, st - (i ? OV : 0)), pe = Math.min(total, en + OV);
+      const piece = await chunkPiece(audio, ps, pe); let fromPiece = false;
       const o = Object.assign({}, opts, { deadline: Date.now() + 6 * 60 * 1000 });   // לא יותר מ-6 דקות לחלק אחד
-      try { segs = await retrying(() => geminiTranscribeOne(piece.blob, piece.mime, lang, en - st, o), ` חלק ${i + 1}`); }
+      try { segs = await retrying(() => geminiTranscribeOne(piece.blob, piece.mime, lang, pe - ps, o), ` חלק ${i + 1}`); fromPiece = true; }
       catch (err0) {
         let err = err0;
         if (/לא החזיר/.test(err.message) && !err.dayQuota) {
@@ -2381,6 +2383,10 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
         }
       }
       busyRow = 0;
+      if (fromPiece && segs) {
+        if (typeof ADV === 'function' && ADV().verify) { try { onProgress && onProgress(`🔁 הקשבה שנייה – חלק ${i + 1} מתוך ${parts}…`); segs = await geminiVerify(piece.blob, piece.mime, lang, pe - ps, segs, o); } catch (ev) { console.warn('verify failed', ev.message); } }
+        segs = segs.map((x) => Object.assign({}, x, { start: x.start + ps - st, end: x.end + ps - st })).filter((x) => (i === 0 || x.start >= -1) && (i === parts - 1 || x.start < en - st));
+      }
       GEM_CHUNK_CACHE.set(cacheKey, segs);
       if (lsKey) try { LS.set(lsKey, segs); } catch (e) {}
     }
@@ -9768,6 +9774,501 @@ document.addEventListener('click', async (e) => {
   const r = await _ro112.apply(this, arguments);
   $$('#orgsBox [data-orgkeys]').forEach((b) => { const td = b.parentElement; if (td.querySelector('[data-orgadmin]')) return; const l = td.querySelector('[data-orglink]'); (l || b).insertAdjacentHTML(l ? 'afterend' : 'beforebegin', `<button class="btn small" data-orgadmin="${esc(b.dataset.orgkeys)}">👤 מנהל</button>`); });
   return r;
+}; }
+
+
+/* =========================================================
+   3.11.3 – החומר של האדמו"ר: תרגום לפי הדוגמאות של החסידות · בדיקה אמיתית · מצב הלימוד
+   ========================================================= */
+// דוגמאות "מילה במילה" (יידיש ← עברית) של החסידות
+async function orgPairs() {
+  await loadStyleExamples(true).catch(() => {});
+  return (STYLE_EX || []).filter((x) => x.kind === 'before' && x.source_text && x.target_text && x.source_text.length > 200 && x.target_text.length > 200);
+}
+const pairBlock = (pairs, max = 2, len = 2600) => pairs.slice(0, max).map((x, i) => `### דוגמה ${i + 1}\n[יידיש]\n${x.source_text.slice(0, len)}\n[עברית – כפי שהחסידות כותבת]\n${x.target_text.slice(0, Math.round(len * 1.1))}`).join('\n\n');
+// כל תרגום ליידיש←עברית בחסידות (לא ביאלה) – לומד מהדוגמאות שלה
+{ const _gt123 = gemText; gemText = async function (prompt, kind, onProgress) {
+  try {
+    if (kind === 'translate' && !isBiala() && /into Hebrew/i.test(String(prompt)) && !/CommunityExamples/.test(prompt)) {
+      const pairs = await orgPairs();
+      if (pairs.length) prompt = `CommunityExamples: below are real examples of how THIS community translates the Rebbe's Yiddish into Hebrew. Translate in exactly the same way – same wording style, same spelling of names and terms, same level of literalness.\n\n${pairBlock(pairs.sort(() => Math.random() - 0.5), 2)}\n\n===== NOW THE TASK =====\n` + prompt;
+    }
+  } catch (e) {}
+  return _gt123.call(this, prompt, kind, onProgress);
+}; }
+// 🔍 בדיקה אמיתית: לוקחים שיחה אחת מהחומר, המערכת מתרגמת אותה לבד, ומראים ליד מה שהחסידות כתבה
+async function trainCheck() {
+  const out = $('#tcOut'); out.innerHTML = '<span class="spinner"></span> בודק את החומר…';
+  try {
+    const pairs = await orgPairs();
+    const yiOnly = (STYLE_EX || []).filter((x) => x.kind === 'yi').length;
+    if (!pairs.length) { out.innerHTML = `<div class="err-text">עדיין אין זוגות של יידיש + עברית (נמצאו ${yiOnly} קבצים ביידיש בלבד). מעלים באותו חלון גם את העברית עם אותם מספרים.</div>`; return; }
+    const test = pairs[Math.floor(Math.random() * pairs.length)], others = pairs.filter((x) => x !== test);
+    const src = test.source_text.slice(0, 5000);
+    out.innerHTML = `<span class="spinner"></span> המערכת מתרגמת לבד את "${esc(test.title)}" (מתוך ${pairs.length} שיחות שלמדה)… כדקה`;
+    const prompt = `CommunityExamples: ${others.length ? 'below are real examples of how THIS community translates the Rebbe\'s Yiddish into Hebrew. Translate in exactly the same way.\n\n' + pairBlock(others, 2) : ''}\n\n===== NOW THE TASK =====\nTranslate this Torah talk from Hasidic Yiddish into Hebrew – faithfully, sentence by sentence, nothing added and nothing skipped. Hebrew/Aramaic quotes stay as they are. Output only the Hebrew.\n\n${src}`;
+    const res = await gemText(prompt, 'translate');
+    const ratio = src.length / Math.max(1, test.source_text.length);
+    const tgt = ratio >= 0.98 ? test.target_text : test.target_text.slice(0, Math.round(test.target_text.length * ratio * 1.05)) + ' …';
+    const col = (t, h) => `<div style="flex:1 1 320px;min-width:0"><b>${t}</b><div dir="rtl" style="white-space:pre-wrap;max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:.7em;margin-top:.3em;font-size:.93em;line-height:1.75">${esc(h)}</div></div>`;
+    out.innerHTML = `<div class="hint">השיחה: <b>${esc(test.title)}</b>${ratio < 0.98 ? ' (החלק הראשון)' : ''}. המערכת לא ראתה את התרגום של השיחה הזאת – היא למדה מ-${others.length} השיחות האחרות.</div>
+      <div class="row" style="gap:1em;align-items:flex-start;flex-wrap:wrap;margin-top:.4em">${col('🤖 המערכת תרגמה עכשיו לבד', res || '')}${col('✍️ החסידות כתבה', tgt)}</div>
+      <div style="margin-top:.6em"><button class="btn" type="button" id="tcAgain">🔄 בדיקה על שיחה אחרת</button></div>`;
+  } catch (er) { out.innerHTML = `<div class="err-text">❌ ${esc(er.message || String(er))}</div><div class="hint">אם כתוב שהמכסה נגמרה – מנסים שוב בעוד כמה דקות.</div>`; }
+}
+async function openTrainStatus() {
+  const pairs = await orgPairs();
+  const by = (k) => (STYLE_EX || []).filter((x) => x.kind === k).length;
+  modal(`<h3>🧠 מה המערכת למדה – ${esc(orgName())}</h3>
+    <div class="row" style="gap:.6em;flex-wrap:wrap;margin:.3em 0 .6em">
+      <span class="badge ok">🔗 ${pairs.length} שיחות יידיש + עברית</span><span class="badge">📜 ${by('yi')} ביידיש</span><span class="badge">🖨️ ${by('after')} מוכן להדפסה</span>${by('guide_before') || by('guide_after') ? '<span class="badge ok">📘 מדריך סגנון נכתב</span>' : '<span class="badge">📘 מדריך סגנון – עוד לא</span>'}</div>
+    <div class="hint">מעכשיו כל תרגום מיידיש לעברית ב${esc(orgName())} נעשה לפי השיחות האלה.</div>
+    <button class="btn primary" type="button" id="tcGo" style="width:100%;margin-top:.6em">🔍 בדיקה – לראות דוגמה אמיתית</button>
+    <div id="tcOut" style="margin-top:.7em"></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const m = [...$$('.modal-bg')].pop(); const mm = m && m.querySelector('.modal'); if (mm) mm.style.maxWidth = '1100px';
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#tcGo, #tcAgain')) { e.preventDefault(); trainCheck(); }
+  if (e.target.closest('[data-trainstatus]')) { e.preventDefault(); openTrainStatus(); }
+  if (e.target.closest('#trCheckGo')) { e.stopImmediatePropagation(); e.preventDefault(); openTrainStatus().then(() => setTimeout(trainCheck, 200)); }
+}, true);
+// בחלון החומר + ב"פרטי החסידות": כפתור "מה המערכת למדה / בדיקה"
+{ const _ot123 = openTrain; openTrain = function () {
+  const r = _ot123.apply(this, arguments);
+  try { const go = $('#trGo'); if (go && !$('[data-trainstatus]', go.parentElement)) go.insertAdjacentHTML('afterend', '<button class="btn" type="button" data-trainstatus style="width:100%;margin-top:.5em">🧠 מה המערכת כבר למדה · 🔍 בדיקה</button>'); } catch (e) {}
+  return r;
+}; }
+if (typeof renderMyOrg === 'function') { const _rmo123 = renderMyOrg; renderMyOrg = async function () {
+  const r = await _rmo123.apply(this, arguments);
+  const t = $('#myOrgBox [data-train]'); if (t && !t.parentElement.querySelector('[data-trainstatus]')) t.insertAdjacentHTML('afterend', ' <button class="btn" type="button" data-trainstatus style="margin-top:.5em">🧠 מה המערכת למדה · 🔍 בדיקה</button>');
+  return r;
+}; }
+// אחרי "שמירה ולימוד" – הכפתור הכחול מוביל לבדיקה האמיתית
+{ const _trr123 = trRun; trRun = async function () {
+  const r = await _trr123.apply(this, arguments);
+  try { const p = $('#trProg'); if (p && !p.querySelector('#trCheckGo')) p.insertAdjacentHTML('beforeend', '<div style="margin-top:.8em"><button class="btn primary" type="button" id="trCheckGo">🔍 בדיקה: לראות איך המערכת מתרגמת עכשיו</button></div>'); } catch (e) {}
+  return r;
+}; }
+// החומר של האדמו"ר נסתר ממי שאינו מנהל (גם בתצוגה)
+function hideTrainingFor() { return !(isAdmin() || isSuper()); }
+{ const _lr123 = loadRecs; loadRecs = async function () {
+  const r = await _lr123.apply(this, arguments);
+  try { if (hideTrainingFor() && RECS && RECS.forEach) { const del = []; RECS.forEach((v, k) => { if (v && v.extras && v.extras.training) del.push(k); }); del.forEach((k) => RECS.delete(k)); } } catch (e) {}
+  return r;
+}; }
+{ const _lf123 = loadFolders; loadFolders = async function () {
+  const r = await _lf123.apply(this, arguments);
+  try { if (hideTrainingFor() && Array.isArray(FOLDERS)) FOLDERS = FOLDERS.filter((f) => f.name !== '🎓 הקלטות לימוד' || f.owner === (ME && ME.id)); } catch (e) {}
+  return r;
+}; }
+
+
+/* =========================================================
+   3.11.4 – המערכת משתפרת כל הזמן: כל תיקון בתרגום מלמד אותה
+            החומר של מנהל-העל – רק הוא רואה; מנהל/משתמש רואה רק את מה שהוא העלה
+   ========================================================= */
+// מי רואה חומר לימוד: מנהל-העל – הכל; כל אחד אחר – רק את מה שהוא עצמו העלה
+hideTrainingFor = function () { return !isSuper(); };
+{ const _lr124 = loadRecs; loadRecs = async function () {
+  const r = await _lr124.apply(this, arguments);
+  try { if (!isSuper() && RECS && RECS.forEach) { const del = []; RECS.forEach((v, k) => { if (v && v.extras && v.extras.training && v.owner !== (ME && ME.id)) del.push(k); }); del.forEach((k) => RECS.delete(k)); } } catch (e) {}
+  return r;
+}; }
+// גם בחלון "📚 דוגמאות" – דוגמאות שמנהל-העל העלה לא מוצגות לאחרים (אבל המערכת לומדת מהן)
+{ const _ose124 = openStyleExamples; openStyleExamples = async function () {
+  const r = await _ose124.apply(this, arguments);
+  try { if (!isSuper()) { const sup = new Set(); const { data } = await sb.from('profiles').select('id').eq('is_super', true); (data || []).forEach((p) => sup.add(p.id)); const hide = new Set((STYLE_EX || []).filter((x) => sup.has(x.created_by)).map((x) => x.title)); $$('.modal .act-row').forEach((row) => { const t = (row.querySelector('b') || {}).textContent; if (hide.has(t)) row.remove(); }); } } catch (e) {}
+  return r;
+}; }
+// ✏️ תיקון התרגום – כל תיקון נשמר, והמערכת לומדת ממנו (מילים + דוגמה שלמה)
+{ const _rt124 = Detail.renderTranslations; Detail.renderTranslations = function () {
+  const r = _rt124.apply(this, arguments);
+  try { if (this.canEdit()) $$('#dTranslations [data-trdel]').forEach((b) => { if (!b.parentElement.querySelector('[data-tredit]')) b.insertAdjacentHTML('beforebegin', `<button class="btn small" type="button" data-tredit="${esc(b.dataset.trdel)}">✏️ תיקון</button>`); }); } catch (e) {}
+  return r;
+}; }
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-tredit]'); if (!b) return; e.preventDefault();
+  const k = b.dataset.tredit, rec = Detail.rec; if (!rec) return; const old = (rec.translations || {})[k] || '';
+  let val = old;
+  const ok = await modal(`<h3>✏️ תיקון התרגום ל${esc(LANGS[k] || k)}</h3><p class="muted">מתקנים כאן – והמערכת לומדת מהתיקון ולא תחזור על אותה טעות, בכל ${esc(orgName())}.</p><textarea id="trEditTa" dir="${k === 'en' ? 'ltr' : 'rtl'}" style="width:100%;min-height:50vh;line-height:1.8">${esc(old)}</textarea>`, { okText: '💾 שמירה ולימוד', wide: true, onOk: (bg) => { val = bg.querySelector('#trEditTa').value; } });
+  if (!ok || val.trim() === old.trim()) return;
+  rec.translations = Object.assign({}, rec.translations, { [k]: val.trim() });
+  try { await Detail.save(['translations']); Detail.renderTranslations(); } catch (er) { return toast('❌ ' + er.message); }
+  let learned = 0; try { if (ADV().learnFix) learned = await learnFixes(old, val); } catch (er) {}
+  // תרגום מתוקן מיידיש לעברית = דוגמה חדשה שהמערכת לומדת ממנה
+  try {
+    if (k === 'he' && rec.lang === 'yi' && val.trim().length > 300) {
+      const yi = (rec.extras && rec.extras.yiOrig && rec.extras.yiOrig.length ? rec.extras.yiOrig.map((x) => x.text).join(' ') : (rec.segments || []).map((x) => x.text).join(' ')) || rec.text || '';
+      if (yi.length > 300) { const title = ('✏️ תיקון – ' + (rec.title || '')).slice(0, 190); const have = (STYLE_EX || []).some((x) => x.kind === 'before' && x.title === title); if (!have) { await sb.from('style_examples').insert({ kind: 'before', title, source_text: yi.slice(0, 40000), target_text: val.trim().slice(0, 60000), created_by: ME.id }); await loadStyleExamples(true).catch(() => {}); learned++; } }
+    }
+  } catch (er) {}
+  toast(learned ? '✅ נשמר – והמערכת למדה מהתיקון 🧠' : '✅ נשמר');
+});
+
+
+/* =========================================================
+   3.12.0 – סבב 1: איכות התמלול
+   ניקוי שמע · חלקים עם חפיפה · הקשבה שנייה (אימות) · טביעת קול · השלמת קטעים חסרים
+   מבחן איכות קבוע · דוח איכות לכל הקלטה · התראות למנהל-העל · גיבוי יומי
+   ========================================================= */
+Object.assign(ADV_DEF, { clean: true, verify: true, gaps: true, voice: true, mailDone: false });
+Object.assign(ADV_NAMES, {
+  clean: '🎚️ ניקוי שמע לפני התמלול (רעשי רקע, הד, קול חלש)',
+  verify: '🔁 הקשבה שנייה – בדיקה חוזרת של כל קטע (מדויק יותר, משתמש בפי 2 מהמכסה)',
+  gaps: '🧩 השלמה לבד של קטעים חסרים או לא ברורים',
+  voice: '🎙️ זיהוי הקול של האדמו"ר (טביעת קול מהחומר)',
+  mailDone: '📧 מייל "התמלול מוכן" למי שהעלה (חשבון EmailJS – עד 200 מיילים בחודש)'
+});
+
+// 1 · ניקוי שמע: סינון רעשים נמוכים/גבוהים, דחיסה ונרמול – לפני כל חלק שנשלח לתמלול
+{ const _rs = resampleMono16k; resampleMono16k = async function (audioBuf, start, end) {
+  if (!(typeof ADV === 'function' && ADV().clean)) return _rs.apply(this, arguments);
+  try {
+    const rate = 16000, len = Math.max(1, Math.ceil((end - start) * rate));
+    const off = new OfflineAudioContext(1, len, rate);
+    const src = off.createBufferSource(); src.buffer = audioBuf;
+    const hp = off.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 75; hp.Q.value = 0.7;
+    const lp = off.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7600; lp.Q.value = 0.7;
+    const pk = off.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 2500; pk.gain.value = 3; pk.Q.value = 1;   // בהירות הדיבור
+    const cmp = off.createDynamicsCompressor(); cmp.threshold.value = -28; cmp.knee.value = 12; cmp.ratio.value = 3.5; cmp.attack.value = 0.005; cmp.release.value = 0.25;
+    src.connect(hp); hp.connect(lp); lp.connect(pk); pk.connect(cmp); cmp.connect(off.destination);
+    src.start(0, start, end - start);
+    const x = (await off.startRendering()).getChannelData(0);
+    let peak = 0; for (let i = 0; i < x.length; i++) { const v = Math.abs(x[i]); if (v > peak) peak = v; }
+    if (peak > 0.0005 && peak < 0.9) { const g = Math.min(8, 0.92 / peak); for (let i = 0; i < x.length; i++) x[i] *= g; }
+    return x;
+  } catch (e) { console.warn('audio clean failed – raw audio', e); return _rs.apply(this, arguments); }
+}; }
+
+// 2 · הקשבה שנייה: אותו קטע נשמע שוב עם הטיוטה – תיקון מילים, ומה שעדיין לא ודאי מסומן
+async function geminiVerify(blob, mime, lang, dur, segs, opts = {}) {
+  if (!segs || !segs.length) return segs;
+  const models = (await geminiModels()).filter((m) => !GEM_DAY_OUT.has(m));
+  if (!models.length) return segs;
+  const model = models[1] || models[0];
+  const b64 = await blobToB64(blob);
+  const draft = segs.map((s) => `[${fmtTime(s.start)}] ${s.text}`).join('\n');
+  const terms = (() => { try { return glossaryText(900); } catch (e) { return ''; } })();
+  const prompt = `You are a senior transcription proof-listener. Below is the audio and a DRAFT transcript of it (timestamps relative to this audio).
+Listen to the WHOLE audio again, very carefully, and output the CORRECTED transcript in EXACTLY the same format – one line per sentence: "[mm:ss] text" – same language and same script as the draft.
+- Fix words that were misheard, add words that were missed, fix names of tzaddikim, sefarim and places${terms ? ` (correct spellings: ${terms})` : ''}.
+- Keep the same timestamps as much as possible. Do NOT translate, do NOT summarize, do NOT add anything that is not said.
+- If after listening you are still not sure about a word, wrap it in ⟦ ⟧.
+Output ONLY the corrected lines.
+
+DRAFT:
+${draft}`;
+  const res = await gemFetch(`/models/${model}:generateContent`, { contents: [{ role: 'user', parts: [{ inline_data: { mime_type: mime, data: b64 } }, { text: prompt }] }], generationConfig: { temperature: 0, maxOutputTokens: 30000 } }, 'transcribe', dur);
+  const c = res.candidates && res.candidates[0];
+  const txt = c && c.content && (c.content.parts || []).filter((p) => !p.thought).map((p) => p.text || '').join('').trim();
+  if (!txt) return segs;
+  const out = parseTimedLines(txt, dur).map((s) => { const u = /⟦/.test(s.text); return Object.assign({}, s, { text: s.text.replace(/[⟦⟧]/g, '').trim() }, u ? { u: 1 } : {}); }).filter((s) => s.text);
+  const a = draft.replace(/\[[^\]]*\]/g, '').length, b = out.map((s) => s.text).join(' ').length;
+  if (!out.length || b < a * 0.6 || b > a * 1.6) return segs;   // תשובה חשודה – נשארים עם הטיוטה
+  return out;
+}
+
+// 3 · טביעת קול: כשמפרידים בין דוברים – דוגמת הקול של האדמו"ר נשלחת יחד עם ההקלטה
+{ const _tb125 = transcribeBlob; transcribeBlob = async function (blob, name, lang, onProgress, opts = {}) {
+  try {
+    if (ADV().voice && opts.speakers && !opts.refParts && !(opts.rec && opts.rec.extras && opts.rec.extras.interview)) {
+      const v = (await loadVoices(true)).slice(0, 2);
+      if (v.length) opts.refParts = [].concat(...v.map((x) => [{ text: `Reference voice sample of "${x.name}" – when this voice speaks, label the line with this name:` }, { inline_data: { mime_type: x.mime || 'audio/mpeg', data: x.audio_b64 } }]), [{ text: 'End of reference samples. Now the recording to transcribe:' }]);
+    }
+  } catch (e) {}
+  return _tb125.call(this, blob, name, lang, onProgress, opts);
+}; }
+// אחרי העלאת חומר עם הקלטות – אם אין עדיין דוגמת קול של האדמו"ר, היא נוצרת לבד מההקלטה הראשונה
+{ const _trr125 = trRun; trRun = async function () {
+  const first = Object.values(TR.audio || {})[0];
+  const r = await _trr125.apply(this, arguments);
+  try {
+    if (first && first.size < 45 * 1024 * 1024 && ADV().voice) {
+      const name = (ORG && (ORG.rebbe || ('האדמו"ר – ' + ORG.name))) || 'האדמו"ר';
+      const have = (await loadVoices(true)) || [];
+      if (!have.some((x) => x.name === name)) {
+        const audio = await decodeAudio(first); const d = audio.duration || 0;
+        if (d > 40) { const s = Math.min(90, Math.max(5, d * 0.2)); const pc = await chunkPiece(audio, s, Math.min(d, s + 25)); const b64 = await blobToB64(pc.blob);
+          const { error } = await sb.from('voice_profiles').insert({ name, audio_b64: b64, mime: pc.mime });
+          const p = $('#trProg'); if (!error && p) p.insertAdjacentHTML('beforeend', `<br>🎙️ נשמרה "טביעת קול" של ${esc(name)} – המערכת תזהה את הקול שלו.`); }
+      }
+    }
+  } catch (e) { console.warn('voice sample failed', e); }
+  return r;
+}; }
+
+// 8 · השלמת קטעים חסרים – גם בתמלול של Gemini
+{ const _tb8 = transcribeBlob; transcribeBlob = async function (blob, name, lang, onProgress, opts = {}) {
+  const res = await _tb8.call(this, blob, name, lang, onProgress, opts);
+  try { if (ADV().gaps && engineFor(lang, opts.rec) === 'gemini' && !opts.hole) return await geminiGapRepair(blob, res, lang, onProgress, opts); } catch (e) { console.warn('gemini gap repair failed', e); }
+  return res;
+}; }
+// קטע ארוך עם מעט מאוד טקסט = כנראה דילוג של המודל → מתמללים שוב רק את הקטע הזה
+async function geminiGapRepair(blob, res, lang, onProgress, opts) {
+  const segs = (res && res.segments) || []; if (!segs.length) return res;
+  const holes = [];
+  segs.forEach((g) => { const d = (g.end || 0) - (g.start || 0), len = String(g.text || '').replace(/\s/g, '').length; if (d > 22 && len / d < 4) { const s = g.start + Math.min(d - 10, len / 12); if (g.end - s > 10) holes.push({ s, e: g.end }); } });
+  if (!holes.length) return res;
+  const win = []; holes.forEach((h) => { for (let t = h.s; t < h.e; t += 60) win.push({ s: t, e: Math.min(h.e, t + 60) }); });
+  let audio; try { audio = await decodeAudio(blob); } catch (e) { return res; }
+  let out = segs.slice(), added = 0;
+  for (let i = 0; i < Math.min(win.length, 12); i++) {
+    const h = win[i]; onProgress && onProgress(`🧩 משלים קטע שדולג ${i + 1} מתוך ${Math.min(win.length, 12)}…`);
+    const fill = (await transcribeHole(audio, h, lang, opts)).filter((x) => !/^\[קטע לא ברור/.test(x.text || ''));
+    if (fill.length) { out = out.map((g) => (g.start < h.s && g.end > h.s ? Object.assign({}, g, { end: h.s }) : g)).concat(fill); added += fill.length; }
+  }
+  if (!added) return res;
+  out.sort((a, b) => a.start - b.start);
+  return Object.assign({}, res, { segments: out, text: out.map((g) => g.text).join(' '), repaired: added });
+}
+
+// 10 · דוח איכות לכל הקלטה
+function recQuality(r) {
+  const segs = (r && r.segments) || [], dur = +r.duration || (segs.length ? segs[segs.length - 1].end : 0);
+  const words = segs.reduce((a, s) => a + String(s.text || '').split(/\s+/).filter(Boolean).length, 0);
+  const uns = segs.filter((s) => s.u).length, miss = segs.filter((s) => /^\[(⏸️|קטע לא ברור)/.test(String(s.text || ''))).length;
+  let covered = 0; segs.forEach((s) => { covered += Math.max(0, (s.end || 0) - (s.start || 0)); });
+  const cov = dur ? Math.min(100, Math.round(covered / dur * 100)) : 0, wpm = dur ? Math.round(words / (dur / 60)) : 0;
+  const sure = segs.length ? Math.round((1 - uns / segs.length) * 100) : 0;
+  const level = miss ? 'bad' : (sure >= 92 && (wpm >= 60 || !dur)) ? 'good' : 'check';
+  return { dur, words, uns, miss, cov, wpm, sure, level };
+}
+function renderQualRow() {
+  const r = Detail.rec; const anchor = $('#readBtn'); if (!r || !anchor || r.status !== 'done' || !(r.segments || []).length) { const q0 = $('#qualRow'); if (q0) q0.remove(); return; }
+  const q = recQuality(r);
+  let row = $('#qualRow'); if (!row) { anchor.closest('.row, div').insertAdjacentHTML('afterend', '<div id="qualRow" style="margin:.4em 0;padding:.5em .8em;border-radius:10px;font-size:.92em"></div>'); row = $('#qualRow'); }
+  const col = { good: ['#dcfce7', '✅ איכות גבוהה'], check: ['#fef3c7', '🔎 כדאי לעבור על המסומן'], bad: ['#fee2e2', '⚠️ חסרים קטעים – כדאי לבדוק'] }[q.level];
+  row.style.background = col[0];
+  row.innerHTML = `<b>📊 דוח איכות: ${col[1]}</b> · ודאות ${q.sure}% · ${q.uns ? `<a href="#" data-unsurenext>${q.uns} משפטים מסומנים לבדיקה</a>` : 'אין משפטים לבדיקה'} · ${q.miss ? `<b style="color:#b91c1c">${q.miss} קטעים חסרים</b> · ` : ''}${q.words.toLocaleString('he-IL')} מילים · ${q.wpm} מילים לדקה`;
+}
+document.addEventListener('click', (e) => { if (!e.target.closest('[data-unsurenext]')) return; e.preventDefault(); const u = document.querySelector('#dTranscript .seg.unsure, .seg.unsure'); if (u) { u.scrollIntoView({ block: 'center', behavior: 'smooth' }); u.style.outline = '3px solid #f59e0b'; setTimeout(() => (u.style.outline = ''), 2500); } });
+{ const _do125 = Detail.open; Detail.open = async function () { const r = await _do125.apply(this, arguments); try { renderQualRow(); } catch (e) {} return r; }; }
+{ const _rtx125 = Detail.renderTranscript; Detail.renderTranscript = function () { const r = _rtx125.apply(this, arguments); try { renderQualRow(); } catch (e) {} return r; }; }
+
+// 11 · התראות למנהל-העל: תמלול שנכשל / מכסה שנגמרה · ומייל "מוכן" (אם הופעל)
+async function sendAlert(kind, msg) {
+  try { const k = 'alert_' + (ORG && ORG.id) + '_' + kind; const last = LS.get(k, 0); if (Date.now() - last < 45 * 60 * 1000) return; LS.set(k, Date.now()); await api('alert', { message: msg }); } catch (e) {}
+}
+{ const _sr125 = saveRec; saveRec = async function (rec, fields) {
+  const r = await _sr125.apply(this, arguments);
+  try {
+    if (rec && fields && fields.includes('status')) {
+      if (rec.status === 'error' && rec.error && !/בוטל/.test(rec.error)) sendAlert(/מכסה|quota/i.test(rec.error) ? 'quota' : 'error', `${/מכסה|quota/i.test(rec.error) ? '⏸️ המכסה נגמרה' : '❌ תמלול נכשל'}: "${rec.title || ''}"\n${rec.error}`);
+      if (rec.status === 'done' && ADV().mailDone && rec.owner === (ME && ME.id) && !rec._mailed) { rec._mailed = true; api('notify-done', { title: rec.title || '', message: rec.duration ? `אורך: ${Math.round(rec.duration / 60)} דקות.` : '' }).catch(() => {}); }
+    }
+  } catch (e) {}
+  return r;
+}; }
+
+// 7 · מבחן איכות קבוע: 3 שיחות קבועות מהחומר – המערכת מתרגמת אותן לבד ומודדת אחוז התאמה
+function wordSim(a, b) {
+  const A = String(a || '').replace(/[^א-ת\s]/g, ' ').split(/\s+/).filter(Boolean).slice(0, 1500), B = String(b || '').replace(/[^א-ת\s]/g, ' ').split(/\s+/).filter(Boolean).slice(0, 1500);
+  if (!A.length || !B.length) return 0;
+  const m = B.length, prev = new Uint16Array(m + 1), cur = new Uint16Array(m + 1);
+  for (let i = 1; i <= A.length; i++) { for (let j = 1; j <= m; j++) cur[j] = A[i - 1] === B[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]); prev.set(cur); }
+  return Math.round(2 * prev[m] / (A.length + B.length) * 100);
+}
+async function runQaTest(out) {
+  const pairs = (await orgPairs()).filter((x) => !/^✏️/.test(x.title)).sort((a, b) => String(a.title).localeCompare(String(b.title), 'he', { numeric: true }));
+  if (pairs.length < 2) { out.innerHTML = '<div class="err-text">צריך לפחות 2 שיחות של יידיש + עברית כדי להריץ מבחן.</div>'; return; }
+  const tests = pairs.slice(0, 3), res = [];
+  for (let i = 0; i < tests.length; i++) {
+    const t = tests[i], others = pairs.filter((x) => x !== t);
+    out.innerHTML = `<span class="spinner"></span> מבחן ${i + 1} מתוך ${tests.length}: "${esc(t.title)}"…`;
+    const src = t.source_text.slice(0, 3500); const ratio = src.length / t.source_text.length;
+    const ref = t.target_text.slice(0, Math.round(t.target_text.length * Math.min(1, ratio * 1.05)));
+    const p = `CommunityExamples: below are real examples of how THIS community translates the Rebbe's Yiddish into Hebrew. Translate in exactly the same way.\n\n${pairBlock(others, 2)}\n\n===== NOW THE TASK =====\nTranslate this Torah talk from Hasidic Yiddish into Hebrew – faithfully, sentence by sentence. Output only the Hebrew.\n\n${src}`;
+    try { const got = await gemText(p, 'translate'); res.push({ title: t.title, score: wordSim(got, ref) }); } catch (e) { res.push({ title: t.title, score: null, err: e.message }); }
+  }
+  const ok = res.filter((x) => x.score != null), avg = ok.length ? Math.round(ok.reduce((a, x) => a + x.score, 0) / ok.length) : null;
+  const hist = Array.isArray(SETTINGS.qa_hist) ? SETTINGS.qa_hist.slice(-11) : [];
+  const prev = hist.length ? hist[hist.length - 1].avg : null;
+  if (avg != null) { hist.push({ d: new Date().toISOString().slice(0, 10), avg }); try { if (isAdmin() || isSuper()) await setSetting('qa_hist', hist); } catch (e) {} }
+  if (avg != null && prev != null && avg < prev - 6) sendAlert('qa', `📉 מבחן האיכות ירד: ${prev}% ← ${avg}%`);
+  out.innerHTML = `<div style="font-size:1.2em;font-weight:800;margin:.3em 0">🧪 ציון: ${avg != null ? avg + '%' : '—'} ${prev != null && avg != null ? (avg >= prev ? `<span style="color:#15803d">▲ (קודם: ${prev}%)</span>` : `<span style="color:#b91c1c">▼ (קודם: ${prev}%)</span>`) : ''}</div>
+    ${res.map((x) => `<div>• ${esc(x.title)}: <b>${x.score != null ? x.score + '%' : '❌ ' + esc(x.err || '')}</b></div>`).join('')}
+    <div class="hint" style="margin-top:.4em">הציון = כמה מהמילים של המערכת זהות למה שהחסידות כתבה (100% = זהה לגמרי; 60%+ = טוב מאוד, כי יש כמה דרכים נכונות לכתוב). מריצים שוב אחרי כל עדכון – אם הציון יורד, תגיע אליך התראה.</div>
+    ${hist.length > 1 ? `<div class="hint">היסטוריה: ${hist.map((h) => `${h.d.slice(5)}: ${h.avg}%`).join(' · ')}</div>` : ''}`;
+}
+{ const _ots125 = openTrainStatus; openTrainStatus = async function () {
+  const r = await _ots125.apply(this, arguments);
+  try { const go = $('#tcGo'); if (go && !$('#qaGo')) go.insertAdjacentHTML('afterend', '<button class="btn" type="button" id="qaGo" style="width:100%;margin-top:.4em">🧪 מבחן איכות קבוע (3 שיחות – ציון באחוזים)</button>'); } catch (e) {}
+  return r;
+}; }
+document.addEventListener('click', (e) => { if (!e.target.closest('#qaGo')) return; e.preventDefault(); runQaTest($('#tcOut')); });
+
+// 12 · גיבוי יומי – רשימה והורדה (מנהל-העל: כל החסידויות; מנהל: החסידות שלו)
+async function openBackups() {
+  modal(`<h3>🗄️ גיבויים יומיים</h3><p class="muted">כל לילה בשעה 04:30 נשמר גיבוי של כל השיחות (טקסט, תרגומים ונוסחים) – 7 ימים אחורה.</p><div id="bkList"><span class="spinner"></span></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const { data, error } = await sb.rpc('list_backups');
+  const box = $('#bkList'); if (!box) return;
+  if (error) { box.innerHTML = `<div class="err-text">${esc(/list_backups|function/.test(error.message) ? 'צריך קודם להריץ את עדכון בסיס הנתונים.' : error.message)}</div>`; return; }
+  box.innerHTML = (data || []).length ? `<table class="tbl" style="width:100%"><tr><th>חסידות</th><th>תאריך</th><th>שיחות</th><th>גודל</th><th></th></tr>${data.map((b) => `<tr><td>${esc(b.name)}</td><td>${new Date(b.taken_at).toLocaleString('he-IL')}</td><td>${b.recordings}</td><td>${b.size_kb} KB</td><td><button class="btn small" data-bkdl="${b.id}" data-bkn="${esc(b.name)}">⬇️ הורדה</button></td></tr>`).join('')}</table>` : '<div class="empty">עוד אין גיבויים – הראשון ייווצר הלילה.</div>';
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-openbackups]')) { e.preventDefault(); return openBackups(); }
+  const b = e.target.closest('[data-bkdl]'); if (!b) return; e.preventDefault();
+  const { data, error } = await sb.from('daily_backups').select('data,taken_at').eq('id', +b.dataset.bkdl).maybeSingle();
+  if (error || !data) return toast('❌ ' + (error ? error.message : 'לא נמצא'));
+  const blob = new Blob([JSON.stringify(data.data, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `גיבוי-${b.dataset.bkn}-${String(data.taken_at).slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+if (typeof renderMyOrg === 'function') { const _rmo125 = renderMyOrg; renderMyOrg = async function () {
+  const r = await _rmo125.apply(this, arguments);
+  const b = $('#advBox [data-orgbackupfile]'); if (b && !$('#advBox [data-openbackups]')) b.insertAdjacentHTML('afterend', ' <button class="btn" type="button" data-openbackups>🗄️ גיבויים יומיים אוטומטיים</button>');
+  return r;
+}; }
+{ const _ro125 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro125.apply(this, arguments);
+  const nb = $('#orgNew'); if (nb && !$('#orgsBox [data-openbackups]')) nb.insertAdjacentHTML('beforebegin', '<button class="btn" data-openbackups type="button" style="margin-inline-end:.5em">🗄️ גיבויים</button>');
+  return r;
+}; }
+
+
+/* =========================================================
+   3.13.0 – סבב 2: פחות עומס · הגדרות מסודרות · סיור למשתמש חדש
+            סבב 3: עיצוב לפי חסידות · תצוגת ספר · מצב לילה רך · מסך בית חכם
+                   יידיש מול עברית · מהירות בלי עיוות · "מה חדש"
+   ========================================================= */
+// ---- ט · כפתורים משניים בהקלטה – לתוך "⋯ עוד" ----
+(function () {
+  const bar = $('#page-detail .toolbar'); if (!bar || $('#moreBtn')) return;
+  const ids = ['historyBtn', 'replaceBtn', 'shareBtn', 'dlAudioBtn', 'offlineBtn', 'studyBtn', 'videoBtn', 'compareBtn', 'lockBtn', 'retryBtn', 'delBtn'];
+  bar.insertAdjacentHTML('beforeend', '<span style="position:relative;display:inline-block"><button class="btn small" id="moreBtn" type="button" aria-haspopup="true">⋯ עוד</button><div id="moreMenu" class="more-menu hidden"></div></span>');
+  const menu = $('#moreMenu'); ids.forEach((id) => { const b = document.getElementById(id); if (b) menu.appendChild(b); });
+  const st = document.createElement('style');
+  st.textContent = `.more-menu{position:absolute;inset-inline-end:0;top:110%;z-index:40;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:.4em;display:flex;flex-direction:column;gap:.25em;min-width:230px}
+  .more-menu .btn{justify-content:flex-start;width:100%;border:none;box-shadow:none;background:transparent}.more-menu .btn:hover{background:var(--primary-soft)}
+  .ai-more.hidden{display:none!important}
+  .set-nav .sn-group{font-size:.78em;font-weight:800;color:var(--muted);margin:.7em .4em .2em;letter-spacing:.02em}
+  body.book-font #dTranscript,body.book-font #dTranslations,body.book-font .nusach-box,body.book-font .nusach-text,body.book-font #nusBox{font-family:'Frank Ruhl Libre','David Libre',serif!important;font-size:1.12em;line-height:2}
+  body.dark{--bg:#14161d;--card:#1c1f29;--line:#2c3040;--text:#e7e8ee;--muted:#9aa0b4}
+  .sbs-row{display:grid;grid-template-columns:1fr 1fr;gap:.8em;padding:.45em .3em;border-bottom:1px solid var(--line);cursor:pointer}.sbs-row:hover{background:var(--primary-soft)}
+  .sbs-row .t{font-size:.8em;color:var(--muted)} .sbs-he[contenteditable=true]{outline:2px dashed var(--primary);border-radius:6px;padding:.1em .3em}
+  .home-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7em;margin:.2em 0 1em}.home-stats .hs{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.8em 1em;cursor:pointer}.home-stats .hs b{font-size:1.7em;display:block}`;
+  document.head.appendChild(st);
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#moreBtn')) { e.preventDefault(); menu.classList.toggle('hidden'); return; }
+    if (!e.target.closest('#moreMenu')) menu.classList.add('hidden'); else setTimeout(() => menu.classList.add('hidden'), 50);
+  });
+  // כלים חכמים: 3 בחוץ, השאר ב"⋯ עוד כלים"
+  const ai = $('#aiBar'); if (ai) { const bs = [...ai.querySelectorAll('[data-ai]')]; const keep = new Set(['chapters', 'sources', 'article']); const extra = bs.filter((b) => !keep.has(b.dataset.ai)); if (extra.length) { const w = document.createElement('span'); w.className = 'ai-more hidden row'; w.style.gap = '.35em'; extra.forEach((b) => w.appendChild(b)); [...ai.children].filter((c) => c.id === 'nikudBtn').forEach((c) => w.appendChild(c)); ai.appendChild(w); ai.insertAdjacentHTML('beforeend', '<button class="btn small" type="button" id="aiMore">⋯ עוד כלים</button>'); $('#aiMore').onclick = () => { w.classList.toggle('hidden'); $('#aiMore').textContent = w.classList.contains('hidden') ? '⋯ עוד כלים' : '✕ פחות'; }; } }
+})();
+
+// ---- י · הגדרות מסודרות בקבוצות ----
+const SET_GROUPS = [
+  ['👑 מנהל-העל', ['orgs']],
+  ['🏛️ החסידות', ['myorg', 'brand', 'dict']],
+  ['👥 אנשים', ['users', 'requests', 'groups']],
+  ['🔧 מערכת וגיבוי', ['system', 'data', 'security', 'log', 'live', 'trash']]
+];
+function groupSetNav() {
+  const nav = $('#setNav'); if (!nav) return;
+  const all = [...nav.querySelectorAll('button[data-sec]')]; if (!all.length) return;
+  nav.querySelectorAll('.sn-group').forEach((g) => g.remove());
+  const used = new Set(); const frag = document.createDocumentFragment();
+  SET_GROUPS.forEach(([label, secs]) => {
+    const bs = secs.map((s) => all.find((b) => b.dataset.sec === s)).filter(Boolean).filter((b) => getComputedStyle(b).display !== 'none' || b.classList.contains('active'));
+    if (!bs.length) return;
+    const h = document.createElement('div'); h.className = 'sn-group'; h.textContent = label; frag.appendChild(h);
+    bs.forEach((b) => { frag.appendChild(b); used.add(b); });
+  });
+  all.filter((b) => !used.has(b)).forEach((b) => frag.appendChild(b));
+  nav.appendChild(frag);
+}
+{ const _rs126 = renderSettings; renderSettings = function () { const r = _rs126.apply(this, arguments); try { groupSetNav(); } catch (e) {} return r; }; }
+
+// ---- יא · סיור קצר למשתמש חדש (פעם אחת) ----
+{ const _lm126 = loadMe; loadMe = async function () {
+  const ok = await _lm126.apply(this, arguments);
+  try {
+    const k = 'tourDone_' + (ME && ME.id);
+    const fresh = ME && ME.created_at && (Date.now() - new Date(ME.created_at).getTime() < 10 * 864e5);
+    if (ok && fresh && !LS.get(k, false) && typeof startTour === 'function') { LS.set(k, true); try { LS.set('seenNew', WHATS_NEW.v); } catch (e) {} setTimeout(() => { try { go('home'); startTour(); } catch (e) {} }, 1800); }
+  } catch (e) {}
+  return ok;
+}; }
+
+// ---- א · עיצוב לפי החסידות (הצבע שלה בכל האפליקציה) ----
+{ const _lo126 = loadOrg; loadOrg = async function () {
+  const x = await _lo126.apply(this, arguments);
+  try { if (ORG && ORG.id !== 'biala' && ORG.color && !LS.get('accent', '')) { const r = document.documentElement.style; r.setProperty('--primary', ORG.color); r.setProperty('--primary-2', ORG.color); r.setProperty('--primary-soft', ORG.color + '1a'); } } catch (e) {}
+  return x;
+}; }
+
+// ---- ב · תצוגת ספר (גופן של ספרי קודש) ----
+(function () {
+  const anchor = $('#readBtn'); if (!anchor || $('#bookBtn')) return;
+  anchor.insertAdjacentHTML('afterend', '<button class="btn small" id="bookBtn" type="button" title="גופן של ספרי קודש">📜 גופן ספר</button>');
+  const apply = () => { document.body.classList.toggle('book-font', !!LS.get('bookFont', false)); const b = $('#bookBtn'); if (b) b.classList.toggle('primary', !!LS.get('bookFont', false)); };
+  $('#bookBtn').onclick = () => { LS.set('bookFont', !LS.get('bookFont', false)); apply(); };
+  apply();
+})();
+
+// ---- ז · מהירות השמעה בלי עיוות הקול ----
+(function () { const p = $('#player'); if (p) { p.preservesPitch = true; p.mozPreservesPitch = true; p.webkitPreservesPitch = true; } })();
+
+// ---- ד · מסך בית חכם ----
+function renderHomeStats() {
+  const home = $('#page-home'); if (!home || !ME) return;
+  let box = $('#homeStats'); if (!box) { const hero = home.querySelector('.hero'); (hero || home.firstElementChild).insertAdjacentHTML('afterend', '<div id="homeStats" class="home-stats"></div>'); box = $('#homeStats'); }
+  const list = (typeof recsList === 'function' ? recsList() : [...RECS.values()]) || [];
+  const now = Date.now(), wk = list.filter((r) => r.status === 'done' && now - new Date(r.createdAt || r.created_at || 0).getTime() < 7 * 864e5).length;
+  const inQ = list.filter((r) => r.status === 'queued' || r.status === 'processing').length;
+  const toCheck = list.filter((r) => r.status === 'done' && (r.segments || []).some((s) => s.u) && !(r.extras && r.extras.task === 'done')).length;
+  const mine = list.filter((r) => r.extras && r.extras.assignee === ME.id && r.extras.task !== 'done').length;
+  const err = list.filter((r) => r.status === 'error').length;
+  const card = (n, t, act) => `<div class="hs" data-hsgo="${act}"><b>${n}</b>${t}</div>`;
+  box.innerHTML = card(inQ, '⏳ בתמלול עכשיו', 'queue') + card(toCheck, '🔎 מחכות לבדיקה', 'lib') + (ADV().tasks ? card(mine, '📋 המשימות שלי', 'tasks') : '') + card(wk, '✅ תומללו השבוע', 'lib') + (err ? card(err, '⚠️ נכשלו', 'lib') : '');
+}
+document.addEventListener('click', (e) => { const h = e.target.closest('[data-hsgo]'); if (!h) return; const a = h.dataset.hsgo; if (a === 'tasks') { const b = document.querySelector('[data-mytasks]'); if (b) b.click(); } else go(a === 'queue' ? 'home' : 'library'); });
+{ const _lr126 = loadRecs; loadRecs = async function () { const r = await _lr126.apply(this, arguments); try { renderHomeStats(); } catch (e) {} return r; }; }
+setInterval(() => { try { if (currentPage === 'home') renderHomeStats(); } catch (e) {} }, 20000);
+
+// ---- ה · יידיש מול עברית – משפט מול משפט, עם השמעה ותיקון ----
+function sbsPairs(r) {
+  const yo = r.extras && r.extras.yiOrig;
+  if (yo && yo.length && (r.segments || []).length) {   // התמלול בעברית, והיידיש המקורית שמורה
+    return yo.map((y) => { const he = (r.segments || []).reduce((best, s) => (Math.abs(s.start - y.start) < Math.abs((best ? best.start : 1e9) - y.start) ? s : best), null); return { t: y.start, yi: y.text, he: he ? he.text : '', heIdx: he ? r.segments.indexOf(he) : -1 }; });
+  }
+  const he = (r.translations && r.translations.he) || '';
+  const heLines = he.split(/\n+/).map((x) => x.replace(/^\[?\d{1,2}:\d{2}(:\d{2})?\]?\s*/, '').trim()).filter(Boolean);
+  const segs = r.segments || [];
+  return segs.map((s, i) => ({ t: s.start, yi: s.text, he: heLines[Math.round(i * heLines.length / Math.max(1, segs.length))] || '', heIdx: -1 }));
+}
+function openSideBySide() {
+  const r = Detail.rec; if (!r) return;
+  if (r.lang !== 'yi') return toast('זה עובד בהקלטות ביידיש');
+  const pairs = sbsPairs(r); if (!pairs.length || !pairs.some((p) => p.he)) return toast('אין עדיין תרגום לעברית להקלטה הזאת – קודם "🌐 תרגום" לעברית');
+  const ce = Detail.canEdit() && pairs.some((p) => p.heIdx >= 0);
+  modal(`<h3>↔️ יידיש מול עברית</h3><p class="muted">לחיצה על שורה – שומעים אותה.${ce ? ' לחיצה כפולה על העברית – מתקנים (והמערכת לומדת).' : ''}</p>
+    <div class="sbs-row" style="font-weight:800;cursor:default"><div>📜 יידיש</div><div>🇮🇱 עברית</div></div>
+    <div style="max-height:62vh;overflow:auto">${pairs.map((p, i) => `<div class="sbs-row" data-sbst="${p.t}"><div><span class="t">${fmtTime(p.t)}</span> ${esc(p.yi)}</div><div class="sbs-he" data-sbsi="${p.heIdx}">${esc(p.he)}</div></div>`).join('')}</div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const m = [...$$('.modal-bg')].pop(); const mm = m && m.querySelector('.modal'); if (mm) mm.style.maxWidth = '1150px';
+}
+document.addEventListener('click', (e) => { const row = e.target.closest('[data-sbst]'); if (!row || e.target.closest('[contenteditable=true]')) return; try { const p = $('#player'); p.currentTime = +row.dataset.sbst; p.play().catch(() => {}); } catch (er) {} });
+document.addEventListener('dblclick', (e) => {
+  const c = e.target.closest('.sbs-he'); if (!c || +c.dataset.sbsi < 0 || !Detail.canEdit()) return;
+  c.contentEditable = 'true'; c.focus(); const old = c.textContent;
+  c.onblur = async () => { c.contentEditable = 'false'; const v = c.textContent.trim(); if (v === old.trim()) return; const i = +c.dataset.sbsi; Detail.rec.segments[i].text = v; Detail.rec.text = Detail.rec.segments.map((x) => x.text).join(' '); try { await Detail.save(['segments', 'text']); if (ADV().learnFix) learnFixes(old, v); toast('✅ תוקן – והמערכת למדה'); Detail.renderTranscript(); } catch (er) { toast('❌ ' + er.message); } };
+});
+(function () { const anchor = $('#readBtn'); if (anchor && !$('#sbsBtn')) { anchor.insertAdjacentHTML('afterend', '<button class="btn small" id="sbsBtn" type="button">↔️ יידיש מול עברית</button>'); $('#sbsBtn').onclick = openSideBySide; } })();
+{ const _do126 = Detail.open; Detail.open = async function () { const r = await _do126.apply(this, arguments); try { const b = $('#sbsBtn'); if (b) b.classList.toggle('hidden', !(Detail.rec && Detail.rec.lang === 'yi')); } catch (e) {} return r; }; }
+
+// ---- טו · "מה חדש" אחרי עדכון ----
+const WHATS_NEW = { v: '3.13.0', items: [
+  '🎚️ ניקוי שמע לפני התמלול – פחות רעשים, יותר מילים נכונות',
+  '🔁 הקשבה שנייה לכל קטע – המערכת בודקת את עצמה ומסמנת מה שלא ודאי',
+  '🧩 קטעים שדולגו מתומללים שוב לבד · 📊 דוח איכות לכל הקלטה',
+  '🎙️ זיהוי הקול של האדמו"ר · 🧪 מבחן איכות קבוע',
+  '↔️ יידיש מול עברית – משפט מול משפט · 📜 גופן ספר',
+  '🏠 מסך בית חכם · ⚙️ הגדרות מסודרות · ⋯ פחות כפתורים על המסך',
+  '🗄️ גיבוי אוטומטי כל לילה'
+] };
+{ const _lm126b = loadMe; loadMe = async function () {
+  const ok = await _lm126b.apply(this, arguments);
+  try { if (ok && LS.get('seenNew', '') !== WHATS_NEW.v) { LS.set('seenNew', WHATS_NEW.v); setTimeout(() => { if (!$('.modal-bg')) modal(`<h3>✨ מה חדש במערכת</h3><ul style="line-height:2">${WHATS_NEW.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`, { okText: 'מעולה 👍', cancelText: '' }); }, 2500); } } catch (e) {}
+  return ok;
 }; }
 
 </script>
