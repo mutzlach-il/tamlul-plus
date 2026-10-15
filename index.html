@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.13.3';
+const APP_VERSION = '3.13.4';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -3404,7 +3404,7 @@ $('#player').addEventListener('timeupdate', () => {
   if (idx !== Detail.activeSeg && idx >= 0) {
     $$('#dTranscript .seg.active').forEach((x) => x.classList.remove('active'));
     const el = $(`#dTranscript [data-seg="${idx}"]`);
-    if (el) { el.classList.add('active'); if ($('#followChk').checked && !p.paused && currentPage === 'detail') el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    if (el) { el.classList.add('active'); if ($('#followChk').checked && !p.paused && currentPage === 'detail') { const bx = $('#dTranscript'), br = bx && bx.getBoundingClientRect(), er = el.getBoundingClientRect(); const boxSeen = bx && !bx.classList.contains('hidden') && br.top < innerHeight - 80 && br.bottom > 80; if (boxSeen && (er.top < 60 || er.bottom > innerHeight - 60)) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }
     Detail.activeSeg = idx;
   }
 });
@@ -9617,9 +9617,9 @@ const ADV = () => Object.assign({}, ADV_DEF, (SETTINGS && SETTINGS.adv) || {});
 // ---- שפות: אחת מתוך שלוש – יידיש, עברית, אנגלית ----
 (function () {
   const st = document.createElement('style');
-  st.textContent = '#yiOutPills [data-yiout="both"],#yiOutPills [data-yiout="all"]{display:none!important}';
+  st.textContent = '#yiOutPills [data-yiout="all"]{display:none!important}';
   document.head.appendChild(st);
-  try { if (['both', 'all'].includes(LS.get('yiOut', 'both'))) LS.set('yiOut', 'yi'); } catch (e) {}
+  try { if (LS.get('yiOut', 'both') === 'all') LS.set('yiOut', 'both'); } catch (e) {}
   const lp = $('#langPills'); if (lp) { const yi = lp.querySelector('[data-lang="yi"]:not([data-iv])'), he = lp.querySelector('[data-lang="he"]'); if (yi && he) lp.insertBefore(yi, he); }
 })();
 // ---- בלי המיקרופון האדום ----
@@ -10438,6 +10438,9 @@ orgPairs = async function () {
 };
 
 { const _tz133 = trZone; trZone = function (kind, icon, title, sub) { const h = _tz133.apply(this, arguments); return (kind === 'he' || kind === 'yi') ? h.replace(/>[23]\. מילה במילה – (בעברית|ביידיש)</, '>' + title + '<') : h; }; }
+
+/* 3.13.4 – "יידיש + עברית" חזר: התמלול ביידיש + עברית מילה במילה, כל אחד בלשונית שלו */
+(function () { const b = document.querySelector('#yiOutPills [data-yiout="both"]'); if (b) { b.textContent = '📜+🇮🇱 יידיש + עברית'; b.title = 'מקבלים את התמלול ביידיש, ובנוסף את העברית מילה במילה'; const yi = document.querySelector('#yiOutPills [data-yiout="yi"]'); if (yi && yi.nextSibling !== b) yi.after(b); } })();
 </script>
 </body>
 </html>
