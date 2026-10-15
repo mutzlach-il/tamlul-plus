@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.13.0';
+const APP_VERSION = '3.13.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -9421,7 +9421,7 @@ const URL_ORG = (() => { try { return (new URLSearchParams(location.search).get(
 if (URL_ORG) {
   (async () => { try {
     for (let i = 0; i < 40 && typeof sb === 'undefined'; i++) await new Promise((r) => setTimeout(r, 100));
-    const { data } = await sb.rpc('public_orgs'); const o = (data || []).find((x) => x.id === URL_ORG);
+    const { data } = await sb.rpc('public_org', { p_id: URL_ORG }); const o = (data || [])[0];
     if (o) { LS.set('orgBrand', { id: o.id, name: o.name, logo: o.id === 'biala' ? null : o.logo }); paintPreBrand(); }
   } catch (e) {} })();
 }
