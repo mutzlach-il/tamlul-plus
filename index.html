@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.13.1';
+const APP_VERSION = '3.13.2';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2278,7 +2278,7 @@ async function geminiTranscribeOne(blob, mime, lang, dur, opts = {}) {
     } catch (err) {
       lastErr = err; console.warn('Gemini model failed', model, err.message);
       if (err.dayQuota) { GEM_DAY_OUT.add(model); LS.set('gemDayOut', { day: gemQuotaDay(), list: [...GEM_DAY_OUT] }); if (!models.some((m) => !GEM_DAY_OUT.has(m))) throw gemQuotaErr(); continue; }
-      if (err.status === 403 || (err.status === 400 && /API key|permission|PERMISSION/i.test(err.message))) throw err;
+      if (err.status === 403 || err.status === 402 || (err.status === 400 && /API key|permission|PERMISSION/i.test(err.message))) throw err;
     }
   }
   throw lastErr || new Error('Gemini נכשל');
@@ -2376,7 +2376,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
           catch (e2) { err = e2; segs = null; }
         }
         if (!segs) {
-          if (err.status === 403 || (err.status === 400 && /API key|permission/i.test(err.message))) throw err;
+          if (err.status === 403 || err.status === 402 || (err.status === 400 && /API key|permission/i.test(err.message))) throw err;
           console.warn('chunk failed – skipping for now', i, err.message);
           if (err.dayQuota) dayOut = true; else busyRow++;
           results[i] = { miss: true, st, en }; return;
@@ -10271,6 +10271,69 @@ const WHATS_NEW = { v: '3.13.0', items: [
   return ok;
 }; }
 
+
+/* =========================================================
+   3.13.2 – חסידות בלי חשבון מחובר: הודעה ברורה במקום "עמוס", ומסך פתיחה למנהל
+   ========================================================= */
+const NEED_KEY_MSG = '🔑 החסידות עוד לא חיברה את החשבון שלה לתמלול. המנהל נכנס ל: ⚙️ ניהול ← 🔑 חיבור החשבון (2 דקות, בחינם) – ואז לוחצים "נסה שוב".';
+const needOrgKey = () => { try { return !!ME && !isBiala() && !isSuper() && ORG_HASKEY === false; } catch (e) { return false; } };
+keyStepsHtml = function () {
+  return `<ol style="line-height:2;margin:.4em 0">
+    <li>לוחצים כאן: <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener"><b>🌐 פתיחת הדף של גוגל</b></a> (נפתח בלשונית חדשה).</li>
+    <li>אם מבקשים להיכנס – מקלידים את <b>כתובת הג'ימייל</b> של החסידות (או שלכם), לוחצים <b>"הבא"</b>, מקלידים את <b>הסיסמה של הג'ימייל</b> ולוחצים <b>"הבא"</b>.</li>
+    <li>אם קופץ חלון עם תנאי שימוש – מסמנים את הריבוע ✔️ ולוחצים <b>"Continue"</b> / <b>"I accept"</b>.</li>
+    <li>לוחצים על הכפתור <b>"Create API key"</b> (יצירת מפתח) – למעלה בצד ימין. אם שואלים על "project" – בוחרים את מה שמופיע ולוחצים שוב <b>"Create"</b>.</li>
+    <li>מופיע קוד ארוך שמתחיל ב-<b dir="ltr">AIza</b> – לוחצים <b>"Copy"</b> (או מסמנים אותו ולוחצים Ctrl+C).</li>
+    <li>חוזרים ללשונית הזו, לוחצים בתיבה למטה, מדביקים (<b>Ctrl+V</b>) ולוחצים <b>"🔗 חיבור"</b>.</li></ol>
+    <div class="hint">זה בחינם. התמלול של החסידות ירוץ על החשבון שלכם. אחרי השמירה אף אחד (גם לא אנחנו) לא רואה את המפתח.</div>`;
+};
+{ const _gt132 = geminiTranscribe; geminiTranscribe = async function () {
+  if (needOrgKey()) { if (isAdmin()) setTimeout(() => openKeyConnect(), 300); const e = new Error(NEED_KEY_MSG); e.status = 402; throw e; }
+  try { return await _gt132.apply(this, arguments); }
+  catch (err) { if (err && (err.status === 402 || /עוד לא חיברה את החשבון/.test(err.message || ''))) { ORG_HASKEY = false; try { keyBanner(); } catch (e) {} const e2 = new Error(NEED_KEY_MSG); e2.status = 402; throw e2; } throw err; }
+}; }
+function openKeyWelcome() {
+  modal(`<h3>👋 ברוכים הבאים, ${esc((ME && ME.display_name) || 'מנהל החסידות')}!</h3>
+    <p>לפני שמתחילים לתמלל יש <b>שלב אחד</b> – לחבר את המערכת לחשבון הג'ימייל של החסידות. זה לוקח 2 דקות ועושים את זה רק פעם אחת.</p>
+    ${keyStepsHtml()}
+    <input id="myKeyIn" dir="ltr" placeholder="AIza..." style="width:100%;margin-top:.6em" autocomplete="off">
+    <button class="btn primary" id="myKeyGo" type="button" style="width:100%;margin-top:.6em">🔗 חיבור</button><div id="myKeyMsg" class="form-msg" style="margin-top:.4em"></div>`, { okText: 'אחר כך', cancelText: '' });
+}
+{ const _lof132 = loadOrgFeat; loadOrgFeat = async function () {
+  const r = await _lof132.apply(this, arguments);
+  try { if (needOrgKey() && isAdmin() && !sessionStorage.getItem('keyWelcome_' + ORG.id)) { sessionStorage.setItem('keyWelcome_' + ORG.id, '1'); setTimeout(openKeyWelcome, 900); } } catch (e) {}
+  return r;
+}; }
+
+// חיבור המפתח – בדיקה גמישה יותר + הודעות ברורות (קוד חדש של גוגל יכול להתחיל גם באותיות אחרות)
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#myKeyGo')) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  const inp = $('#myKeyIn'), msg = $('#myKeyMsg');
+  const v = (inp.value || '').replace(/[\s"'״׳]/g, '');
+  inp.value = v;
+  if (!v) { msg.className = 'form-msg err'; msg.textContent = 'התיבה ריקה – מדביקים את הקוד מגוגל (Ctrl+V).'; return; }
+  if (/@/.test(v)) { msg.className = 'form-msg err'; msg.textContent = 'זה המייל – לא צריך אותו כאן. צריך את הקוד הארוך שגוגל נותן אחרי "Create API key".'; return; }
+  if (v.length < 30 || !/^[\w.\-]+$/.test(v)) { msg.className = 'form-msg err'; msg.textContent = 'זה לא נראה כמו המפתח (הוא ארוך – כ-39 תווים באנגלית ומספרים). חוזרים לגוגל, לוחצים "Copy" ליד המפתח ומדביקים שוב.'; return; }
+  msg.className = 'form-msg'; msg.textContent = '⏳ בודק את המפתח מול גוגל…';
+  let googleSays = '';
+  try {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1&key=' + encodeURIComponent(v));
+    if (r.status === 400 || r.status === 403) { const t = await r.text(); googleSays = /API_KEY_INVALID|not valid/i.test(t) ? 'invalid' : /SERVICE_DISABLED|has not been used|disabled/i.test(t) ? 'disabled' : /location|region|country/i.test(t) ? 'region' : 'invalid'; }
+  } catch (er) { /* חסום בסינון / רשת – לא מפריע, ממשיכים לשמור */ }
+  if (googleSays === 'invalid') { msg.className = 'form-msg err'; msg.textContent = '❌ גוגל אומר שהמפתח לא תקין. כנראה הועתק חלקית – חוזרים לגוגל, לוחצים "Copy" ליד המפתח ומדביקים שוב.'; return; }
+  if (googleSays === 'region') { msg.className = 'form-msg err'; msg.textContent = '❌ גוגל לא מאפשר את השירות בחשבון/מיקום הזה. נסו עם חשבון ג\'ימייל אחר, או פנו למנהל-העל.'; return; }
+  const { error } = await sb.rpc('set_my_org_key', { p_gemini: v });
+  if (error) {
+    msg.className = 'form-msg err';
+    msg.textContent = /admin_only/.test(error.message) ? '❌ רק מנהל החסידות יכול לחבר. צאו מהמערכת ונכנסו שוב עם המייל של המנהל.' : /bad_key/.test(error.message) ? '❌ המפתח קצר מדי – העתיקו אותו שוב במלואו.' : '❌ ' + error.message;
+    return;
+  }
+  msg.className = 'form-msg'; msg.innerHTML = '✅ מחובר! מעכשיו התמלול רץ על החשבון שלכם.' + (googleSays === 'disabled' ? '<br>⚠️ גוגל אומר שהשירות עוד לא הופעל במפתח הזה – אם התמלול לא עובד, צרו מפתח חדש ב"Create API key".' : '');
+  ORG_HASKEY = true; try { keyBanner(); } catch (er) {} try { renderMyOrg(); } catch (er) {}
+  let n = 0; [...RECS.values()].filter((r) => r.status === 'error' && /עמוס|חיבר|חשבון/.test(r.error || '') && !(r.extras && r.extras.training)).forEach((r) => { n++; retryRec(r.id); });
+  if (n) toast(`▶️ ממשיך לתמלל ${n} הקלטות שנעצרו`, 5000);
+}, true);
 </script>
 </body>
 </html>
