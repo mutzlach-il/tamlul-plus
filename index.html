@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.13.2';
+const APP_VERSION = '3.13.3';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -10334,6 +10334,110 @@ document.addEventListener('click', async (e) => {
   let n = 0; [...RECS.values()].filter((r) => r.status === 'error' && /עמוס|חיבר|חשבון/.test(r.error || '') && !(r.extras && r.extras.training)).forEach((r) => { n++; retryRec(r.id); });
   if (n) toast(`▶️ ממשיך לתמלל ${n} הקלטות שנעצרו`, 5000);
 }, true);
+
+/* 3.13.3 – בחלון הדוגמאות: העלאת הקלטות בולטת למעלה (הקלטות + עברית "סיכום"/"מוכן להדפסה" + יידיש) */
+{ const _ose133 = openStyleExamples; openStyleExamples = async function () {
+  const r = await _ose133.apply(this, arguments);
+  try {
+    const m = $('#modalRoot').lastElementChild; const row = m && m.querySelector('[data-sexfiles]'); if (!row || m.querySelector('#trBig')) return r;
+    m.querySelectorAll('[data-train]').forEach((b) => b.classList.add('hidden'));
+    row.parentElement.insertAdjacentHTML('beforebegin', `<div id="trBig" style="border:2px solid #b8892b;background:#fffaf0;border-radius:12px;padding:.8em 1em;margin:.6em 0 .9em;color:#3a2a00">
+      <b style="font-size:1.1em">🎙️ להוסיף דוגמאות עם הקלטות</b>
+      <div class="hint" style="color:#5a4a1a">מעלים <b>הקלטות</b> + <b>הכתב בעברית</b> (בוחרים: 📜 סיכום ההקלטה או 🖨️ מוכן להדפסה) + <b>הכתב ביידיש</b>. המערכת מחברת לפי המספר בשם הקובץ (1 ↔ 1) ולומדת. אפשר להוסיף עוד בכל זמן – מה שכבר הועלה נשאר.</div>
+      <button class="btn" data-train133 type="button" style="background:#b8892b;color:#fff;margin-top:.5em;font-size:1.05em;width:100%">🎙️ העלאת הקלטות + עברית + יידיש</button></div>`);
+  } catch (e) {}
+  return r;
+}; }
+document.addEventListener('click', (e) => { if (e.target.closest('[data-train133]')) { e.preventDefault(); openTrain(); } });
+
+/* 3.13.3 – חמישה מקומות נפרדים: הקלטות · עברית מילה במילה · יידיש מילה במילה · סיכום · מוכן להדפסה */
+TR.sum = {}; TR.print = {};
+TR_EXT.sum = TR_EXT.he; TR_EXT.print = TR_EXT.he;
+trAll = function () { return [...new Set(['audio', 'he', 'yi', 'sum', 'print'].flatMap((k) => Object.keys(TR[k] || {})))].sort((a, b) => { const x = /^\d+$/.test(a), y = /^\d+$/.test(b); return x && y ? +a - +b : x ? -1 : y ? 1 : a.localeCompare(b, 'he'); }); };
+trTable = function () {
+  const nums = trAll(); const box = $('#trTable'); if (!box) return;
+  const bad = [...(TR._noNum || [])];
+  if (!nums.length) { box.innerHTML = '<div class="empty" style="padding:1em">עדיין לא נבחרו קבצים</div>'; $('#trGo').disabled = true; return; }
+  const cell = (x) => x ? `<span style="color:#1f7a4d">✓</span> <span class="muted" style="font-size:.8em">${esc(x.name)}</span>` : '<span class="muted">—</span>';
+  const K = [['audio', '🎙️ הקלטה'], ['he', '🇮🇱 עברית'], ['yi', '🗣️ יידיש'], ['sum', '📜 סיכום'], ['print', '🖨️ מוכן להדפסה']];
+  box.innerHTML = `<table class="tbl" style="width:100%;font-size:.9em"><thead><tr><th>#</th>${K.map((k) => `<th>${k[1]}</th>`).join('')}</tr></thead><tbody>${nums.map((n) => `<tr><td><b>${esc(n)}</b></td>${K.map((k) => `<td>${cell(TR[k[0]][n])}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    ${bad.length ? `<div class="hint" style="color:#b45309;margin-top:.5em">⚠️ בקבצים האלה אין מספר בשם, ולכן הם לא נכנסו: ${bad.map(esc).join(', ')}</div>` : ''}
+    <div class="hint" style="margin-top:.5em">סה"כ ${nums.length} מספרים · ${K.map((k) => `${Object.keys(TR[k[0]]).length} ${k[1].replace(/^\S+\s/, '')}`).join(' · ')}</div>`;
+  $('#trGo').disabled = false;
+};
+openTrain = function () {
+  TR.audio = {}; TR.he = {}; TR.yi = {}; TR.sum = {}; TR.print = {}; TR._noNum = [];
+  modal(`<h3>🎓 חומרי לימוד – ${esc(typeof orgName === 'function' ? orgName() : '')}</h3>
+    <p class="muted" style="margin:.2em 0 .6em">כל סוג מעלים <b>בנפרד</b>, במקום שלו. אפשר מאות קבצים בבת אחת. המערכת מחברת לפי <b>המספר בשם הקובץ</b> (1 ↔ 1). לא חייבים את כל הסוגים – מעלים מה שיש, ואפשר להוסיף עוד בכל זמן.</p>
+    <div class="row" style="gap:.6em;flex-wrap:wrap;align-items:stretch">
+      ${trZone('audio', '🎙️', '1. הקלטות', 'של האדמו"ר – יידיש, עברית או אנגלית')}
+      ${trZone('he', '🇮🇱', '2. עברית', 'וורד (docx / odt) או טקסט')}
+      ${trZone('yi', '🗣️', '3. יידיש', 'וורד (docx / odt) או טקסט')}
+    </div>
+    <div class="row" style="gap:.6em;flex-wrap:wrap;align-items:stretch;margin-top:.6em">
+      ${trZone('sum', '📜', '4. סיכום', 'איך החסידות מסכמת – וורד או טקסט')}
+      ${trZone('print', '🖨️', '5. מוכן להדפסה', 'עם כותרות, כמו שמדפיסים – וורד או טקסט')}
+    </div>
+    <div class="row" style="gap:1.2em;flex-wrap:wrap;margin:.7em 0 .2em">
+      <label>🎙️ ההקלטות הן ב: <select id="trRecLang"><option value="yi">יידיש</option><option value="he">עברית</option><option value="en">אנגלית</option></select></label>
+      <select id="trHeKind" class="hidden"><option value="hew">hew</option><option value="before">before</option><option value="after">after</option></select>
+    </div>
+    <div id="trTable" style="margin-top:.6em;max-height:32vh;overflow:auto"></div>
+    <button class="btn primary" id="trGo" type="button" style="margin-top:.8em;width:100%;font-size:1.1em" disabled>💾 שמירה ולימוד</button>
+    <button class="btn" type="button" data-trainstatus style="width:100%;margin-top:.5em">🧠 מה המערכת כבר למדה · 🔍 בדיקה</button>
+    <div id="trProg" style="margin-top:.6em;font-weight:700"></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const bg = [...$$('.modal-bg')].pop(); const m = bg && bg.querySelector('.modal'); if (m) m.style.maxWidth = '1000px';
+  trTable();
+};
+// השמירה: כל סוג עברית נשמר בנפרד (מילה במילה / סיכום / מוכן להדפסה), וההקלטות עולות פעם אחת
+{ const _trr133 = trRun; trRun = async function () {
+  const all = { audio: TR.audio, he: TR.he, yi: TR.yi, sum: TR.sum || {}, print: TR.print || {} };
+  const passes = [['hew', all.he], ['before', all.sum], ['after', all.print]].filter((x) => Object.keys(x[1]).length);
+  if (!passes.length) passes.push(['hew', {}]);
+  const sel = $('#trHeKind'); const prog = $('#trProg'); const out = [];
+  // שם אחיד לכל מספר – כדי שהיידיש לא יישמר פעמיים ושכל הסוגים יקבלו אותה כותרת
+  const ref = {}; trAll.call(null); ['audio', 'he', 'yi', 'sum', 'print'].forEach((k) => Object.keys(all[k]).forEach((n) => { if (!ref[n]) ref[n] = all[k][n].name.replace(/\.[^.]+$/, '').replace(/[-_ ]*(סיכום|מוכן להדפסה|מוכן|הדפסה|מילה במילה)[-_ ]*/g, ' ').trim(); }));
+  const ren = (set) => { const o = {}; Object.keys(set).forEach((n) => { const f = set[n], ext = (f.name.match(/\.[^.]+$/) || [''])[0]; try { o[n] = new File([f], ref[n] + ext, { type: f.type }); } catch (e) { o[n] = f; } }); return o; };
+  passes.forEach((x) => { x[1] = ren(x[1]); });
+  for (let i = 0; i < passes.length; i++) {
+    TR.audio = i === 0 ? all.audio : {}; TR.yi = all.yi; TR.he = passes[i][1]; TR.sum = {}; TR.print = {};
+    if (sel) sel.value = passes[i][0];
+    if (i > 0 && !Object.keys(TR.he).length) continue;
+    await _trr133.apply(this, arguments);
+    if (prog) out.push(prog.innerHTML);
+    if (i < passes.length - 1 && $('#trGo')) $('#trGo').disabled = true;
+  }
+  if (typeof TR_CHECK !== 'undefined' && TR_CHECK && TR_CHECK.kind === 'hew') { TR_CHECK = null; $$('#trCheckGo').forEach((b) => b.closest('div') && b.closest('div').remove()); out.forEach((h, i) => { out[i] = h.replace(/<div style="margin-top:\.8em"><button[^>]*id="trCheckGo"[\s\S]*?<\/div>/, ''); }); }
+  if (prog && out.length > 1) prog.innerHTML = out.join('<hr style="border:0;border-top:1px solid var(--line);margin:.6em 0">');
+  // מצמידים להקלטת הלימוד את הסיכום ואת המוכן-להדפסה, ואת העברית מילה במילה
+  try {
+    const nums = Object.keys(all.audio);
+    if (nums.length) {
+      try { await loadRecs(); } catch (e) {}
+      for (const n of nums) {
+        const rec = [...RECS.values()].filter((r) => r.extras && r.extras.training && String(r.extras.trainNo) === String(+n) && r.owner === ME.id).sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))[0];
+        if (!rec) continue;
+        const ex = Object.assign({}, rec.extras); const nu = Object.assign({}, ex.nusach || {});
+        if (nu.hew) { ex.heWord = nu.hew; delete nu.hew; delete nu.hewAt; }
+        if (all.sum[n]) { nu.before = await trText(all.sum[n]); nu.beforeAt = Date.now(); }
+        if (all.print[n]) { nu.after = await trText(all.print[n]); nu.afterAt = Date.now(); }
+        ex.nusach = nu; rec.extras = ex;
+        await sb.from('recordings').update({ extras: ex }).eq('id', rec.id);
+      }
+    }
+  } catch (e) { console.warn('attach nusach', e); }
+  TR.audio = {}; TR.he = {}; TR.yi = {}; TR.sum = {}; TR.print = {};
+}; }
+// התרגום של החסידות לומד גם מ"עברית מילה במילה"
+orgPairs = async function () {
+  await loadStyleExamples(true).catch(() => {});
+  const ok = (x) => x.source_text && x.target_text && x.source_text.length > 200 && x.target_text.length > 200;
+  const L = STYLE_EX || [];
+  const hew = L.filter((x) => x.kind === 'hew' && ok(x));
+  return hew.length ? hew : L.filter((x) => x.kind === 'before' && ok(x));
+};
+
+{ const _tz133 = trZone; trZone = function (kind, icon, title, sub) { const h = _tz133.apply(this, arguments); return (kind === 'he' || kind === 'yi') ? h.replace(/>[23]\. מילה במילה – (בעברית|ביידיש)</, '>' + title + '<') : h; }; }
 </script>
 </body>
 </html>
