@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.18.0';
+const APP_VERSION = '3.18.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -3984,14 +3984,16 @@ function gem(n) {
   return s.length > 1 ? s.slice(0, -1) + '״' + s.slice(-1) : s + '׳';
 }
 function hdOf(t) { try { return HC ? new HC.HDate(new Date(t)) : null; } catch (e) { return null; } }
+function hebIntl(t) { const o = {}; new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(new Date(t)).forEach((p) => { o[p.type] = p.value; }); const num = (v) => { const n = +String(v || '').replace(/\D/g, ''); return n ? gem(n) : String(v || ''); }; const m = String(o.month || '').replace(/^ב/, ''); return o.day && m ? `${num(o.day)} ${m} ${num(o.year)}` : ''; }
 function hebDate(t) {
   if (!t) return '';
+  try { const x = hebIntl(t); if (x) return x; } catch (e) {}
   const hd = hdOf(t);
   if (hd) { try { return `${gem(hd.getDate())} ${heMonth(hd)} ${gem(hd.getFullYear())}`; } catch (e) {} }
   try { return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(t)); } catch (e) { return ''; }
 }
 function heMonth(hd) { try { return stripNikud(HC.Locale.gettext(hd.getMonthName(), 'he')); } catch (e) { return hd.getMonthName(); } }
-function hebYearOf(t) { const hd = hdOf(t); if (hd) return gem(hd.getFullYear()); try { const y = +new Intl.DateTimeFormat('en-u-ca-hebrew', { year: 'numeric' }).format(new Date(t)).replace(/\D/g, ''); return y ? gem(y) : ''; } catch (e) { return ''; } }
+function hebYearOf(t) { try { const y = +new Intl.DateTimeFormat('en-u-ca-hebrew', { year: 'numeric' }).format(new Date(t)).replace(/\D/g, ''); if (y > 5000) return gem(y); } catch (e) {} const hd = hdOf(t); if (hd) return gem(hd.getFullYear()); try { const y = +new Intl.DateTimeFormat('en-u-ca-hebrew', { year: 'numeric' }).format(new Date(t)).replace(/\D/g, ''); return y ? gem(y) : ''; } catch (e) { return ''; } }
 function enToHe(name) {
   let i = HC && HC.parshiot ? HC.parshiot.indexOf(name) : -1;
   if (i < 0) i = PARSHA_EN.findIndex((x) => normEn(x) === normEn(name));
@@ -10259,8 +10261,8 @@ document.addEventListener('dblclick', (e) => {
 
 // ---- טו · "מה חדש" אחרי עדכון ----
 const WHATS_NEW = { v: '3.16.0', items: [
-  '🎬 סרטון הדרכה קצר – בכפתור "❓ עזרה" בפינה',
-  '❓ עזרה בצד המסך – הסבר קצר לכל מסך',
+  '🎬 סרטון הדרכה קצר – ב"🎓 מרכז ההדרכה" למעלה, ובראש דף ההוראות',
+  '🎓 מרכז ההדרכה – סרטון, סיור, הוראות לכל מסך, ורעיונות',
   '🔎 חיפוש חדש בכל ההקלטות – שומעים בדיוק את הרגע',
   '🤖 העוזר האישי – שואלים על השיחות ומקבלים תשובה עם מקור',
   '📁 תיקייה כבר לא חובה – מעלים ישר',
@@ -10646,7 +10648,7 @@ orgPairs = async function () {
       if ($('#asInText').checked && Array.isArray(r.segments)) for (const sg of r.segments) { const n = norm(sg.text); if (t.some((w) => n.includes(w))) { moments.push(sg); if (moments.length >= 6) break; } }
       // קטעים מהנוסחים / התרגום
       const snips = [];
-      fl.filter(([k]) => k !== 'text' && k !== 'title').forEach(([k, v, n]) => { const w = t.find((x) => n.includes(x)); if (!w) return; const at = n.indexOf(w); snips.push([k, v.slice(Math.max(0, at - 90), at + 160)]); });
+      fl.filter(([k]) => k !== 'text' && k !== 'title').forEach(([k, v, n]) => { const w = t.find((x) => n.includes(x)); if (!w) return; const at = n.indexOf(w); snips.push([k, v.slice(Math.max(0, at - 90), at + 160).replace(/^\s*(#{1,6}|>|[-*•]|@)\s*/gm, '').replace(/(\*\*|__|`)/g, '').replace(/\s*\n+\s*/g, ' · ').replace(/(?:^|\s)(#{1,6}|>|@)(?=\s)/g, ' ').replace(/\s{2,}/g, ' ').trim()]); });
       res.push({ r, score, moments, snips, inTitle: fl.some(([k, , n]) => k === 'title' && t.some((w) => n.includes(w))) });
     }
     const so = $('#asSort').value;
@@ -10693,8 +10695,8 @@ orgPairs = async function () {
   #helpPanel ol{padding-inline-start:1.3em;line-height:1.9;margin:.4em 0}#helpPanel video{width:100%;border-radius:12px;background:#000;margin:.4em 0}
   body.reading #helpFab{display:none}`;
   document.head.appendChild(st);
-  document.body.insertAdjacentHTML('beforeend', `<button id="helpFab" type="button" class="hidden" title="עזרה – איך עושים?">❓ עזרה</button>
-    <aside id="helpPanel" aria-hidden="true"><header><b style="font-size:1.1em" class="grow">❓ איך עושים?</b><button class="btn small" type="button" id="helpClose">✕</button></header><div class="hb" id="helpBody"></div></aside>`);
+  document.body.insertAdjacentHTML('beforeend', `<button id="helpFab" type="button" class="hidden" title="מרכז ההדרכה – סרטון, סיור, הוראות, העוזר ורעיונות">🎓 מרכז ההדרכה</button>
+    <aside id="helpPanel" aria-hidden="true"><header><b style="font-size:1.1em" class="grow">🎓 מרכז ההדרכה</b><button class="btn small" type="button" id="helpClose">✕</button></header><div class="hb" id="helpBody"></div></aside>`);
   const VIDEO = 'help-video.mp4';
   let hasVideo = null;
   async function checkVideo() { if (hasVideo !== null) return hasVideo; try { const r = await fetch(VIDEO, { method: 'HEAD', cache: 'no-store' }); hasVideo = r.ok; } catch (e) { hasVideo = false; } return hasVideo; }
@@ -10743,7 +10745,7 @@ orgPairs = async function () {
       <div style="font-weight:800;font-size:1.08em">👋 חדשים כאן?</div>
       <div style="margin:.3em 0 .7em;line-height:1.6">יש סרטון קצר (דקה וחצי) שמראה בדיוק מה לוחצים. ממליצים לצפות – זה חוסך הרבה זמן.</div>
       <div class="row" style="gap:.5em"><button class="btn primary" type="button" id="vwWatch">🎬 לצפות עכשיו</button><button class="btn" type="button" id="vwLater">אחר כך</button></div>
-      <div class="hint" style="margin-top:.5em">הסרטון תמיד זמין בכפתור "❓ עזרה" בפינה.</div></div>`);
+      <div class="hint" style="margin-top:.5em">הסרטון תמיד זמין ב"🎓 מרכז ההדרכה" למעלה, ובראש דף ההוראות.</div></div>`);
   }
   document.addEventListener('click', (e) => {
     if (e.target.closest('#vwLater')) { document.getElementById('vWelcome')?.remove(); }
@@ -10872,7 +10874,7 @@ orgPairs = async function () {
     @media (prefers-reduced-motion:reduce){#asstFab .af-ic::after{animation:none}}
     #asstPanel header{background:linear-gradient(135deg,#1b2350,#2c3e8f);color:#fff}#asstPanel header small{opacity:.85}`;
   document.head.appendChild(st);
-  const decorate = () => { const f = document.getElementById('asstFab'); if (!f || f.dataset.dec) return; f.dataset.dec = '1'; f.innerHTML = '<span class="af-ic">✨</span><span class="af-t"><b>יש לכם שאלה?</b><small>העוזר האישי עונה מתוך השיחות</small></span>'; f.title = 'העוזר האישי – שאלו כל שאלה על השיחות'; };
+  const decorate = () => { const f = document.getElementById('asstFab'); if (!f || f.dataset.dec) return; f.dataset.dec = '1'; f.innerHTML = '<span class="af-ic">✨</span><span class="af-t"><b>העוזר האישי</b><small>שאלו כל שאלה – תשובה מתוך השיחות</small></span>'; f.title = 'העוזר האישי – שאלו כל שאלה על השיחות'; };
   decorate(); setTimeout(decorate, 1500);
 
   // ---- תצוגה עברית / יידיש מסונכרנת ----
@@ -11167,11 +11169,207 @@ orgPairs = async function () {
     setTimeout(() => { const d = document.getElementById('drop'); if (!d) return; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); d.classList.add('tryFocus'); setTimeout(() => d.classList.remove('tryFocus'), 6000); }, 350);
   }
   new MutationObserver(() => {
-    const v = document.querySelector('#helpBody video'); if (!v || v.dataset.try) return; v.dataset.try = '1';
+    const v = document.querySelector('#helpBody video'); if (!v || v.dataset.try) return; v.dataset.try = '1'; if (!v.poster) v.poster = 'help-video-poster.jpg';
     v.insertAdjacentHTML('afterend', '<button type="button" class="tryNow" data-trynow>🎙️ עכשיו תורכם – העלו הקלטה ונסו בעצמכם</button>');
     v.addEventListener('ended', () => { const b = v.parentElement && v.parentElement.querySelector('[data-trynow]'); if (b) { b.classList.add('big'); b.scrollIntoView({ block: 'center', behavior: 'smooth' }); } });
   }).observe(document.body, { childList: true, subtree: true });
   document.addEventListener('click', (e) => { if (e.target.closest('[data-trynow]')) { e.preventDefault(); goTry(); } });
+})();
+
+/* 3.18.1 – העוזר האישי ו"איך עושים?" למעלה · דף "🎁 חבר מביא חבר" אחרי ניהול */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `#tabs .navAsst{background:linear-gradient(180deg,#f6d98d,#d6a845)!important;color:#1b2350!important;font-weight:800}
+  #tabs .navRefer .ni{filter:saturate(1.3)}
+  #topHow{font-weight:800}
+  @media (max-width:640px){#topHow{display:none!important}}
+  @media (min-width:641px){header.top{flex-wrap:wrap!important;row-gap:8px}header.top .logo{white-space:nowrap}header.top nav.tabs{order:9;flex:1 1 100%!important;max-width:none!important;justify-content:center;flex-wrap:wrap;overflow:visible!important}}
+  .rfHero{border-radius:22px;padding:28px 26px;color:#fff;background:radial-gradient(700px 260px at 85% -20%,rgba(214,168,72,.45),transparent 60%),linear-gradient(135deg,#1b2350,#2c3e8f);box-shadow:0 10px 30px rgba(27,35,80,.25)}
+  .rfHero h2{margin:0 0 .3em;font-size:1.9em;color:#f6d98d}.rfHero p{margin:0;font-size:1.12em;line-height:1.7;opacity:.95}
+  .rfSteps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+  .rfSteps .card{padding:16px;text-align:center}.rfSteps .n{display:grid;margin:0 auto 6px;place-items:center;width:42px;height:42px;border-radius:50%;background:#1b2350;color:#f6d98d;font-weight:800;font-size:1.2em;margin-bottom:6px}
+  .rfGifts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:.4em 0 1em}
+  .rfGift{display:block;cursor:pointer;border:2px solid var(--line,#d9dfec);border-radius:16px;padding:16px 18px;background:var(--card,#fff);transition:.15s}
+  .rfGift:has(input:checked){border-color:#d6a845;box-shadow:0 0 0 4px rgba(214,168,69,.25)}
+  .rfGift input{width:auto;margin-left:.5em}.rfGift b{font-size:1.25em}.rfGift .big{display:block;font-size:2em;font-weight:900;color:#b8892b;margin:.15em 0}`;
+  document.head.appendChild(st);
+  const GIFTS = [['credit', '🎙️ תמלולים בחינם', '500 ₪', 'בשווי 500 ₪ – תמלול, תרגום ועריכה של שיחות שלכם'], ['cash', '💵 תודה במזומן', '300 ₪', '300 ₪ במזומן, כשהם מתחילים לעבוד']];
+  // ---- כפתורים בסרגל העליון ----
+  function addNav() {
+    const tabs = document.getElementById('tabs'); if (!tabs || tabs.querySelector('.navAsst')) return;
+    const srch = tabs.querySelector('[data-page="search"]');
+    const a = document.createElement('button'); a.type = 'button'; a.className = 'navAsst'; a.title = 'העוזר האישי – שאלו כל שאלה, והוא עונה מתוך השיחות עם מקור';
+    a.innerHTML = '<span class="ni">✨</span><span class="lb">העוזר האישי</span>';
+    a.onclick = () => { const f = document.getElementById('asstFab'); if (f) f.click(); };
+    (srch ? srch.after(a) : tabs.append(a));
+    const r = document.createElement('button'); r.type = 'button'; r.className = 'navRefer'; r.dataset.page = 'refer';
+    r.innerHTML = '<span class="ni">🎁</span><span class="lb">נהניתם?</span>'; r.title = 'חבר מביא חבר · יש לכם רעיון? · מה לבנות הבא'; r.onclick = () => go('refer'); tabs.append(r);
+    const ta = document.querySelector('.top-actions');
+    if (ta && !document.getElementById('topHow')) { ta.insertAdjacentHTML('afterbegin', '<button class="btn small" type="button" id="topHow" title="מרכז ההדרכה – סרטון, סיור, הוראות, העוזר ורעיונות">🎓 מרכז ההדרכה</button>'); document.getElementById('topHow').onclick = () => document.getElementById('helpFab')?.click(); }
+  }
+  addNav();
+  // ---- דף חבר מביא חבר ----
+  const host = document.querySelector('#page-help') ? document.querySelector('#page-help').parentNode : document.querySelector('main');
+  if (host && !document.getElementById('page-refer')) host.insertAdjacentHTML('beforeend', `<section class="page" id="page-refer">
+    <div class="rfHero"><h2>🎁 נהניתם? תנו גם לחברים ליהנות</h2><div style="margin:-.2em 0 .5em;opacity:.85">בדף הזה: 🎁 חבר מביא חבר · 💡 יש לכם רעיון? · 🗳️ מה לבנות הבא</div>
+      <p>אם המערכת חוסכת לכם שעות של עבודה – יש עוד חצרות, מכונים ועלונים שמחפשים בדיוק את זה.<br><b>המליצו עליה – וכשהם מצטרפים, אתם מקבלים מתנה.</b></p></div>
+    <div class="rfSteps">
+      <div class="card"><div class="n">1</div><b>ספרו לנו עליהם</b><div class="muted">שם המוסד, איש קשר ומייל – דקה אחת.</div></div>
+      <div class="card"><div class="n">2</div><b>אנחנו פונים בעדינות</b><div class="muted">מציגים להם את המערכת, ומכינים להם שיחה לדוגמה.</div></div>
+      <div class="card"><div class="n">3</div><b>הם מצטרפים – אתם מקבלים</b><div class="muted">המתנה שבחרתם, מיד כשהם מתחילים לעבוד.</div></div>
+    </div>
+    <h3 style="margin:.4em 0 .3em">🎁 בחרו את המתנה שלכם</h3>
+    <div class="rfGifts">${GIFTS.map(([k, t, big, d], i) => `<label class="rfGift"><input type="radio" name="rpGift" value="${k}" ${i ? '' : 'checked'}><b>${t}</b><span class="big">${big}</span><span class="muted">${d}</span></label>`).join('')}</div>
+    <div class="card" style="padding:18px">
+      <h3 style="margin:0 0 .5em">✍️ על מי אתם ממליצים?</h3>
+      <div class="col" style="gap:.55em">
+        <label>שם החצר / המכון / העלון * <input id="rpOrg" placeholder="למשל: עלון שבועי של בית המדרש"></label>
+        <label>שם איש הקשר שם * <input id="rpName"></label>
+        <label>המייל שלו * <input id="rpMail" dir="ltr" placeholder="name@gmail.com"></label>
+        <label>טלפון (לא חובה) <input id="rpPhone" dir="ltr"></label>
+        <label>משהו שכדאי שנדע? (לא חובה) <textarea id="rpNote" rows="2" placeholder="למשל: הם מוציאים עלון כל שבוע ומתמללים ביד"></textarea></label>
+        <label class="row" style="gap:.4em;margin:0"><input type="checkbox" id="rpOk" style="width:auto"> דיברתי איתם, והם יודעים שתפנו אליהם</label>
+      </div>
+      <button class="btn primary" type="button" id="rpSend" style="width:100%;margin-top:.8em;font-size:1.1em">📨 שליחת ההמלצה</button>
+      <div id="rpMsg" class="form-msg" style="margin-top:.5em"></div>
+      <div class="hint" style="margin-top:.4em">אפשר להמליץ על כמה מוסדות – על כל אחד שמצטרף מקבלים מתנה. נעדכן אתכם במייל בכל שלב.</div>
+    </div>
+  </section>`);
+  { const _go = go; go = function (page) { const r = _go.apply(this, arguments); try { $$('#tabs button').forEach((b) => { if (b.dataset.page) b.classList.toggle('active', b.dataset.page === currentPage); }); } catch (e) {} return r; }; }
+  // הכפתורים הישנים של "חבר מביא חבר" (בעזרה ובמשוב) – מובילים עכשיו לדף
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-refer]')) { e.preventDefault(); e.stopImmediatePropagation(); try { document.querySelector('.modal-bg')?.remove(); } catch (er) {} const p = document.getElementById('helpPanel'); if (p && p.classList.contains('open')) document.getElementById('helpClose')?.click(); go('refer'); } }, true);
+  const EJ = { service: 'service_tplus', template: 'template_gzcqacc', key: '6G0YaH5dH_TKKk_hu' };
+  const TO = ['bnyytmrkwt@gmail.com', 'ay0533115854@gmail.com'];
+  document.addEventListener('click', async (e) => {
+    if (!e.target.closest('#rpSend')) return; e.preventDefault();
+    const g = (id) => (document.getElementById(id).value || '').trim(), msg = document.getElementById('rpMsg');
+    const org = g('rpOrg'), name = g('rpName'), mail = g('rpMail'), phone = g('rpPhone'), note = g('rpNote');
+    const gk = (document.querySelector('input[name=rpGift]:checked') || {}).value || 'credit'; const gift = GIFTS.find((x) => x[0] === gk);
+    if (!org || !name || !/^\S+@\S+\.\S+$/.test(mail)) { msg.className = 'form-msg err'; msg.textContent = 'צריך: שם המוסד, שם איש הקשר ומייל תקין.'; return; }
+    if (!document.getElementById('rpOk').checked) { msg.className = 'form-msg err'; msg.textContent = 'סמנו שדיברתם איתם – כדי שהפנייה שלנו לא תפתיע אותם.'; return; }
+    const b = document.getElementById('rpSend'); b.disabled = true; msg.className = 'form-msg'; msg.textContent = '⏳ שולח…';
+    const by = (ME && (ME.display_name || ME.email)) || '', byMail = (ME && ME.email) || '', from = (typeof ORG !== 'undefined' && ORG && ORG.name) || '';
+    const subject = `🎁 חבר מביא חבר – ${org} (המליץ: ${by}, ${from})`;
+    const message = `המלצה חדשה מתוך המערכת:\n\nמוסד: ${org}\nאיש קשר: ${name}\nמייל: ${mail}${phone ? '\nטלפון: ' + phone : ''}${note ? '\nהערה: ' + note : ''}\n\nהמתנה שנבחרה: ${gift[1]} – ${gift[2]}\n\nהמליץ: ${by} (${byMail})\nמהחסידות: ${from}\nזמן: ${new Date().toLocaleString('he-IL')}`;
+    let ok = 0;
+    for (const to of TO) { try { const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service_id: EJ.service, template_id: EJ.template, user_id: EJ.key, template_params: { to_email: to, email: to, subject, title: subject, message, name: 'המערכת', to_name: 'צוות' } }) }); if (r.ok) ok++; } catch (er) {} }
+    if (!ok) { try { await api('alert', { message: subject + '\n' + message }); ok = 1; } catch (er) {} }
+    if (ok) { msg.innerHTML = `✅ <b>תודה רבה!</b> קיבלנו את ההמלצה. ניצור איתם קשר בעדינות, ונעדכן אתכם כשהם מצטרפים. רוצים להמליץ על עוד מישהו? מלאו שוב.`; ['rpOrg', 'rpName', 'rpMail', 'rpPhone', 'rpNote'].forEach((id) => document.getElementById(id).value = ''); document.getElementById('rpOk').checked = false; }
+    else { msg.className = 'form-msg err'; msg.textContent = '❌ לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע.'; }
+    b.disabled = false;
+  });
+})();
+
+/* 3.18.1 – שדות תאריך בפורמט ישראלי (יום/חודש/שנה) + התאריך העברי לידם, במקום mm/dd/yyyy */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `.ilDate{display:flex;align-items:center;gap:.4em;flex-wrap:wrap;position:relative}.ilDate .ilT{flex:1 1 6em;min-width:0;width:auto!important;direction:ltr;text-align:center}.ilDate .ilH{flex-basis:100%}
+  .ilDate .ilB{border:1.5px solid var(--line);background:var(--card,#fff);border-radius:10px;padding:.35em .55em;cursor:pointer;font-size:1em;line-height:1}
+  .ilDate .ilH{font-size:.85em;color:#8a6420;font-weight:700}.ilDate input[type=date].ilHid{position:absolute!important;opacity:0!important;width:1px!important;height:1px!important;pointer-events:none;bottom:0;right:0}`;
+  document.head.appendChild(st);
+  const fmt = (v) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+  const heb = (v) => { if (!v) return ''; try { return hebDate(new Date(v + 'T12:00:00').getTime()); } catch (e) { return ''; } };
+  function parse(t) { const m = /^\s*(\d{1,2})[./\-\s](\d{1,2})[./\-\s](\d{2,4})\s*$/.exec(t || ''); if (!m) return null; let [, d, mo, y] = m.map(Number); if (y < 100) y += 2000; const dt = new Date(y, mo - 1, d); if (dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null; return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+  function enhance(inp) {
+    if (inp.dataset.il) return; inp.dataset.il = '1';
+    const w = document.createElement('span'); w.className = 'ilDate'; inp.parentNode.insertBefore(w, inp); w.appendChild(inp); inp.classList.add('ilHid'); inp.tabIndex = -1;
+    w.insertAdjacentHTML('afterbegin', `<input type="text" class="ilT" inputmode="numeric" placeholder="יום/חודש/שנה" aria-label="תאריך (יום/חודש/שנה)"><button type="button" class="ilB" title="לבחור בלוח שנה">📅</button><span class="ilH"></span>`);
+    const t = w.querySelector('.ilT'), h = w.querySelector('.ilH');
+    let last = null; const show = () => { if (inp.value === last) return; last = inp.value; if (document.activeElement !== t) t.value = fmt(inp.value); h.textContent = heb(inp.value); };
+    show(); setInterval(() => { if (w.isConnected) show(); }, 700);
+    t.addEventListener('change', () => { const v = t.value.trim() ? parse(t.value) : ''; if (v === null) { t.style.borderColor = '#d33'; return; } t.style.borderColor = ''; inp.value = v; inp.dispatchEvent(new Event('input', { bubbles: true })); inp.dispatchEvent(new Event('change', { bubbles: true })); show(); });
+    w.querySelector('.ilB').onclick = () => { try { inp.showPicker(); } catch (e) { inp.classList.remove('ilHid'); inp.focus(); } };
+    inp.addEventListener('change', show);
+  }
+  const scan = () => document.querySelectorAll('input[type=date]:not([data-il])').forEach(enhance);
+  scan(); new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
+})();
+
+/* 3.18.1 – 🎓 מרכז ההדרכה (במקום "עזרה") · סרטון בראש דף ההוראות · 💡 יש לכם רעיון? · 🗳️ מה לבנות הבא */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `.hcTiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 12px}
+  .hcTiles button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px;border-radius:14px;border:1.5px solid var(--line,#d9dfec);background:var(--card,#fff);cursor:pointer;font:inherit;font-weight:700;color:inherit}
+  .hcTiles button:hover{border-color:#d6a845;box-shadow:0 4px 14px rgba(214,168,69,.25)}.hcTiles .i{font-size:1.6em}.hcTiles small{font-weight:500;opacity:.75;font-size:.78em}
+  #hvTop{border-radius:18px;overflow:hidden;margin:0 0 16px;background:linear-gradient(135deg,#1b2350,#2c3e8f);color:#fff;padding:16px}
+  #hvTop video{width:100%;max-height:60vh;border-radius:12px;background:#000;display:block;margin-top:10px}
+  .ideaCard{padding:18px;margin-top:16px}.voteRow{display:flex;align-items:center;gap:.6em;padding:10px 12px;border:1.5px solid var(--line,#d9dfec);border-radius:12px;margin:.4em 0;cursor:pointer;background:var(--card,#fff)}
+  .voteRow.on{border-color:#d6a845;background:rgba(214,168,69,.12)}.voteRow .vi{font-size:1.4em}`;
+  document.head.appendChild(st);
+  const EJ = { service: 'service_tplus', template: 'template_gzcqacc', key: '6G0YaH5dH_TKKk_hu' };
+  const TO = ['bnyytmrkwt@gmail.com', 'ay0533115854@gmail.com'];
+  async function mail(subject, message) { let ok = 0; for (const to of TO) { try { const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service_id: EJ.service, template_id: EJ.template, user_id: EJ.key, template_params: { to_email: to, email: to, subject, title: subject, message, name: 'המערכת', to_name: 'צוות' } }) }); if (r.ok) ok++; } catch (e) {} } if (!ok) { try { await api('alert', { message: subject + '\n' + message }); ok = 1; } catch (e) {} } return ok > 0; }
+  const who = () => `${(ME && (ME.display_name || ME.email)) || ''} (${(ME && ME.email) || ''}) · ${(typeof ORG !== 'undefined' && ORG && ORG.name) || ''}`;
+  const closeHelp = () => { const p = document.getElementById('helpPanel'); if (p && p.classList.contains('open')) document.getElementById('helpClose')?.click(); };
+  // ---- אריחי אפשרויות בראש מרכז ההדרכה ----
+  new MutationObserver(() => {
+    const hb = document.getElementById('helpBody'); if (!hb || hb.querySelector('.hcTiles')) return;
+    hb.insertAdjacentHTML('afterbegin', `<div class="hcTiles">
+      <button type="button" data-hc="video"><span class="i">🎬</span>סרטון הדרכה<small>שתי דקות – הכל</small></button>
+      <button type="button" data-hc="tour"><span class="i">🧭</span>סיור על המסך<small>דקה, צעד אחר צעד</small></button>
+      <button type="button" data-hc="help"><span class="i">📘</span>כל ההוראות<small>לכל מסך ומסך</small></button>
+      <button type="button" data-hc="asst"><span class="i">✨</span>העוזר האישי<small>שאלה על השיחות</small></button>
+      <button type="button" data-hc="idea"><span class="i">💡</span>יש לכם רעיון?<small>שיפור או אפליקציה חדשה</small></button>
+      <button type="button" data-hc="refer"><span class="i">🎁</span>חבר מביא חבר<small>המליצו – וקבלו מתנה</small></button>
+    </div>`);
+  }).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-hc]'); if (!b) return; e.preventDefault(); const k = b.dataset.hc;
+    if (k === 'video') { const v = document.querySelector('#helpBody video'); if (v) { v.scrollIntoView({ block: 'center', behavior: 'smooth' }); try { v.play(); } catch (er) {} } return; }
+    closeHelp();
+    if (k === 'tour') { go('home'); setTimeout(() => { try { startTour(); } catch (er) {} }, 300); }
+    if (k === 'help') go('help');
+    if (k === 'asst') document.getElementById('asstFab')?.click();
+    if (k === 'idea') { go('refer'); setTimeout(() => document.getElementById('ideaBox')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250); }
+    if (k === 'refer') go('refer');
+  });
+  // ---- הסרטון בראש דף ההוראות ----
+  function topVideo() {
+    const pg = document.getElementById('page-help'); if (!pg) return; const ex = document.getElementById('hvTop'); if (ex) { if (pg.firstElementChild !== ex) pg.prepend(ex); return; }
+    pg.insertAdjacentHTML('afterbegin', `<div id="hvTop"><b style="font-size:1.25em;color:#f6d98d">🎬 סרטון הדרכה – כל המערכת בשתי דקות</b><div style="opacity:.9">צפו פעם אחת – וזה חוסך הרבה זמן. בסוף: נסו בעצמכם!</div>
+      <video src="help-video.mp4" controls preload="none" playsinline poster="help-video-poster.jpg"></video>
+      <button type="button" class="tryNow" data-trynow style="margin-top:10px">🎙️ עכשיו תורכם – העלו הקלטה ונסו בעצמכם</button></div>`);
+    const v = pg.querySelector('#hvTop video'); v.addEventListener('ended', () => pg.querySelector('#hvTop [data-trynow]')?.classList.add('big'));
+  }
+  topVideo(); { const _go = go; go = function (page) { const r = _go.apply(this, arguments); if (page === 'help') { topVideo(); setTimeout(topVideo, 60); } return r; }; }
+  // ---- בדף "נהניתם?": יש לכם רעיון? + מה לבנות הבא ----
+  const NEXT = [['📱', 'הקלטה ישירה מהטלפון – והטקסט מגיע לבד למערכת'], ['📚', 'ספר שלם בלחיצה – כמה שיחות בחוברת אחת, עם תוכן עניינים'], ['📨', 'שליחה אוטומטית של החוברת במייל לרשימת התפוצה'], ['🔊', 'הקראה בקול של הנוסח הערוך – לשמוע במקום לקרוא'], ['🌍', 'תרגום הנוסח לאנגלית ולצרפתית – לחסידים בחו"ל'], ['🗓️', 'לוח שיחות לפי פרשה – כל מה שנאמר על הפרשה לאורך השנים']];
+  function ideas() {
+    const pg = document.getElementById('page-refer'); if (!pg || document.getElementById('ideaBox')) return;
+    pg.insertAdjacentHTML('beforeend', `<div class="card ideaCard" id="ideaBox">
+      <h3 style="margin:0 0 .3em">💡 יש לכם רעיון?</h3>
+      <p class="muted" style="margin:0 0 .7em">משהו שהיה עוזר לכם בעבודה? רעיון לשיפור, לפיצ'ר חדש – או אפילו לאפליקציה חדשה לגמרי? <b>כתבו לנו – אנחנו קוראים כל רעיון</b>, והטובים נבנים.</p>
+      <div class="row" style="gap:.4em;flex-wrap:wrap;margin-bottom:.5em" id="ideaType">${['🔧 שיפור במערכת', '✨ פיצ\'ר חדש', '📱 רעיון לאפליקציה חדשה', '🙂 סתם מחמאה'].map((x, i) => `<button type="button" class="btn small ${i ? '' : 'primary'}" data-itype="${x}">${x}</button>`).join('')}</div>
+      <textarea id="ideaText" rows="4" style="width:100%" placeholder="למשל: היה עוזר לי אם המערכת הייתה מסמנת לבד את כל הפסוקים בשיחה…"></textarea>
+      <button class="btn primary" type="button" id="ideaSend" style="width:100%;margin-top:.6em">📨 שליחת הרעיון</button><div id="ideaMsg" class="form-msg" style="margin-top:.4em"></div>
+    </div>
+    <div class="card ideaCard" id="voteBox">
+      <h3 style="margin:0 0 .3em">🗳️ מה לבנות הבא? אתם מחליטים</h3>
+      <p class="muted" style="margin:0 0 .5em">סמנו מה הכי היה עוזר לכם (אפשר כמה), ולחצו "שליחת ההצבעה". מה שיקבל הכי הרבה קולות – ייבנה ראשון.</p>
+      ${NEXT.map(([i, t], n) => `<div class="voteRow" data-vote="${n}"><span class="vi">${i}</span><span style="flex:1">${t}</span><span class="vchk">⬜</span></div>`).join('')}
+      <button class="btn primary" type="button" id="voteSend" style="width:100%;margin-top:.6em">🗳️ שליחת ההצבעה</button><div id="voteMsg" class="form-msg" style="margin-top:.4em"></div>
+    </div>`);
+  }
+  ideas(); { const _go2 = go; go = function (page) { const r = _go2.apply(this, arguments); if (page === 'refer') ideas(); return r; }; }
+  let ITYPE = '🔧 שיפור במערכת';
+  document.addEventListener('click', async (e) => {
+    const t = e.target.closest('[data-itype]'); if (t) { ITYPE = t.dataset.itype; document.querySelectorAll('[data-itype]').forEach((b) => b.classList.toggle('primary', b === t)); return; }
+    const v = e.target.closest('[data-vote]'); if (v) { v.classList.toggle('on'); v.querySelector('.vchk').textContent = v.classList.contains('on') ? '✅' : '⬜'; return; }
+    if (e.target.closest('#ideaSend')) {
+      const txt = (document.getElementById('ideaText').value || '').trim(), m = document.getElementById('ideaMsg');
+      if (txt.length < 3) { m.className = 'form-msg err'; m.textContent = 'כתבו את הרעיון בכמה מילים.'; return; }
+      m.className = 'form-msg'; m.textContent = '⏳ שולח…';
+      const ok = await mail(`💡 רעיון חדש מהמערכת – ${ITYPE}`, `סוג: ${ITYPE}\n\n${txt}\n\nמאת: ${who()}\nזמן: ${new Date().toLocaleString('he-IL')}`);
+      if (ok) { m.innerHTML = '✅ <b>תודה רבה!</b> הרעיון הגיע אלינו. נעדכן אתכם אם הוא נבנה.'; document.getElementById('ideaText').value = ''; } else { m.className = 'form-msg err'; m.textContent = '❌ לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע.'; }
+    }
+    if (e.target.closest('#voteSend')) {
+      const on = [...document.querySelectorAll('.voteRow.on')].map((r) => NEXT[+r.dataset.vote][1]); const m = document.getElementById('voteMsg');
+      if (!on.length) { m.className = 'form-msg err'; m.textContent = 'סמנו לפחות אפשרות אחת.'; return; }
+      m.className = 'form-msg'; m.textContent = '⏳ שולח…';
+      const ok = await mail('🗳️ הצבעה – מה לבנות הבא', `הצביע/ה על:\n- ${on.join('\n- ')}\n\nמאת: ${who()}\nזמן: ${new Date().toLocaleString('he-IL')}`);
+      m.innerHTML = ok ? '✅ <b>תודה!</b> ההצבעה נקלטה.' : '❌ לא הצלחנו לשלוח כרגע.';
+    }
+  });
 })();
 </script>
 </body>
