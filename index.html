@@ -1053,7 +1053,7 @@ body.viewas #toTop{display:none}
           <div class="drop" id="drop">
             <div style="font-size:2em">📁</div>
             <div>גרור לכאן קובץ, כמה קבצים או תיקייה שלמה</div>
-            <div class="muted" style="font-size:.9em">🎵 הקלטות: ווטסאפ, mp3, m4a, wav… · 🎬 סרטונים: mp4, mov, mkv, webm, avi…</div>
+            <div class="muted" style="font-size:.9em">🎵 הקלטות: mp3, m4a, wav, ogg… · 🎬 סרטונים: mp4, mov, mkv, webm, avi…</div>
             <div class="row" style="margin-top:.8em;justify-content:center">
               <button class="btn primary" id="pickBtn">🎵 קובץ אחד או כמה</button>
               <button class="btn" id="pickDirBtn">📂 תיקייה שלמה</button>
@@ -1488,7 +1488,7 @@ body.viewas #toTop{display:none}
           <li>בחירה מרובה ← "⬇️ ייצוא" – מוריד קובץ ZIP עם כל ההקלטות שנבחרו.</li>
         </ul></details>
         <details><summary>🔗 שיתוף</summary><ul>
-          <li>"🔗 קישור שיתוף" – יוצר קישור (לתקופה שבוחרים) שכל אחד יכול לפתוח בלי להיכנס למערכת. יש גם קוד QR וכפתור וואטסאפ. אפשר לבטל בכל רגע.</li>
+          <li>"🔗 קישור שיתוף" – יוצר קישור (לתקופה שבוחרים) שכל אחד יכול לפתוח בלי להיכנס למערכת. יש גם קוד QR וכפתור שליחה במייל. אפשר לבטל בכל רגע.</li>
         </ul></details>
         <details><summary>📲 טלפון וקיצורים</summary><ul>
           <li>התקנה: אנדרואיד – תפריט ⋮ ← "התקנת אפליקציה". אייפון – שיתוף ← "הוסף למסך הבית".</li>
@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.18.1';
+const APP_VERSION = '3.19.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -3676,8 +3676,8 @@ $('#shareBtn').onclick = async () => {
   const link = shareUrl(r.shareToken);
   try { await navigator.clipboard.writeText(link); } catch (e) {}
   const qr = await qrImg(link);
-  modal(`<h3>✅ הקישור מוכן</h3><p>הקישור הועתק. אפשר להדביק אותו בוואטסאפ או במייל:</p><input type="text" readonly value="${esc(link)}" dir="ltr" onclick="this.select()">
-    <div class="row" style="margin-top:.8em"><a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(r.title + '\n' + link)}">🟢 שליחה בוואטסאפ</a></div>
+  modal(`<h3>✅ הקישור מוכן</h3><p>הקישור הועתק. אפשר להדביק אותו במייל או בכל מקום:</p><input type="text" readonly value="${esc(link)}" dir="ltr" onclick="this.select()">
+    <div class="row" style="margin-top:.8em"><a class="btn primary" href="mailto:?subject=${encodeURIComponent(r.title)}&body=${encodeURIComponent(r.title + '\n' + link)}">✉️ שליחה במייל</a></div>
     ${qr ? `<div style="text-align:center;margin-top:.8em">${qr}<div class="hint">סריקה במצלמה של הטלפון</div></div>` : ''}`, { cancelText: '', okText: 'סגירה' });
 };
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'copyShare') navigator.clipboard.writeText($('#shareLink').value).then(() => toast('הקישור הועתק ✓')).catch(() => {}); });
@@ -5119,7 +5119,7 @@ function renderHero() {
   const chips = [`<span class="hero-chip">📅 <b>${esc(hebDate(Date.now()))}</b></span>`];
   if (pr) chips.push(`<span class="hero-chip link" data-goparsha="${esc(pr)}">📖 פרשת <b>${esc(pr)}</b></span>`);
   chips.push(`<span class="hero-chip link" data-goto="library">🎧 <b>${recs.length}</b> הקלטות</span>`);
-  if (secs) chips.push(`<span class="hero-chip">⏱️ <b>${secs >= 3600 ? (secs / 3600).toFixed(secs >= 36000 ? 0 : 1) + '</b> שעות' : Math.round(secs / 60) + '</b> דקות'} תומללו</span>`);
+  if (secs) { const hh = secs >= 3600 ? +(secs / 3600).toFixed(secs >= 36000 ? 0 : 1) : 0, mm = Math.max(1, Math.round(secs / 60)); chips.push(`<span class="hero-chip">⏱️ ${hh ? (hh === 1 ? '<b>שעה אחת</b> תומללה' : `<b>${hh}</b> שעות תומללו`) : (mm === 1 ? '<b>דקה אחת</b> תומללה' : `<b>${mm}</b> דקות תומללו`)}</span>`); }
   if (st > 1) chips.push(`<span class="hero-chip">🔥 <b>${st}</b> ימים ברצף</span>`);
   chips.push(`<span class="hero-chip link" id="heroCmd">🔍 חיפוש מהיר <b style="opacity:.75;font-weight:600">Ctrl+K</b></span>`);
   $('#heroChips').innerHTML = chips.join('');
@@ -5464,9 +5464,9 @@ async function shareCard(r) {
   const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
   const url = URL.createObjectURL(blob), name = safeName(r.title) + '.png';
   const canShare = navigator.canShare && navigator.canShare({ files: [new File([blob], name, { type: 'image/png' })] });
-  await modal(`<h3>🖼️ כרטיס לוואטסאפ</h3><img src="${url}" alt="" style="width:100%;border-radius:14px;box-shadow:var(--shadow)">
-    <div class="row" style="margin-top:.8em">${canShare ? '<button class="btn primary" id="scShare">📤 שליחה (וואטסאפ…)</button>' : ''}<button class="btn ${canShare ? '' : 'primary'}" id="scDl">⬇️ הורדת התמונה</button></div>
-    <div class="hint">${canShare ? 'בטלפון: "שליחה" ← בוחרים וואטסאפ.' : 'מורידים את התמונה ושולחים אותה בוואטסאפ כמו כל תמונה.'}</div>`, { okText: '', cancelText: 'סגירה' });
+  await modal(`<h3>🖼️ כרטיס תמונה לשיתוף</h3><img src="${url}" alt="" style="width:100%;border-radius:14px;box-shadow:var(--shadow)">
+    <div class="row" style="margin-top:.8em">${canShare ? '<button class="btn primary" id="scShare">📤 שליחה</button>' : ''}<button class="btn ${canShare ? '' : 'primary'}" id="scDl">⬇️ הורדת התמונה</button></div>
+    <div class="hint">${canShare ? 'בטלפון: "שליחה" ← בוחרים לאן לשלוח (מייל וכו\').' : 'מורידים את התמונה ושולחים אותה במייל כמו כל תמונה.'}</div>`, { okText: '', cancelText: 'סגירה' });
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 document.addEventListener('click', async (e) => {
@@ -5522,7 +5522,7 @@ let markMode = '';
 function afterDetailOpen() {
   if (!$('#markBar')) {
     const bar = document.createElement('div'); bar.id = 'markBar';
-    bar.innerHTML = `<div class="mk-row"><span class="mk-lbl">🖍️ סימון:</span>${Object.entries(MARK_COLORS).map(([k, m]) => `<button type="button" class="mk-btn" data-mk="${k}" style="--mc:${m.bg}">${m.ic} ${m.n}</button>`).join('')}<button type="button" class="mk-btn" data-mk="erase">🧽 מחיקת סימון</button><button type="button" class="mk-btn" data-mk="head">➕ כותרת</button><span class="grow"></span><button type="button" class="btn small" id="bookBtn">📖 מצב ספר</button><button type="button" class="btn small" id="cardBtn">🖼️ כרטיס לוואטסאפ</button></div>
+    bar.innerHTML = `<div class="mk-row"><span class="mk-lbl">🖍️ סימון:</span>${Object.entries(MARK_COLORS).map(([k, m]) => `<button type="button" class="mk-btn" data-mk="${k}" style="--mc:${m.bg}">${m.ic} ${m.n}</button>`).join('')}<button type="button" class="mk-btn" data-mk="erase">🧽 מחיקת סימון</button><button type="button" class="mk-btn" data-mk="head">➕ כותרת</button><span class="grow"></span><button type="button" class="btn small" id="bookBtn">📖 מצב ספר</button><button type="button" class="btn small" id="cardBtn">🖼️ כרטיס תמונה לשיתוף</button></div>
       <div class="mk-row qx"><span class="mk-lbl">⬇️ בלחיצה אחת:</span><button type="button" class="btn small" data-qx="print">🖨️ הדפסה</button><button type="button" class="btn small" data-qx="pdf">📕 PDF</button><button type="button" class="btn small" data-qx="docx">📘 Word</button><button type="button" class="btn small" data-qx="xlsx">📗 Excel</button><span class="mk-legend" id="mkLegend"></span></div>
       <div class="hint" id="mkHint"></div>`;
     $('#dTranscript').before(bar);
@@ -6660,7 +6660,7 @@ document.addEventListener('click', async (e) => {
 
 /* ---------- חוברת לדפוס – בדיוק כמו "דברי אלוקים חיים ושיחות קודש" ---------- */
 let BOOK_HEAD = 'דא"ח מכ"ק מרן אדמו"ר שליט"א';
-function shortYear(hy) { const m = String(hy || '').match(/תש(.+)$/); return m ? m[1] : (hy || ''); }
+function shortYear(hy) { return String(hy || '').trim(); } // 3.19 – השנה תמיד מלאה (תשפ"ז ולא פ"ז)
 function openBookletPrint(rec) {
   const lastG = LS.get('bookGil', '');
   const par = (rec.parasha ? 'פרשת ' + rec.parasha.replace(/^פרשת\s*/, '') : '') + (rec.hyear ? ' ' + shortYear(rec.hyear) : '');
@@ -11369,6 +11369,224 @@ orgPairs = async function () {
       const ok = await mail('🗳️ הצבעה – מה לבנות הבא', `הצביע/ה על:\n- ${on.join('\n- ')}\n\nמאת: ${who()}\nזמן: ${new Date().toLocaleString('he-IL')}`);
       m.innerHTML = ok ? '✅ <b>תודה!</b> ההצבעה נקלטה.' : '❌ לא הצלחנו לשלוח כרגע.';
     }
+  });
+})();
+
+/* 3.18.2 – הגנה על התיקונים: תיקון של עורך נשמר כהצעה, ומוחלף אוטומטית רק אחרי אישור מנהל (✅).
+   (באג שתוקן: עריכה אחת נספרה 3 פעמים, ולכן תיקון מקומי להקלטה אחת הפך מיד להחלפה בכל התמלולים) */
+(function () {
+  // 1. החלפה אוטומטית – רק תיקונים שמנהל אישר
+  autoFix = function (text, kind) {
+    let t = String(text || ''); if (!t || !FIXES) return t;
+    for (const f of FIXES) {
+      if (!f.confirmed) continue;
+      if (f.kind && f.kind !== 'all' && f.kind !== kind) continue;
+      const w = String(f.wrong || '').trim(); if (w.length < 4 && !/\s/.test(w)) continue;
+      const re = new RegExp('(^|[\\s"\'״׳(\\[,.:;!?־-])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=$|[\\s"\'״׳)\\],.:;!?־-])', 'g');
+      t = t.replace(re, (m, pre) => pre + f.right);
+    }
+    return t;
+  };
+  // 2. רמזים למודל – רק תיקונים מאושרים (תיקון מקומי להקלטה אחת לא מלמד את כל המערכת)
+  fixesText = function (max = 2500) {
+    let s = '';
+    for (const f of (FIXES || [])) {
+      if (!f.confirmed) continue;
+      if (f.kind && f.kind !== 'all' && f.kind !== FIX_KIND) continue;
+      const l = `${f.wrong} ← ${f.right}`; if ((s + l).length > max) break; s += (s ? ' | ' : '') + l;
+    }
+    return s;
+  };
+  // 3. אותו תיקון באותה הקלטה נרשם פעם אחת בלבד (לא 3)
+  const SEEN = new Set();
+  const _lf = learnFixes;
+  learnFixes = async function (before, after, kind) {
+    try {
+      const rid = (typeof Detail !== 'undefined' && Detail.rec && Detail.rec.id) || '';
+      const fx = (typeof wordFixes === 'function' ? wordFixes(before, after) : []) || [];
+      const fresh = fx.filter(([w, r]) => !SEEN.has(rid + '|' + w + '|' + r));
+      if (!fresh.length) return 0;
+      fresh.forEach(([w, r]) => SEEN.add(rid + '|' + w + '|' + r));
+      const k = rid + '|' + before.length + '|' + after.length;
+      if (SEEN.has('call|' + k)) return 0; SEEN.add('call|' + k);
+    } catch (e) {}
+    return _lf.apply(this, arguments);
+  };
+  // 4. במסך "תיקונים שהמערכת למדה" – הסבר ברור למנהל
+  new MutationObserver(() => {
+    const h = [...document.querySelectorAll('.modal h3')].find((x) => /תיקונים שהמערכת למדה/.test(x.textContent));
+    if (h && !h.dataset.v3182) { h.dataset.v3182 = '1'; h.insertAdjacentHTML('afterend', '<div style="margin:.3em 0 .6em;padding:.6em .8em;border-radius:10px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.5)"><b>🛡️ חשוב:</b> תיקון של עורך נשמר כ<b>הצעה</b> ומתקן רק את ההקלטה שבה נעשה. רק תיקון שאתה מאשר ב-✅ (למשל שם של צדיק או ספר שתמיד נשמע לא נכון) יוחלף אוטומטית בכל התמלולים הבאים.</div>'); }
+  }).observe(document.body, { childList: true, subtree: true });
+  try { loadFixes(true); } catch (e) {}
+})();
+
+/* ===== 3.19.0 – תאריך עברי אחרי השקיעה · ניקוד ופיסוק · שיעור גמרא (ארמית) · תיקוני תצוגה ===== */
+(function () {
+  // --- 1. תאריך עברי: אחרי השקיעה בארץ ישראל – כבר היום הבא ---
+  const LAT = 31.778, LON = 35.235, RAD = Math.PI / 180;
+  function ilYMD(t) { const o = {}; new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(new Date(t)).forEach((p) => { o[p.type] = +p.value; }); return [o.year, o.month, o.day]; }
+  function sunsetMs(y, m, d) { // אלגוריתם NOAA המקוצר – שקיעה (90.833°) בירושלים
+    const N = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 0)) / 864e5), lh = LON / 15, t = N + (18 - lh) / 24;
+    const M = 0.9856 * t - 3.289; let L = M + 1.916 * Math.sin(M * RAD) + 0.020 * Math.sin(2 * M * RAD) + 282.634; L = ((L % 360) + 360) % 360;
+    let RA = Math.atan(0.91764 * Math.tan(L * RAD)) / RAD; RA = ((RA % 360) + 360) % 360; RA = (RA + Math.floor(L / 90) * 90 - Math.floor(RA / 90) * 90) / 15;
+    const sd = 0.39782 * Math.sin(L * RAD), cd = Math.cos(Math.asin(sd));
+    const cH = (Math.cos(90.833 * RAD) - sd * Math.sin(LAT * RAD)) / (cd * Math.cos(LAT * RAD));
+    const H = Math.acos(Math.max(-1, Math.min(1, cH))) / RAD / 15;
+    let UT = H + RA - 0.06571 * t - 6.622 - lh; UT = ((UT % 24) + 24) % 24;
+    return Date.UTC(y, m - 1, d) + UT * 3600e3;
+  }
+  window.ilSunset = (t) => { const [y, m, d] = ilYMD(t); return sunsetMs(y, m, d); };
+  const adj = (t) => { if (!t) return t; const n = typeof t === 'number' ? t : new Date(t).getTime(); if (!isFinite(n)) return t; return n >= window.ilSunset(n) ? n + 864e5 : n; };
+  window.heAdj = adj;
+  const _hd = hebDate; hebDate = function (t) { return _hd(t ? adj(t) : t); };
+  const _hy = hebYearOf; hebYearOf = function (t) { return _hy(t ? adj(t) : t); };
+  const _pf = parshaFor; parshaFor = function (t) { return _pf(t ? adj(t) : t); };
+
+  // --- 2. "מה לקבל בסוף": להסתיר קבוצות ריקות (למשל כשההקלטה בעברית) ---
+  function syncYo() {
+    const box = document.getElementById('yiOutPills'); if (!box) return;
+    const kids = [...box.children]; let any = false;
+    kids.forEach((el, i) => {
+      if (!el.classList.contains('yoGrp')) return;
+      let vis = false;
+      for (let j = i + 1; j < kids.length; j++) { const k = kids[j]; if (k.classList.contains('yoGrp') || k.id === 'yoHint' || k.id === 'trPills') break; if (k.tagName === 'BUTTON' && !k.classList.contains('hidden')) vis = true; }
+      el.style.display = vis ? '' : 'none'; if (vis) any = true;
+      const br = el.previousElementSibling; if (br && br.tagName === 'SPAN' && !br.className && br.style.flexBasis === '100%') br.style.display = vis ? '' : 'none';
+    });
+    const h = document.getElementById('yoHint'); if (h) h.style.display = any ? '' : 'none';
+  }
+  window.syncYo = syncYo;
+  setInterval(syncYo, 400); document.addEventListener('click', (e) => { if (e.target.closest('#langPills,#yiOutPills')) setTimeout(syncYo, 60); });
+
+  // --- 3. העוזר האישי: כפתור ✕ נראה, וכותרת שלא נחתכת ---
+  const st = document.createElement('style');
+  st.textContent = `#asstPanel header{padding-top:16px}#asstPanel header>div{flex:1;min-width:0}#asstPanel h2{white-space:normal;line-height:1.35;overflow:visible}
+  #asstClose{flex:0 0 auto;min-width:40px;height:40px;padding:0;font-size:20px;font-weight:700;line-height:1;color:#1b2350!important;background:#f5d27a!important;border:2px solid #fff!important;border-radius:12px;display:flex;align-items:center;justify-content:center}
+  #asstClose:hover{background:#ffe39b!important}
+  .ai-out.nk{font-size:1.18em;line-height:2.1}
+  #gemaraRow{margin:.2em 0 0;font-weight:500;gap:.35em}`;
+  document.head.appendChild(st);
+  { const fx = () => { const c = document.getElementById('asstClose'); if (c && !c.textContent.trim()) c.textContent = '✕'; }; fx(); setInterval(fx, 1500); }
+
+  // --- 4. שיעור גמרא – ארמית ---
+  const GEM_AR = ' NOTE: This talk contains quotations from the Talmud (Gemara) and other Aramaic sources. Write every Aramaic word and quotation in standard Aramaic spelling exactly as printed in the Vilna Shas – do NOT convert Aramaic into Hebrew or Yiddish spelling. Keep Talmudic terms as they are (e.g. תא שמע, איבעיא להו, מאי טעמא, תיובתא, קשיא, אמר רבא). When translating or rewriting into Hebrew, leave the quoted Gemara text in its original Aramaic, and translate only the speaker\'s own words.';
+  window.gemaraOn = () => !!LS.get('gemara', false);
+  const _gf = gemFetch;
+  gemFetch = function (path, payload, kind) {
+    try {
+      if (window.gemaraOn() && kind !== 'tts' && kind !== 'summary' && payload && payload.contents) {
+        const parts = payload.contents[payload.contents.length - 1].parts || []; const tp = [...parts].reverse().find((p) => typeof p.text === 'string');
+        if (tp && !tp.text.includes('Vilna Shas')) tp.text = tp.text + GEM_AR;
+      }
+    } catch (e) {}
+    return _gf.apply(this, arguments);
+  };
+  function addGemaraChk() {
+    if (document.getElementById('gemaraChk')) return;
+    const sp = document.getElementById('speakersChk'); if (!sp) return;
+    const lbl = sp.closest('label'); if (!lbl) return;
+    lbl.insertAdjacentHTML('afterend', `<label class="row" id="gemaraRow" title="כשהשיעור מצטט גמרא – הארמית נכתבת בכתיב של הש&quot;ס, ולא מתורגמת"><input type="checkbox" id="gemaraChk" style="width:auto" ${window.gemaraOn() ? 'checked' : ''}> 📖 שיעור גמרא – לשמור את הארמית כמו בגמרא</label>`);
+    document.getElementById('gemaraChk').onchange = (e) => { LS.set('gemara', e.target.checked); toast(e.target.checked ? '📖 מעכשיו – ציטוטים מהגמרא נשמרים בארמית, בכתיב של הש"ס' : 'שיעור רגיל (בלי הדגשת ארמית)'); };
+  }
+  addGemaraChk(); setInterval(addGemaraChk, 1500);
+
+  // --- 5. ✍️ ניקוד ופיסוק ---
+  AI_TOOLS.nikud = { label: '✍️ ניקוד ופיסוק' };
+  const MODES = {
+    full: { n: 'ניקוד מלא', he: 'Add FULL, accurate Hebrew vowel points (nikud) to EVERY word, according to the rules of Hebrew grammar (as in a nikud-ed siddur / Chumash). Also fix the punctuation (periods, commas, question marks, quotation marks) and split into paragraphs where the topic changes.', yi: 'Add vowel points in the way printed Hasidic Yiddish books do: mark אַ / אָ, פּ / פֿ, וּ, יִ where customary in YIVO-style print, and give FULL nikud only to Hebrew/Aramaic (loshn-koydesh) words and quotations. Also fix the punctuation and split into paragraphs.' },
+    light: { n: 'ניקוד קל', he: 'Add PARTIAL nikud only – vowel points only on words that could be misread or are ambiguous (like in Hasidic sefarim), and on names and rare words. Leave all other words without nikud. Also fix the punctuation and split into paragraphs where the topic changes.', yi: 'Add only the customary minimal Yiddish pointing (אַ / אָ, פּ / פֿ) and nikud only on ambiguous Hebrew/Aramaic words. Also fix the punctuation and split into paragraphs.' },
+    punct: { n: 'רק פיסוק', he: 'Do NOT add any nikud. ONLY fix the punctuation: add periods, commas, question marks, exclamation marks, colons and quotation marks (around verses and quotes), and split into paragraphs where the topic changes.', yi: 'Do NOT add any nikud. ONLY fix the punctuation (periods, commas, question marks, quotation marks around quotes) and split into paragraphs where the topic changes.' }
+  };
+  const isYiText = (t) => (String(t).match(/\b(און|איז|דאס|נישט|פון|מען|האט|ווען|וואס|זיך)\b/g) || []).length > String(t).split(/\s+/).length * 0.03;
+  const strip = (t) => String(t || '').replace(/[֑-ׇ]/g, '');
+  async function nikudRun(src, mode, onP) {
+    const parts = [], out = []; { let cur = ''; for (const ln of String(src).split('\n')) { if (cur && (cur + '\n' + ln).length > 3500) { parts.push(cur); cur = ln; } else cur = cur ? cur + '\n' + ln : ln; } if (cur.trim()) parts.push(cur); }
+    for (let i = 0; i < parts.length; i++) {
+      onP && onP(`${i + 1}/${parts.length}`);
+      const yi = isYiText(parts[i]);
+      const p = `You are an expert editor of Torah texts. ${MODES[mode][yi ? 'yi' : 'he']}\nSTRICT RULES: do NOT change, add, remove or reorder any word – the letters must stay exactly the same (only vowel points and punctuation may change). Keep line breaks between paragraphs. Keep any [mm:ss] times and speaker labels as they are. Output ONLY the resulting text.\n\n${parts[i]}`;
+      let r = '';
+      if (mode === 'full' && !yi) { try { r = (await api('nakdan', { text: parts[i] }, { timeout: 90000 })).text || ''; } catch (e) { r = ''; } if (r && strip(r).replace(/\s/g, '') !== strip(parts[i]).replace(/\s/g, '')) r = r; }
+      if (!r) r = await gemText(p, 'translate');
+      // שמירה על המילים: אם המודל שינה מילים – מחזירים את המקור לחלק הזה
+      const a = strip(r).replace(/[^א-ת]/g, ''), b = strip(parts[i]).replace(/[^א-ת]/g, '');
+      if (a.length < b.length * 0.9 || a.length > b.length * 1.1) r = parts[i];
+      out.push(r.trim());
+    }
+    return out.join('\n').replace(/\n{2,}/g, '\n');
+  }
+  window.nikudRun = nikudRun;
+  function srcOptions(r) {
+    const ex = r.extras || {}, nu = ex.nusach || {}, o = [];
+    const isHeMain = r.outLang === 'he' || r.lang !== 'yi';
+    if (r.text) o.push(['text', isHeMain ? 'התמלול' : 'התמלול ביידיש', r.text]);
+    if (r.translations && r.translations.he && r.outLang !== 'he') o.push(['he', 'התרגום לעברית', r.translations.he]);
+    const md = (t) => String(t).replace(/^\s*(#{1,6}|@|>)\s*/gm, '').replace(/\*\*|__/g, '');
+    if (nu.before) o.push(['before', '📜 עריכה ראשונה', md(nu.before)]);
+    if (nu.after) o.push(['after', '🖨️ מוכן להדפסה', md(nu.after)]);
+    return o;
+  }
+  async function openNikud() {
+    const r = Detail.rec; if (!r) return;
+    const srcs = srcOptions(r); if (!srcs.length) return toast('אין עדיין טקסט לנקד');
+    let mode = LS.get('nkMode', 'light'), sk = srcs.find((x) => x[0] === LS.get('nkSrc', ''))?.[0] || srcs[srcs.length - 1][0];
+    const ok = await modal(`<h3>✍️ ניקוד ופיסוק</h3>
+      <p class="muted" style="margin-top:0">המקור לא משתנה – מקבלים עותק נוסף, מנוקד ומפוסק, שאפשר להעתיק, להוריד ל-Word ולהדפיס.</p>
+      <div style="font-weight:700;margin:.6em 0 .3em">מה לעשות?</div>
+      <div class="row" style="gap:.4em;flex-wrap:wrap" id="nkModes">${Object.entries(MODES).map(([k, m]) => `<button type="button" class="btn ${k === mode ? 'primary' : ''}" data-nkm="${k}">${k === 'full' ? '🔤' : k === 'light' ? '✨' : '✒️'} ${m.n}</button>`).join('')}</div>
+      <div class="hint" id="nkExp" style="margin-top:.4em"></div>
+      ${srcs.length > 1 ? `<div style="font-weight:700;margin:.8em 0 .3em">איזה טקסט?</div><div class="row" style="gap:.4em;flex-wrap:wrap" id="nkSrcs">${srcs.map((x) => `<button type="button" class="btn small ${x[0] === sk ? 'primary' : ''}" data-nks="${x[0]}">${x[1]}</button>`).join('')}</div>` : ''}
+      <div class="hint" style="margin-top:.8em">💡 הניקוד נעשה בבינה מלאכותית – מדויק ברובו, אבל כדאי שהעורך יעבור עליו לפני הדפסה (בעיקר שמות ומילים נדירות). ביידיש – מנקדים כמו בספרים: אַ / אָ / פּ, ואת לשון הקודש שבתוך הדברים.</div>`,
+      { okText: '✍️ להתחיל', cancelText: 'ביטול', wide: true, onOk: () => true });
+    void ok;
+  }
+  // מצב הבחירה בתוך החלון
+  const EXP = { full: 'כל מילה מנוקדת – כמו בסידור או בחומש. הכי מתאים לחוברת לילדים או לקריאה בציבור.', light: 'ניקוד רק במקום שאפשר לטעות בקריאה – כמו בספרי חסידות. הכי נקי להדפסה.', punct: 'בלי ניקוד – רק נקודות, פסיקים, מירכאות סביב פסוקים, וחלוקה לפסקאות.' };
+  document.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-nkm]'); if (m) { e.preventDefault(); LS.set('nkMode', m.dataset.nkm); m.parentElement.querySelectorAll('[data-nkm]').forEach((b) => b.classList.toggle('primary', b === m)); const x = document.getElementById('nkExp'); if (x) x.textContent = EXP[m.dataset.nkm]; return; }
+    const s = e.target.closest('[data-nks]'); if (s) { e.preventDefault(); LS.set('nkSrc', s.dataset.nks); s.parentElement.querySelectorAll('[data-nks]').forEach((b) => b.classList.toggle('primary', b === s)); }
+  }, true);
+  new MutationObserver(() => { const x = document.getElementById('nkExp'); if (x && !x.textContent) x.textContent = EXP[LS.get('nkMode', 'light')] || ''; }).observe(document.body, { childList: true, subtree: true });
+  async function doNikud(btn) {
+    const r = Detail.rec; const srcs = srcOptions(r); if (!srcs.length) return;
+    const mode = LS.get('nkMode', 'light'); const s = srcs.find((x) => x[0] === LS.get('nkSrc', '')) || srcs[srcs.length - 1];
+    const lbl = btn ? btn.innerHTML : ''; if (btn) { btn.disabled = true; }
+    try {
+      const out = await nikudRun(s[2], mode, (p) => { if (btn) btn.innerHTML = '<span class="spinner"></span> מנקד… ' + p; });
+      r.extras = Object.assign({}, r.extras); r.extras.ai = Object.assign({}, r.extras.ai, { nikud: out, nikudInfo: `${MODES[mode].n} · ${s[1].replace(/^[^א-ת]+/, '')}` });
+      if (Detail.canEdit()) { try { await saveExtras(); } catch (e) {} }
+      Detail.renderAi(); toast('✅ מוכן – ' + MODES[mode].n);
+      setTimeout(() => document.querySelector('.ai-out.nk')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 200);
+    } catch (e) { toast('❌ ' + (e.message || e), 6000); }
+    finally { if (btn) { btn.disabled = false; btn.innerHTML = lbl; } }
+  }
+  window.doNikud = doNikud;
+  // הכפתור – בשורת הכפתורים הראשית, בולט
+  function placeBtn() {
+    const old = document.getElementById('nikudBtn'); const tb = document.querySelector('#page-detail .toolbar'); if (!old || !tb) return;
+    if (old.dataset.v319) return; old.dataset.v319 = 1;
+    old.className = 'btn small primary'; old.innerHTML = '✍️ ניקוד ופיסוק'; old.title = 'הוספת ניקוד (מלא / קל) או רק פיסוק – בעותק נפרד';
+    const ex = document.getElementById('exportBtn'); (ex || tb.firstChild).after(old);
+    old.onclick = async (e) => { e.preventDefault(); const go = await openNikud(); void go; };
+  }
+  placeBtn(); setInterval(placeBtn, 1500);
+  // אחרי "להתחיל" בחלון – מריצים
+  document.addEventListener('click', (e) => { const ok = e.target.closest('.modal [data-ok]'); if (ok && ok.closest('.modal').querySelector('#nkModes')) setTimeout(() => doNikud(document.getElementById('nikudBtn')), 50); }, true);
+  // תצוגה: כותרת עם סוג הניקוד + הורדה ל-Word
+  const _ra = Detail.renderAi; Detail.renderAi = function () {
+    const r = _ra.apply(this, arguments);
+    try {
+      const ai = (this.rec.extras && this.rec.extras.ai) || {}; if (!ai.nikud) return r;
+      const box = [...document.querySelectorAll('#dAi .ai-out')].find((x) => x.querySelector('[data-aicopy="nikud"]')); if (!box) return r;
+      box.classList.add('nk'); const h = box.querySelector('.t-head');
+      if (h && !h.querySelector('[data-nkdocx]')) { if (ai.nikudInfo) h.firstChild.textContent = '✍️ ניקוד ופיסוק – ' + ai.nikudInfo; h.querySelector('[data-aicopy]').insertAdjacentHTML('beforebegin', '<button class="btn small" data-nkdocx title="הורדה ל-Word">⬇️ Word</button>'); }
+    } catch (e) {}
+    return r;
+  };
+  document.addEventListener('click', async (e) => {
+    if (!e.target.closest('[data-nkdocx]')) return; e.preventDefault();
+    const r = Detail.rec, t = (r.extras && r.extras.ai && r.extras.ai.nikud) || ''; if (!t) return;
+    try { const blob = await docToDocxBlob([{ title: r.title, meta: (r.extras.ai.nikudInfo || ''), secs: [{ h: '', lines: t.split(/\n+/) }] }], r.title); download(blob, safeName(r.title) + ' - מנוקד.docx'); toast('⬇️ הקובץ ירד'); } catch (er) { toast('❌ ' + er.message); }
   });
 })();
 </script>
