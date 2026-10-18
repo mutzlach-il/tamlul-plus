@@ -925,7 +925,7 @@ body.viewas #toTop{display:none}
     <p>מערכת התמלול שמבינה עברית, יידיש ואנגלית – ושומרת כל שיעור מסודר לפי תאריך, פרשה ודובר.</p>
     <div class="auth-feat"><span class="fi">🎙️</span>הקלטה, קובץ או סרטון – ותמלול אוטומטי</div>
     <div class="auth-feat"><span class="fi">📜</span>יידיש – גם ישר לעברית</div>
-    <div class="auth-feat"><span class="fi">📅</span>לוח עברי, פרשיות וחיפוש חכם</div>
+    <div class="auth-feat"><span class="fi">🔎</span>חיפוש בכל ההקלטות ועוזר אישי ששואלים אותו</div>
     <div class="auth-feat"><span class="fi">⬇️</span>Word · PDF · Excel · PowerPoint</div>
     <div class="auth-feat"><span class="fi">🔒</span>פרטי ומאובטח – רק מי שהמנהל מאשר</div>
   </div>
@@ -981,8 +981,8 @@ body.viewas #toTop{display:none}
     <nav class="tabs" id="tabs">
       <button data-page="home" class="active"><span class="ni">🎙️</span><span class="lb">תמלול</span></button>
       <button data-page="library"><span class="ni">📚</span><span class="lb">ספרייה</span></button>
-      <button data-page="calendar"><span class="ni">📅</span><span class="lb">לוח עברי</span></button>
-      <button data-page="parshiyot"><span class="ni">📖</span><span class="lb">פרשיות</span></button>
+      <button data-page="search"><span class="ni">🔎</span><span class="lb">חיפוש</span></button>
+      
       <button data-page="stats"><span class="ni">📊</span><span class="lb">סטטיסטיקה</span></button>
       <button data-page="help"><span class="ni">📘</span><span class="lb">הוראות</span></button>
       <button data-page="settings" class="admin-only"><span class="ni">⚙️</span><span class="lb">ניהול</span></button>
@@ -1024,8 +1024,8 @@ body.viewas #toTop{display:none}
         <div class="lang-pills" id="langPills">
           <button data-lang="he">🇮🇱 עברית</button><button data-lang="yi">📜 יידיש</button><button data-lang="en">🇺🇸 אנגלית</button><button data-lang="yi" data-iv="1">🗣️ ראיון / שיחה (יידיש)</button><button data-lang="auto">✨ זיהוי אוטומטי</button>
         </div>
-        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ לכתוב את התמלול ב:</span>
-          <button data-yiout="yi">📜 יידיש ← יידיש</button><button data-yiout="he">🇮🇱 יידיש ← עברית</button><button data-yiout="en">🇺🇸 יידיש ← אנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח 'סיכום ההקלטה' (בסגנון הדוגמאות שלכם). התמלול ביידיש נעשה מאחורי הקלעים.">📜 סיכום ההקלטה – בלשון הקודש</button><button data-yiout="after" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח הסופי 'מוכן להדפסה', מוכן עם הלוגו כמו החוברת. הכול נעשה מאחורי הקלעים.">🖨️ מוכן להדפסה – בלשון הקודש</button>
+        <div class="lang-pills hidden" id="yiOutPills" style="margin-inline-start:.4em"><span style="font-weight:700;align-self:center">✍️ מה לקבל בסוף?</span>
+          <button data-yiout="yi">📜 טקסט ביידיש</button><button data-yiout="he">🇮🇱 תרגום לעברית</button><button data-yiout="en">🇺🇸 תרגום לאנגלית</button><button data-yiout="both">📜+🇮🇱 יידיש + עברית</button><button data-yiout="before" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח 'עריכה ראשונה' (בסגנון הדוגמאות שלכם). התמלול ביידיש נעשה מאחורי הקלעים.">📜 עריכה ראשונה</button><button data-yiout="after" title="ההקלטה ביידיש – והמערכת כותבת אותה בלשון הקודש, בנוסח הסופי 'מוכן להדפסה', מוכן עם הלוגו כמו החוברת. הכול נעשה מאחורי הקלעים.">🖨️ מוכן להדפסה</button>
         </div>
         <div class="lang-pills hidden" id="ivPills"><span style="font-weight:700;align-self:center">👥 איך לסמן את הדוברים:</span><button data-ivstyle="ab">א׳ / ב׳ / ג׳</button><button data-ivstyle="qa">שאלה / תשובה</button><span class="hint" id="ivVoices" style="align-self:center"></span></div>
         <label class="row" style="margin:0;font-weight:500;gap:.3em"><input type="checkbox" id="speakersChk" style="width:auto"> 👥 להפריד בין דוברים</label>
@@ -1034,7 +1034,7 @@ body.viewas #toTop{display:none}
         </select>
       </div>
       <div class="row" style="margin-bottom:14px">
-        <span style="font-weight:700">📁 לאיזו תיקייה לשמור? <span style="color:#d33">*חובה</span></span>
+        <span style="font-weight:700">📁 לשמור בתיקייה? <span class="muted" style="font-weight:400">(לא חובה)</span></span>
         <select id="upFolder" style="width:auto;min-width:180px"></select> <span class="muted">או</span> <input type="text" id="upNewFolder" placeholder="✏️ שם לתיקייה חדשה (למשל: אברהמי יונג)" style="width:auto;min-width:240px"> <button type="button" class="btn small primary" id="upNewFolderBtn">➕ יצירת תיקייה</button>
       </div>
       <div class="home-grid">
@@ -1505,7 +1505,7 @@ body.viewas #toTop{display:none}
       <div class="card admin-only">
         <p>רק מנהל רואה את החלק הזה ואת לשונית "⚙️ ניהול". כל הרשאה נבדקת גם בשרת – משתמש רגיל לא יכול לעקוף.</p>
         <details open><summary>⚙️ מה כל חסידות רואה – ומי משלם על הדקות</summary><ul>
-          <li>🏛️ חסידויות ← <b>⚙️ מה פתוח</b>: מסמנים מה החסידות תקבל – תמלול עברית / יידיש / אנגלית, תרגום, "סיכום ההקלטה", "מוכן להדפסה". מה שלא מסומן – <b>לא מופיע</b> אצל המנהל והמשתמשים שלה, כאילו לא קיים. רק אתה יכול לשנות את זה.</li>
+          <li>🏛️ חסידויות ← <b>⚙️ מה פתוח</b>: מסמנים מה החסידות תקבל – תמלול עברית / יידיש / אנגלית, תרגום, "עריכה ראשונה", "מוכן להדפסה". מה שלא מסומן – <b>לא מופיע</b> אצל המנהל והמשתמשים שלה, כאילו לא קיים. רק אתה יכול לשנות את זה.</li>
           <li>כשמעלים "🎓 חומרי לימוד" – מה שהועלה נפתח לבד (למשל: העלית עברית "מוכן להדפסה" – נפתח "מוכן להדפסה").</li>
           <li>חסידות חדשה מתחילה רק עם תמלול עברית, עד שתפתח לה עוד.</li>
           <li><b>🔑 חיבור החשבון</b>: המנהל של כל חסידות (חוץ מביאלה) מחבר פעם אחת מפתח מהג'ימייל שלו – יש לו הוראות צעד אחר צעד במערכת. מאותו רגע כל התמלול שלהם רץ על <b>החשבון שלו</b>, והדקות החינמיות שלך נשמרות לביאלה.</li>
@@ -1522,7 +1522,7 @@ body.viewas #toTop{display:none}
           <li>⚙️ ניהול ← <b>🏷️ פרטי החסידות</b> ← <b>🎓 העלאת חומרי לימוד</b> (או: 📚 דוגמאות ← 🎓 העלאה מסודרת).</li>
           <li>שלושה כפתורים: <b>🎙️ הקלטות</b> · <b>🇮🇱 עברית</b> (וורד) · <b>📜 יידיש מילה במילה</b> (וורד). בוחרים בכל אחד את כל הקבצים ביחד.</li>
           <li><b>בכל שם קובץ צריך מספר</b> – למשל "1 נח.mp3", "1 נח עברית.docx", "1 נח יידיש.docx". המערכת מחברת לבד: הקלטה 1 ↔ עברית 1 ↔ יידיש 1, ומראה טבלה מה חסר.</li>
-          <li>בוחרים אם העברית היא "מוכן להדפסה" או "סיכום ההקלטה", ולוחצים <b>💾 שמירה ולימוד</b>.</li>
+          <li>בוחרים אם העברית היא "מוכן להדפסה" או "עריכה ראשונה", ולוחצים <b>💾 שמירה ולימוד</b>.</li>
           <li>מה קורה: העברית + היידיש נשמרים כדוגמאות (היידיש כמקור והעברית כנוסח), היידיש נשמר גם ללימוד הכתיב, וההקלטות נשמרות בתיקייה "🎓 הקלטות לימוד" יחד עם התמלול והנוסח שלהן – בלי לתמלל מחדש. בסוף המערכת לומדת את הסגנון והמילון של החסידות.</li>
         </ol></details>
         <details open><summary>💰 הדקות החינמיות – על החשבון של כל חסידות</summary><ul>
@@ -1547,16 +1547,16 @@ body.viewas #toTop{display:none}
           <li>טוענים דוגמאות (ראו למטה) ולוחצים <b>🧠 ללמוד את הסגנון מכל הדוגמאות</b>.</li>
         </ol></details>
         <details><summary>🧠 איך המערכת לומדת את הסגנון של כל חסידות</summary><ul>
-          <li>📖 דוגמאות ← <b>📂 טעינת קבצי וורד</b>: קבצים של "סיכום ההקלטה", של "מוכן להדפסה", ו<b>🗣️ יידיש מילה במילה</b> (הקלטות שתומללו אצלכם מילה במילה – כ-10 הקלטות מספיקות להתחלה).</li>
+          <li>📖 דוגמאות ← <b>📂 טעינת קבצי וורד</b>: קבצים של "עריכה ראשונה", של "מוכן להדפסה", ו<b>🗣️ יידיש מילה במילה</b> (הקלטות שתומללו אצלכם מילה במילה – כ-10 הקלטות מספיקות להתחלה).</li>
           <li><b>🧠 ללמוד את הסגנון</b>: המערכת קוראת את כל הדוגמאות וכותבת לעצמה מדריך כתיבה ומילון – רק של החסידות הזאת. בחסידות חדשה זה קורה גם לבד, כמה שניות אחרי שטוענים קבצים.</li>
           <li><b>📒 מדריכי כתיבה</b>: לכל נוסח יש מדריך (מבנה, כותרות, לשון) – אפשר לערוך אותו בחלון הדוגמאות.</li>
           <li><b>תיקונים נלמדים</b>: כל תיקון של כל משתמש נשמר. תיקון שחוזר 3 פעמים, או שאישרת ✅ – מתוקן לבד בפעם הבאה. בחלון "תיקונים" רואים מי תיקן, איפה, ואפשר לאשר או למחוק. 📒 יומן – כל התיקונים לפי הסדר.</li>
           <li>כשמישהו מתקן נוסח או כתיב יידיש בהקלטה – זה נשמר כדוגמה חדשה, והמערכת משתפרת.</li>
         </ul></details>
         <details><summary>📜 הנוסחים, הורדה והדפסה</summary><ul>
-          <li><b>"סיכום ההקלטה"</b> – הנוסח בלשון הקודש לפני העריכה. <b>"מוכן להדפסה"</b> – הנוסח הסופי לחוברת. שניהם תמיד בעברית, ותמיד אפשר לערוך.</li>
+          <li><b>"עריכה ראשונה"</b> – הנוסח בלשון הקודש לפני העריכה. <b>"מוכן להדפסה"</b> – הנוסח הסופי לחוברת. שניהם תמיד בעברית, ותמיד אפשר לערוך.</li>
           <li>לכל נוסח: <b>📄 PDF</b> (נשמר כקובץ), <b>Word</b>, ו<b>🖨️ הדפסה</b> ישירה.</li>
-          <li>בהעלאת הקלטה ביידיש בוחרים מה לכתוב: יידיש, עברית, "סיכום ההקלטה" או "מוכן להדפסה".</li>
+          <li>בהעלאת הקלטה ביידיש בוחרים מה לכתוב: יידיש, עברית, "עריכה ראשונה" או "מוכן להדפסה".</li>
           <li><b>🇮🇱 עברית</b>: התרגום נבדק שאין בו מילים ביידיש. תרגום ישן שיצא ביידיש – נמחק כשפותחים את ההקלטה, ולחיצה על "עברית" מתרגמת מחדש.</li>
         </ul></details>
         <details><summary>👁️ צפייה כמשתמש ומעקב</summary><ul>
@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.14.0';
+const APP_VERSION = '3.18.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2566,7 +2566,9 @@ const Queue = {
             prog('מתרגם לעברית…');
             try {
               const src = res.segments && res.segments.length ? res.segments.map((x) => x.text).join('\n') : res.text;
-              const he = await geminiTranslateText(src, 'he').catch(() => translateText(src, 'he'));
+              let he = '';
+              try { const hs = res.segments && res.segments.length ? await translateSegsToHe(res.segments, prog) : null; if (hs && hs.length) { rec.extras = Object.assign({}, rec.extras, { heSegs: hs }); he = hs.map((x) => x.text).join('\n'); } } catch (e) { console.warn('aligned he failed', e); }
+              if (!he) he = await geminiTranslateText(src, 'he').catch(() => translateText(src, 'he'));
               rec.translations = Object.assign({}, rec.translations, { he });
             } catch (e) { console.warn('auto translate failed', e); }
           }
@@ -2588,7 +2590,7 @@ const Queue = {
             } catch (e) { console.warn('auto translate failed', e); }
           }
           if (res.text && rec.extras && rec.extras.wantNusach && !(rec.extras.nusach && rec.extras.nusach.before) && perm('translate')) {
-            prog('📜 כותב את הנוסח "סיכום ההקלטה"…');
+            prog('📜 כותב את הנוסח "עריכה ראשונה"…');
             rec.status = 'done'; rec.segments = res.segments; rec.text = res.text;
             try { await makeNusach(rec, 'before', { silent: true }); } catch (e) { console.warn('nusach failed', e); }
           }
@@ -2613,7 +2615,7 @@ const Queue = {
         if (rec._upP) { this.progress[id] = '☁️ מסיים לשמור את ההקלטה בענן…'; renderQueue(); try { await rec._upP; } catch (e) {} delete rec._upP; }
         delete this.progress[id];
         try {
-          await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited']);
+          await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited', 'extras']);
         } catch (e) { rec.status = 'error'; rec.error = 'שמירה בענן נכשלה: ' + e.message; }
         if (rec.status === 'done' && rec.filePath) Cache.del(id);
         notifyDone(rec);
@@ -2897,7 +2899,7 @@ function folderOptions(sel, emptyLabel = 'ללא תיקייה') {
   return `<option value="">${emptyLabel}</option>` + folderTree().map((f) => `<option value="${f.id}" ${f.id === sel ? 'selected' : ''}>${'\u00a0\u00a0'.repeat(folderDepth(f))}${folderIcon(f)} ${esc(f.name)}${f.owner !== ME.id ? ' (' + esc(personName(f.owner) || 'משותף') + ')' : ''}</option>`).join('');
 }
 function fillUpFolder() {
-  const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בחר תיקייה (חובה) —');
+  const cur = $('#upFolder').value; $('#upFolder').innerHTML = folderOptions(cur, '— בלי תיקייה —');
   const np = $('#newFolderParent'); if (np) np.innerHTML = folderOptions(np.value, '— ראשית —').replace('— ראשית —', '📂 תיקייה ראשית');
 }
 function highlight(text, q) {
@@ -6252,11 +6254,11 @@ setInterval(resumeQuotaWaits, 10 * 60 * 1000);
 { const _ea3 = enterApp; enterApp = async function () { const r = await _ea3.apply(this, arguments); setTimeout(resumeQuotaWaits, 8000); return r; }; }
 
 /* =========================================================
-   3.7 – נוסחים: "מילה במילה" / "סיכום ההקלטה" (נוסח כתיבה) / "מוכן להדפסה" (לדפוס)
+   3.7 – נוסחים: "מילה במילה" / "עריכה ראשונה" (נוסח כתיבה) / "מוכן להדפסה" (לדפוס)
    המערכת לומדת את הסגנון מדוגמאות שנשמרות בטבלה style_examples
    ========================================================= */
 const NUSACH_KINDS = {
-  before: { icon: '📜', name: 'סיכום ההקלטה', short: 'סיכום ההקלטה' },
+  before: { icon: '📜', name: 'עריכה ראשונה', short: 'עריכה ראשונה' },
   after: { icon: '🖨️', name: 'מוכן להדפסה', short: 'מוכן להדפסה' }
 };
 let STYLE_EX = null;
@@ -6417,7 +6419,7 @@ function renderNusach() {
   const n = (r.extras && r.extras.nusach) || {};
   const canMake = perm('translate') && !VIEW_AS;
   const isYi = r.lang === 'yi' && r.outLang !== 'he';
-  const tabs = [['verbatim', isYi ? '📝 התמלול המקורי (יידיש)' : '📝 התמלול המקורי']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 סיכום ההקלטה'], ['after', '🖨️ מוכן להדפסה']]);
+  const tabs = [['verbatim', isYi ? '📝 התמלול המקורי (יידיש)' : '📝 התמלול המקורי']].concat(isYi ? [['he', '🇮🇱 מילה במילה בעברית']] : []).concat([['before', '📜 עריכה ראשונה'], ['after', '🖨️ מוכן להדפסה']]);
   if (!tabs.some((x) => x[0] === NUSACH_TAB)) NUSACH_TAB = 'verbatim';
   const tr = r.translations || {};
   const tabHtml = tabs.map(([k, l]) => `<button class="ntab ${NUSACH_TAB === k ? 'active' : ''}" data-ntab="${k}">${l}${(k === 'he' ? tr.he : k !== 'verbatim' && n[k]) ? ' ✓' : ''}</button>`).join('');
@@ -6434,7 +6436,7 @@ function renderNusach() {
     const exN = (STYLE_EX || []).filter((x) => x.kind === k).length;
     if (busy) body = `<p><span class="spinner"></span> ${esc(busy)}</p>`;
     else if (txt) {
-      body = `<div class="nbar"><span class="muted">${n[k + 'At'] ? 'נכתב ' + fmtDate(n[k + 'At']) : ''}${k === 'after' && n.afterOld ? ' · ⚠️ נכתב לפני שהנוסח "סיכום ההקלטה" עודכן' : ''}</span><span class="grow"></span>
+      body = `<div class="nbar"><span class="muted">${n[k + 'At'] ? 'נכתב ' + fmtDate(n[k + 'At']) : ''}${k === 'after' && n.afterOld ? ' · ⚠️ נכתב לפני שהנוסח "עריכה ראשונה" עודכן' : ''}</span><span class="grow"></span>
         <button class="btn small" data-ncopy="${k}">📋 העתקה</button><button class="btn small" data-nword="${k}">📘 וורד</button><button class="btn small" data-nprint="${k}">🖨️ הדפסה / PDF</button>
         ${canMake ? `<button class="btn small can-edit" data-nedit="${k}">✏️ עריכה</button><button class="btn small can-edit" data-nmake="${k}">🔄 לכתוב מחדש</button>` : ''}
         ${canMake && ME.role !== 'viewer' ? `<button class="btn small can-edit" data-nasex="${k}" title="הנוסח הזה טוב? שמור אותו כדוגמה כדי שהמערכת תלמד ממנו">⭐ לשמור כדוגמה</button>` : ''}</div>
@@ -6442,7 +6444,7 @@ function renderNusach() {
     } else {
       const why = '';
       body = `<div class="nempty"><div style="font-size:2em">${NUSACH_KINDS[k].icon}</div><b>${NUSACH_KINDS[k].name}</b>
-        <div class="muted">${k === 'before' ? 'המערכת תכתוב את הנוסח "סיכום ההקלטה" בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח "מוכן להדפסה" – עם הלוגו והעימוד של החוברת, לפי הדוגמאות שלכם.'}</div>
+        <div class="muted">${k === 'before' ? 'המערכת תכתוב את הנוסח "עריכה ראשונה" בלשון הקודש – בדיוק בסגנון של הדוגמאות שלכם.' : 'המערכת תכתוב את הנוסח "מוכן להדפסה" – עם הלוגו והעימוד של החוברת, לפי הדוגמאות שלכם.'}</div>
         <div class="muted" style="font-size:.9em">📚 דוגמאות שהמערכת לומדת מהן: <b>${exN}</b>${!exN ? ' – עוד אין דוגמאות מהסוג הזה (אפשר להוסיף בהגדרות ← 📚 דוגמאות נוסח)' : ''}</div>
         ${why ? `<div class="muted">${why}</div>` : ''}
         ${canMake ? `<button class="btn primary" data-nmake="${k}" ${!src.text ? 'disabled' : ''}>${NUSACH_KINDS[k].icon} לכתוב עכשיו</button>` : '<div class="muted">אין לך הרשאה ליצור נוסח</div>'}</div>`;
@@ -6474,7 +6476,7 @@ function fillBookPreview(rec) {
 }
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'bkPrevCover' && Detail.rec) { LS.set('bookCover', e.target.checked); const fr = $('#bkPrev'); if (fr) fr.dataset.h = ''; fillBookPreview(Detail.rec); } });
 window.addEventListener('resize', () => { const fr = $('#bkPrev'); if (fr && fr.onload) try { fr.onload(); } catch (e) {} });
-/* בבחירה "סיכום ההקלטה" / "מוכן להדפסה" – לא מציגים את התמלול ביידיש (אפשר לפתוח אותו בלחיצה) */
+/* בבחירה "עריכה ראשונה" / "מוכן להדפסה" – לא מציגים את התמלול ביידיש (אפשר לפתוח אותו בלחיצה) */
 function syncVerbatimHide(rec) {
   const m = rec && rec.extras && rec.extras.outMode;
   const hide = (m === 'before' || m === 'after') && rec.status === 'done' && !LS.get('showVerb_' + rec.id, false);
@@ -6535,10 +6537,10 @@ document.addEventListener('click', async (e) => {
 
 /* ---------- בהעלאה: "גם נוסח כתיבה" ---------- */
 function syncNusachPill() {
-  return;   // 3.9: "סיכום ההקלטה" / "מוכן להדפסה" הם עכשיו חלק מהבחירה "לכתוב את התמלול ב:"
+  return;   // 3.9: "עריכה ראשונה" / "מוכן להדפסה" הם עכשיו חלק מהבחירה "לכתוב את התמלול ב:"
   const host = $('#yiOutPills'); if (!host) return;
   if (!$('#nusBefore')) {
-    host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'סיכום ההקלטה' בלשון הקודש, בסגנון שלימדנו אותה">📜 סיכום ההקלטה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'מוכן להדפסה' עם הלוגו">🖨️ מוכן להדפסה</button>`);
+    host.insertAdjacentHTML('beforeend', `<span class="nus-sep" style="align-self:center;font-weight:700;margin-inline-start:.5em">➕ ועוד:</span><button type="button" id="nusBefore" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח 'עריכה ראשונה' בלשון הקודש, בסגנון שלימדנו אותה">📜 עריכה ראשונה</button><button type="button" id="nusAfter" class="nus-pill" title="אחרי התמלול – המערכת תכתוב גם את הנוסח הסופי 'מוכן להדפסה' עם הלוגו">🖨️ מוכן להדפסה</button>`);
   }
   $('#nusBefore').classList.toggle('active', !!LS.get('autoNusach', false));
   $('#nusAfter').classList.toggle('active', !!LS.get('autoNusachAfter', false));
@@ -6548,7 +6550,7 @@ document.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
   const key = b.id === 'nusBefore' ? 'autoNusach' : 'autoNusachAfter';
   LS.set(key, !LS.get(key, false)); syncNusachPill();
-  const on = [LS.get('autoNusach', false) && '"סיכום ההקלטה"', LS.get('autoNusachAfter', false) && '"מוכן להדפסה"'].filter(Boolean);
+  const on = [LS.get('autoNusach', false) && '"עריכה ראשונה"', LS.get('autoNusachAfter', false) && '"מוכן להדפסה"'].filter(Boolean);
   toast(on.length ? '✍️ אחרי התמלול ייכתב גם: ' + on.join(' + ') : 'רק תמלול – בלי נוסחים');
 }, true);
 { const _sl = syncLangPills; syncLangPills = function () { const x = _sl.apply(this, arguments); try { syncNusachPill(); } catch (e) {} return x; }; }
@@ -6568,11 +6570,11 @@ async function openStyleExamples() {
   const row = (x) => `<div class="act-row"><span class="badge">${NUSACH_KINDS[x.kind] ? NUSACH_KINDS[x.kind].icon + ' ' + NUSACH_KINDS[x.kind].short : x.kind}</span><b class="grow">${esc(x.title)}</b><span class="muted" style="font-size:.85em">${x.source_text ? 'מקור + נוסח' : 'נוסח בלבד'} · ${Math.round(x.target_text.length / 1000)}K תווים</span><button class="btn small" data-sexview="${x.id}">👁️</button><button class="btn small danger" data-sexdel="${x.id}">🗑️</button></div>`;
   modal(`<h3>📚 דוגמאות נוסח – מהן המערכת לומדת את הסגנון</h3>
     <p class="muted">כשכותבים נוסח, המערכת מקבלת כמה דוגמאות מכאן (קודם מאותה פרשה, אם יש) וכותבת בדיוק באותו סגנון. כמה שיותר דוגמאות טובות – יותר מדויק.</p>
-    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "סיכום ההקלטה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "מוכן להדפסה"</button><button class="btn primary" data-sexfiles="yi">🗣️ יידיש מילה במילה (ללימוד היידיש)</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
+    <div class="row" style="gap:.5em;margin:.4em 0 .8em;flex-wrap:wrap"><b>📂 טעינת קבצי וורד:</b><button class="btn primary" data-sexfiles="before">📜 קבצים של "עריכה ראשונה"</button><button class="btn primary" data-sexfiles="after">🖨️ קבצים של "מוכן להדפסה"</button><button class="btn primary" data-sexfiles="yi">🗣️ יידיש מילה במילה (ללימוד היידיש)</button><span class="muted" style="font-size:.88em">אפשר לבחור הרבה קבצים ביחד (Ctrl+A). שם הקובץ = שם הדוגמה.</span></div>
     ${list.length ? list.map(row).join('') : '<div class="empty"><b>אין עדיין דוגמאות</b></div>'}
     <details style="margin-top:1em"><summary style="font-weight:700;cursor:pointer">➕ הוספת דוגמה חדשה</summary>
       <div class="col" style="gap:.5em;margin-top:.5em">
-        <label>סוג <select id="sexKind"><option value="before">📜 סיכום ההקלטה</option><option value="after">🖨️ מוכן להדפסה</option></select></label>
+        <label>סוג <select id="sexKind"><option value="before">📜 עריכה ראשונה</option><option value="after">🖨️ מוכן להדפסה</option></select></label>
         <label>שם (למשל: פרשת נח תשפ"ו) <input id="sexTitle"></label>
         <label>הנוסח הכתוב (להדביק כאן מהוורד) <textarea id="sexText" rows="8" dir="rtl"></textarea></label>
         <label>(לא חובה) מקור – מה שנאמר / הגרסה הקודמת <textarea id="sexSrc" rows="4" dir="rtl"></textarea></label>
@@ -7257,8 +7259,8 @@ function syncTrPills() {
   if (!other) { grp.innerHTML = ''; return; }
   host.classList.remove('hidden');
   const L = OUT_LN[lang], F = OUT_FL[lang];
-  const opts = [['same', `${F} ${L} ← ${L}`]].concat(['he', 'yi', 'en'].filter((x) => x !== lang).map((x) => [x, `${OUT_FL[x]} ${L} ← ${OUT_LN[x]}`]))
-    .concat([['before', '📜 סיכום ההקלטה – בלשון הקודש'], ['after', '🖨️ מוכן להדפסה – בלשון הקודש']]);
+  const opts = [['same', `${F} טקסט ב${L}`]].concat(['he', 'yi', 'en'].filter((x) => x !== lang).map((x) => [x, `${OUT_FL[x]} תרגום ל${OUT_LN[x]}`]))
+    .concat([['before', '📜 עריכה ראשונה'], ['after', '🖨️ מוכן להדפסה']]);
   const cur = outModeFor(lang);
   grp.innerHTML = opts.map(([k, l]) => `<button type="button" data-outm="${k}" class="${cur === k ? 'active' : ''}">${l}</button>`).join('');
 }
@@ -7308,7 +7310,7 @@ async function askFolder() {
 { const _qa10 = Queue.add; Queue.add = async function (blob, name, lang, title, meta = {}) {
   if (typeof VIEW_AS !== 'undefined' && VIEW_AS) return _qa10.apply(this, arguments);
   const has = meta.folderId !== undefined && meta.folderId !== null && meta.folderId !== '' ? true : (meta.folderId === undefined && !!($('#upFolder') && $('#upFolder').value));
-  if (!has) {
+  if (!has && LS.get('needFolder', false)) {
     const f = await askFolder();
     if (!f) { toast('❌ ההקלטה לא נשמרה – לא נבחרה תיקייה', 6000); return null; }
     meta = Object.assign({}, meta, { folderId: f });
@@ -8096,8 +8098,8 @@ document.addEventListener('click', async (e) => {
     const h = document.querySelector('.modal-bg h3');
     if (h && !$('#guideBox')) h.insertAdjacentHTML('afterend', `<div id="guideBox" style="background:#fff7ed;border:2px solid #fb923c;border-radius:12px;padding:.6em .8em;margin:.5em 0">
       <b>📘 מדריכי הכתיבה – לפיהם המערכת כותבת</b>
-      <div class="muted" style="font-size:.88em;margin:.2em 0 .4em">נכתבו מתוך כל הדוגמאות: איך כותבים "סיכום ההקלטה", ואיך "מוכן להדפסה" – כותרות, מה מוסיפים ומה לא. אפשר לשנות.</div>
-      <div class="row" style="gap:.4em;flex-wrap:wrap"><button class="btn small" data-guide="before">📜 מדריך "סיכום ההקלטה"</button><button class="btn small" data-guide="after">🖨️ מדריך "מוכן להדפסה"</button>
+      <div class="muted" style="font-size:.88em;margin:.2em 0 .4em">נכתבו מתוך כל הדוגמאות: איך כותבים "עריכה ראשונה", ואיך "מוכן להדפסה" – כותרות, מה מוסיפים ומה לא. אפשר לשנות.</div>
+      <div class="row" style="gap:.4em;flex-wrap:wrap"><button class="btn small" data-guide="before">📜 מדריך "עריכה ראשונה"</button><button class="btn small" data-guide="after">🖨️ מדריך "מוכן להדפסה"</button>
       <span class="badge">📜 ${cnt('before')} דוגמאות לפני</span><span class="badge">🖨️ ${cnt('after')} דוגמאות אחרי</span><span class="badge">🗣️ ${cnt('yi')} דוגמאות כתיב יידיש</span></div></div>`);
     if (!isEd) $$('[data-guide]').forEach((b) => (b.title = 'צפייה בלבד'));
   } catch (e) { console.warn(e); }
@@ -8144,10 +8146,10 @@ async function autoLinkExamples() {
 
 
 /* =========================================================
-   3.9.9 – שמות חדשים: "סיכום ההקלטה" / "מוכן להדפסה" ·
+   3.9.9 – שמות חדשים: "עריכה ראשונה" / "מוכן להדפסה" ·
    PDF אמיתי שיורד תמיד (בלי חלון הדפסה) · הדפסה ישירה בלי חלון קופץ
    ========================================================= */
-try { NUSACH_KINDS.before.name = NUSACH_KINDS.before.short = 'סיכום ההקלטה'; NUSACH_KINDS.after.name = NUSACH_KINDS.after.short = 'מוכן להדפסה'; } catch (e) {}
+try { NUSACH_KINDS.before.name = NUSACH_KINDS.before.short = 'עריכה ראשונה'; NUSACH_KINDS.after.name = NUSACH_KINDS.after.short = 'מוכן להדפסה'; } catch (e) {}
 
 /* ---------- כפתורים: וורד · PDF · הדפסה ---------- */
 { const _rn9 = renderNusach; renderNusach = function () {
@@ -8808,7 +8810,7 @@ async function editOrgKeys(id) {
 
 /* ---------- לומדים את הסגנון של החסידות – מכל הדוגמאות שלה בלבד ----------
    המערכת קוראת את כל הדוגמאות שהועלו לחסידות, מודדת אורך ויחס, ומוציאה:
-   (1) מדריך כתיבה מותאם לחסידות הזאת ("סיכום ההקלטה" / "מוכן להדפסה")
+   (1) מדריך כתיבה מותאם לחסידות הזאת ("עריכה ראשונה" / "מוכן להדפסה")
    (2) מילון שמות, ספרים ומקומות שחוזרים – נוסף לפרטי החסידות */
 const wc = (t) => String(t || '').split(/\s+/).filter(Boolean).length;
 async function learnOrgStyle(kind, silent) {
@@ -8824,10 +8826,10 @@ async function learnOrgStyle(kind, silent) {
   const before = kind === 'after' ? (STYLE_EX || []).filter((x) => x.kind === 'before') : [];
   const stats = `מספר הדוגמאות: ${all.length}. אורך כל דוגמה במילים (מהקצרה לארוכה): ${words.join(', ')}.` +
     (pairs.length ? ` יחס בין הנוסח הכתוב למה שנאמר בהקלטה (בדוגמאות שיש להן הקלטה): ${pairs.join(', ')}.` : '') +
-    (before.length ? ` אורך ממוצע של "סיכום ההקלטה" באותה חסידות: ${Math.round(before.reduce((a, x) => a + wc(x.target_text), 0) / before.length)} מילים.` : '');
+    (before.length ? ` אורך ממוצע של "עריכה ראשונה" באותה חסידות: ${Math.round(before.reduce((a, x) => a + wc(x.target_text), 0) / before.length)} מילים.` : '');
   const exText = picked.map((x, i) => `### דוגמה ${i + 1} – ${x.title}\n${x.source_text ? `[מה שנאמר בהקלטה – קטע]\n${x.source_text.slice(0, 8000)}\n\n[מה שנכתב]\n` : ''}${x.target_text}`).join('\n\n');
   const what = kind === 'before'
-    ? '"סיכום ההקלטה" – הנוסח הראשון של השיחה: מה שנאמר, כתוב כמאמר רצוף בלשון ספרי החסידות'
+    ? '"עריכה ראשונה" – הנוסח הראשון של השיחה: מה שנאמר, כתוב כמאמר רצוף בלשון ספרי החסידות'
     : '"מוכן להדפסה" – הנוסח הסופי לחוברת המודפסת, עם הכותרות והמבנה של החוברת';
   const prompt = `You are a senior editor. Study ALL the examples below – they are the written Torah talks of ${(ORG && ORG.rebbe_en) || 'the Rebbe'} (${(ORG && (ORG.full_name || ORG.name)) || ''}), kind: ${what}.
 Write, IN HEBREW, a precise house-style guide that another editor (or a computer) can follow to write new talks EXACTLY like these – the same structure, length, language, expressions and typography. Learn it ONLY from these examples – this chasidus has its own style; do not assume anything from other chassidusim.
@@ -9014,7 +9016,7 @@ function openTrain() {
       <button class="btn primary" type="button" data-trpick="yi">📜 3. יידיש מילה במילה (וורד) <span data-trcount="yi"></span></button>
     </div>
     <label style="display:block;margin:.4em 0">🎙️ ההקלטות הן ב: <select id="trRecLang"><option value="yi">יידיש</option><option value="he">עברית</option></select></label>
-    <label style="display:block;margin:.4em 0">הקבצים בעברית הם: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 סיכום ההקלטה (לפני עריכה)</option></select></label>
+    <label style="display:block;margin:.4em 0">הקבצים בעברית הם: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 עריכה ראשונה (לפני עריכה)</option></select></label>
     <div class="hint">דוגמה לשמות: <b dir="ltr">1 נח.mp3</b> · <b dir="ltr">1 נח עברית.docx</b> · <b dir="ltr">1 נח יידיש.docx</b>. לא חייב שיהיה כל השלושה – אפשר להעלות רק עברית, רק יידיש, או רק הקלטות.</div>
     <div id="trTable" style="margin-top:.8em;max-height:40vh;overflow:auto"></div>
     <button class="btn primary" id="trGo" type="button" style="margin-top:.8em;width:100%" disabled>💾 שמירה ולימוד</button>
@@ -9041,7 +9043,7 @@ if (typeof renderMyOrg === 'function') { const _rmo3 = renderMyOrg; renderMyOrg 
 if (typeof renderMyOrg === 'function') { const _rmo4 = renderMyOrg; renderMyOrg = async function () {
   const r = await _rmo4.apply(this, arguments);
   const box = $('#myOrgBox');
-  if (box && isSuper() && !box.querySelector('[data-goorgs]')) box.insertAdjacentHTML('afterbegin', '<div style="background:var(--primary-soft);border-radius:12px;padding:.8em 1em;margin-bottom:1em"><b>👑 אתה מנהל-העל</b><div class="hint">כאן מוסיפים חסידויות נוספות – כל אחת מערכת נפרדת עם מנהל משלה ומפתח משלה.</div><button class="btn primary" data-goorgs type="button" style="margin-top:.5em">🏛️ כל החסידויות · ➕ חסידות חדשה</button></div>');
+  if (box && isSuper() && !box.querySelector('[data-goorgs]')) box.insertAdjacentHTML('afterbegin', '<div style="background:var(--primary-soft);border-radius:12px;padding:.8em 1em;margin-bottom:1em"><b>🛡️ אתה מנהל-העל</b><div class="hint">כאן מוסיפים חסידויות נוספות – כל אחת מערכת נפרדת עם מנהל משלה ומפתח משלה.</div><button class="btn primary" data-goorgs type="button" style="margin-top:.5em">🏛️ כל החסידויות · ➕ חסידות חדשה</button></div>');
   return r;
 }; }
 document.addEventListener('click', (e) => { if (!e.target.closest('[data-goorgs]')) return; e.preventDefault(); const b = document.querySelector('#setNav [data-sec="orgs"]'); if (b) b.click(); });
@@ -9096,7 +9098,7 @@ function applyFeat() {
 }; }
 
 // ---------- מנהל-העל: מה פתוח לכל חסידות ----------
-const FEAT_LABELS = [['he', '🇮🇱 תמלול עברית'], ['yi', '📜 תמלול יידיש'], ['en', '🇺🇸 תמלול אנגלית'], ['translate', '🔁 תרגום בין השפות'], ['before', '📜 "סיכום ההקלטה" – נוסח בלשון הקודש'], ['after', '🖨️ "מוכן להדפסה" – חוברת עם שער']];
+const FEAT_LABELS = [['he', '🇮🇱 תמלול עברית'], ['yi', '📜 תמלול יידיש'], ['en', '🇺🇸 תמלול אנגלית'], ['translate', '🔁 תרגום בין השפות'], ['before', '📜 "עריכה ראשונה" – נוסח בלשון הקודש'], ['after', '🖨️ "מוכן להדפסה" – חוברת עם שער']];
 async function editOrgFeat(id) {
   const { data } = await sb.from('orgs').select('name,features').eq('id', id).maybeSingle();
   const f = (data && data.features) || {}; const langs = f.langs || [];
@@ -9333,7 +9335,7 @@ openTrain = function () {
     </div>
     <div class="row" style="gap:1.2em;flex-wrap:wrap;margin:.7em 0 .2em">
       <label>🎙️ ההקלטות הן ב: <select id="trRecLang"><option value="yi">יידיש</option><option value="he">עברית</option></select></label>
-      <label>🇮🇱 הכתב בעברית הוא: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 סיכום ההקלטה (לפני עריכה)</option></select></label>
+      <label>🇮🇱 הכתב בעברית הוא: <select id="trHeKind"><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option><option value="before">📜 עריכה ראשונה (לפני עריכה)</option></select></label>
     </div>
     <div id="trTable" style="margin-top:.6em;max-height:32vh;overflow:auto"></div>
     <button class="btn primary" id="trGo" type="button" style="margin-top:.8em;width:100%;font-size:1.1em" disabled>💾 שמירה ולימוד</button>
@@ -9562,7 +9564,7 @@ orgCreatedModal = function (id, name) {
 }; }
 { const _ot118 = openTrain; openTrain = function () {
   const r = _ot118.apply(this, arguments);
-  try { const s = $('#trHeKind'); if (s) { s.innerHTML = '<option value="before">📜 מילה במילה / סיכום ההקלטה (לפני עריכה)</option><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option>'; s.value = 'before'; } } catch (e) {}
+  try { const s = $('#trHeKind'); if (s) { s.innerHTML = '<option value="before">📜 מילה במילה / עריכה ראשונה (לפני עריכה)</option><option value="after">🖨️ מוכן להדפסה (הנוסח הסופי)</option>'; s.value = 'before'; } } catch (e) {}
   return r;
 }; }
 // (3) יידיש + עברית + אנגלית – בסדר הזה
@@ -9789,9 +9791,9 @@ const pairBlock = (pairs, max = 2, len = 2600) => pairs.slice(0, max).map((x, i)
 // כל תרגום ליידיש←עברית בחסידות (לא ביאלה) – לומד מהדוגמאות שלה
 { const _gt123 = gemText; gemText = async function (prompt, kind, onProgress) {
   try {
-    if (kind === 'translate' && !isBiala() && /into Hebrew/i.test(String(prompt)) && !/CommunityExamples/.test(prompt)) {
+    if (kind === 'translate' && /into Hebrew/i.test(String(prompt)) && !/CommunityExamples/.test(prompt)) {
       const pairs = await orgPairs();
-      if (pairs.length) prompt = `CommunityExamples: below are real examples of how THIS community translates the Rebbe's Yiddish into Hebrew. Translate in exactly the same way – same wording style, same spelling of names and terms, same level of literalness.\n\n${pairBlock(pairs.sort(() => Math.random() - 0.5), 2)}\n\n===== NOW THE TASK =====\n` + prompt;
+      if (pairs.length) prompt = `CommunityExamples: below are real examples of how THIS community translates the Rebbe's Yiddish into Hebrew. Study them carefully and translate in EXACTLY the same way: the same honorific titles (how they write the Rebbe and the previous Rebbes), the same abbreviations, the same Hebrew phrasing and word choices, the same sentence openings, the same spelling of names and terms, the same level of literalness. Your translation should read as if their own editor wrote it.\n\n${pairBlock(pairs.sort(() => Math.random() - 0.5), 6, 3000)}\n\n===== NOW THE TASK =====\n` + prompt;
     }
   } catch (e) {}
   return _gt123.call(this, prompt, kind, onProgress);
@@ -10157,7 +10159,7 @@ if (typeof renderMyOrg === 'function') { const _rmo125 = renderMyOrg; renderMyOr
 
 // ---- י · הגדרות מסודרות בקבוצות ----
 const SET_GROUPS = [
-  ['👑 מנהל-העל', ['orgs']],
+  ['🛡️ מנהל-העל', ['orgs']],
   ['🏛️ החסידות', ['myorg', 'brand', 'dict']],
   ['👥 אנשים', ['users', 'requests', 'groups']],
   ['🔧 מערכת וגיבוי', ['system', 'data', 'security', 'log', 'live', 'trash']]
@@ -10184,7 +10186,7 @@ function groupSetNav() {
   try {
     const k = 'tourDone_' + (ME && ME.id);
     const fresh = ME && ME.created_at && (Date.now() - new Date(ME.created_at).getTime() < 10 * 864e5);
-    if (ok && fresh && !LS.get(k, false) && typeof startTour === 'function') { LS.set(k, true); try { LS.set('seenNew', WHATS_NEW.v); } catch (e) {} setTimeout(() => { try { go('home'); startTour(); } catch (e) {} }, 1800); }
+    if (ok && fresh && !LS.get(k, false)) { LS.set(k, true); try { LS.set('seenNew', WHATS_NEW.v); } catch (e) {} } /* 3.16: במקום סיור אוטומטי – הצעה לצפות בסרטון */
   } catch (e) {}
   return ok;
 }; }
@@ -10256,14 +10258,14 @@ document.addEventListener('dblclick', (e) => {
 { const _do126 = Detail.open; Detail.open = async function () { const r = await _do126.apply(this, arguments); try { const b = $('#sbsBtn'); if (b) b.classList.toggle('hidden', !(Detail.rec && Detail.rec.lang === 'yi')); } catch (e) {} return r; }; }
 
 // ---- טו · "מה חדש" אחרי עדכון ----
-const WHATS_NEW = { v: '3.13.0', items: [
-  '🎚️ ניקוי שמע לפני התמלול – פחות רעשים, יותר מילים נכונות',
-  '🔁 הקשבה שנייה לכל קטע – המערכת בודקת את עצמה ומסמנת מה שלא ודאי',
-  '🧩 קטעים שדולגו מתומללים שוב לבד · 📊 דוח איכות לכל הקלטה',
-  '🎙️ זיהוי הקול של האדמו"ר · 🧪 מבחן איכות קבוע',
-  '↔️ יידיש מול עברית – משפט מול משפט · 📜 גופן ספר',
-  '🏠 מסך בית חכם · ⚙️ הגדרות מסודרות · ⋯ פחות כפתורים על המסך',
-  '🗄️ גיבוי אוטומטי כל לילה'
+const WHATS_NEW = { v: '3.16.0', items: [
+  '🎬 סרטון הדרכה קצר – בכפתור "❓ עזרה" בפינה',
+  '❓ עזרה בצד המסך – הסבר קצר לכל מסך',
+  '🔎 חיפוש חדש בכל ההקלטות – שומעים בדיוק את הרגע',
+  '🤖 העוזר האישי – שואלים על השיחות ומקבלים תשובה עם מקור',
+  '📁 תיקייה כבר לא חובה – מעלים ישר',
+  '💬 כתבו לנו – כל הודעה מגיעה אלינו ישירות',
+  '🎁 חבר מביא חבר – המליצו, ותקבלו תודה'
 ] };
 { const _lm126b = loadMe; loadMe = async function () {
   const ok = await _lm126b.apply(this, arguments);
@@ -10343,7 +10345,7 @@ document.addEventListener('click', async (e) => {
     m.querySelectorAll('[data-train]').forEach((b) => b.classList.add('hidden'));
     row.parentElement.insertAdjacentHTML('beforebegin', `<div id="trBig" style="border:2px solid #b8892b;background:#fffaf0;border-radius:12px;padding:.8em 1em;margin:.6em 0 .9em;color:#3a2a00">
       <b style="font-size:1.1em">🎙️ להוסיף דוגמאות עם הקלטות</b>
-      <div class="hint" style="color:#5a4a1a">מעלים <b>הקלטות</b> + <b>הכתב בעברית</b> (בוחרים: 📜 סיכום ההקלטה או 🖨️ מוכן להדפסה) + <b>הכתב ביידיש</b>. המערכת מחברת לפי המספר בשם הקובץ (1 ↔ 1) ולומדת. אפשר להוסיף עוד בכל זמן – מה שכבר הועלה נשאר.</div>
+      <div class="hint" style="color:#5a4a1a">מעלים <b>הקלטות</b> + <b>הכתב בעברית</b> (בוחרים: 📜 עריכה ראשונה או 🖨️ מוכן להדפסה) + <b>הכתב ביידיש</b>. המערכת מחברת לפי המספר בשם הקובץ (1 ↔ 1) ולומדת. אפשר להוסיף עוד בכל זמן – מה שכבר הועלה נשאר.</div>
       <button class="btn" data-train133 type="button" style="background:#b8892b;color:#fff;margin-top:.5em;font-size:1.05em;width:100%">🎙️ העלאת הקלטות + עברית + יידיש</button></div>`);
   } catch (e) {}
   return r;
@@ -10463,7 +10465,7 @@ orgPairs = async function () {
   function save() { try { sessionStorage.setItem('asst_' + ORG.id, JSON.stringify(messages)); } catch (_) {} }
   function link(source, label, sec = 0) { return `<a class="asst-chip" href="#" data-jump="${esc(source.id)}" data-t="${sec}">${esc(label)}</a>`; }
   function render() {
-    el('asstTitle').textContent = '🤖 העוזר האישי של ' + orgName();
+    el('asstTitle').textContent = '✨ העוזר האישי · דברי קודש';
     el('asstList').innerHTML = messages.length ? messages.map((m) => {
       const sources = m.sources || [];
       const body = esc(m.text).replace(/\[(\d+)(?:@(\d{1,4}):([0-5]\d))?\]/g, (raw, n, mm, ss) => sources[+n - 1] ? link(sources[+n - 1], '▶️ לשמוע [' + n + ']', mm == null ? 0 : +mm * 60 + +ss) : raw);
@@ -10546,6 +10548,630 @@ orgPairs = async function () {
   });
   document.addEventListener('keydown', (e) => { if (opened && e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); close(); } }, true);
   window.addEventListener('resize', sync); setInterval(sync, 500); sync();
+})();
+
+/* =========================================================
+   3.15.0 – 🔎 חיפוש מתקדם (במקום הלוח העברי) · ❓ עזרה בצד, עם סרטון · תיקייה לא חובה
+   ========================================================= */
+(function () {
+  // ---- דף החיפוש ----
+  const host = document.querySelector('#page-calendar') ? document.querySelector('#page-calendar').parentNode : document.querySelector('main');
+  if (host && !document.querySelector('#page-search')) host.insertAdjacentHTML('beforeend', `<section class="page" id="page-search">
+    <h2 style="margin:0 0 .2em">🔎 חיפוש בכל ההקלטות</h2>
+    <p class="muted" style="margin:0 0 .8em">כותבים מילה או כמה מילים – ומקבלים כל מקום שבו זה נאמר או נכתב. לוחצים ▶ ושומעים בדיוק את הרגע.</p>
+    <div class="card" style="padding:1em">
+      <div class="row" style="gap:.5em;flex-wrap:wrap">
+        <input type="search" id="asQ" placeholder='למשל: שמחה · או ביטוי מדויק במירכאות: "עבדו את ה׳ בשמחה"' style="flex:1;min-width:240px;font-size:1.05em">
+        <button class="btn primary" type="button" id="asGo">🔎 חיפוש</button>
+      </div>
+      <div class="row" style="gap:1em;flex-wrap:wrap;margin-top:.7em;align-items:center">
+        <label class="row" style="gap:.3em;margin:0"><input type="radio" name="asMode" value="all" checked style="width:auto"> כל המילים</label>
+        <label class="row" style="gap:.3em;margin:0"><input type="radio" name="asMode" value="any" style="width:auto"> אחת מהמילים</label>
+        <label class="row" style="gap:.3em;margin:0"><input type="radio" name="asMode" value="exact" style="width:auto"> ביטוי מדויק</label>
+        <span class="muted">|</span>
+        <span class="muted">לחפש ב:</span>
+        <label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="asInText" checked style="width:auto"> התמלול</label>
+        <label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="asInHe" checked style="width:auto"> התרגום לעברית</label>
+        <label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="asInNus" checked style="width:auto"> הסיכומים והנוסחים</label>
+        <label class="row" style="gap:.3em;margin:0"><input type="checkbox" id="asInTitle" checked style="width:auto"> השמות</label>
+      </div>
+      <details style="margin-top:.6em"><summary style="cursor:pointer;font-weight:700">⚙️ לצמצם (לא חובה)</summary>
+        <div class="row" style="gap:.6em;flex-wrap:wrap;margin-top:.6em">
+          <label>📁 תיקייה <select id="asFolder" style="width:auto"></select></label>
+          <label>👤 דובר <select id="asSpeaker" style="width:auto"></select></label>
+          <label>📖 פרשה <select id="asParasha" style="width:auto"></select></label>
+          <label>🗓️ שנה <select id="asYear" style="width:auto"></select></label>
+          <label>מתאריך <input type="date" id="asFrom" style="width:auto"></label>
+          <label>עד תאריך <input type="date" id="asTo" style="width:auto"></label>
+        </div>
+      </details>
+      <div class="row" style="gap:.6em;margin-top:.6em;align-items:center"><span class="muted">סדר:</span>
+        <select id="asSort" style="width:auto"><option value="score">הכי מתאים קודם</option><option value="new">החדשות קודם</option><option value="old">הישנות קודם</option></select>
+        <span class="grow"></span><button class="btn small" type="button" id="asAsk">💬 לשאול את העוזר על זה</button></div>
+    </div>
+    <div id="asOut" style="margin-top:1em"></div>
+  </section>`);
+
+  const norm = (t) => String(t || '').replace(/[֑-ׇ]/g, '').replace(/װ/g, 'וו').replace(/ױ/g, 'וי').replace(/ײ/g, 'יי').replace(/[״“”]/g, '"').replace(/[׳‘’]/g, "'").toLowerCase();
+  const escRe = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function fillFilters() {
+    const recs = [...RECS.values()].filter((r) => !r.deletedAt && !(r.extras && r.extras.training));
+    const opt = (arr, all) => `<option value="">${all}</option>` + [...new Set(arr.filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), 'he')).map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    const fs = $('#asFolder'); if (fs) fs.innerHTML = `<option value="">כל התיקיות</option><option value="__none">ללא תיקייה</option>` + (FOLDERS || []).map((f) => `<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');
+    const sp = $('#asSpeaker'); if (sp) sp.innerHTML = opt(recs.map((r) => r.speaker), 'כל הדוברים');
+    const pa = $('#asParasha'); if (pa) pa.innerHTML = opt(recs.map((r) => r.parasha), 'כל הפרשות');
+    const ye = $('#asYear'); if (ye) ye.innerHTML = opt(recs.map((r) => r.hyear), 'כל השנים');
+  }
+  function terms() {
+    const raw = ($('#asQ').value || '').trim(); let mode = (document.querySelector('input[name="asMode"]:checked') || {}).value || 'all';
+    const m = raw.match(/^"(.+)"$/); if (m) mode = 'exact';
+    const t = mode === 'exact' ? [norm((m ? m[1] : raw).trim())] : [...new Set(norm(raw).split(/\s+/).map((w) => w.replace(/^["'(]+|["'),.?!:;]+$/g, '')).filter((w) => w.length >= 2))];
+    return { raw, mode, t: t.filter(Boolean) };
+  }
+  function fieldsOf(r) {
+    const f = [];
+    if ($('#asInTitle').checked) f.push(['title', r.title || '']);
+    if ($('#asInText').checked) f.push(['text', r.text || '']);
+    if ($('#asInHe').checked && r.translations && r.translations.he) f.push(['he', r.translations.he]);
+    if ($('#asInNus').checked && r.extras && r.extras.nusach) ['before', 'after'].forEach((k) => { if (r.extras.nusach[k]) f.push([k, r.extras.nusach[k]]); });
+    return f;
+  }
+  const FLBL = { title: '🏷️ בשם', text: '🎙️ בתמלול', he: '🇮🇱 בתרגום', before: '📜 בסיכום', after: '🖨️ במוכן להדפסה' };
+  let LAST = [];
+  async function run() {
+    const { raw, mode, t } = terms(); const out = $('#asOut');
+    if (!t.length) { out.innerHTML = '<div class="muted">כותבים מילה לחיפוש (לפחות 2 אותיות)</div>'; return; }
+    out.innerHTML = '<span class="spinner"></span> מחפש בכל ההקלטות…';
+    const key = [...t].sort((a, b) => b.length - a.length)[0].replace(/[%,()"]/g, ' ').trim();
+    const cols = 'id,title,text,segments,translations,extras,created_at,folder_id,speaker,parasha,hyear,rec_date,duration';
+    let data = null, error = null;
+    const ors = [`title.ilike.%${key}%`, `text.ilike.%${key}%`, `translations->>he.ilike.%${key}%`, `extras->nusach->>before.ilike.%${key}%`, `extras->nusach->>after.ilike.%${key}%`];
+    try { ({ data, error } = await sb.from('recordings').select(cols).is('deleted_at', null).or(ors.join(',')).order('created_at', { ascending: false }).limit(300)); } catch (e) { error = e; }
+    if (error) { try { ({ data, error } = await sb.from('recordings').select(cols).is('deleted_at', null).or(ors.slice(0, 2).join(',')).order('created_at', { ascending: false }).limit(300)); } catch (e) { error = e; } }
+    if (error) { out.innerHTML = `<div class="err-text">${esc(error.message || String(error))}</div>`; return; }
+    const fF = $('#asFolder').value, fS = $('#asSpeaker').value, fP = $('#asParasha').value, fY = $('#asYear').value, d1 = $('#asFrom').value, d2 = $('#asTo').value;
+    const res = [];
+    for (const r of data || []) {
+      if (r.extras && r.extras.training) continue;
+      if (fF && (fF === '__none' ? r.folder_id : r.folder_id !== fF)) continue;
+      if (fS && r.speaker !== fS) continue; if (fP && r.parasha !== fP) continue; if (fY && r.hyear !== fY) continue;
+      const day = String(r.rec_date || r.created_at || '').slice(0, 10); if (d1 && day < d1) continue; if (d2 && day > d2) continue;
+      const fl = fieldsOf(r).map(([k, v]) => [k, v, norm(v)]);
+      const all = fl.map((x) => x[2]).join('\n');
+      const ok = mode === 'any' ? t.some((w) => all.includes(w)) : t.every((w) => all.includes(w));
+      if (!ok) continue;
+      let score = 0; fl.forEach(([k, , n]) => t.forEach((w) => { const c = n.split(w).length - 1; score += c * (k === 'title' ? 5 : 1); }));
+      // רגעים בהקלטה (עם זמן)
+      const moments = [];
+      if ($('#asInText').checked && Array.isArray(r.segments)) for (const sg of r.segments) { const n = norm(sg.text); if (t.some((w) => n.includes(w))) { moments.push(sg); if (moments.length >= 6) break; } }
+      // קטעים מהנוסחים / התרגום
+      const snips = [];
+      fl.filter(([k]) => k !== 'text' && k !== 'title').forEach(([k, v, n]) => { const w = t.find((x) => n.includes(x)); if (!w) return; const at = n.indexOf(w); snips.push([k, v.slice(Math.max(0, at - 90), at + 160)]); });
+      res.push({ r, score, moments, snips, inTitle: fl.some(([k, , n]) => k === 'title' && t.some((w) => n.includes(w))) });
+    }
+    const so = $('#asSort').value;
+    res.sort((a, b) => so === 'new' ? String(b.r.created_at).localeCompare(String(a.r.created_at)) : so === 'old' ? String(a.r.created_at).localeCompare(String(b.r.created_at)) : b.score - a.score);
+    LAST = res;
+    if (!res.length) { out.innerHTML = `<div class="card" style="padding:1em"><b>לא נמצא.</b><div class="muted">נסו: מילה אחת בלבד · "אחת מהמילים" · או כתיב אחר (למשל שימחה / שמחה).</div></div>`; return; }
+    const re = new RegExp(t.map(escRe).join('|'), 'gi');
+    const mark = (x) => esc(x).replace(re, (m) => `<mark>${m}</mark>`);
+    const totalM = res.reduce((a, x) => a + x.moments.length, 0);
+    out.innerHTML = `<div class="hint" style="margin-bottom:.5em">נמצאו <b>${res.length}</b> הקלטות${totalM ? ` · <b>${totalM}</b> רגעים שאפשר לשמוע` : ''}</div>` + res.slice(0, 80).map(({ r, moments, snips, inTitle }) => `
+      <div class="card" style="padding:.8em 1em;margin:.5em 0">
+        <div class="row" style="gap:.5em;align-items:baseline;flex-wrap:wrap"><a href="#" data-jump="${esc(r.id)}" style="font-weight:800;font-size:1.05em">${mark(r.title || 'הקלטה')}</a>
+          <span class="muted" style="font-size:.85em">${[r.speaker && '👤 ' + esc(r.speaker), r.parasha && '📖 ' + esc(r.parasha), r.hyear && esc(r.hyear), new Date(r.created_at).toLocaleDateString('he-IL')].filter(Boolean).join(' · ')}</span>${inTitle ? '<span class="badge">בשם</span>' : ''}</div>
+        ${moments.map((sg) => `<div style="margin:.3em 0;line-height:1.7"><a href="#" class="btn small" data-jump="${esc(r.id)}" data-t="${+sg.start || 0}" style="padding:.1em .55em">▶ ${fmtT(sg.start)}</a> ${mark(sg.text)}</div>`).join('')}
+        ${snips.map(([k, x]) => `<div style="margin:.3em 0;line-height:1.7"><span class="badge">${FLBL[k]}</span> …${mark(x)}…</div>`).join('')}
+      </div>`).join('') + (res.length > 80 ? `<div class="muted">מוצגות 80 הראשונות – צמצמו את החיפוש כדי לראות עוד.</div>` : '');
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#asGo')) { e.preventDefault(); run(); }
+    if (e.target.closest('#asAsk')) { e.preventDefault(); const q = ($('#asQ').value || '').trim(); const fab = document.getElementById('asstFab'); if (fab) { fab.click(); setTimeout(() => { const i = document.getElementById('asstInput'); if (i && q) { i.value = 'מה נאמר על ' + q.replace(/"/g, '') + '?'; i.focus(); } }, 250); } }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target && e.target.id === 'asQ') { e.preventDefault(); run(); } });
+  document.addEventListener('change', (e) => { if (e.target.closest('#page-search select, #page-search input[type=radio], #page-search input[type=checkbox], #page-search input[type=date]') && LAST.length) run(); });
+  { const _go315 = go; go = function (page) { if (page === 'calendar') page = 'search'; const r = _go315.call(this, page); if (page === 'search') { fillFilters(); setTimeout(() => { const i = $('#asQ'); i && i.focus(); }, 60); } return r; }; }
+  // הלוח העברי – יוצא מהתפריט ומההוראות
+  const css = document.createElement('style');
+  css.textContent = '#tabs [data-page="calendar"]{display:none!important}';
+  document.head.appendChild(css);
+  if (typeof renderHelp === 'function') { const _rh315 = renderHelp; renderHelp = function () { const r = _rh315.apply(this, arguments); try { $$('#page-help *').forEach((el) => { if (el.children.length < 4 && /^📅\s*לוח עברי/.test((el.innerText || '').trim()) && el.closest('button, .card, [data-hd]')) (el.closest('button, .card, [data-hd]')).style.display = 'none'; }); } catch (e) {} return r; }; }
+
+  // ---- ❓ עזרה בצד – תמיד זמינה ----
+  const HELP = {
+    home: ['🎙️ דף התמלול', ['בוחרים <b>באיזו שפה מדברים</b> בהקלטה (יידיש / עברית / אנגלית).', 'בוחרים <b>מה לקבל בסוף</b>: טקסט, תרגום, סיכום או מוכן להדפסה.', 'גוררים קובץ לכאן, או לוחצים <b>"🎵 קובץ אחד או כמה"</b>. אפשר גם להקליט.', 'תיקייה – <b>לא חובה</b>. אפשר לסדר אחר כך.', 'ההקלטה נכנסת לתור – כשהיא מוכנה תקבלו הודעה. בינתיים אפשר להמשיך לעבוד.']],
+    library: ['📚 הספרייה', ['כאן <b>כל ההקלטות</b>. לוחצים על הקלטה כדי לפתוח אותה.', 'בצד – <b>תיקיות</b>. "ללא תיקייה" = מה שלא סודר.', 'למעלה – <b>סינון</b> לפי דובר, פרשה, שנה ושפה.', 'מחפשים מילה? יש לשונית <b>🔎 חיפוש</b> בתפריט.']],
+    detail: ['🎧 דף ההקלטה', ['לוחצים ▶ ושומעים. <b>השורה שנשמעת מסומנת</b>.', 'לוחצים על שורה כדי <b>לקפוץ לשם</b> בהקלטה.', 'רוצים לתקן? לוחצים על הטקסט ומקלידים. המערכת <b>לומדת מכל תיקון</b>.', 'בלשוניות למעלה: <b>התרגום, הסיכום, ומוכן להדפסה</b>.', 'להורדה: Word / PDF / הדפסה – בכפתורים שמעל הטקסט.']],
+    search: ['🔎 חיפוש', ['כותבים מילה ולוחצים <b>חיפוש</b>.', 'ביטוי מדויק – כותבים אותו <b>בתוך מירכאות</b>.', 'לוחצים <b>▶</b> ליד תוצאה – ושומעים בדיוק את הרגע.', 'אפשר לצמצם לפי תיקייה, דובר, פרשה ותאריך.']],
+    settings: ['⚙️ ניהול', ['<b>👥 משתמשים</b> – מוסיפים אנשים ונותנים הרשאות.', '<b>🎓 חומרי לימוד</b> – מעלים הקלטות וכתבים, והמערכת לומדת את הסגנון שלכם.', '<b>💾 גיבויים</b> – גיבוי לדרייב או הורדה למחשב.', '<b>🔑 חיבור החשבון</b> – פעם אחת, כדי שהתמלול ירוץ.']],
+    _: ['📘 עזרה', ['בתפריט למעלה: <b>🎙️ תמלול</b> · <b>📚 ספרייה</b> · <b>🔎 חיפוש</b>.', 'בפינה השמאלית למטה – <b>🤖 העוזר האישי</b>: שואלים שאלה על השיחות.', 'כל ההוראות המלאות – בלשונית <b>📘 הוראות</b>.']]
+  };
+  const st = document.createElement('style');
+  st.textContent = `#helpFab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:10020;height:48px;border:0;border-radius:24px;padding:0 16px;background:var(--primary,#2c3e8f);color:#fff;font-weight:800;font-size:1rem;box-shadow:0 4px 18px #0004;cursor:pointer}
+  #helpPanel{position:fixed;top:0;bottom:0;right:0;width:min(400px,100vw);z-index:10030;background:var(--card,#fff);color:inherit;border-left:1px solid var(--line,#ccc);box-shadow:-6px 0 30px #0003;transform:translateX(105%);transition:transform .22s;display:flex;flex-direction:column;direction:rtl}
+  #helpPanel.open{transform:none}#helpPanel header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line,#ccc)}#helpPanel .hb{overflow:auto;padding:14px;flex:1}
+  #helpPanel ol{padding-inline-start:1.3em;line-height:1.9;margin:.4em 0}#helpPanel video{width:100%;border-radius:12px;background:#000;margin:.4em 0}
+  body.reading #helpFab{display:none}`;
+  document.head.appendChild(st);
+  document.body.insertAdjacentHTML('beforeend', `<button id="helpFab" type="button" class="hidden" title="עזרה – איך עושים?">❓ עזרה</button>
+    <aside id="helpPanel" aria-hidden="true"><header><b style="font-size:1.1em" class="grow">❓ איך עושים?</b><button class="btn small" type="button" id="helpClose">✕</button></header><div class="hb" id="helpBody"></div></aside>`);
+  const VIDEO = 'help-video.mp4';
+  let hasVideo = null;
+  async function checkVideo() { if (hasVideo !== null) return hasVideo; try { const r = await fetch(VIDEO, { method: 'HEAD', cache: 'no-store' }); hasVideo = r.ok; } catch (e) { hasVideo = false; } return hasVideo; }
+  async function renderHelpPanel() {
+    const [title, steps] = HELP[currentPage] || HELP._;
+    const v = await checkVideo();
+    $('#helpBody').innerHTML = `${v ? `<b>🎬 סרטון הדרכה – כל המערכת בכמה דקות</b><video src="${VIDEO}" controls preload="none" playsinline></video>` : ''}
+      <h3 style="margin:.6em 0 .2em">${title}</h3><ol>${steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+      <div class="col" style="gap:.5em;margin-top:.8em">
+        <button class="btn" type="button" data-helptour>🧭 סיור מודרך על המסך (דקה)</button>
+        <button class="btn" type="button" data-helpfull>📘 כל ההוראות</button>
+        <button class="btn" type="button" data-helpasst>🤖 לשאול את העוזר האישי</button>
+      </div>
+      <p class="hint" style="margin-top:1em">העזרה משתנה לפי המסך שאתם נמצאים בו.</p>`;
+  }
+  function openHelp() { renderHelpPanel(); $('#helpPanel').classList.add('open'); $('#helpPanel').setAttribute('aria-hidden', 'false'); }
+  function closeHelp() { $('#helpPanel').classList.remove('open'); $('#helpPanel').setAttribute('aria-hidden', 'true'); const v = $('#helpPanel video'); if (v) v.pause(); }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#helpFab')) { e.preventDefault(); return $('#helpPanel').classList.contains('open') ? closeHelp() : openHelp(); }
+    if (e.target.closest('#helpClose')) { e.preventDefault(); return closeHelp(); }
+    if (e.target.closest('[data-helptour]')) { e.preventDefault(); closeHelp(); go('home'); setTimeout(() => { try { startTour(); } catch (er) {} }, 300); }
+    if (e.target.closest('[data-helpfull]')) { e.preventDefault(); closeHelp(); go('help'); }
+    if (e.target.closest('[data-helpasst]')) { e.preventDefault(); closeHelp(); const f = document.getElementById('asstFab'); f && f.click(); }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#helpPanel').classList.contains('open')) closeHelp(); });
+  { const _go315b = go; go = function () { const r = _go315b.apply(this, arguments); try { if ($('#helpPanel').classList.contains('open')) renderHelpPanel(); } catch (e) {} return r; }; }
+  setInterval(() => { const on = !!(typeof ME !== 'undefined' && ME) && !document.querySelector('#auth:not(.hidden)'); $('#helpFab').classList.toggle('hidden', !on);
+    /* 3.16: במקום לפתוח לבד – כרטיס הצעה לצפות בסרטון */ }, 800);
+})();
+
+/* =========================================================
+   3.16.0 – סרטון לפי החסידות · הצעה לצפות בהתחלה · 💬 "כתבו לנו" – משוב שמגיע ישר אלינו
+   ========================================================= */
+(function () {
+  // ---- סרטון לפי החסידות (אם הוכן לה סרטון משלה) ----
+  const vidFor = () => 'help-video.mp4'; /* 3.18: סרטון אחד לכולם – בלי שמות של חסידויות */
+  const VCACHE = {};
+  async function pickVideo() { const own = vidFor(); for (const v of [own, 'help-video.mp4']) { if (VCACHE[v] === undefined) { try { const r = await fetch(v, { method: 'HEAD', cache: 'no-store' }); VCACHE[v] = r.ok; } catch (e) { VCACHE[v] = false; } } if (VCACHE[v]) return v; } return null; }
+  // מחליפים את מקור הסרטון בחלון העזרה
+  new MutationObserver(async () => { const v = document.querySelector('#helpBody video'); if (!v || v.dataset.org) return; v.dataset.org = '1'; const src = await pickVideo(); if (src) v.src = src; }).observe(document.body, { childList: true, subtree: true });
+
+  // ---- כניסה ראשונה: הצעה (לא חובה) לצפות בסרטון ----
+  function welcomeCard() {
+    if (document.getElementById('vWelcome')) return;
+    document.body.insertAdjacentHTML('beforeend', `<div id="vWelcome" dir="rtl" style="position:fixed;right:max(16px,env(safe-area-inset-right));bottom:76px;z-index:10025;width:min(340px,calc(100vw - 32px));background:var(--card,#fff);color:inherit;border:2px solid #f5b342;border-radius:16px;box-shadow:0 10px 34px #0004;padding:14px 16px">
+      <div style="font-weight:800;font-size:1.08em">👋 חדשים כאן?</div>
+      <div style="margin:.3em 0 .7em;line-height:1.6">יש סרטון קצר (דקה וחצי) שמראה בדיוק מה לוחצים. ממליצים לצפות – זה חוסך הרבה זמן.</div>
+      <div class="row" style="gap:.5em"><button class="btn primary" type="button" id="vwWatch">🎬 לצפות עכשיו</button><button class="btn" type="button" id="vwLater">אחר כך</button></div>
+      <div class="hint" style="margin-top:.5em">הסרטון תמיד זמין בכפתור "❓ עזרה" בפינה.</div></div>`);
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#vwLater')) { document.getElementById('vWelcome')?.remove(); }
+    if (e.target.closest('#vwWatch')) { document.getElementById('vWelcome')?.remove(); document.getElementById('helpFab')?.click(); setTimeout(() => { const v = document.querySelector('#helpBody video'); if (v) { v.scrollIntoView({ block: 'center' }); v.play().catch(() => {}); } }, 900); }
+  });
+
+  // ---- 💬 כתבו לנו – משוב ----
+  const EJ = { service: 'service_tplus', template: 'template_gzcqacc', key: '6G0YaH5dH_TKKk_hu' };
+  const TO = ['bnyytmrkwt@gmail.com', 'ay0533115854@gmail.com'];
+  async function sendFeedback(mood, text) {
+    const who = (ME && (ME.display_name || ME.email)) || '';
+    const org = (typeof ORG !== 'undefined' && ORG && ORG.name) || '';
+    const subject = `💬 משוב מהמערכת – ${org}${who ? ' · ' + who : ''}`;
+    const message = [mood && `הרגשה: ${mood}`, `\n${text}\n`, `משתמש: ${who} (${(ME && ME.email) || ''})`, `חסידות: ${org}`, `מסך: ${typeof currentPage !== 'undefined' ? currentPage : ''}`, `גרסה: ${APP_VERSION}`, `זמן: ${new Date().toLocaleString('he-IL')}`].filter(Boolean).join('\n');
+    let ok = 0;
+    for (const to of TO) { try { const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service_id: EJ.service, template_id: EJ.template, user_id: EJ.key, template_params: { to_email: to, email: to, subject, title: subject, message, name: 'המערכת', to_name: 'צוות' } }) }); if (r.ok) ok++; } catch (e) {} }
+    if (!ok) { try { await api('alert', { message: subject + '\n' + message }); ok = 1; } catch (e) {} }
+    return ok > 0;
+  }
+  function openFeedback(intro) {
+    modal(`<h3>💬 נשמח לשמוע מכם</h3>
+      <p style="margin:.2em 0 .6em">${intro || 'נהניתם? משהו לא עבד? יש לכם רעיון איך לשפר? כתבו לנו – <b>אנחנו קוראים כל הודעה</b> ומשפרים את המערכת כבר בימים הקרובים.'}</p>
+      <div class="row" style="gap:.4em;margin-bottom:.6em" id="fbMood">${['😍 מצוין', '🙂 טוב', '😐 בסדר', '🙁 צריך שיפור'].map((m) => `<button type="button" class="btn small" data-fbmood="${m}">${m}</button>`).join('')}</div>
+      <textarea id="fbText" rows="5" style="width:100%" placeholder="מה אהבתם? מה חסר? מה היה קשה?"></textarea>
+      <button class="btn primary" type="button" id="fbSend" style="width:100%;margin-top:.6em">📨 שליחה</button>
+      <div id="fbMsg" class="form-msg" style="margin-top:.4em"></div>
+      <div class="hint" style="margin-top:.4em">ההודעה מגיעה ישירות לצוות המערכת, ונחזור אליכם במייל.</div>`, { okText: 'סגירה', cancelText: '' });
+  }
+  let MOOD = '';
+  document.addEventListener('click', async (e) => {
+    const m = e.target.closest('[data-fbmood]'); if (m) { MOOD = m.dataset.fbmood; $$('[data-fbmood]').forEach((b) => b.classList.toggle('primary', b === m)); return; }
+    if (e.target.closest('[data-feedback]')) { e.preventDefault(); MOOD = ''; openFeedback(); }
+    if (e.target.closest('#fbSend')) {
+      const t = ($('#fbText').value || '').trim(), msg = $('#fbMsg');
+      if (!t && !MOOD) { msg.className = 'form-msg err'; msg.textContent = 'כתבו כמה מילים, או בחרו איך הרגשתם.'; return; }
+      $('#fbSend').disabled = true; msg.className = 'form-msg'; msg.textContent = '⏳ שולח…';
+      const ok = await sendFeedback(MOOD, t || '(בלי טקסט)');
+      if (ok) { msg.innerHTML = '✅ <b>תודה רבה!</b> קיבלנו את ההודעה ונחזור אליכם בהקדם.'; try { LS.set('fbSent_' + (ME && ME.id), Date.now()); } catch (er) {} }
+      else { msg.className = 'form-msg err'; msg.textContent = '❌ לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע.'; $('#fbSend').disabled = false; }
+    }
+  });
+  // כפתור קבוע בחלון העזרה + בתפריט החשבון
+  new MutationObserver(() => {
+    const hb = document.getElementById('helpBody');
+    if (hb && hb.innerHTML && !hb.querySelector('[data-feedback]')) hb.insertAdjacentHTML('beforeend', `<div style="margin-top:1em;padding:12px;border-radius:12px;background:rgba(245,179,66,.12);border:1px solid rgba(245,179,66,.5)"><b>💬 נהניתם? יש לכם רעיון?</b><div class="muted" style="margin:.2em 0 .5em">כתבו לנו – אנחנו קוראים הכל ומשפרים כל הזמן.</div><button class="btn primary" type="button" data-feedback>✍️ לכתוב לנו</button></div>`);
+  }).observe(document.body, { childList: true, subtree: true });
+
+  // ---- מתי לשאול לבד (פעם אחת, בעדינות) ----
+  setInterval(() => {
+    if (typeof ME === 'undefined' || !ME || document.querySelector('#auth:not(.hidden)') || document.querySelector('.modal-bg')) return;
+    const k = 'vwShown_' + ME.id;
+    if (!LS.get(k, false)) { LS.set(k, true); LS.set('helpSeen1_' + ME.id, true); setTimeout(welcomeCard, 1200); return; }
+    const done = [...RECS.values()].filter((r) => r.owner === ME.id && r.status === 'done' && !(r.extras && r.extras.training)).length;
+    const asked = LS.get('fbAsked_' + ME.id, 0);
+    if (!asked && done >= 5) { LS.set('fbAsked_' + ME.id, Date.now()); setTimeout(() => { MOOD = ''; openFeedback('כבר תמללתם כמה הקלטות 🎉 – <b>איך המערכת עובדת אצלכם?</b> נשמח לשמוע מה טוב ומה אפשר לשפר. אנחנו קוראים כל הודעה.'); }, 1500); }
+  }, 3000);
+  // ---- דף "פרשיות" יוצא מהתפריט ----
+  const css = document.createElement('style'); css.textContent = '#tabs [data-page="parshiyot"]{display:none!important}'; document.head.appendChild(css);
+})();
+
+/* 3.16.0 – 🎁 חבר מביא חבר (רק בתוך המערכת – ללקוחות קיימים) */
+(function () {
+  const EJ = { service: 'service_tplus', template: 'template_gzcqacc', key: '6G0YaH5dH_TKKk_hu' };
+  const TO = ['bnyytmrkwt@gmail.com', 'ay0533115854@gmail.com'];
+  const REWARD = '300 ₪';
+  function openRefer() {
+    modal(`<h3>🎁 חבר מביא חבר</h3>
+      <p style="margin:.2em 0 .6em;line-height:1.7">נהניתם מהמערכת? <b>מכירים חצר, מכון או מוסד שזה יכול לעזור לו?</b> ספרו לנו עליהם – ואנחנו ניצור איתם קשר בעדינות.<br>
+      אם הם מצטרפים – <b>תקבלו ${REWARD} כתודה</b> (או, אם תעדיפו, הנחה בחשבון שלכם).</p>
+      <div class="col" style="gap:.5em">
+        <label>שם החצר / המוסד * <input id="rfOrg" placeholder="למשל: מכון להוצאת שיחות קודש"></label>
+        <label>שם איש הקשר שם * <input id="rfName"></label>
+        <label>המייל שלו * <input id="rfMail" dir="ltr" placeholder="name@gmail.com"></label>
+        <label>טלפון (לא חובה) <input id="rfPhone" dir="ltr"></label>
+        <label>משהו שכדאי שנדע? (לא חובה) <textarea id="rfNote" rows="2" placeholder="למשל: הם מוציאים עלון כל שבוע, ומחפשים פתרון לתמלול יידיש"></textarea></label>
+        <label class="row" style="gap:.4em;margin:0"><input type="checkbox" id="rfOk" style="width:auto"> דיברתי איתם, והם יודעים שנפנה אליהם</label>
+      </div>
+      <button class="btn primary" type="button" id="rfSend" style="width:100%;margin-top:.7em">📨 שליחת ההמלצה</button>
+      <div id="rfMsg" class="form-msg" style="margin-top:.4em"></div>
+      <div class="hint" style="margin-top:.4em">התודה ניתנת אחרי שהחצר שהמלצתם עליה מתחילה לעבוד עם המערכת. נעדכן אתכם במייל.</div>`, { okText: 'סגירה', cancelText: '' });
+  }
+  async function sendRefer() {
+    const g = (id) => ($('#' + id).value || '').trim(), msg = $('#rfMsg');
+    const org = g('rfOrg'), name = g('rfName'), mail = g('rfMail'), phone = g('rfPhone'), note = g('rfNote');
+    if (!org || !name || !/^\S+@\S+\.\S+$/.test(mail)) { msg.className = 'form-msg err'; msg.textContent = 'צריך: שם החצר, שם איש הקשר ומייל תקין.'; return; }
+    if (!$('#rfOk').checked) { msg.className = 'form-msg err'; msg.textContent = 'סמנו שדיברתם איתם – כדי שהפנייה שלנו לא תפתיע אותם.'; return; }
+    $('#rfSend').disabled = true; msg.className = 'form-msg'; msg.textContent = '⏳ שולח…';
+    const by = (ME && (ME.display_name || ME.email)) || '', byMail = (ME && ME.email) || '', from = (typeof ORG !== 'undefined' && ORG && ORG.name) || '';
+    const subject = `🎁 חבר מביא חבר – ${org} (המליץ: ${by}, ${from})`;
+    const message = `המלצה חדשה מתוך המערכת:\n\nחצר / מוסד: ${org}\nאיש קשר: ${name}\nמייל: ${mail}${phone ? '\nטלפון: ' + phone : ''}${note ? '\nהערה: ' + note : ''}\n\nהמליץ: ${by} (${byMail})\nמהחסידות: ${from}\nזמן: ${new Date().toLocaleString('he-IL')}\n\nתודה של ${REWARD} – כשהם מצטרפים.`;
+    let ok = 0;
+    for (const to of TO) { try { const r = await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service_id: EJ.service, template_id: EJ.template, user_id: EJ.key, template_params: { to_email: to, email: to, subject, title: subject, message, name: 'המערכת', to_name: 'צוות' } }) }); if (r.ok) ok++; } catch (e) {} }
+    if (ok) { msg.innerHTML = `✅ <b>תודה רבה!</b> קיבלנו את ההמלצה. ניצור איתם קשר, ונעדכן אתכם כשהם מצטרפים.`; }
+    else { msg.className = 'form-msg err'; msg.textContent = '❌ לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע.'; $('#rfSend').disabled = false; }
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-refer]')) { e.preventDefault(); openRefer(); }
+    if (e.target.closest('#rfSend')) { e.preventDefault(); sendRefer(); }
+  });
+  // בחלון העזרה – מתחת ל"כתבו לנו"
+  new MutationObserver(() => {
+    const hb = document.getElementById('helpBody');
+    if (hb && hb.querySelector('[data-feedback]') && !hb.querySelector('[data-refer]')) hb.insertAdjacentHTML('beforeend', `<div style="margin-top:.8em;padding:12px;border-radius:12px;background:rgba(80,160,110,.1);border:1px solid rgba(80,160,110,.45)"><b>🎁 חבר מביא חבר</b><div class="muted" style="margin:.2em 0 .5em">מכירים חצר או מוסד שזה יעזור לו? המליצו – ואם יצטרפו, תקבלו ${REWARD} כתודה.</div><button class="btn" type="button" data-refer>🎁 להמליץ על מישהו</button></div>`);
+  }).observe(document.body, { childList: true, subtree: true });
+  // בטופס המשוב – אחרי "מצוין" / "טוב"
+  document.addEventListener('click', (e) => { const m = e.target.closest('[data-fbmood]'); if (!m || !/מצוין|טוב/.test(m.dataset.fbmood)) return; const box = document.getElementById('fbMood'); if (box && !document.getElementById('fbRefer')) box.insertAdjacentHTML('afterend', `<div id="fbRefer" style="margin:-.2em 0 .6em;padding:8px 10px;border-radius:10px;background:rgba(80,160,110,.1)">😊 שמחים לשמוע! מכירים עוד חצר שזה יעזור לה? <a href="#" data-refer>🎁 המליצו – ותקבלו ${REWARD} תודה</a></div>`); });
+})();
+
+/* =========================================================
+   3.17.0 – כפתור עוזר מרשים · תצוגה עברית/יידיש מסונכרנת עם השמע
+   ========================================================= */
+(function () {
+  // ---- כפתור העוזר ----
+  const st = document.createElement('style');
+  st.textContent = `#asstFab{width:auto!important;height:auto!important;min-height:58px;border-radius:32px!important;padding:8px 18px 8px 10px!important;display:flex!important;align-items:center;gap:10px;direction:rtl;font:inherit!important;color:#fff!important;
+      background:linear-gradient(135deg,#d4a63c 0%,#b8862b 45%,#8a5f17 100%)!important;box-shadow:0 10px 28px rgba(140,95,23,.45),inset 0 1px 0 rgba(255,255,255,.35)!important;border:1px solid rgba(255,255,255,.35)!important;transition:transform .2s, box-shadow .2s}
+    #asstFab[hidden]{display:none!important}
+    #asstFab:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 14px 34px rgba(140,95,23,.55)!important}
+    #asstFab .af-ic{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:22px;position:relative;flex:none}
+    #asstFab .af-ic::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,230,160,.8);animation:afPulse 2.4s ease-out infinite}
+    @keyframes afPulse{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.45);opacity:0}}
+    #asstFab .af-t{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;text-align:right}
+    #asstFab .af-t b{font-size:1.02rem;font-weight:800;letter-spacing:.2px}
+    #asstFab .af-t small{font-size:.78rem;opacity:.92;font-weight:500}
+    @media (max-width:640px){#asstFab .af-t small{display:none}#asstFab{padding:6px 14px 6px 8px!important;min-height:50px}}
+    @media (prefers-reduced-motion:reduce){#asstFab .af-ic::after{animation:none}}
+    #asstPanel header{background:linear-gradient(135deg,#1b2350,#2c3e8f);color:#fff}#asstPanel header small{opacity:.85}`;
+  document.head.appendChild(st);
+  const decorate = () => { const f = document.getElementById('asstFab'); if (!f || f.dataset.dec) return; f.dataset.dec = '1'; f.innerHTML = '<span class="af-ic">✨</span><span class="af-t"><b>יש לכם שאלה?</b><small>העוזר האישי עונה מתוך השיחות</small></span>'; f.title = 'העוזר האישי – שאלו כל שאלה על השיחות'; };
+  decorate(); setTimeout(decorate, 1500);
+
+  // ---- תצוגה עברית / יידיש מסונכרנת ----
+  let VIEW = null; // 'he' | 'yi' | null (המקור)
+  const isYi = (r) => r && r.lang === 'yi';
+  function altSegs(r, v) {
+    if (!r) return null;
+    const ex = r.extras || {};
+    if (r.outLang === 'he' && Array.isArray(ex.yiOrig) && ex.yiOrig.length) return v === 'yi' ? ex.yiOrig : null; // העיקר בעברית, המקור ביידיש
+    if (v === 'he' && Array.isArray(ex.heSegs) && ex.heSegs.length) return ex.heSegs;
+    return null;
+  }
+  function defaultView(r) { if (!isYi(r)) return null; if (r.outLang === 'he') return 'he'; if (r.yiOut === 'both' && r.extras && r.extras.heSegs) return 'he'; return 'yi'; }
+  function mainLang(r) { return r.outLang === 'he' ? 'he' : 'yi'; }
+  function render() {
+    const r = Detail.rec, box = $('#dTranscript'); if (!r || !box) return;
+    let bar = document.getElementById('lvBar'), alt = document.getElementById('lvAlt');
+    if (!isYi(r) || r.status !== 'done' || !r.segments || !r.segments.length) { bar && bar.remove(); alt && alt.remove(); box.classList.remove('hidden-lv'); box.style.display = ''; return; }
+    if (VIEW === null || VIEW.id !== r.id) VIEW = { id: r.id, v: defaultView(r) };
+    const ml = mainLang(r), hasHe = ml === 'he' || !!altSegs(r, 'he'), hasYi = ml === 'yi' || !!altSegs(r, 'yi');
+    if (!bar) { box.insertAdjacentHTML('beforebegin', '<div id="lvBar" class="row" style="gap:.4em;margin:.4em 0 .6em;align-items:center;flex-wrap:wrap"></div>'); bar = document.getElementById('lvBar'); }
+    bar.innerHTML = `<span style="font-weight:700">מה להציג:</span>
+      <button type="button" class="btn small ${VIEW.v === 'he' ? 'primary' : ''}" data-lv="he">🇮🇱 עברית</button>
+      <button type="button" class="btn small ${VIEW.v === 'yi' ? 'primary' : ''}" data-lv="yi">📜 יידיש (מקור)</button>
+      <span class="hint" style="margin:0">${VIEW.v === 'he' ? 'האדמו"ר מדבר ביידיש – ואתם קוראים בעברית, שורה אחרי שורה.' : 'התמלול כפי שנאמר, ביידיש.'}</span>`;
+    const want = VIEW.v;
+    if (want === ml) { alt && alt.remove(); box.style.display = ''; return; }
+    const segs = altSegs(r, want);
+    if (!alt) { box.insertAdjacentHTML('afterend', '<div id="lvAlt" class="transcript" style="line-height:2"></div>'); alt = document.getElementById('lvAlt'); }
+    box.style.display = 'none';
+    alt.className = 'transcript ' + (LS.get('font', '') || '');
+    if (!segs) {
+      alt.innerHTML = want === 'he' ? `<div class="card" style="padding:1em;text-align:center"><div style="margin-bottom:.6em">לשיחה הזו עוד אין עברית מסונכרנת עם ההקלטה.</div><button class="btn primary" type="button" id="lvMake">⚡ ליצור עכשיו עברית מסונכרנת</button><div class="hint" style="margin-top:.5em">לוקח דקה-שתיים. אחר כך זה נשמר.</div></div>` : '<div class="muted">אין כאן תמלול מקורי ביידיש.</div>';
+      return;
+    }
+    const times = $('#timesChk') && $('#timesChk').checked, ce = Detail.canEdit && Detail.canEdit();
+    alt.innerHTML = segs.map((s, i) => `<span class="seg" data-lvseg="${i}" data-t="${+s.start || 0}" title="לחיצה – ניגון מכאן${ce && want === 'he' ? ' · לחיצה כפולה – תיקון' : ''}">${times ? `<span class="seg-time">${fmtTime(s.start)}</span> ` : ''}<span class="lvtx">${esc(s.text)}</span> </span>`).join('');
+  }
+  { const _rt317 = Detail.renderTranscript; Detail.renderTranscript = function () { const r = _rt317.apply(this, arguments); try { render(); } catch (e) { console.warn(e); } return r; }; }
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-lv]'); if (b) { e.preventDefault(); VIEW = { id: Detail.rec && Detail.rec.id, v: b.dataset.lv }; render(); return; }
+    if (e.target.closest('#lvMake')) {
+      e.preventDefault(); const r = Detail.rec; const btn = e.target.closest('#lvMake'); btn.disabled = true; btn.textContent = '⏳ מתרגם שורה אחרי שורה…';
+      try { const hs = await translateSegsToHe(r.segments, (p) => { btn.textContent = '⏳ ' + p; }); if (!hs || !hs.length) throw new Error('התרגום לא הצליח'); r.extras = Object.assign({}, r.extras, { heSegs: hs }); r.translations = Object.assign({}, r.translations, { he: hs.map((x) => x.text).join('\n') }); await saveRec(r, ['extras', 'translations']); toast('✅ נוצרה עברית מסונכרנת'); render(); }
+      catch (er) { toast('❌ ' + (er.message || er), 6000); btn.disabled = false; btn.textContent = '⚡ ליצור עכשיו עברית מסונכרנת'; }
+      return;
+    }
+    const sg = e.target.closest('#lvAlt [data-lvseg]'); if (sg && !sg.querySelector('[contenteditable="true"]')) { const p = $('#player'); if (p) { p.currentTime = +sg.dataset.t + 0.01; p.play().catch(() => {}); } }
+  });
+  // תיקון בעברית – לחיצה כפולה
+  document.addEventListener('dblclick', (e) => {
+    const sg = e.target.closest('#lvAlt [data-lvseg]'); if (!sg || !(Detail.canEdit && Detail.canEdit()) || VIEW.v !== 'he') return;
+    const tx = sg.querySelector('.lvtx'); tx.contentEditable = 'true'; tx.focus();
+    const done = async () => { tx.contentEditable = 'false'; const r = Detail.rec, i = +sg.dataset.lvseg, val = tx.textContent.trim();
+      const segs = r.outLang === 'he' ? null : (r.extras && r.extras.heSegs); if (!segs || !segs[i] || segs[i].text === val) return;
+      const old = segs[i].text; segs[i] = Object.assign({}, segs[i], { text: val }); r.translations = Object.assign({}, r.translations, { he: segs.map((x) => x.text).join('\n') });
+      try { await saveRec(r, ['extras', 'translations']); toast('✅ התיקון נשמר'); try { if (typeof learnFixes === 'function') learnFixes(old, val); } catch (er) {} } catch (er) { toast('❌ ' + er.message); } };
+    tx.addEventListener('blur', done, { once: true }); tx.addEventListener('keydown', (k) => { if (k.key === 'Enter') { k.preventDefault(); tx.blur(); } });
+  });
+  // הדגשה מסונכרנת עם השמע
+  let lastI = -1;
+  setInterval(() => {
+    const alt = document.getElementById('lvAlt'), p = $('#player'); if (!alt || !p || currentPage !== 'detail' || alt.style.display === 'none') return;
+    const r = Detail.rec; const segs = r && altSegs(r, VIEW && VIEW.v); if (!segs) return;
+    const t = p.currentTime; let i = -1; for (let k = 0; k < segs.length; k++) { if (t >= (+segs[k].start || 0)) i = k; else break; }
+    if (i === lastI) return; lastI = i;
+    alt.querySelectorAll('.seg.active').forEach((x) => x.classList.remove('active'));
+    const el = alt.querySelector(`[data-lvseg="${i}"]`); if (!el) return; el.classList.add('active');
+    if (!p.paused && $('#followChk') && $('#followChk').checked) { const br = alt.getBoundingClientRect(), er = el.getBoundingClientRect(); const seen = br.top < innerHeight - 80 && br.bottom > 80; if (seen && (er.top < 60 || er.bottom > innerHeight - 60)) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }, 250);
+})();
+
+/* 3.17.0 – עברית = רק עברית: בדיקה שורה-שורה ותיקון שורות שנשארו ביידיש */
+(function () {
+  const isYiLine = (t) => { const w = String(t || '').split(/\s+/).filter(Boolean).length; return w >= 4 && yiRatio(t) > 0.12; };
+  { const _ts317 = translateSegsToHe; translateSegsToHe = async function (segs, onProgress) {
+    let res = await _ts317.apply(this, arguments);
+    if (!res || !res.length) return res;
+    for (let pass = 0; pass < 2; pass++) {
+      const bad = res.map((s, i) => [i, s]).filter(([, s]) => isYiLine(s.text));
+      if (!bad.length) break;
+      onProgress && onProgress(`🇮🇱 מתקן ${bad.length} שורות שיצאו ביידיש…`);
+      const src = bad.map(([i, s]) => `[${i}] ${s.text}`).join('\n');
+      try {
+        const out = await gemText(HE_STRICT + `\nThe following numbered lines are still in YIDDISH. Translate each one fully into Hebrew. Keep the [number] at the start of every line. Output ONLY the lines.\n\n${src}`, 'translate', onProgress);
+        String(out || '').split('\n').forEach((l) => { const m = l.match(/^\s*\[(\d+)\]\s*(.+)$/); if (m && res[+m[1]] && !isYiLine(m[2])) res[+m[1]] = Object.assign({}, res[+m[1]], { text: fixArabic(m[2].trim()) }); });
+      } catch (e) { console.warn('fix yi lines', e); break; }
+    }
+    return res;
+  }; }
+  // נוסח / תרגום שיצא עם יידיש – עוד ניסיון אחד, בהוראה חזקה
+  { const _gt317 = gemText; gemText = async function (prompt, kind, prog) {
+    const out = await _gt317.apply(this, arguments);
+    if ((kind === 'nusach' || kind === 'translate') && out && yiRatio(out) > 0.06 && !/Transcribe/i.test(String(prompt).slice(0, 200))) {
+      try {
+        prog && prog('🇮🇱 הטקסט יצא חלקית ביידיש – כותב שוב בעברית…');
+        const again = await _gt317.call(this, HE_STRICT + '\nWRITE THE ENTIRE ANSWER IN HEBREW / לשון הקודש ONLY. Not a single Yiddish sentence.\n\n' + prompt, kind, prog);
+        if (again && yiRatio(again) < yiRatio(out)) return again;
+      } catch (e) {}
+    }
+    return out;
+  }; }
+})();
+/* =========================================================
+   3.18.0 – ספריית סגנון חסויה (חומר ערוך של החצר) + מילון החצר
+   החומר נשמר בטבלה style_examples בסוג 'lib' – לא מוצג למשתמשים, לא בחיפוש
+   ובארכיון; משמש רק את המערכת: בכל עריכה נשלפים 2–3 קטעים מאותה פרשה.
+   ========================================================= */
+(function () {
+  const _lse = loadStyleExamples;
+  loadStyleExamples = async function (force) {
+    if (STYLE_EX && !force) return STYLE_EX;
+    const { data, error } = await sb.from('style_examples').select('id,kind,title,source_text,target_text,rec_id,created_at').neq('kind', 'lib').order('created_at');
+    if (error) return _lse.apply(this, arguments);
+    STYLE_EX = data || []; return STYLE_EX;
+  };
+  const LIBC = new Map();
+  window.libFor = async function (rec) {
+    const par = (typeof detectParasha === 'function' ? detectParasha(rec || {}) : '') || '';
+    const occ = ((rec && (rec.occasion || rec.title)) || '').match(/ראש השנה|שבועות|חנוכה|פסח|סוכות|שבת שובה|ל"ג בעומר|סליחות|תשליך|כ"ה תשרי|י"ט ניסן|פתיחת הזמן|סיום זמן|סעודת הודאה|מעמד/);
+    const key = par ? 'פרשת ' + par : (occ ? occ[0] : '');
+    const ck = key || '*';
+    if (LIBC.has(ck)) return LIBC.get(ck);
+    let q = sb.from('style_examples').select('title,target_text').eq('kind', 'lib');
+    q = key ? q.ilike('title', '%' + key + '%') : q.ilike('title', '📚 תורה%');
+    const { data, error } = await q.limit(24);
+    if (error || !data) { LIBC.set(ck, []); return []; }
+    const rank = (t) => (t.startsWith('📚 תורה') ? 0 : t.startsWith('📚 גליון') ? 1 : 2);
+    const rows = data.slice().sort((a, b) => rank(a.title) - rank(b.title) || (key ? 0 : Math.random() - 0.5));
+    const out = []; let used = 0;
+    for (const r of rows) { const t = r.target_text || ''; if (used + t.length > 16000 && out.length) break; out.push(r); used += t.length; if (out.length >= 3) break; }
+    LIBC.set(ck, out); return out;
+  };
+  window.CUR_LIB = [];
+  const termsText = () => { const g = (STYLE_EX || []).find((x) => x.kind === 'guide_terms'); return g ? g.target_text : ''; };
+  { const _np18 = nusachPrompt; nusachPrompt = function (kind, part, examples, ctx) {
+    let p = _np18.apply(this, arguments);
+    const terms = termsText();
+    const lib = (window.CUR_LIB || []).map((x, i) => `### קטע ${i + 1} – ${x.title.replace(/^📚\s*/, '')}\n${x.target_text}`).join('\n\n');
+    if (!terms && !lib) return p;
+    const block = (terms ? `\n===== THE HOUSE STYLE DICTIONARY OF THIS COURT – use these exact forms of titles, abbreviations, openings, transitions and closings =====\n${terms}\n` : '') +
+      (lib ? `\n===== PUBLISHED TEXTS OF THIS COURT (same parasha / occasion) – ONLY to imitate their language, titles and style. NEVER copy ideas, sources, stories or sentences from them; the content must come only from the transcript of THIS talk =====\n${lib}\n` : '');
+    const at = p.lastIndexOf('\n===== THE ');
+    return at > 0 ? p.slice(0, at) + block + p.slice(at) : p + block;
+  }; }
+  { const _mn18 = makeNusach; makeNusach = async function (rec) {
+    try { await loadStyleExamples(); window.CUR_LIB = await libFor(rec); } catch (e) { window.CUR_LIB = []; }
+    try { return await _mn18.apply(this, arguments); } finally { window.CUR_LIB = []; }
+  }; }
+  { const _gt18 = gemText; gemText = async function (prompt, kind, prog) {
+    if (kind === 'translate' || kind === 'proof') {
+      const terms = termsText();
+      if (terms && !String(prompt).includes('HOUSE STYLE DICTIONARY')) prompt = `===== HOUSE STYLE DICTIONARY OF THIS COURT – when the Yiddish mentions these people / terms, write them in Hebrew exactly in these forms =====\n${terms.slice(0, 6000)}\n=====\n\n` + prompt;
+      return _gt18.call(this, prompt, kind, prog);
+    }
+    return _gt18.apply(this, arguments);
+  }; }
+})();
+
+/* 3.18.0 – העלאת "ספרייה חסויה" מחלון האימון (רק מנהל) */
+(function () {
+  const PARS = ['בראשית','נח','לך לך','וירא','חיי שרה','תולדות','ויצא','וישלח','וישב','מקץ','ויגש','ויחי','שמות','וארא','בא','בשלח','יתרו','משפטים','תרומה','תצוה','כי תשא','ויקהל','פקודי','ויקרא','צו','שמיני','תזריע','מצורע','אחרי מות','קדושים','אמור','בהר','בחוקותי','במדבר','נשא','בהעלותך','שלח','קרח','חוקת','בלק','פנחס','מטות','מסעי','דברים','ואתחנן','עקב','ראה','שופטים','כי תצא','כי תבא','נצבים','וילך','האזינו'];
+  const libTitle = (name, text) => {
+    const hay = ' ' + (name + ' ' + String(text || '').slice(0, 300)).replace(/[_\-–.]/g, ' ') + ' ';
+    const p = PARS.slice().sort((a, b) => b.length - a.length).find((x) => hay.includes(' ' + x + ' '));
+    return '📚 תורה · ' + (p ? 'פרשת ' + p : name.replace(/\.[^.]+$/, '').slice(0, 80));
+  };
+  const chunk = (title, text) => {
+    const out = []; let cur = '';
+    for (const para of String(text).split('\n')) { if (cur.length + para.length > 9000 && cur) { out.push(cur); cur = ''; } cur += para + '\n'; }
+    if (cur.trim()) out.push(cur);
+    return out.filter((t) => t.trim().length > 300).map((t, i, a) => ({ title: (title + (a.length > 1 ? ` (${i + 1}/${a.length})` : '')).slice(0, 190), text: t.trim() }));
+  };
+  async function libCount() { try { const { count } = await sb.from('style_examples').select('id', { count: 'exact', head: true }).eq('kind', 'lib'); return count || 0; } catch (e) { return 0; } }
+  async function libUpload() {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true; inp.accept = '.json,.docx,.txt';
+    inp.onchange = async () => {
+      const files = [...inp.files]; if (!files.length) return;
+      const st = $('#libSt'); const say = (t) => { if (st) st.textContent = t; };
+      let items = [];
+      for (const f of files) {
+        try {
+          if (/\.json$/i.test(f.name)) { const j = JSON.parse(await f.text()); (Array.isArray(j) ? j : []).forEach((x) => { if (x && x.text && x.title) items.push({ kind: x.kind === 'guide_terms' ? 'guide_terms' : 'lib', title: String(x.title).slice(0, 190), text: String(x.text) }); }); }
+          else { const t = /\.docx$/i.test(f.name) ? await docxToText(f) : await f.text(); items = items.concat(chunk(libTitle(f.name, t), t)); }
+        } catch (e) { console.warn('lib file', f.name, e); }
+      }
+      if (!items.length) return say('❌ לא נמצא טקסט בקבצים');
+      let ok = 0;
+      if (items.some((x) => x.kind === 'guide_terms')) await sb.from('style_examples').delete().eq('kind', 'guide_terms');
+      for (let i = 0; i < items.length; i += 40) {
+        say(`⏳ שומר בספרייה… ${Math.min(i + 40, items.length)} מתוך ${items.length}`);
+        const rows = items.slice(i, i + 40).map((x) => ({ kind: x.kind || 'lib', title: x.title, target_text: x.text.slice(0, 60000), created_by: ME.id }));
+        const { error } = await sb.from('style_examples').insert(rows);
+        if (error) { say('❌ ' + error.message); return; }
+        ok += rows.length;
+      }
+      try { await loadStyleExamples(true); } catch (e) {}
+      say(`✅ נשמרו ${ok} קטעים. בספרייה עכשיו: ${await libCount()} קטעים.${items.some((x) => x.kind === 'guide_terms') ? ' + מילון החצר' : ''}`);
+    };
+    inp.click();
+  }
+  { const _ot = openTrain; openTrain = function () {
+    const r = _ot.apply(this, arguments);
+    try {
+      const pr = $('#trProg');
+      if (pr && isAdmin() && !$('#libBox')) {
+        pr.insertAdjacentHTML('beforebegin', `<div id="libBox" class="card" style="margin-top:1em;padding:.8em 1em;border:2px dashed var(--line);border-radius:12px">
+          <b>📚 ספרייה חסויה – חומר ערוך בלי הקלטות</b>
+          <div class="muted" style="margin:.3em 0 .6em">גליונות, קבצי וורד, ספרים – הכול עוזר. המערכת לומדת מהם רק את הסגנון, התארים והניסוחים של החצר. החומר <b>לא מופיע</b> בארכיון, בחיפוש או אצל המשתמשים.</div>
+          <button class="btn primary" type="button" id="libGo">📂 בחירת קבצים (וורד / טקסט / json)</button>
+          <span id="libSt" class="muted" style="margin-inline-start:.8em"></span></div>`);
+        libCount().then((n) => { const s = $('#libSt'); if (s && !s.textContent) s.textContent = n ? `בספרייה עכשיו: ${n} קטעים` : 'הספרייה עדיין ריקה'; });
+      }
+    } catch (e) {}
+    return r;
+  }; }
+  document.addEventListener('click', (e) => { if (e.target.closest('#libGo')) { e.preventDefault(); libUpload(); } });
+})();
+
+/* 3.18.0 – "מה לקבל בסוף": שפה אחת / שתי שפות / נוסח כתוב – מסודר ומוסבר */
+(function () {
+  const EXPL = { yi: '📜 רק יידיש – התמלול בדיוק כפי שנאמר, ביידיש.', he: '🇮🇱 רק עברית – הכול מתורגם לעברית. (היידיש המקורית נשמרת – אפשר להציץ בה בלחיצה.)', en: '🇺🇸 רק אנגלית – הכול מתורגם לאנגלית.', both: '📜+🇮🇱 שתי השפות – מקבלים גם את היידיש וגם את העברית, שורה מול שורה, ועוברים ביניהן בלחיצה אחת.', before: '📜 עריכה ראשונה – המערכת כותבת את השיחה בלשון הקודש, בסגנון של הבית.', after: '🖨️ מוכן להדפסה – הנוסח הסופי עם כותרות, כמו בחוברת.' };
+  const fix = () => { try { const v = LS.get('yiOut', null); if (v === null || v === 'all') LS.set('yiOut', 'he'); } catch (e) {} };
+  fix();
+  const st = document.createElement('style'); st.textContent = '#yiOutPills .yoGrp{font-size:.82em;opacity:.75;font-weight:700;align-self:center;margin-inline-start:.6em}#yoHint{flex-basis:100%;font-size:.88em;padding:.35em .7em;border-radius:10px;background:rgba(245,179,66,.14);margin-top:.3em}'; document.head.appendChild(st);
+  const lay = () => {
+    const box = document.getElementById('yiOutPills'); if (!box) return;
+    box.querySelectorAll('[data-yiout="all"]').forEach((b) => b.remove());
+    const q = (k) => box.querySelector(`[data-yiout="${k}"]`);
+    if (!box.querySelector('.yoGrp')) {
+      const g = (t, br) => { const f = document.createDocumentFragment(); if (br) { const x = document.createElement('span'); x.style.cssText = 'flex-basis:100%;height:0'; f.appendChild(x); } const s = document.createElement('span'); s.className = 'yoGrp'; s.textContent = t; f.appendChild(s); return f; };
+      q('yi') && q('yi').before(g('שפה אחת:'));
+      q('both') && (q('both').textContent = '📜+🇮🇱 יידיש + עברית', q('both').before(g('שתי שפות:', true)));
+      q('before') && q('before').before(g('נוסח כתוב:', true));
+      // הסדר: יידיש · עברית · אנגלית | יידיש+עברית | עריכה · מוכן
+      const yi = q('yi'), he = q('he'), en = q('en'), bo = q('both'); if (yi && he && en) { yi.after(he); he.after(en); }
+      box.style.flexWrap = 'wrap';
+    }
+    let h = document.getElementById('yoHint'); if (!h) { box.insertAdjacentHTML('beforeend', '<div id="yoHint"></div>'); h = document.getElementById('yoHint'); }
+    const yo = LS.get('yiOut', 'he'); h.textContent = EXPL[yo] || '';
+    box.querySelectorAll('button[data-yiout]').forEach((b) => b.classList.toggle('active', b.dataset.yiout === yo));
+  };
+  lay(); new MutationObserver(() => { const box = document.getElementById('yiOutPills'); if (box && (!box.querySelector('.yoGrp') || !document.getElementById('yoHint') || box.querySelector('[data-yiout="all"]'))) lay(); }).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('click', (e) => { if (e.target.closest('#yiOutPills [data-yiout]')) setTimeout(lay, 50); });
+  { const _qa = Queue.add; Queue.add = function () { fix(); return _qa.apply(this, arguments); }; }
+})();
+
+/* 3.18.0 – 🔎 חיפוש במקום בולט: שורת חיפוש גדולה בראש "תמלול" ובראש "ספרייה" */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `.bigSearch{display:flex;gap:.5em;align-items:center;margin:0 0 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(245,179,66,.18),rgba(44,62,143,.10));border:2px solid rgba(245,179,66,.65);box-shadow:0 4px 16px #0001}
+  .bigSearch .bsI{font-size:1.5em}.bigSearch input{flex:1;min-width:0;font-size:1.12em;padding:.65em .9em;border-radius:12px;border:1px solid var(--line,#ccd);direction:rtl}
+  .bigSearch button{font-size:1.05em;white-space:nowrap}.bigSearch small{display:block;opacity:.75;font-size:.82em;margin-top:2px}
+  nav [data-page="search"]{background:rgba(245,179,66,.22)!important;border-radius:10px;font-weight:800}
+  @media (max-width:640px){.bigSearch{flex-wrap:wrap}.bigSearch .bsI{display:none}.bigSearch button{width:100%}}`;
+  document.head.appendChild(st);
+  const html = (id) => `<form class="bigSearch" data-bigsearch id="${id}"><span class="bsI">🔎</span><div style="flex:1;min-width:0"><input type="search" placeholder="חיפוש בכל השיחות – מילה, פסוק, שם או נושא…" aria-label="חיפוש בכל השיחות"><small>מוצא בדיוק איפה זה נאמר בהקלטה – לוחצים ושומעים</small></div><button class="btn primary" type="submit">🔎 חיפוש</button></form>`;
+  const put = () => {
+    const home = document.getElementById('page-home'); if (home && !document.getElementById('bsHome')) { home.insertAdjacentHTML('afterbegin', html('bsHome')); }
+    const lib = document.getElementById('page-library'); if (lib && !document.getElementById('bsLib')) lib.insertAdjacentHTML('afterbegin', html('bsLib'));
+  };
+  put(); new MutationObserver(() => { if (!document.getElementById('bsHome') || !document.getElementById('bsLib')) put(); }).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('[data-bigsearch]'); if (!f) return; e.preventDefault();
+    const q = f.querySelector('input').value.trim(); if (!q) { f.querySelector('input').focus(); return; }
+    go('search');
+    setTimeout(() => { const i = document.getElementById('asQ'); if (i) { i.value = q; const g = document.getElementById('asGo'); g && g.click(); } }, 150);
+  });
+})();
+
+/* 3.18.0 – רקע בצבעי המותג: כחול-אפור בהיר עם הילה כחולה וזהב עדין – רק במצב בהיר */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `body:not(.dark):not(.a11y-contrast){--bg:#eef1f7;--line:#d9dfec;
+    background:radial-gradient(1000px 480px at 85% -10%,rgba(40,62,140,.20),transparent 62%),radial-gradient(800px 420px at -5% 0%,rgba(201,162,74,.16),transparent 58%),radial-gradient(1200px 700px at 50% 118%,rgba(30,45,110,.14),transparent 60%),linear-gradient(180deg,#f4f6fb 0%,#e9edf6 100%)!important;background-attachment:fixed!important}
+  body:not(.dark) .card,body:not(.dark) .hero,body:not(.dark) .page>.card{box-shadow:0 1px 2px rgba(27,35,80,.06),0 8px 26px rgba(27,35,80,.10)}
+  body:not(.dark) .bigSearch{background:linear-gradient(135deg,#ffffff,#eef2fb)!important;border:2px solid rgba(201,162,74,.75)!important;box-shadow:0 6px 20px rgba(27,35,80,.12)!important}`;
+  document.head.appendChild(st);
+})();
+
+
+/* 3.18.0 – "עכשיו תורכם": בסוף סרטון העזרה – כפתור גדול לנסות בעצמכם (מעביר להעלאת הקלטה ומסמן אותה) */
+(function () {
+  const st = document.createElement('style');
+  st.textContent = `.tryNow{display:block;width:100%;margin:.6em 0 .2em;padding:.85em 1em;border:0;border-radius:14px;cursor:pointer;font:inherit;font-weight:800;font-size:1.12em;color:#1b2350;background:linear-gradient(180deg,#f6d98d,#d6a845);box-shadow:0 6px 18px rgba(214,168,69,.35)}
+  .tryNow.big{animation:tryPulse 1.4s ease-in-out infinite}@keyframes tryPulse{50%{transform:scale(1.04);box-shadow:0 8px 26px rgba(214,168,69,.6)}}
+  .tryFocus{outline:5px solid #f97316!important;outline-offset:6px;border-radius:18px;animation:tryGlow 1.2s ease-in-out 4}@keyframes tryGlow{50%{outline-color:#fdba74}}`;
+  document.head.appendChild(st);
+  function goTry() {
+    try { const pnl = document.getElementById('helpPanel'); if (pnl && pnl.classList.contains('open')) document.getElementById('helpClose')?.click(); } catch (e) {}
+    go('home');
+    setTimeout(() => { const d = document.getElementById('drop'); if (!d) return; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); d.classList.add('tryFocus'); setTimeout(() => d.classList.remove('tryFocus'), 6000); }, 350);
+  }
+  new MutationObserver(() => {
+    const v = document.querySelector('#helpBody video'); if (!v || v.dataset.try) return; v.dataset.try = '1';
+    v.insertAdjacentHTML('afterend', '<button type="button" class="tryNow" data-trynow>🎙️ עכשיו תורכם – העלו הקלטה ונסו בעצמכם</button>');
+    v.addEventListener('ended', () => { const b = v.parentElement && v.parentElement.querySelector('[data-trynow]'); if (b) { b.classList.add('big'); b.scrollIntoView({ block: 'center', behavior: 'smooth' }); } });
+  }).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-trynow]')) { e.preventDefault(); goTry(); } });
 })();
 </script>
 </body>
