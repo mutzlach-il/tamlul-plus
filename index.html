@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.19.0';
+const APP_VERSION = '3.20.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -11309,7 +11309,7 @@ orgPairs = async function () {
       <button type="button" data-hc="tour"><span class="i">🧭</span>סיור על המסך<small>דקה, צעד אחר צעד</small></button>
       <button type="button" data-hc="help"><span class="i">📘</span>כל ההוראות<small>לכל מסך ומסך</small></button>
       <button type="button" data-hc="asst"><span class="i">✨</span>העוזר האישי<small>שאלה על השיחות</small></button>
-      <button type="button" data-hc="idea"><span class="i">💡</span>יש לכם רעיון?<small>שיפור או אפליקציה חדשה</small></button>
+      <button type="button" data-hc="idea"><span class="i">💡</span>יש לכם רעיון?<small>כתבו לנו מה אתם חושבים</small></button>
       <button type="button" data-hc="refer"><span class="i">🎁</span>חבר מביא חבר<small>המליצו – וקבלו מתנה</small></button>
     </div>`);
   }).observe(document.body, { childList: true, subtree: true });
@@ -11338,16 +11338,9 @@ orgPairs = async function () {
     const pg = document.getElementById('page-refer'); if (!pg || document.getElementById('ideaBox')) return;
     pg.insertAdjacentHTML('beforeend', `<div class="card ideaCard" id="ideaBox">
       <h3 style="margin:0 0 .3em">💡 יש לכם רעיון?</h3>
-      <p class="muted" style="margin:0 0 .7em">משהו שהיה עוזר לכם בעבודה? רעיון לשיפור, לפיצ'ר חדש – או אפילו לאפליקציה חדשה לגמרי? <b>כתבו לנו – אנחנו קוראים כל רעיון</b>, והטובים נבנים.</p>
-      <div class="row" style="gap:.4em;flex-wrap:wrap;margin-bottom:.5em" id="ideaType">${['🔧 שיפור במערכת', '✨ פיצ\'ר חדש', '📱 רעיון לאפליקציה חדשה', '🙂 סתם מחמאה'].map((x, i) => `<button type="button" class="btn small ${i ? '' : 'primary'}" data-itype="${x}">${x}</button>`).join('')}</div>
-      <textarea id="ideaText" rows="4" style="width:100%" placeholder="למשל: היה עוזר לי אם המערכת הייתה מסמנת לבד את כל הפסוקים בשיחה…"></textarea>
+      <p class="muted" style="margin:0 0 .7em">כתבו לנו במילים שלכם – מה חסר, מה היה עוזר, מה הייתם משנים. <b>אנחנו קוראים כל מה שנכתב.</b></p>
+      <textarea id="ideaText" rows="5" style="width:100%" placeholder="כתבו כאן מה שאתם חושבים…"></textarea>
       <button class="btn primary" type="button" id="ideaSend" style="width:100%;margin-top:.6em">📨 שליחת הרעיון</button><div id="ideaMsg" class="form-msg" style="margin-top:.4em"></div>
-    </div>
-    <div class="card ideaCard" id="voteBox">
-      <h3 style="margin:0 0 .3em">🗳️ מה לבנות הבא? אתם מחליטים</h3>
-      <p class="muted" style="margin:0 0 .5em">סמנו מה הכי היה עוזר לכם (אפשר כמה), ולחצו "שליחת ההצבעה". מה שיקבל הכי הרבה קולות – ייבנה ראשון.</p>
-      ${NEXT.map(([i, t], n) => `<div class="voteRow" data-vote="${n}"><span class="vi">${i}</span><span style="flex:1">${t}</span><span class="vchk">⬜</span></div>`).join('')}
-      <button class="btn primary" type="button" id="voteSend" style="width:100%;margin-top:.6em">🗳️ שליחת ההצבעה</button><div id="voteMsg" class="form-msg" style="margin-top:.4em"></div>
     </div>`);
   }
   ideas(); { const _go2 = go; go = function (page) { const r = _go2.apply(this, arguments); if (page === 'refer') ideas(); return r; }; }
@@ -11357,9 +11350,9 @@ orgPairs = async function () {
     const v = e.target.closest('[data-vote]'); if (v) { v.classList.toggle('on'); v.querySelector('.vchk').textContent = v.classList.contains('on') ? '✅' : '⬜'; return; }
     if (e.target.closest('#ideaSend')) {
       const txt = (document.getElementById('ideaText').value || '').trim(), m = document.getElementById('ideaMsg');
-      if (txt.length < 3) { m.className = 'form-msg err'; m.textContent = 'כתבו את הרעיון בכמה מילים.'; return; }
+      if (txt.length < 3) { m.className = 'form-msg err'; m.textContent = 'כתבו כמה מילים.'; return; }
       m.className = 'form-msg'; m.textContent = '⏳ שולח…';
-      const ok = await mail(`💡 רעיון חדש מהמערכת – ${ITYPE}`, `סוג: ${ITYPE}\n\n${txt}\n\nמאת: ${who()}\nזמן: ${new Date().toLocaleString('he-IL')}`);
+      const ok = await mail('💡 רעיון חדש מהמערכת', `${txt}\n\nמאת: ${who()}\nזמן: ${new Date().toLocaleString('he-IL')}`);
       if (ok) { m.innerHTML = '✅ <b>תודה רבה!</b> הרעיון הגיע אלינו. נעדכן אתכם אם הוא נבנה.'; document.getElementById('ideaText').value = ''; } else { m.className = 'form-msg err'; m.textContent = '❌ לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע.'; }
     }
     if (e.target.closest('#voteSend')) {
@@ -11415,7 +11408,7 @@ orgPairs = async function () {
   // 4. במסך "תיקונים שהמערכת למדה" – הסבר ברור למנהל
   new MutationObserver(() => {
     const h = [...document.querySelectorAll('.modal h3')].find((x) => /תיקונים שהמערכת למדה/.test(x.textContent));
-    if (h && !h.dataset.v3182) { h.dataset.v3182 = '1'; h.insertAdjacentHTML('afterend', '<div style="margin:.3em 0 .6em;padding:.6em .8em;border-radius:10px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.5)"><b>🛡️ חשוב:</b> תיקון של עורך נשמר כ<b>הצעה</b> ומתקן רק את ההקלטה שבה נעשה. רק תיקון שאתה מאשר ב-✅ (למשל שם של צדיק או ספר שתמיד נשמע לא נכון) יוחלף אוטומטית בכל התמלולים הבאים.</div>'); }
+    if (h && !h.dataset.v3182) { h.dataset.v3182 = '1'; h.insertAdjacentHTML('afterend', '<div class="fx318" style="margin:.4em 0 .6em;padding:.6em .8em;border-radius:10px;background:rgba(249,115,22,.12);border:1px solid #f97316;font-size:.92em">🛡️ <b>חשוב:</b> תיקון שהעורך עשה בשיחה אחת – מתקן רק אותה. תיקון שהעורך עשה ב-2 שיחות שונות או יותר – מאושר אוטומטית ומוחלף בכל התמלולים הבאים. אין צורך שהמנהל יאשר כל תיקון.</div>'); }
   }).observe(document.body, { childList: true, subtree: true });
   try { loadFixes(true); } catch (e) {}
 })();
@@ -11588,6 +11581,120 @@ orgPairs = async function () {
     const r = Detail.rec, t = (r.extras && r.extras.ai && r.extras.ai.nikud) || ''; if (!t) return;
     try { const blob = await docToDocxBlob([{ title: r.title, meta: (r.extras.ai.nikudInfo || ''), secs: [{ h: '', lines: t.split(/\n+/) }] }], r.title); download(blob, safeName(r.title) + ' - מנוקד.docx'); toast('⬇️ הקובץ ירד'); } catch (er) { toast('❌ ' + er.message); }
   });
+})();
+
+/* ===== 3.20.0 – לומדים יותר מהעורך: "סיימתי לערוך", ציון אמיתי, "מומלץ לאשר", מילון שמות ===== */
+(function () {
+  const W = (t) => String(t || '').replace(/\[\d{1,2}:\d{2}(?::\d{2})?\]/g, ' ').replace(/[֑-ׇ]/g, '').replace(/[.,:;!?״"׳'()\-–]/g, ' ').split(/\s+/).filter(Boolean);
+  function lev(a, b) { const n = a.length, m = b.length; if (!n) return m; if (!m) return n; let p = new Array(m + 1); for (let j = 0; j <= m; j++) p[j] = j; for (let i = 1; i <= n; i++) { const c = [i]; for (let j = 1; j <= m; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[m]; }
+  // אחוז המילים שהעורך שינה. טקסט ארוך – בחלקים של 600 מילים כדי שלא ייתקע
+  function editRate(src, dst) {
+    const a = W(src), b = W(dst); if (!b.length) return null;
+    let ed = 0; const N = 600;
+    if (a.length * b.length <= 9e6) ed = lev(a, b);
+    else { const k = Math.ceil(Math.max(a.length, b.length) / N); for (let i = 0; i < k; i++) { const ra = a.slice(Math.floor(i * a.length / k), Math.floor((i + 1) * a.length / k)), rb = b.slice(Math.floor(i * b.length / k), Math.floor((i + 1) * b.length / k)); ed += lev(ra, rb); } }
+    return { words: b.length, edits: ed, pct: Math.min(100, 100 * ed / b.length) };
+  }
+  window.editRate = editRate;
+  const isEd = () => ME && (ME.role === 'admin' || ME.role === 'editor');
+  const nowText = (r) => (r.segments && r.segments.length ? r.segments.map((s) => s.text).join('\n') : r.text || '');
+  async function origText(r) {
+    try { const { data } = await sb.from('rec_versions').select('text,created_at').eq('rec_id', r.id).order('created_at', { ascending: true }).limit(1); if (data && data[0] && data[0].text) return data[0].text; } catch (e) {}
+    try { await loadStyleExamples(); const ex = (STYLE_EX || []).find((x) => x.kind === 'yi' && x.rec_id === r.id); if (ex && ex.source_text) return ex.source_text; } catch (e) {}
+    return (typeof YI_FIRST !== 'undefined' && YI_FIRST[r.id]) || '';
+  }
+
+  // --- 1. כפתור "✅ סיימתי לערוך" ---
+  function placeDone() {
+    const tb = document.querySelector('#page-detail .toolbar'); if (!tb || document.getElementById('editDoneBtn')) return;
+    tb.insertAdjacentHTML('afterbegin', '<button class="btn small can-edit" id="editDoneBtn" title="העורך סיים – המערכת לומדת מכל השיחה ומחשבת כמה היא צדקה" style="background:#2e9e5b;color:#fff;border-color:#2e9e5b">✅ סיימתי לערוך</button>');
+  }
+  placeDone(); setInterval(placeDone, 1500);
+  { const _o = Detail.open; Detail.open = async function () { const x = await _o.apply(this, arguments); try { const b = document.getElementById('editDoneBtn'); const r = this.rec; if (b && r) { const d = r.extras && r.extras.editDone; b.classList.toggle('hidden', !isEd() || r.status !== 'done'); b.innerHTML = d ? `✅ נערך · ${Math.round(100 - d.pct)}% נכון` : '✅ סיימתי לערוך'; } } catch (e) {} return x; }; }
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('#editDoneBtn'); if (!b) return; e.preventDefault();
+    const r = Detail.rec; if (!r || !isEd()) return;
+    b.disabled = true; const lbl = b.innerHTML; b.innerHTML = '<span class="spinner"></span> מחשב…';
+    try {
+      const src = await origText(r), now = nowText(r);
+      if (!src || src.trim() === now.trim()) { toast('לא מצאתי שינויים מהתמלול הראשון – אין ממה ללמוד', 5000); return; }
+      const q = editRate(src, now);
+      r.extras = Object.assign({}, r.extras, { editDone: { by: (ME.display_name || ME.email || ''), at: new Date().toISOString(), pct: +q.pct.toFixed(1), words: q.words, edits: q.edits } });
+      await saveRec(r, ['extras']);
+      // השיחה המתוקנת כולה – כדוגמה לכתיב יידיש (גם אם תוקן מעט)
+      if (r.lang === 'yi') { try { await sb.rpc('learn_example', { p_kind: 'yi', p_rec: r.id, p_title: (r.title || 'הקלטה') + ' – כתיב מתוקן', p_src: src.slice(0, 40000), p_target: now.slice(0, 60000) }); await loadStyleExamples(true); } catch (er) {} }
+      modal(`<h3>✅ תודה! השיחה נשמרה ללימוד</h3>
+        <div style="font-size:1.6em;font-weight:800;margin:.3em 0">${Math.round(100 - q.pct)}% מהמילים – המערכת צדקה</div>
+        <p>שינית ${q.edits === 1 ? 'מילה אחת' : q.edits.toLocaleString('he-IL') + ' מילים'} מתוך ${q.words.toLocaleString('he-IL')} (${q.pct.toFixed(1)}%).</p>
+        <p class="muted">מעכשיו המערכת משתמשת בשיחה הזו כדוגמה לכתיב הנכון. הציון נשמר, ובחלון "🧠 תיקונים שהמערכת למדה" רואים איך המערכת משתפרת משיחה לשיחה.</p>`, { okText: 'סגירה', cancelText: '' });
+      b.innerHTML = `✅ נערך · ${Math.round(100 - q.pct)}% נכון`;
+    } catch (er) { toast('❌ ' + (er.message || er), 6000); b.innerHTML = lbl; }
+    finally { b.disabled = false; }
+  });
+
+  // --- 2+3. חלון התיקונים: איכות אמיתית, "מומלץ לאשר", הסבר נכון ---
+  async function quality() {
+    const rows = [];
+    try { await loadStyleExamples(); (STYLE_EX || []).filter((x) => x.kind === 'yi' && x.source_text && x.target_text).forEach((x) => { const q = editRate(x.source_text, x.target_text); if (q && q.words > 80) rows.push({ t: String(x.title || '').replace(/ – כתיב מתוקן$/, ''), by: x.by_name || '', at: x.created_at, pct: q.pct, words: q.words }); }); } catch (e) {}
+    try { recsList().forEach((r) => { const d = r.extras && r.extras.editDone; if (d && !rows.find((x) => x.t === r.title)) rows.push({ t: r.title, by: d.by, at: d.at, pct: d.pct, words: d.words }); }); } catch (e) {}
+    rows.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    return rows;
+  }
+  const _of = openFixes;
+  openFixes = async function () {
+    const x = await _of.apply(this, arguments);
+    try {
+      const m = [...document.querySelectorAll('.modal')].find((el) => /תיקונים שהמערכת למדה/.test((el.querySelector('h3') || {}).textContent || '')); if (!m) return x;
+      const p = m.querySelector('p.muted'); if (p) p.innerHTML = 'כל תיקון נשמר כאן, עם שם מי שתיקן. העורך או המנהל יכולים גם לאשר תיקון מיד ב-✅ (שם או מונח שאושר נכנס גם למילון). תיקון לא נכון – 🗑️.';
+      m.querySelectorAll('.act-row .badge').forEach((bd) => { bd.textContent = bd.textContent.replace(' · מוחלף לבד', ' · הצעה').replace(' · פעיל', ' · הצעה'); if (/הצעה/.test(bd.textContent)) bd.classList.remove('ok'); });
+      // מומלץ לאשר: אותו תיקון בשתי שיחות שונות או יותר
+      const { data: lg } = await sb.from('nusach_fix_log').select('wrong,right,rec_title').order('created_at', { ascending: false }).limit(3000);
+      const recsOf = {}; (lg || []).forEach((l) => { const k = l.wrong + '\u0001' + l.right; (recsOf[k] = recsOf[k] || new Set()).add(l.rec_title || ''); });
+      let nRec = 0;
+      m.querySelectorAll('.act-row').forEach((row) => {
+        const bt = row.querySelector('b.grow'); const up = row.querySelector('[data-fixup]'); if (!bt || !up) return;
+        const [w, r] = bt.textContent.split(' ← '); const s = recsOf[(w || '').trim() + '\u0001' + (r || '').trim()];
+        const conf = /מאושר/.test(row.textContent);
+        if (s && s.size >= 2 && !conf) { nRec++; row.style.background = 'rgba(46,158,91,.10)'; row.style.borderRight = '4px solid #2e9e5b'; row.querySelectorAll('.badge').forEach((bd) => { if (/הצעה/.test(bd.textContent)) { bd.textContent = bd.textContent.replace(' · הצעה', ' · מאושר אוטומטית'); bd.classList.add('ok'); } }); bt.insertAdjacentHTML('afterend', `<span class="badge ok" title="העורך תיקן כך ב-${s.size} שיחות שונות – לכן זה מוחלף לבד בכל תמלול">🤖 ${s.size} שיחות</span>`); }
+      });
+      // איכות אמיתית
+      const Q = await quality();
+      const avg = Q.length ? Q.reduce((a, q) => a + (100 - q.pct) * q.words, 0) / Q.reduce((a, q) => a + q.words, 0) : null;
+      const box = `<div class="card" style="margin:.5em 0;padding:.8em 1em;border:2px solid #c9a24a">
+        <div style="font-weight:800;font-size:1.05em">📈 כמה המערכת צודקת – לפי מה שהעורכים תיקנו</div>
+        ${Q.length ? `<div style="font-size:1.5em;font-weight:800;margin:.2em 0">${avg.toFixed(1)}% מהמילים נכונות <span class="muted" style="font-size:.6em;font-weight:500">(ממוצע על ${Q.length} שיחות שנערכו)</span></div>
+        ${Q.slice(0, 8).map((q) => `<div class="act-row"><span class="grow">${esc(q.t)}</span><span class="badge ${q.pct <= 10 ? 'ok' : ''}">${(100 - q.pct).toFixed(1)}% נכון</span><span class="muted" style="font-size:.82em">${q.words.toLocaleString('he-IL')} מילים${q.by ? ' · 👤 ' + esc(q.by) : ''}</span></div>`).join('')}`
+        : '<div class="muted">עוד אין שיחות שהעורך סימן "✅ סיימתי לערוך". אחרי השיחה הראשונה – יופיע כאן ציון אמיתי.</div>'}
+        <div class="hint" style="margin-top:.4em">💡 כל שיחה שהעורך גומר – לוחצים "✅ סיימתי לערוך". ככה המערכת לומדת מכל השיחה, והציון כאן מתעדכן.</div>
+        ${nRec ? `<div style="margin-top:.4em;font-weight:700;color:#2e9e5b">🤖 ${nRec} תיקונים של העורך חזרו בכמה שיחות – הם מאושרים אוטומטית (מסומנים בירוק) ומתוקנים בכל תמלול חדש.</div>` : ''}
+      </div>`;
+      (p || m.querySelector('h3')).insertAdjacentHTML('afterend', box);
+    } catch (e) { console.warn('fixes 3.20', e); }
+    return x;
+  };
+  // --- 3ב. אישור אוטומטי: העורך (חונא) מוסמך לאשר. תיקון של עורך שחזר ב-2 שיחות שונות או יותר – מאושר לבד ---
+  window.AUTO_FIX = new Map();
+  const _lfx = loadFixes;
+  loadFixes = async function (force) {
+    const F = await _lfx.apply(this, arguments);
+    try {
+      let eds = null; try { const { data: pr } = await sb.from('profiles').select('display_name,email,role').in('role', ['admin', 'editor']); if (pr && pr.length) eds = new Set(pr.flatMap((x) => [x.display_name, x.email]).filter(Boolean)); } catch (e) {}
+      const { data: lg } = await sb.from('nusach_fix_log').select('wrong,right,rec_title,user_name').order('created_at', { ascending: false }).limit(5000);
+      const m = new Map(); (lg || []).forEach((l) => { if (eds && l.user_name && !eds.has(l.user_name)) return; const k = l.wrong + '\u0001' + l.right; if (!m.has(k)) m.set(k, { recs: new Set(), by: l.user_name || '' }); m.get(k).recs.add(l.rec_title || ''); });
+      window.AUTO_FIX = new Map(); (F || []).forEach((f) => { const x = m.get(f.wrong + '\u0001' + f.right); if (!f.confirmed && x && x.recs.size >= 2) { f.confirmed = true; f._auto = true; window.AUTO_FIX.set(f.wrong + '\u0001' + f.right, x); } });
+    } catch (e) { console.warn('auto fix', e); }
+    return F;
+  };
+  try { loadFixes(true); } catch (e) {}
+
+  // --- 4. אישור ✅ של שם/מונח – נכנס גם למילון ---
+  document.addEventListener('click', (e) => {
+    const u = e.target.closest('[data-fixup]'); if (!u) return;
+    try { const bt = u.closest('.act-row').querySelector('b.grow'); const right = (bt.textContent.split(' ← ')[1] || '').trim();
+      const looksName = right && right.length <= 40 && (right.split(/\s+/).length >= 2 || /['"׳״]/.test(right));
+      if (looksName) sb.from('dictionary').upsert([{ term: right }], { onConflict: 'org_id,term', ignoreDuplicates: true }).then(() => { try { loadDict(); } catch (er) {} toast('📖 "' + right + '" נוסף גם למילון השמות', 4000); });
+    } catch (er) {}
+  }, true);
 })();
 </script>
 </body>
