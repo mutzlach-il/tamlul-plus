@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.20.0';
+const APP_VERSION = '3.21.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -8715,12 +8715,12 @@ async function renderOrgs() {
   if (error) { box.innerHTML = `<div class="err-text">${esc(error.message)}</div>`; return; }
   box.innerHTML = `<div class="row"><h3 class="grow">🏛️ החסידויות במערכת</h3><button class="btn primary" id="orgNew">➕ חסידות חדשה</button></div>
     <div class="hint">כל חסידות נפרדת לגמרי: משתמשים, הקלטות, דוגמאות, תיקונים ולוגו. רק אתה רואה את הרשימה הזאת ואת כמות השימוש.</div>
-    <div class="tbl-wrap" style="margin-top:.6em"><table class="tbl"><tr><th>חסידות</th><th>משתמשים</th><th>הקלטות</th><th>תמלול היום</th><th>תמלול החודש</th><th>מפתח תמלול</th><th></th></tr>
+    <div class="tbl-wrap" style="margin-top:.6em"><table class="tbl"><tr><th>חסידות</th><th>משתמשים</th><th>הקלטות</th><th>תמלול היום</th><th>תמלול החודש</th><th>מסלול</th><th></th></tr>
     ${(data || []).map((o) => `<tr style="${o.active ? '' : 'opacity:.5'}">
       <td>${o.logo ? `<img src="${esc(o.logo)}" style="height:24px;width:24px;object-fit:contain;vertical-align:middle"> ` : '🏛️ '}<b>${esc(o.name)}</b> <span class="muted" dir="ltr">${esc(o.id)}</span>${o.id === ORG.id ? ' <span class="badge ok">אתה כאן</span>' : ''}</td>
       <td>${o.members}</td><td>${o.recordings}</td><td>${fmtMin(+o.seconds_today)}</td><td>${fmtMin(+o.seconds_month)}</td>
-      <td>${o.has_gemini ? '<span class="badge ok">✓ משלה</span>' : '<span class="badge">על המפתח שלך</span>'}</td>
-      <td style="white-space:nowrap"><button class="btn small" data-orgedit="${esc(o.id)}">✏️ פרטים</button><button class="btn small" data-orgkeys="${esc(o.id)}">🔑 מפתח</button>${o.id !== ORG.id ? `<button class="btn small primary" data-orgsw="${esc(o.id)}">➡️ כניסה</button>` : ''}</td></tr>`).join('')}</table></div>
+      <td>${o.has_gemini ? '<span class="badge ok" title="עובדת דרך הפרויקט בתשלום – גוגל לא משתמשת בחומר">🔒 בתשלום – פרטי</span>' : '<span class="badge" title="עובדת על הפרויקט החינמי">🆓 חינם</span>'}</td>
+      <td style="white-space:nowrap"><button class="btn small" data-orgedit="${esc(o.id)}">✏️ פרטים</button><button class="btn small" data-orgkeys="${esc(o.id)}">🆓/🔒 חינם או תשלום</button>${o.id !== ORG.id ? `<button class="btn small primary" data-orgsw="${esc(o.id)}">➡️ כניסה</button>` : ''}</td></tr>`).join('')}</table></div>
     <div class="hint" style="margin-top:.6em">💡 כדי למנות מנהל לחסידות: "כניסה" ← ניהול ← משתמשים ← מוסיפים אותו עם תפקיד "מנהל". הוא יראה וינהל רק את החסידות הזאת.</div>`;
 }
 async function renderMyOrg() {
@@ -8799,6 +8799,16 @@ document.addEventListener('click', (e) => {
 async function editOrgKeys(id) {
   if (!isSuper()) return;
   let g = null, q = null;
+  const pick = await new Promise((res) => { modal(`<h3>🆓/🔒 איך החסידות "${esc(id)}" עובדת?</h3>
+      <p class="muted">🆓 <b>חינם</b> – על הפרויקט החינמי של גוגל. עולה 0, אבל יש מכסה יומית, ו<b>גוגל רשאית להשתמש בחומר ולתת לעובדים שלה לקרוא אותו</b>.<br>🔒 <b>בתשלום – פרטי</b> – על הפרויקט בתשלום. בלי מכסה יומית, ו<b>גוגל לא משתמשת בחומר</b>. מתאים לחסידויות שמשלמות לך.</p>
+      <div class="row" style="gap:.5em;margin-top:.6em"><button class="btn" type="button" data-opick="free">🆓 חינם</button><button class="btn primary" type="button" data-opick="paid">🔒 בתשלום – פרטי</button><button class="btn small" type="button" data-opick="adv" style="margin-inline-start:auto">🔑 מפתח אחר (מתקדם)</button></div>`, { okText: '', cancelText: 'סגירה' }).then(() => res(null));
+    setTimeout(() => document.querySelectorAll('[data-opick]').forEach((b) => b.onclick = () => { const m = b.closest('.modal-bg'); m && m.remove(); res(b.dataset.opick); }), 50); });
+  if (!pick) return;
+  if (pick !== 'adv') {
+    const { error } = await sb.rpc('set_org_keys', { p_org: id, p_gemini: pick === 'paid' ? 'PAID' : '-', p_groq: null });
+    if (error) return toast('❌ ' + error.message);
+    toast(pick === 'paid' ? '🔒 מעכשיו החסידות עובדת דרך התשלום – פרטי' : '🆓 מעכשיו החסידות עובדת בחינם', 5000); return renderOrgs();
+  }
   const ok = await modal(`<h3>🔑 מפתח תמלול – ${esc(id)}</h3>
     <p class="muted">אם תכניס כאן מפתח, החסידות הזאת תשתמש בו – והמכסה החינמית שלה תהיה נפרדת משלך. אם תשאיר ריק – היא ממשיכה על המפתח שלך.<br>המפתח נשמר בשרת בלבד. אף אחד לא יכול לראות אותו אחר כך – גם לא אתה. כדי למחוק מפתח: כותבים מקף (-).</p>
     <label>מפתח Gemini (התמלול והנוסח)</label><input type="password" id="okG" dir="ltr" autocomplete="off" placeholder="להשאיר ריק = בלי שינוי">
@@ -11695,6 +11705,32 @@ orgPairs = async function () {
       if (looksName) sb.from('dictionary').upsert([{ term: right }], { onConflict: 'org_id,term', ignoreDuplicates: true }).then(() => { try { loadDict(); } catch (er) {} toast('📖 "' + right + '" נוסף גם למילון השמות', 4000); });
     } catch (er) {}
   }, true);
+})();
+
+
+/* ===== 3.21.0 – חינם / בתשלום: הקלטה חשובה עוברת דרך הפרויקט בתשלום (פרטי) ===== */
+(function () {
+  const paidNow = () => { try {
+    if (Queue.running && Queue.items.length) { const r = RECS.get(Queue.items[0]); if (r && r.extras && r.extras.paid) return true; }
+    if (typeof currentPage !== 'undefined' && currentPage === 'detail' && Detail.rec && Detail.rec.extras && Detail.rec.extras.paid) return true;
+  } catch (e) {} return false; };
+  const _api = api;
+  api = function (action, data, opts) { if (action === 'gemini' && data && paidNow()) data = Object.assign({}, data, { paid: true }); return _api.call(this, action, data, opts); };
+  function addPaidChk() {
+    if (document.getElementById('paidChk') || !(ME && typeof isSuper === 'function' && isSuper())) return; // רק מנהל-העל (אברימי)
+    const g = document.getElementById('gemaraRow') || (document.getElementById('speakersChk') || {}).closest?.('label'); if (!g) return;
+    g.insertAdjacentHTML('afterend', `<label class="row" id="paidRow" style="margin:.2em 0 0;font-weight:500;gap:.35em" title="ההקלטה עוברת דרך הפרויקט בתשלום – גוגל לא משתמשת בחומר. עולה בערך 5–8 ₪ לשעת הקלטה."><input type="checkbox" id="paidChk" style="width:auto"> 🔒 הקלטה חשובה – לעבור דרך התשלום (פרטי)</label>`);
+  }
+  addPaidChk(); setInterval(addPaidChk, 1500);
+  const _add = Queue.add;
+  Queue.add = async function () {
+    const want = !!(document.getElementById('paidChk') && document.getElementById('paidChk').checked);
+    const id = await _add.apply(this, arguments);
+    if (want && id) { try { const r = RECS.get(id); if (r) { r.extras = Object.assign({}, r.extras, { paid: true }); await saveRec(r, ['extras']); } } catch (e) {} }
+    return id;
+  };
+  // סימון בספרייה ובכרטיס ההקלטה
+  { const _o = Detail.open; Detail.open = async function () { const x = await _o.apply(this, arguments); try { const r = this.rec, t = document.getElementById('dTitle'); document.getElementById('paidBadge')?.remove(); if (r && r.extras && r.extras.paid && t) t.insertAdjacentHTML('afterend', '<span id="paidBadge" class="badge ok" title="עברה דרך הפרויקט בתשלום – פרטי">🔒 פרטי</span>'); } catch (e) {} return x; }; }
 })();
 </script>
 </body>
