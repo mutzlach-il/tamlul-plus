@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.23.0';
+const APP_VERSION = '3.23.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -1745,7 +1745,11 @@ function fromRow(r, prev) {
 }
 async function saveRec(rec, fields) {
   const patch = { updated_at: new Date().toISOString() };
-  for (const f of fields) patch[COLS[f]] = rec[f] === undefined ? null : rec[f];
+  for (const f of fields) {
+    // 3.23.1: extras לא נטען ברשימה – אסור לדרוס אותו ב-null (העמודה לא מקבלת null)
+    if (f === 'extras' && (rec.extras === undefined || rec.extras === null)) continue;
+    patch[COLS[f]] = rec[f] === undefined ? null : rec[f];
+  }
   const { error } = await sb.from('recordings').update(patch).eq('id', rec.id);
   dbErr(error);
 }
@@ -2559,6 +2563,10 @@ const Queue = {
         const id = this.items[0];
         const rec = RECS.get(id);
         if (!rec) { this.items.shift(); continue; }
+        // 3.23.1: הקלטה שנטענה מהרשימה – להביא את ההגדרות שלה (extras) מהענן לפני התמלול
+        if (rec.extras === undefined || rec.extras === null) {
+          try { const { data } = await sb.from('recordings').select('extras').eq('id', id).single(); if (data && data.extras) rec.extras = data.extras; } catch (e) {}
+        }
         const prog = (p) => { this.progress[id] = p; renderQueue(); if (currentPage === 'detail' && Detail.id === id) Detail.renderTranscript(); };
         try {
           let blob = await this.getBlob(rec);
