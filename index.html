@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.22.0';
+const APP_VERSION = '3.23.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2051,7 +2051,7 @@ async function toMp3(blob, onPct, opt = {}) {
   let data = audio.getChannelData(0);
   if (audio.numberOfChannels > 1) { const b = audio.getChannelData(1); const m = new Float32Array(data.length); for (let i = 0; i < data.length; i++) m[i] = (data[i] + b[i]) / 2; data = m; }
   const rate = audio.sampleRate;
-  const enc = new lamejs.Mp3Encoder(1, rate, rate <= 16000 ? 32 : 48);
+  const enc = new lamejs.Mp3Encoder(1, rate, opt.kbps || (rate <= 16000 ? 32 : 48));
   const out = []; const block = 1152, batch = block * 200;
   const pcm = new Int16Array(batch);
   for (let pos = 0; pos < data.length; pos += batch) {
@@ -2063,6 +2063,18 @@ async function toMp3(blob, onPct, opt = {}) {
   }
   const fin = enc.flush(); if (fin.length) out.push(new Uint8Array(fin));
   return { blob: new Blob(out, { type: 'audio/mpeg' }), duration: audio.duration, peaks: computePeaks(audio) };
+}
+/* 3.23: כיווץ לגודל שנכנס לענן (עד 50MB לקובץ) – מוריד איכות בהדרגה, מספיק לדיבור */
+async function fitCloud(blob, name, onPct) {
+  if (!blob || blob.size <= STORAGE_MAX) return null;
+  let audio; try { audio = await decodeAudio(blob); } catch (e) { return null; }
+  const dur = audio.duration || 1;
+  for (const k of [32, 24, 16, 8]) {
+    if (k * 1000 / 8 * dur > STORAGE_MAX * 0.97) continue;
+    const r = await toMp3(blob, onPct, { audio, kbps: k });
+    if (r.blob.size <= STORAGE_MAX) return { blob: r.blob, duration: r.duration, peaks: r.peaks, name: (name || 'audio').replace(/\.[^.]+$/, '') + '.mp3', kbps: k };
+  }
+  return null;
 }
 async function resampleMono16k(audioBuf, start, end) {
   const rate = 16000;
@@ -2509,6 +2521,15 @@ const Queue = {
       await Cache.put(rec.id, blob);
       await saveRec(rec, ['fileName', 'mime', 'size', 'duration', 'peaks']).catch(() => {});
     }
+    if (!rec.filePath && blob.size > STORAGE_MAX) {
+      prog('🗜️ מכווץ לשמירה בענן…');
+      const f = await fitCloud(blob, rec.fileName, (p) => prog(`🗜️ מכווץ לשמירה בענן… ${p}%`)).catch(() => null);
+      if (f) {
+        blob = f.blob; rec.duration = f.duration; rec.peaks = f.peaks; rec.fileName = f.name; rec.mime = 'audio/mpeg'; rec.size = blob.size;
+        await Cache.put(rec.id, blob);
+        await saveRec(rec, ['fileName', 'mime', 'size', 'duration', 'peaks']).catch(() => {});
+      }
+    }
     if (!rec.filePath) {
       if (blob.size <= STORAGE_MAX) {
         const ext = guessExt(blob, rec.fileName), path = `${ME.id}/${rec.id}.${ext}`;
@@ -2517,7 +2538,7 @@ const Queue = {
           if (ue) toast('⚠️ שמירת קובץ השמע בענן נכשלה: ' + ue.message, 6000);
           else { rec.filePath = path; await saveRec(rec, ['filePath']).catch(() => {}); }
         }).catch((e) => console.warn('upload', e));
-      } else toast('⚠️ הקובץ גדול מדי לשמירה בענן (מעל 50MB) – התמלול יישמר, אבל השמע יישאר רק במחשב הזה', 7000);
+      } else toast('⚠️ ההקלטה ארוכה מאוד (יותר מכ-14 שעות) – התמלול יישמר, אבל השמע יישאר רק במחשב הזה', 7000);
     }
     return blob;
   },
@@ -7056,7 +7077,8 @@ $('#importOldBtn').onclick = async () => {
     $('#importMsg').innerHTML = `<span class="spinner"></span> מעביר ${n + 1}/${todo.length}: ${esc(r.title)}`;
     try {
       const id = uuid(); let path = null;
-      const blob = await oldAudio(old.db, r.id);
+      let blob = await oldAudio(old.db, r.id);
+      if (blob && blob.size > STORAGE_MAX) { const f = await fitCloud(blob, r.fileName).catch(() => null); if (f) { blob = f.blob; r.fileName = f.name; r.mime = 'audio/mpeg'; r.size = blob.size; } }
       if (blob && blob.size <= STORAGE_MAX) {
         const ext = guessExt(blob, r.fileName); path = `${ME.id}/${id}.${ext}`;
         const { error: ue } = await sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true });
@@ -9003,6 +9025,7 @@ async function trRun() {
         if (blob.size > STORAGE_MAX && typeof toMp3 === 'function') { const r = await toMp3(blob, (p) => { prog.textContent = `🗜️ דוחס את הקלטה ${n}… ${p}%`; }); blob = r.blob; fname = fname.replace(/\.[^.]+$/, '') + '.mp3'; }
         const id = uuid(), ext = guessExt(blob, fname), path = `${ME.id}/${id}.${ext}`;
         let filePath = null;
+        if (blob.size > STORAGE_MAX) { const f2 = await fitCloud(blob, fname, (p) => { prog.textContent = `🗜️ מכווץ את הקלטה ${n}… ${p}%`; }).catch(() => null); if (f2) blob = f2.blob; }
         if (blob.size <= STORAGE_MAX) { const { error: ue } = await sb.storage.from('audio').upload(path, blob, { contentType: blob.type || 'audio/' + ext, upsert: true }); if (!ue) filePath = path; }
         const duration = await trAudioDuration(blob);
         const extras = { training: true, trainNo: +n };
