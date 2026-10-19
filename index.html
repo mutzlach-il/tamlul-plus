@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.21.1';
+const APP_VERSION = '3.22.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -11731,6 +11731,64 @@ orgPairs = async function () {
   };
   // סימון בספרייה ובכרטיס ההקלטה
   { const _o = Detail.open; Detail.open = async function () { const x = await _o.apply(this, arguments); try { const r = this.rec, t = document.getElementById('dTitle'); document.getElementById('paidBadge')?.remove(); if (r && r.extras && r.extras.paid && t) t.insertAdjacentHTML('afterend', '<span id="paidBadge" class="badge ok" title="עברה דרך הפרויקט בתשלום – פרטי">🔒 פרטי</span>'); } catch (e) {} return x; }; }
+})();
+
+/* ===== 3.22.0 – ⬇️ הורדת כל החומר של החסידות (למנהל החסידות) ===== */
+(function () {
+  const clean = (s) => String(s || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 70) || 'הקלטה';
+  const dstr = (t) => { try { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } catch (e) { return ''; } };
+  const PART = 280 * 1024 * 1024; // כל קובץ zip עד כ-280MB, כדי שהדפדפן לא ייתקע
+  async function audioOf(r) {
+    try { const b = await Cache.get(r.id); if (b) return b; } catch (e) {}
+    if (!r.filePath) return null;
+    try { const { data } = await sb.storage.from('audio').download(r.filePath); return data || null; } catch (e) { return null; }
+  }
+  async function exportAll() {
+    if (!isAdmin()) return toast('רק מנהל החסידות יכול להוריד את כל החומר');
+    const recs = recsList().filter((r) => r.status === 'done').sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    if (!recs.length) return toast('אין עדיין הקלטות להוריד');
+    const withA = recs.filter((r) => r.filePath).length;
+    let want = { text: true, nusach: true, audio: false };
+    const ok = await modal(`<h3>⬇️ הורדת כל החומר של ${esc(orgName())}</h3>
+      <p>${recs.length} הקלטות מוכנות. כל הקלטה – בתיקייה משלה, עם השם והתאריך.</p>
+      <label class="row" style="gap:.4em;font-weight:600"><input type="checkbox" id="exT" checked style="width:auto"> 📝 התמלולים והתרגומים (Word)</label>
+      <label class="row" style="gap:.4em;font-weight:600"><input type="checkbox" id="exN" checked style="width:auto"> 📜 העריכות והחוברות המוכנות להדפסה (Word)</label>
+      <label class="row" style="gap:.4em;font-weight:600"><input type="checkbox" id="exA" style="width:auto"> 🎵 קבצי השמע (${withA} קבצים – גדול, יורד בכמה חלקים)</label>
+      <div class="hint">הכול יורד למחשב שלך כקובצי ZIP (תיקייה דחוסה). אם יש הרבה שמע – זה מתחלק לכמה קבצים, ולוקח כמה דקות. אל תסגור את הדף בזמן ההורדה.</div>`,
+      { okText: '⬇️ להתחיל להוריד', onOk: (bg) => { want = { text: bg.querySelector('#exT').checked, nusach: bg.querySelector('#exN').checked, audio: bg.querySelector('#exA').checked }; } });
+    if (!ok || !(want.text || want.nusach || want.audio)) return;
+    const JSZip = await libZIP();
+    const base = clean(orgName()) + ' – כל החומר ' + dstr(Date.now());
+    let zip = new JSZip(), size = 0, part = 1, done = 0, missingA = 0;
+    const flush = async (last) => {
+      if (!size && !last) return; if (!Object.keys(zip.files).length) return;
+      toast(`⏳ אורז חלק ${part}…`, 60000);
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+      download(blob, base + (part > 1 || !last ? ` – חלק ${part}` : '') + '.zip');
+      part++; zip = new JSZip(); size = 0; await sleep(1500);
+    };
+    try {
+      for (const r of recs) {
+        const dir = `${dstr(recDateOf(r))} ${clean(r.title)}/`;
+        if (want.text) { try { const b = await docToDocxBlob([buildDoc(r, { meta: true, translations: true, summary: true, notes: true, chapters: true, sources: true, times: false })], r.title); zip.file(dir + 'תמלול ותרגום.docx', b); size += b.size; } catch (e) { console.warn('docx', e); } }
+        if (want.nusach) { const nu = (r.extras && r.extras.nusach) || {}; for (const [k, nm] of [['before', 'עריכה ראשונה'], ['after', 'מוכן להדפסה']]) { if (!nu[k]) continue; try { const b = await nusachDocx(r, k); zip.file(dir + nm + '.docx', b); size += b.size; } catch (e) { console.warn('nusach', e); } } }
+        if (want.audio && r.filePath) { const a = await audioOf(r); if (a) { const ext = (/mpeg|mp3/.test(a.type) ? 'mp3' : (r.fileName || '').split('.').pop() || 'mp3'); zip.file(dir + 'הקלטה.' + ext, a); size += a.size; } else missingA++; }
+        done++; toast(`⬇️ מכין… ${done} מתוך ${recs.length}`, 60000);
+        if (size > PART) await flush(false);
+      }
+      await flush(true);
+      toast(`✅ הסתיים – ${recs.length} הקלטות ירדו${missingA ? ` (${missingA} קבצי שמע לא נמצאו בענן)` : ''}`, 9000);
+    } catch (e) { toast('❌ ' + (e.message || e), 8000); }
+  }
+  window.exportAll = exportAll;
+  function placeBtn() {
+    if (!isAdmin()) return; const pg = document.getElementById('page-settings'); if (!pg || document.getElementById('exAllCard')) return;
+    const c = document.createElement('div'); c.className = 'card'; c.id = 'exAllCard';
+    c.innerHTML = '<h3>⬇️ הורדת כל החומר שלנו</h3><p class="muted" style="margin:.2em 0 .6em">כל ההקלטות, התמלולים, התרגומים והחוברות של החסידות – למחשב שלכם, מסודר בתיקיות. טוב לגיבוי, או כדי שהחומר תמיד יהיה גם אצלכם.</p><button class="btn primary" type="button" id="exAllBtn">⬇️ להוריד את כל החומר</button>';
+    const fc = document.getElementById('freeCard'); if (fc) fc.after(c); else pg.insertBefore(c, pg.children[1] || null);
+  }
+  placeBtn(); setInterval(placeBtn, 1500);
+  document.addEventListener('click', (e) => { if (e.target.closest('#exAllBtn')) { e.preventDefault(); exportAll(); } });
 })();
 </script>
 </body>
