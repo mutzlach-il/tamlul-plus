@@ -1612,7 +1612,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.23.1';
+const APP_VERSION = '3.25.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2496,10 +2496,12 @@ const Queue = {
   async add(blob, name, lang, title, meta = {}) {
     const id = uuid();
     const when = meta.recDate ? new Date(meta.recDate + 'T12:00:00').getTime() : Date.now();
+    // 3.24: קובץ שהועלה (לא הקלטה חיה) בלי תאריך – לא לסמן את הפרשה/השנה של היום! לנחש משם הקובץ
+    const auto = (!meta.recDate && name && !/^recording\./.test(name) && typeof guessMetaFromName === 'function') ? guessMetaFromName(name) : null;
     const rec = {
       id, owner: ME.id, title: title || (name ? name.replace(/\.[^.]+$/, '') : 'הקלטה'), fileName: name || 'recording', mime: blob.type || '', size: blob.size,
       lang, yiOut: lang === 'yi' ? ({ before: 'yi', after: 'yi', en: 'yi', all: 'both' }[LS.get('yiOut', 'both')] || LS.get('yiOut', 'both')) : null, createdAt: Date.now(), duration: 0, folderId: meta.folderId !== undefined ? meta.folderId : ($('#upFolder').value || null), tags: [], text: '', segments: [], summary: '', translations: {}, status: 'queued', error: '', filePath: null,
-      speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || parshaFor(when) || null, hyear: meta.hyear || hebYearOf(when) || null, occasion: meta.occasion || holidayOf(when) || null, recDate: meta.recDate || null,
+      speaker: meta.speaker || null, category: meta.category || null, parasha: meta.parasha || (auto ? auto.parasha : parshaFor(when)) || null, hyear: meta.hyear || (auto ? auto.hyear : hebYearOf(when)) || null, occasion: meta.occasion || (auto ? auto.occasion : holidayOf(when)) || null, recDate: meta.recDate || null,
       series: meta.series || null, seriesNo: meta.seriesNo ? +meta.seriesNo : null, extras: Object.assign(meta.prep ? { prep: meta.prep } : {}, meta.interview ? { interview: meta.interview } : {}, meta.wantNusach ? { wantNusach: true } : {}, meta.wantAfter ? { wantAfter: true } : {}, meta.outMode ? { outMode: meta.outMode } : {}, meta.wantEn ? { wantEn: true } : {}, meta.wantTr ? { wantTr: meta.wantTr } : {})
     };
     const { error } = await sb.from('recordings').insert({ id, owner: ME.id, title: rec.title, file_name: rec.fileName, mime: rec.mime, size: rec.size, lang, yi_out: rec.yiOut, folder_id: rec.folderId, status: 'queued',
@@ -4310,9 +4312,9 @@ function renderHomeDash() {
   if (!ME) return;
   const recs = recsList();
   const cont = recs.filter((r) => (LS.get('pos_' + r.id, 0) || 0) > 10 && (PROG[r.id] || 0) < 97).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).slice(0, 5);
-  const recent = [...recs].sort((a, b) => b.createdAt - a.createdAt).slice(0, 5);
+  const recent = recs.filter((r) => r.status !== 'error').sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
   const pr = parshaFor(Date.now());
-  const prRecs = pr ? recs.filter((r) => pr.split('-').some((x) => parshaMatch(r.parasha, x))) : [];
+  const prRecs = pr ? recs.filter((r) => r.status === 'done' && pr.split('-').some((x) => parshaMatch(r.parasha, x))) : [];
   const hd = hdOf(Date.now());
   const ago = hd ? recs.filter((r) => { const h = hdOf(recDateOf(r)); return h && h.getDate() === hd.getDate() && h.getMonth() === hd.getMonth() && h.getFullYear() < hd.getFullYear(); }) : [];
   const it = (r, extra = '') => `<div class="it" data-dopen="${r.id}"><span class="grow">${esc(r.title)}</span><span class="muted" style="font-size:.85em">${extra}</span></div>`;
@@ -7791,10 +7793,10 @@ ${BIALA_ANCESTORS.join('\n')}
     const r = opts.rec;
     if (r) {
       const ctx = [r.title && 'title: ' + r.title, r.parasha && 'parasha: ' + r.parasha, r.occasion && 'occasion: ' + r.occasion, (() => { try { return 'date: ' + hebDate(recDateOf(r)); } catch (e) { return ''; } })()].filter(Boolean).join(' · ');
-      if (ctx) p += `\nRecording context (use it to understand unclear words – e.g. in Tishrei: הקפות, שמחת תורה, סוכות): ${ctx}.`;
+      if (ctx) p += `\nRecording context – ONLY a hint for words that are hard to hear. NEVER write anything that is not actually spoken in the audio. If the audio talks about a different parasha/topic than this context, IGNORE the context completely: ${ctx}.`;
     }
     const ex = (STYLE_EX || []).filter((x) => x.kind === 'yi' && x.target_text).slice(-1)[0];
-    if (ex) p += `\nSPELLING STYLE – this is how the editors write the Rebbe's Yiddish (follow this spelling, NOT the content):\n«${ex.target_text.slice(0, 1600)}»`;
+    if (ex) p += `\nSPELLING LIST – how the editors spell common Yiddish words (a word list only, NOT a text – never copy it as content): ${spellWords([ex.target_text], 160)}`;
   }
   return p;
 }; }
@@ -7957,7 +7959,7 @@ fixesText = function (max = 2500) {
       // עוד דוגמאות כתיב – מכל הקלטה ביידיש שמישהו תיקן (החדשות קודם)
       const exs = (STYLE_EX || []).filter((x) => x.kind === 'yi' && x.target_text);
       const more = exs.slice(0, -1).reverse().slice(0, 3);
-      if (more.length) p += `\nMORE CORRECTED YIDDISH (how the editors fixed earlier transcripts – copy the SPELLING and the way names/quotes are written, NOT the content):\n` + more.map((x) => '«' + x.target_text.slice(0, 900) + '»').join('\n');
+      if (more.length) p += `\nMORE SPELLINGS (word list only – NOT content): ` + spellWords(more.map((x) => x.target_text), 160);
     }
     return p;
   } finally { FIX_KIND = old; }
@@ -11821,6 +11823,201 @@ orgPairs = async function () {
   placeBtn(); setInterval(placeBtn, 1500);
   document.addEventListener('click', (e) => { if (e.target.closest('#exAllBtn')) { e.preventDefault(); exportAll(); } });
 })();
+
+/* ===== 3.24.0 – פרשה/שנה משם הקובץ, הגנה מהעתקת דוגמאות, מסך בית נקי ===== */
+const OCCASIONS_324 = ['מוצאי שבועות', 'נעילת החג', 'ראש השנה', 'שבת שובה', 'יום כיפור', 'שמחת תורה', 'שמיני עצרת', 'הושענא רבה', 'סוכות', 'חנוכה', 'פורים', 'פסח', 'שבועות', 'ל"ג בעומר', 'לג בעומר', 'כה תשרי', 'יט ניסן', 'קודם סליחות', 'סליחות', 'סעודת הודאה', 'הנחת אבן הפינה', 'יום הצלה', 'זכור', 'שקלים', 'פרה', 'החודש', 'בין הזמנים', 'ט"ו בשבט', 'טו בשבט', 'יא ניסן'];
+function guessMetaFromName(name) {
+  const base = String(name || '').replace(/\.[^.]+$/, '').replace(/[_]+/g, ' ');
+  const words = base.split(/[\s,.\-–־()\[\]]+/).filter(Boolean);
+  const strict = (w) => stripNikud(w).replace(/[ךםןףץ]/g, (c) => ({ 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' }[c])).replace(/[^א-ת]/g, '');
+  let parasha = null, hits = [];
+  for (const nf of [strict, normHe]) {
+    const nw = words.map(nf);
+    const findSeq = (p) => { const pw = p.split(/[\s-]+/).map(nf); for (let i = 0; i + pw.length <= nw.length; i++) if (pw.every((x, j) => x && nw[i + j] === x)) return i; return -1; };
+    for (const p of PARSHA_LIST.slice().sort((a, b) => b.length - a.length)) { const i = findSeq(p); if (i >= 0 && !hits.some((h) => i >= h.i && i < h.i + h.n)) hits.push({ p, i, n: p.split(/\s+/).length }); }
+    if (hits.length) break;
+  }
+  hits.sort((a, b) => a.i - b.i);
+  if (hits.length >= 2 && hits[1].i === hits[0].i + hits[0].n) parasha = hits[0].p + '-' + hits[1].p; else if (hits.length) parasha = hits[0].p;
+  // שנה: תשעט / תשפ / תשפ"ג …
+  let hyear = null;
+  const L = { 'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9, 'י': 10, 'כ': 20, 'ל': 30, 'מ': 40, 'נ': 50, 'ס': 60, 'ע': 70, 'פ': 80, 'צ': 90, 'ק': 100, 'ר': 200, 'ש': 300, 'ת': 400 };
+  for (const m of base.matchAll(/(תש[עפצ]["״']?[א-ט]?)(?=[^א-ת]|$)/g)) { const n = [...m[1].replace(/["״']/g, '')].reduce((a, c) => a + (L[c] || 0), 0); if (n >= 760 && n <= 800) { hyear = gem(5000 + n); break; } }
+  const sp = ' ' + base.replace(/\s+/g, ' ') + ' ';
+  const occ = []; for (const o of OCCASIONS_324) if (sp.includes(' ' + o + ' ') && !occ.some((x) => x.includes(o))) occ.push(o);
+  return { parasha, hyear, occasion: occ.length ? occ.slice(0, 2).join(' · ') : null };
+}
+function spellWords(texts, max) {
+  const seen = new Set(), out = [];
+  for (const t of texts) for (const w of String(t || '').split(/[\s,.:;!?"״'׳()\[\]«»\-–]+/)) { if (w.length < 3 || !/[א-ת]/.test(w) || seen.has(w)) continue; seen.add(w); out.push(w); }
+  out.sort((a, b) => a.localeCompare(b, 'he'));
+  return out.slice(0, max || 160).join(' · ');
+}
+// הגנה: תמלול שנראה כמו העתקה של דוגמת עריכה – לא נשמר
+{ const g4 = (s) => { const w = String(s || '').replace(/[^א-ת\s]/g, ' ').split(/\s+/).filter(Boolean); const S = new Set(); for (let i = 0; i + 4 <= w.length; i++) S.add(w.slice(i, i + 4).join(' ')); return S; };
+  const _tb324 = transcribeBlob;
+  transcribeBlob = async function (blob, name, lang) {
+    const res = await _tb324.apply(this, arguments);
+    try {
+      if ((lang === 'yi' || lang === 'auto') && res && res.text && (STYLE_EX || []).length) {
+        const cur = (Queue.running && Queue.items.length) ? RECS.get(Queue.items[0]) : null;
+        const G = g4(res.text); if (G.size >= 40) {
+          for (const x of STYLE_EX) {
+            if (x.kind !== 'yi' || !x.target_text) continue;
+            if (cur && (x.rec_id === cur.id || (x.title && cur.title && String(x.title).startsWith(cur.title)))) continue;
+            const E = g4(x.target_text); let c = 0; for (const k of G) if (E.has(k)) c++;
+            if (c / G.size > 0.25) throw new Error('COPY:' + (x.title || ''));
+          }
+        }
+      }
+    } catch (e) { if (String(e.message).startsWith('COPY:')) throw new Error('⚠️ התמלול יצא דומה מדי לדוגמת עריכה ("' + e.message.slice(5, 40) + '") ולא להקלטה עצמה – לא נשמר. לחצו "שוב".'); }
+    return res;
+  };
+}
+// מסך הבית: בלי תגים וגביעים – רק שורה קטנה כמה פרשות כבר יש להן הקלטה
+renderAchievements = function () {
+  try {
+    const recs = recsList().filter((r) => r.status === 'done');
+    const n = PARSHA_LIST.filter((p) => recs.some((r) => parshaMatch(r.parasha, p))).length;
+    const c = document.querySelector('#homeDash .card'); if (c && !c.querySelector('.pcount324')) c.insertAdjacentHTML('beforeend', `<div class="muted pcount324" style="margin-top:.45em;font-size:.9em" title="לחיצה – לוח הפרשיות">📖 יש הקלטות ל-<b>${n}</b> מתוך 54 פרשות</div>`);
+  } catch (e) {}
+};
+
+/* ===== 3.25.0 – שליחה לחבר צוות · שאל את השיחות עם הרגע המדויק · תוכן עניינים מתוקן · שיפור קול בהשמעה ===== */
+// --- תיקון: לחיצה על זמן בתוכן העניינים לא תפתח "הקלטה" בשם 12:30 ---
+{ const isTime = (v) => /^\d{1,2}:\d{2}(:\d{2})?$/.test(String(v || ''));
+  document.addEventListener('click', (e) => { const j = e.target.closest('[data-jump]'); if (j && isTime(j.dataset.jump) && !j.closest('#dAi')) { e.preventDefault(); e.stopImmediatePropagation(); const p = $('#player'); const a = j.dataset.jump.split(':').map(Number); p.currentTime = a.length === 3 ? a[0] * 3600 + a[1] * 60 + a[2] : a[0] * 60 + a[1]; p.play().catch(() => {}); } }, true);
+  const _ot = openTalkAt; openTalkAt = async function (id, sec) { if (isTime(id)) return; return _ot.apply(this, arguments); };
+}
+// --- מראי מקומות: קישור לספריא בעברית ---
+{ const _ra = Detail.renderAi; Detail.renderAi = function () { _ra.apply(this, arguments); try { $$('#dAi a[href^="https://www.sefaria.org/search"]').forEach((a) => { a.href = a.href.replace('https://www.sefaria.org/search', 'https://www.sefaria.org.il/search'); a.title = 'פתיחת המקור בספריא'; }); } catch (e) {} }; }
+
+// --- 📤 שליחה לחבר צוות + 📥 תיבת "נשלח אליי" ---
+const SHARE325 = { unread: 0, people: null };
+async function sharePeople() { if (SHARE325.people) return SHARE325.people; try { const { data: mem } = await sb.from('org_members').select('user_id,disabled').eq('org_id', ORG.id); const ids = (mem || []).filter((m) => !m.disabled).map((m) => m.user_id); const { data } = await sb.from('profiles').select('id,display_name,email,is_super').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']); SHARE325.people = (data || []).filter((p) => p.id !== ME.id && (!p.is_super || isSuper())); } catch (e) { SHARE325.people = []; } return SHARE325.people; }
+const pName325 = (id, list) => { if (id === (ME && ME.id)) return 'אני'; const p = (list || []).find((x) => x.id === id); return p ? (p.display_name || p.email) : 'חבר צוות'; };
+function addShareBtn() {
+  const ex = $('#exportBtn'); if (!ex || $('#shareTeamBtn') || !ORG) return;
+  ex.insertAdjacentHTML('afterend', ' <button class="btn small" id="shareTeamBtn" type="button" title="שליחת ההקלטה לחבר צוות באותה חסידות – בתוך המערכת, בלי מייל">📤 שליחה לחבר צוות</button>');
+}
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#shareTeamBtn')) return; e.preventDefault();
+  const r = Detail.rec; if (!r) return;
+  const ppl = await sharePeople();
+  if (!ppl.length) return toast('אין עוד משתמשים בחסידות לשלוח אליהם');
+  const p = $('#player'), at = p && p.currentTime > 3 ? Math.floor(p.currentTime) : 0;
+  let to = [], note = '', fromHere = false;
+  const ok = await modal(`<h3>📤 שליחה לחבר צוות</h3><p class="muted">"${esc(r.title || 'הקלטה')}" – נשלח בתוך המערכת. המקבל יראה את זה ב-📥 למעלה.</p>
+    <div style="max-height:34vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:.4em .6em">${ppl.map((x) => `<label class="row" style="gap:.4em;margin:.25em 0"><input type="checkbox" class="shTo" value="${esc(x.id)}" style="width:auto"> ${esc(x.display_name || x.email)}</label>`).join('')}</div>
+    <textarea id="shNote" rows="3" placeholder="הערה (לא חובה) – למשל: תעבור על החלק השני, יש שם שמות לא ברורים" style="width:100%;margin-top:.5em"></textarea>
+    ${at ? `<label class="row" style="gap:.4em;margin-top:.3em"><input type="checkbox" id="shAt" checked style="width:auto"> לפתוח אצלו בדיוק ברגע הזה (${fmtT(at)})</label>` : ''}`,
+    { okText: '📤 שליחה', onOk: (bg) => { to = [...bg.querySelectorAll('.shTo:checked')].map((c) => c.value); note = bg.querySelector('#shNote').value.trim(); fromHere = !!(bg.querySelector('#shAt') || {}).checked; } });
+  if (!ok) return; if (!to.length) return toast('לא נבחר אף אחד');
+  const rows = to.map((u) => ({ org_id: ORG.id, rec_id: r.id, to_user: u, note: note || null, at_sec: fromHere ? at : null }));
+  const { error } = await sb.from('shares').insert(rows);
+  if (error) return toast('❌ השליחה נכשלה: ' + error.message, 6000);
+  toast(`✅ נשלח ל-${to.map((u) => pName325(u, ppl)).join(', ')}`);
+});
+function addInboxBtn() {
+  const w = $('#whoami'); if (!w || $('#inboxBtn') || !ME) return;
+  w.insertAdjacentHTML('beforebegin', '<button class="btn small" id="inboxBtn" type="button" title="נשלח אליי מחברי הצוות" style="position:relative">📥<span id="inboxCnt" class="hidden" style="position:absolute;top:-6px;inset-inline-start:-6px;background:#dc2626;color:#fff;border-radius:999px;font-size:.72em;min-width:1.5em;padding:0 .3em;line-height:1.5em;text-align:center"></span></button> ');
+}
+async function inboxCount() {
+  if (!ME || !ORG) return;
+  try { const { count } = await sb.from('shares').select('id', { count: 'exact', head: true }).eq('to_user', ME.id).is('read_at', null); SHARE325.unread = count || 0; const c = $('#inboxCnt'); if (c) { c.textContent = SHARE325.unread; c.classList.toggle('hidden', !SHARE325.unread); } } catch (e) {}
+}
+async function openInbox() {
+  modal(`<h3>📥 נשלח אליי</h3><div id="ibOut"><span class="spinner"></span></div>`, { okText: 'סגירה', cancelText: '', wide: true });
+  const [{ data: inn, error }, { data: out }] = await Promise.all([
+    sb.from('shares').select('*').eq('to_user', ME.id).order('created_at', { ascending: false }).limit(100),
+    sb.from('shares').select('*').eq('from_user', ME.id).order('created_at', { ascending: false }).limit(30)]);
+  if (error) { $('#ibOut').innerHTML = `<div class="err-text">${esc(error.message)}</div>`; return; }
+  const ids = [...new Set([...(inn || []), ...(out || [])].map((s) => s.rec_id))];
+  const { data: recs } = ids.length ? await sb.from('recordings').select('id,title').in('id', ids) : { data: [] };
+  const title = (id) => ((recs || []).find((x) => x.id === id) || {}).title || 'הקלטה';
+  const { data: profs } = await sb.from('profiles').select('id,display_name,email').in('id', [...new Set([...(inn || []).map((s) => s.from_user), ...(out || []).map((s) => s.to_user)])].concat(['00000000-0000-0000-0000-000000000000']));
+  const nm = (id) => pName325(id, profs);
+  const when = (t) => new Date(t).toLocaleString('he-IL', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const row = (s, mine) => `<div class="ib-row" style="border:1px solid var(--line);border-radius:12px;padding:.55em .8em;margin:.35em 0;${!mine && !s.read_at ? 'background:var(--primary-soft)' : ''}">
+      <div class="row" style="gap:.5em;flex-wrap:wrap"><a href="#" data-ibopen="${esc(s.id)}" data-rec="${esc(s.rec_id)}" data-t="${s.at_sec || ''}"><b>${esc(title(s.rec_id))}</b></a>${s.at_sec ? `<span class="muted">▶ ${fmtT(s.at_sec)}</span>` : ''}<span class="grow"></span>
+      <span class="muted" style="font-size:.85em">${mine ? 'אל: ' + esc(nm(s.to_user)) : 'מאת: ' + esc(nm(s.from_user))} · ${when(s.created_at)}</span></div>
+      ${s.note ? `<div style="margin-top:.25em">💬 ${esc(s.note)}</div>` : ''}
+      <div class="row" style="gap:.4em;margin-top:.3em">${mine ? `<span class="muted" style="font-size:.85em">${s.done_at ? '✅ טופל' : s.read_at ? '👁️ נקרא' : '⏳ עוד לא נקרא'}</span>` : (s.done_at ? '<span class="muted">✅ טופל</span>' : `<button class="btn small" data-ibdone="${esc(s.id)}">✅ טופל</button>`)}<button class="btn small" data-ibdel="${esc(s.id)}" title="הסרה מהרשימה">✕</button></div></div>`;
+  $('#ibOut').innerHTML = `${(inn || []).length ? inn.map((s) => row(s, false)).join('') : '<div class="empty">עוד לא שלחו לך כלום</div>'}
+    ${(out || []).length ? `<details style="margin-top:.8em"><summary><b>📤 מה ששלחתי (${out.length})</b></summary>${out.map((s) => row(s, true)).join('')}</details>` : ''}`;
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('#inboxBtn')) { e.preventDefault(); return openInbox(); }
+  const o = e.target.closest('[data-ibopen]'); if (o) { e.preventDefault(); await sb.from('shares').update({ read_at: new Date().toISOString() }).eq('id', o.dataset.ibopen).is('read_at', null); inboxCount(); return openTalkAt(o.dataset.rec, o.dataset.t ? +o.dataset.t : null); }
+  const d = e.target.closest('[data-ibdone]'); if (d) { e.preventDefault(); await sb.from('shares').update({ done_at: new Date().toISOString(), read_at: new Date().toISOString() }).eq('id', d.dataset.ibdone); inboxCount(); return openInbox(); }
+  const x = e.target.closest('[data-ibdel]'); if (x) { e.preventDefault(); await sb.from('shares').delete().eq('id', x.dataset.ibdel); inboxCount(); return openInbox(); }
+});
+setInterval(() => { try { addShareBtn(); addInboxBtn(); } catch (e) {} }, 1500);
+setInterval(inboxCount, 60000); setTimeout(inboxCount, 4000);
+
+// --- 💬 שאל את השיחות: התשובה מקשרת לרגע המדויק בהקלטה ---
+askTalks = async function (q) {
+  const out = $('#akOut'); q = String(q || '').trim(); if (q.length < 3) return;
+  out.innerHTML = '<span class="spinner"></span> מחפש בשיחות…';
+  try {
+    const words = [...new Set(q.split(/\s+/).map(hebOnly).map((w) => w.replace(/^[והבכלמש](?=[א-ת]{3,})/, '')).filter((w) => w.length >= 3 && !STOP_HE.has(w)))].sort((a, b) => b.length - a.length).slice(0, 5);
+    if (!words.length) { out.innerHTML = '<div class="muted">נסו לשאול עם מילה חשובה (למשל: שמחה, אמונה, חנוכה)</div>'; return; }
+    const { data, error } = await sb.from('recordings').select('id,title,text,segments,extras,parasha,hyear,created_at').is('deleted_at', null).eq('status', 'done').or(words.map((w) => `text.ilike.%${w}%`).join(',')).limit(60);
+    if (error) throw error;
+    const docs = (data || []).map((r) => {
+      const segs = r.segments || [];
+      // הקטעים (עם זמנים) שבהם מופיעות המילים
+      const hitIdx = segs.map((s, i) => words.reduce((a, w) => a + (String(s.text || '').split(w).length - 1), 0) ? i : -1).filter((i) => i >= 0);
+      const sc = hitIdx.length || words.reduce((a, w) => a + ((r.text || '').split(w).length - 1), 0);
+      return { r, segs, hitIdx, sc };
+    }).filter((d) => d.sc).sort((a, b) => b.sc - a.sc).slice(0, 8);
+    if (!docs.length) { out.innerHTML = '<div class="muted">לא נמצאו שיחות שמדברות על זה.</div>'; return; }
+    const per = Math.floor(26000 / docs.length);
+    const parts = docs.map((d, i) => {
+      let ex = '';
+      if (d.hitIdx.length) { const seen = new Set(); for (const h of d.hitIdx.slice(0, 6)) for (let k = Math.max(0, h - 3); k <= Math.min(d.segs.length - 1, h + 4); k++) { if (seen.has(k)) continue; seen.add(k); ex += `{${Math.floor(+d.segs[k].start || 0)}} ${d.segs[k].text}\n`; if (ex.length > per) break; } }
+      else ex = (d.r.text || '').slice(0, per);
+      return `[${i + 1}] ${d.r.title || 'שיחה'}${d.r.parasha ? ' – פרשת ' + d.r.parasha : ''}${d.r.hyear ? ' ' + d.r.hyear : ''}\n${ex}`;
+    });
+    out.innerHTML = '<span class="spinner"></span> כותב תשובה מתוך ' + docs.length + ' שיחות…';
+    const prompt = `ענה בעברית, בלשון ברורה ומכובדת, על השאלה: "${q}".\nענה אך ורק מתוך קטעי השיחות שלמטה (דברי האדמו"ר). אל תוסיף ידע מבחוץ ואל תמציא.\nאחרי כל רעיון ציין מקור בפורמט [מספר-הקטע@שניות], כאשר השניות הן המספר שבסוגריים המסולסלים {…} בתחילת השורה שממנה לקחת את הרעיון. למשל [2@345]. אם אין זמן – רק [2].\nאם התשובה לא נמצאת בקטעים – כתוב שלא נמצא.\n\n===== קטעים =====\n${parts.join('\n\n')}`;
+    const ans = await gemText(prompt, 'nusach');
+    const link = (n, t) => { const d = docs[+n - 1]; if (!d) return null; return `<a href="#" data-jump="${esc(d.r.id)}" data-t="${t || ''}" title="${esc(d.r.title || '')}${t ? ' – ' + fmtT(t) : ''}">[${n}${t ? ' ▶' + fmtT(t) : ''}]</a>`; };
+    out.innerHTML = `<div dir="rtl" style="white-space:pre-wrap;line-height:1.8;border:1px solid var(--line);border-radius:12px;padding:.8em">${esc(ans || '').replace(/\[(\d+)(?:@(\d+))?\]/g, (m, n, t) => link(n, t) || m)}</div>
+      <div style="margin-top:.6em"><b>📚 המקורות:</b>${docs.map((d, i) => `<div><a href="#" data-jump="${esc(d.r.id)}" data-t="${d.hitIdx.length ? Math.floor(+d.segs[d.hitIdx[0]].start || 0) : ''}">[${i + 1}] ${esc(d.r.title || 'שיחה')}</a>${d.hitIdx.length ? ` <span class="muted" style="font-size:.85em">▶ ${fmtT(d.segs[d.hitIdx[0]].start)}</span>` : ''}</div>`).join('')}</div>`;
+  } catch (er) { out.innerHTML = `<div class="err-text">${esc(er.message || String(er))}</div>`; }
+};
+
+// --- 🔊 שיפור קול בהשמעה (להקלטות ישנות / רועשות) ---
+const ENH325 = { ctx: null, nodes: null, on: false };
+function enhApply(on) {
+  const p = $('#player'); if (!p) return;
+  try {
+    if (on && !ENH325.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext; const ctx = new AC();
+      if (!p.crossOrigin) { const t = p.currentTime, play = !p.paused; p.crossOrigin = 'anonymous'; const src = p.src; if (src) { p.src = src; p.addEventListener('loadedmetadata', function once() { p.removeEventListener('loadedmetadata', once); try { p.currentTime = t; } catch (e) {} if (play) p.play().catch(() => {}); }); } }
+      const s = ctx.createMediaElementSource(p);
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 90;
+      const pk = ctx.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 2500; pk.Q.value = 0.8; pk.gain.value = 5;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7500;
+      const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -30; comp.ratio.value = 4; comp.knee.value = 10;
+      const g = ctx.createGain(); g.gain.value = 1.6;
+      s.connect(hp); hp.connect(pk); pk.connect(lp); lp.connect(comp); comp.connect(g); g.connect(ctx.destination);
+      ENH325.ctx = ctx; ENH325.nodes = { hp, pk, lp, comp, g };
+    }
+    if (ENH325.nodes) { const n = ENH325.nodes; n.hp.frequency.value = on ? 90 : 10; n.pk.gain.value = on ? 5 : 0; n.lp.frequency.value = on ? 7500 : 22000; n.comp.threshold.value = on ? -30 : 0; n.comp.ratio.value = on ? 4 : 1; n.g.gain.value = on ? 1.6 : 1; if (ENH325.ctx.state === 'suspended') ENH325.ctx.resume(); }
+    ENH325.on = on; LS.set('enhVoice', on); const b = $('#enhBtn'); if (b) { b.classList.toggle('primary', on); b.textContent = on ? '🔊 שיפור קול: פועל' : '🔊 שיפור קול'; }
+  } catch (e) { toast('שיפור הקול לא נתמך כאן: ' + e.message); }
+}
+function addEnhBtn() {
+  const rb = $('#readBtn'); if (!rb || $('#enhBtn')) return;
+  rb.insertAdjacentHTML('afterend', ' <button class="btn small" id="enhBtn" type="button" title="מנקה רעש, מחזק את הדיבור ומאזן קול חלש – רק בהשמעה, הקובץ לא משתנה">🔊 שיפור קול</button>');
+  if (LS.get('enhVoice', false)) setTimeout(() => enhApply(true), 300);
+}
+document.addEventListener('click', (e) => { if (e.target.closest('#enhBtn')) { e.preventDefault(); enhApply(!ENH325.on); } });
+setInterval(() => { try { addEnhBtn(); } catch (e) {} }, 1500);
+// אחרי ששיפור הקול הופעל – כל הקלטה חדשה נטענת עם הרשאה מתאימה
+{ const _la = Detail.loadAudio; Detail.loadAudio = async function () { const p = $('#player'); if (ENH325.ctx && p && !p.crossOrigin) p.crossOrigin = 'anonymous'; return _la.apply(this, arguments); }; }
 </script>
 </body>
 </html>
