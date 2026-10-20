@@ -1442,6 +1442,15 @@ body.viewas #toTop{display:none}
       <div class="card">
         
         <p><b>ביאלה</b> הופך הקלטות וסרטונים לטקסט בעברית, יידיש ואנגלית – ושומר הכול בענן, מסודר לפי תיקיות, פרשיות, דוברים ותאריכים עבריים.</p>
+        <details open id="helpFid327"><summary>📏 כללי התרגום והעריכה מיידיש לעברית</summary><ul>
+          <li><b>לא מוסיפים מילים שלא נאמרו</b> – בלי "וכבר", "עיקר", "התורה" וכדומה, אם הן לא נאמרו בהקלטה.</li>
+          <li><b>כינויים נשארים כמו שנאמרו</b> – "דער הייליגער זיידע" ← "זקננו הקדוש" (או הכינוי שהחסידות עצמה משתמשת בו). לא הופכים ל"אאזמו״ר" או לכל קיצור שקובע קרבה משפחתית, אלא אם הדובר אמר אותה במפורש.</li>
+          <li><b>לא מוסיפים תארים</b> (זצוקללה״ה, זי״ע וכדומה) שהדובר לא אמר. תארים קבועים שהחסידות ביקשה – רק לפי הכלל שלה, ורק בנוסח <b>"אחרי עריכה"</b>.</li>
+          <li><b>ברכה – בדיוק כמו שנאמרה</b>: "זאל זיין א מליץ יושר" ← "יהא מליץ יושר", ולא "זכותו יגן עלינו".</li>
+          <li><b>אין ברכה כפולה</b>: אם כתוב זיעוכי״א – לא מוסיפים "וזכותו יגן עלינו".</li>
+          <li>🔍 <b>בדיקת תוספות</b> – אחרי כל תרגום ונוסח המערכת בודקת לבד שכל מילה בעברית מכוסה במה שנאמר ביידיש. מה שלא מכוסה מסומן <mark class="addchk">בכתום</mark> ובתיבה "⚠️ תוספות לבדוק". העורך מתקן בעריכה הרגילה, או לוחץ "✓ בסדר" אם זה כן נאמר. אפשר להריץ שוב בכפתור "🔍 בדיקת תוספות" בדף ההקלטה.</li>
+          <li><b>דוגמה</b> – יידיש: ״דער הייליגער זיידע זאל זיין א מליץ יושר, ער האט געזאגט אז מען דארף לערנען מיט שמחה״.<br>✅ נכון: "זקננו הקדוש, יהא מליץ יושר בעדנו, אמר שצריך ללמוד מתוך שמחה."<br>❌ שגוי: "וכבר אמר אאזמו״ר זצוקללה״ה זיעוכי״א שעיקר לימוד התורה הוא מתוך שמחה, וזכותו יגן עלינו."</li>
+        </ul></details>
         <details open id="helpNew325"><summary>🆕 חדש לאחרונה</summary><ul>
           <li>💬 <b>הודעות בין חברי הצוות</b> – הכפתור <b>💬</b> למעלה (ליד השם), עם מספר באדום כשיש הודעה חדשה. רואים רשימה של כל השיחות, נכנסים לשיחה וכותבים (Enter = שליחה). "✉️ הודעה חדשה" – בוחרים למי. אם הקלטה פתוחה – אפשר לסמן "🎧 לצרף את ההקלטה הפתוחה", והמקבל יפתח אותה בדיוק מאותו רגע. רק בין אנשי אותה חסידות.</li>
           <li>💬 <b>שיחה על ההקלטה</b> – בדף ההקלטה מופיעה תיבה "💬 שיחה על ההקלטה הזו" עם כל ההודעות עליה. כותבים תגובה ובוחרים למי. ▶ ליד הודעה = קפיצה לרגע שעליו מדברים.</li>
@@ -1628,7 +1637,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.26.0';
+const APP_VERSION = '3.27.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -6351,7 +6360,7 @@ RULES:
 - Remove repetitions, filler words, hesitations and spoken-language noise; join broken sentences into flowing written sentences.
 - Write it as a flowing ma'amar, like the examples – NOT bullet points, NO headings, NO markdown, NO timestamps.
 - LENGTH: like the examples – each example is about 15–20 minutes of speech written in roughly 900–1,300 words (about half the spoken words). So compress the wording, but keep every idea, source and story – it is not a short summary.
-- Use the same expressions and abbreviations the examples use (e.g. השי"ת, ע"ה, ח"ו, זיעוכי"א, זצללה"ה, כ"ק אאזמו"ר וכו') and the same way of opening a paragraph and citing sources.
+- Use the same expressions the examples use (e.g. השי"ת, ע"ה, ח"ו) and the same way of opening a paragraph and citing sources – but titles (זיעוכי"א, זצללה"ה…) and family relations (אאזמו"ר…) ONLY where the speaker actually said them.
 - Quote verses and Chazal correctly in their original Hebrew/Aramaic. If a source reference is unclear, do not invent page numbers.
 - If a word was misrecognized, write what was obviously meant from the context.
 - Write ONLY in Rabbinic Hebrew (לשון הקודש) – never in Yiddish, even though the talk was spoken in Yiddish.
@@ -10319,7 +10328,9 @@ document.addEventListener('dblclick', (e) => {
 { const _do126 = Detail.open; Detail.open = async function () { const r = await _do126.apply(this, arguments); try { const b = $('#sbsBtn'); if (b) b.classList.toggle('hidden', !(Detail.rec && Detail.rec.lang === 'yi')); } catch (e) {} return r; }; }
 
 // ---- טו · "מה חדש" אחרי עדכון ----
-const WHATS_NEW = { v: '3.26.0', items: [
+const WHATS_NEW = { v: '3.27.0', items: [
+  '📏 כללי נאמנות בתרגום ובנוסח מיידיש – בלי מילים, תארים וברכות שלא נאמרו',
+  '🔍 בדיקת תוספות – מילים בעברית שלא נאמרו ביידיש מסומנות בכתום לעורך',
   '💬 הודעות בין חברי הצוות – כותבים אחד לשני בתוך המערכת (הכפתור 💬 למעלה)',
   '💬 שיחה על כל הקלטה – תגובות הלוך ושוב, עם קפיצה לרגע המדויק',
   '📤 שליחה לחבר צוות – בתוך המערכת, בלי מייל. מה שנשלח אליכם מופיע ב-📥 למעלה',
@@ -12172,6 +12183,177 @@ function fixHeaderLine326(t, rec) {
     }
   } catch (e) {}
   return _sr326.apply(this, arguments);
+}; }
+
+/* ===== 3.27.0 – כללי נאמנות בתרגום ובעריכה מיידיש לעברית (בכל החסידויות) + בדיקת תוספות לעורך ===== */
+const FID_RULES_327 = `FIDELITY RULES – STRICT (an editor of a Hasidic institute requires this; they override any other instruction or example):
+1. Do NOT add any word that was not said. No added connecting/emphasis words such as "וכבר", "ועיקר", "עיקר", "התורה", "הנה", "והנה" – unless the speaker actually said them.
+2. Epithets stay exactly as said: "דער הייליגער זיידע" → "זקננו הקדוש" (or the form THIS chassidus uses in its own examples). NEVER turn an epithet into "אאזמו"ר", "אאמו"ר", "אזמו"ר" or any abbreviation that states a family relation, unless the speaker explicitly said that relation (e.g. "מיין טאטע" = my father).
+3. Do NOT add honorific titles (זצוקללה"ה, זי"ע, זצ"ל, זיעוכי"א, שליט"א …) that the speaker did not say.
+4. A blessing is translated exactly as it was said: "זאל זיין א מליץ יושר" → "יהא מליץ יושר" – NOT "זכותו יגן עלינו".
+5. Never a double blessing: if an abbreviation such as זיעוכי"א is written, do NOT also write "וזכותו יגן עלינו".
+(Allowed: exact source references in parentheses right after a quote, when the system asks for them – they are not "added words".)
+EXAMPLE – Yiddish: «דער הייליגער זיידע זאל זיין א מליץ יושר, ער האט געזאגט אז מען דארף לערנען מיט שמחה»
+CORRECT: «זקננו הקדוש, יהא מליץ יושר בעדנו, אמר שצריך ללמוד מתוך שמחה.»
+WRONG: «וכבר אמר אאזמו"ר זצוקללה"ה זיעוכי"א שעיקר לימוד התורה הוא מתוך שמחה, וזכותו יגן עלינו.»`;
+const FID_AFTER_327 = `\nIn this EDITED ("אחרי עריכה") version only: fixed titles may be added ONLY where the chassidus' own fixed rule below says so. Every other rule above still applies.`;
+const ancestorNames327 = () => (typeof BIALA_ANCESTORS !== 'undefined' ? BIALA_ANCESTORS : []).map((x) => x.replace(/^א?אזמו"ר\s*|^אאמו"ר\s*/, '').replace(/\s*זי"ע\s*$/, '')).join(' · ');
+// 1) תרגום לעברית – הכללים בסוף כל בקשה
+{ const _gt327 = gemText; gemText = function (prompt, kind, prog) {
+  try { if ((kind === 'translate' || kind === 'proof') && /into Hebrew|לעברית|Hebrew translation/i.test(String(prompt)) && !String(prompt).includes('FIDELITY RULES')) prompt = prompt + '\n\n' + FID_RULES_327; } catch (e) {}
+  return _gt327.call(this, prompt, kind, prog);
+}; }
+// 2) נוסח: "לפני עריכה" – בלי תארים קבועים בכלל; "אחרי עריכה" – רק לפי הכלל של החסידות
+{ const _np327 = nusachPrompt; nusachPrompt = function (kind) {
+  let p = _np327.apply(this, arguments);
+  try {
+    if (kind !== 'after' && typeof ANCESTORS_RULE !== 'undefined' && ANCESTORS_RULE) {
+      p = p.split(ANCESTORS_RULE).join(`NAMES (spelling only – write a title or a family relation ONLY if the speaker said it): ${ancestorNames327()}`);
+    }
+    p += '\n\n===== ' + FID_RULES_327 + (kind === 'after' ? FID_AFTER_327 : '') + '\n';
+  } catch (e) {}
+  return p;
+}; }
+// 3) תמלול ביידיש – שמות לכתיב בלבד, בלי תארים
+{ const _gp327 = gemPrompt; gemPrompt = function (lang) {
+  let p = _gp327.apply(this, arguments);
+  try { if (typeof BIALA_ANCESTORS !== 'undefined') p = p.split(`Names of the Rebbe's ancestors (spell exactly so): ${BIALA_ANCESTORS.join(' · ')}.`).join(`Names of the Rebbe's ancestors (spelling only – write exactly what is said, never add titles like זי"ע or relations like אאמו"ר): ${ancestorNames327()}.`); } catch (e) {}
+  return p;
+}; }
+
+// ---- 4) בדיקה עצמית: כל מילה בעברית צריכה להיות מכוסה במה שנאמר ביידיש ----
+const ADD_RULES_327 = [
+  { he: /זצוקללה["״]ה/g, yi: /זצוקללה/g, why: 'תואר שלא נאמר' },
+  { he: /זיעוכי["״]א/g, yi: /זיעוכי/g, why: 'תואר שלא נאמר' },
+  { he: /זי["״]ע/g, yi: /זי["״]ע|זיעוכי/g, why: 'תואר שלא נאמר' },
+  { he: /זצ["״]ל/g, yi: /זצ["״]ל|זכר צדיק/g, why: 'תואר שלא נאמר' },
+  { he: /זכותו יגן עלינו/g, yi: /זכותו יגן|זכות זאל/g, why: 'ברכה שלא נאמרה (לבדוק מה נאמר: "יהא מליץ יושר"?)' },
+  { he: /אאזמו["״]ר/g, yi: /מיין זיידע|מײַן זיידע|מײן זיידע|אאזמו/g, why: 'קרבה משפחתית שלא נאמרה במפורש' },
+  { he: /אאמו["״]ר/g, yi: /מיין טאטע|מײַן טאטע|מײן טאטע|אאמו|אבי/g, why: 'קרבה משפחתית שלא נאמרה במפורש' },
+  { he: /(?<![א-ת])[וש]{1,2}כבר(?![א-ת])/g, yi: /כבר|שוין/g, why: 'מילה שלא נאמרה' },
+  { he: /(?<![א-ת])[ושה]{0,2}עיקר(?![א-ת])/g, yi: /עיקר/g, why: 'מילה שלא נאמרה' }
+];
+function ruleAdds327(yi, he, kind) {
+  const out = []; yi = String(yi || ''); he = String(he || '');
+  const allowAfter = kind === 'after' && typeof BIALA_ANCESTORS !== 'undefined' && typeof isBiala === 'function' && isBiala();
+  for (const r of ADD_RULES_327) {
+    const nh = (he.match(r.he) || []).length, ny = (yi.match(r.yi) || []).length;
+    if (nh > ny) {
+      if (allowAfter && /תואר|קרבה/.test(r.why)) continue; // ב"אחרי עריכה" – לפי הכלל הקבוע של החסידות
+      const m = he.match(r.he); out.push({ he: m[0], why: r.why + (nh - ny > 1 ? ` (${nh - ny} פעמים)` : ''), src: 'rule' });
+    }
+  }
+  if (/זיעוכי["״]א[^.]{0,40}זכותו יגן עלינו/.test(he)) out.push({ he: 'זכותו יגן עלינו', why: 'ברכה כפולה – כבר כתוב זיעוכי"א', src: 'rule' });
+  return out;
+}
+function chunks327(yiArr, heArr, max = 3800) {
+  // מחלקים לפי זמנים (אם יש), אחרת לפי אורך יחסי
+  const out = [];
+  if (heArr.length && heArr[0].start != null && yiArr.length && yiArr[0].start != null) {
+    let cur = []; let len = 0;
+    const flush = () => { if (!cur.length) return; const a = +cur[0].start - 8, b = +(cur[cur.length - 1].end || cur[cur.length - 1].start) + 8; out.push({ he: cur.map((s) => s.text).join('\n'), yi: yiArr.filter((s) => +s.start >= a && +s.start <= b).map((s) => s.text).join('\n') }); cur = []; len = 0; };
+    for (const s of heArr) { if (len + String(s.text).length > max) flush(); cur.push(s); len += String(s.text).length; }
+    flush();
+  } else {
+    const H = heArr.map((s) => s.text).join('\n'), Y = yiArr.map((s) => s.text).join('\n');
+    const n = Math.max(1, Math.ceil(H.length / max));
+    for (let i = 0; i < n; i++) out.push({ he: H.slice(i * H.length / n, (i + 1) * H.length / n), yi: Y.slice(Math.max(0, i * Y.length / n - 400), (i + 1) * Y.length / n + 400) });
+  }
+  return out.slice(0, 8);
+}
+function pair327(rec, kind) {
+  const ex = rec.extras || {}; const toArr = (t) => String(t || '').split(/\n+/).filter(Boolean).map((x) => ({ text: x }));
+  const yi = (ex.yiOrig && ex.yiOrig.length) ? ex.yiOrig : (rec.outLang === 'yi' || rec.lang === 'yi' && rec.outLang !== 'he' ? (rec.segments || []) : []);
+  if (!yi.length) return null;
+  if (kind === 'tr') { const he = rec.outLang === 'he' ? (rec.segments || []) : (ex.heSegs && ex.heSegs.length ? ex.heSegs : toArr(rec.translations && rec.translations.he)); return he.length ? { yi, he } : null; }
+  const t = ex.nusach && ex.nusach[kind]; return t ? { yi, he: toArr(t) } : null;
+}
+const ADD_BUSY_327 = {};
+async function runAddCheck(rec, kind, { silent = true } = {}) {
+  const key = rec.id + kind; if (ADD_BUSY_327[key]) return; ADD_BUSY_327[key] = true;
+  try {
+    const pr = pair327(rec, kind); if (!pr) { if (!silent) toast('אין כאן תרגום/נוסח ביחד עם יידיש לבדיקה'); return; }
+    const yiAll = pr.yi.map((s) => s.text).join('\n'), heAll = pr.he.map((s) => s.text).join('\n');
+    let items = ruleAdds327(yiAll, heAll, kind);
+    if (kind !== 'after') {
+      for (const c of chunks327(pr.yi, pr.he)) {
+        if (!c.he.trim() || !c.yi.trim()) continue;
+        const prompt = `You are a meticulous proof-reader. Below is a Yiddish SOURCE (what was actually said) and its Hebrew TEXT.
+List every word or phrase in the Hebrew TEXT that is NOT covered by anything said in the Yiddish SOURCE – i.e. additions: added words, added titles/honorifics (זצוקללה"ה, זי"ע…), added blessings, family-relation abbreviations (אאזמו"ר…) that were not said, embellishments, added explanations.
+Do NOT list normal translations of words that ARE in the source, and do not list punctuation. Hebrew/Aramaic quotes that appear in the source are covered.
+Answer ONLY with a JSON array (max 25 items), each item: {"he":"<exact substring copied from the Hebrew TEXT, 1–8 words>","why":"<short reason in Hebrew>"}. If nothing was added, answer [].
+
+===== Yiddish SOURCE =====
+${c.yi.slice(0, 9000)}
+
+===== Hebrew TEXT =====
+${c.he}`;
+        try {
+          const raw = await gemText(prompt, 'proof');
+          const js = JSON.parse(String(raw).replace(/^[^\[]*/, '').replace(/[^\]]*$/, '') || '[]');
+          (Array.isArray(js) ? js : []).forEach((x) => { if (x && x.he && heAll.includes(String(x.he).trim())) items.push({ he: String(x.he).trim(), why: String(x.why || 'לא נאמר ביידיש'), src: 'ai' }); });
+        } catch (e) { console.warn('addcheck chunk', e); }
+      }
+    }
+    const seen = new Set(); items = items.filter((x) => { const k = x.he; if (seen.has(k)) return false; seen.add(k); return true; });
+    const prev = ((rec.extras || {}).addCheck || {})[kind] || {}; const ok = new Set(prev.ok || []);
+    rec.extras = Object.assign({}, rec.extras); rec.extras.addCheck = Object.assign({}, rec.extras.addCheck, { [kind]: { at: Date.now(), items, ok: [...ok] } });
+    await saveRec(rec, ['extras']).catch(() => {});
+    if (Detail.rec && Detail.rec.id === rec.id) { Detail.rec.extras = rec.extras; renderAddCheck(); }
+    if (!silent) toast(items.filter((x) => !ok.has(x.he)).length ? `⚠️ נמצאו ${items.filter((x) => !ok.has(x.he)).length} תוספות לבדוק` : '✅ לא נמצאו תוספות');
+  } catch (e) { if (!silent) toast('❌ ' + e.message); } finally { delete ADD_BUSY_327[key]; }
+}
+const ADD_NAMES_327 = { tr: 'בתרגום לעברית', before: 'בנוסח "לפני עריכה"', after: 'בנוסח "אחרי עריכה"' };
+function markIn327(root, items, kind) {
+  if (!root) return;
+  root.querySelectorAll('mark.addchk[data-k="' + kind + '"]').forEach((m) => m.replaceWith(document.createTextNode(m.textContent)));
+  root.normalize();
+  const list = items.slice().sort((a, b) => b.he.length - a.he.length);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.parentElement && n.parentElement.closest('mark.addchk, button, .addchk-box') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (let n of nodes) {
+    for (let guard = 0; n && guard < 50; guard++) {
+      const t = n.nodeValue; let best = null;
+      for (const x of list) { const i = t.indexOf(x.he); if (i >= 0 && (!best || i < best.i || (i === best.i && x.he.length > best.x.he.length))) best = { i, x }; }
+      if (!best) break;
+      const span = document.createElement('mark'); span.className = 'addchk'; span.dataset.k = kind; span.title = 'תוספת – לבדוק: ' + best.x.why; span.textContent = best.x.he;
+      const after = n.splitText(best.i); after.nodeValue = after.nodeValue.slice(best.x.he.length); n.parentNode.insertBefore(span, after); n = after;
+    }
+  }
+}
+function renderAddCheck() {
+  const r = Detail.rec; if (!r) return;
+  const ac = (r.extras && r.extras.addCheck) || {};
+  const host = { tr: $('#dTranscript'), before: $('#dNusach'), after: $('#dNusach') };
+  $$('.addchk-box').forEach((b) => b.remove());
+  ['tr', 'before', 'after'].forEach((k) => {
+    const d = ac[k]; if (!d) return; const ok = new Set(d.ok || []); const items = (d.items || []).filter((x) => !ok.has(x.he));
+    const root = k === 'tr' ? ($('#dTranscript')) : $('#dNusach'); markIn327(root, items, k);
+    const tr = k === 'tr' ? $('#dTranslations') : null; if (tr) markIn327(tr, items, k);
+    if (!items.length || !host[k]) return;
+    host[k].insertAdjacentHTML('beforebegin', `<details class="addchk-box" style="border:1px solid #f59e0b;background:#fffbeb;border-radius:12px;padding:.4em .7em;margin:.4em 0;color:#78350f"><summary><b>⚠️ ${items.length} תוספות לבדוק ${ADD_NAMES_327[k]}</b> <span style="font-size:.85em">– מילים שלא נמצאו במה שנאמר ביידיש (מסומנות בכתום בטקסט)</span></summary>
+      ${items.map((x) => `<div class="row" style="gap:.4em;margin:.2em 0;align-items:center"><mark class="addchk">${esc(x.he)}</mark><span style="font-size:.88em">${esc(x.why)}</span><span class="grow"></span><button class="btn small" data-addok="${esc(k)}" data-he="${esc(x.he)}" title="נבדק – זה כן נאמר / בסדר">✓ בסדר</button></div>`).join('')}
+      <div class="hint">מתקנים בעריכה הרגילה. "✓ בסדר" – מסיר את הסימון.</div></details>`);
+  });
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-addok]'); if (b) { e.preventDefault(); const r = Detail.rec; const k = b.dataset.addok; const d = r.extras.addCheck[k]; d.ok = [...new Set([...(d.ok || []), b.dataset.he])]; await saveRec(r, ['extras']).catch(() => {}); renderAddCheck(); return; }
+  if (e.target.closest('#addChkBtn')) { e.preventDefault(); const r = Detail.rec; if (!r) return; const kinds = ['tr', 'before', 'after'].filter((k) => pair327(r, k)); if (!kinds.length) return toast('אין כאן תרגום או נוסח מיידיש לבדיקה'); toast('🔍 בודק תוספות…'); for (const k of kinds) await runAddCheck(r, k, { silent: false }); }
+});
+setInterval(() => { try { const rb = $('#readBtn'); if (rb && !$('#addChkBtn') && Detail.rec) rb.insertAdjacentHTML('afterend', ' <button class="btn small" id="addChkBtn" type="button" title="בודק שכל מילה בעברית מכוסה במה שנאמר ביידיש, ומסמן תוספות לעורך">🔍 בדיקת תוספות</button>'); const b = $('#addChkBtn'); if (b && Detail.rec) b.classList.toggle('hidden', Detail.rec.lang !== 'yi'); } catch (er) {} }, 1500);
+{ const st = document.createElement('style'); st.textContent = 'mark.addchk{background:#fed7aa;color:inherit;border-bottom:2px solid #f97316;border-radius:3px;cursor:help}'; document.head.appendChild(st); }
+// מתי בודקים לבד: אחרי תמלול+תרגום, ואחרי כל נוסח
+{ const _rt327 = Detail.renderTranscript; Detail.renderTranscript = function () { const x = _rt327.apply(this, arguments); try { setTimeout(renderAddCheck, 50); } catch (e) {} return x; }; }
+{ const _rn327 = renderNusach; renderNusach = function () { const x = _rn327.apply(this, arguments); try { setTimeout(renderAddCheck, 80); } catch (e) {} return x; }; }
+{ const _sr327 = saveRec; saveRec = async function (rec, fields) {
+  const r = await _sr327.apply(this, arguments);
+  try { if (rec && rec.lang === 'yi' && fields && fields.includes('status') && rec.status === 'done' && !(rec.extras && rec.extras.addCheck && rec.extras.addCheck.tr)) setTimeout(() => runAddCheck(rec, 'tr'), 3000); } catch (e) {}
+  return r;
+}; }
+{ const _mn327 = makeNusach; makeNusach = async function (rec, kind = 'before') {
+  const r = await _mn327.apply(this, arguments);
+  try { if (rec && rec.extras && rec.extras.nusach && rec.extras.nusach[kind]) setTimeout(() => runAddCheck(rec, kind), 1500); } catch (e) {}
+  return r;
 }; }
 </script>
 </body>
