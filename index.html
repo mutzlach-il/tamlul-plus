@@ -1622,7 +1622,8 @@ body.viewas #toTop{display:none}
           <li>יציאה אוטומטית אחרי X דקות בלי פעילות (0 = אף פעם).</li>
           <li><b>הודעה לכל המשתמשים</b> – פס כתום למעלה (למשל "השיעור החדש עלה").</li>
           <li>דו"ח שבועי במייל כל יום ראשון + "שלח עכשיו".</li>
-          <li><b>נפח אחסון</b> – כמה מתוך 1GB החינמי בשימוש.</li>
+          <li><b>נפח אחסון</b> – כמה מתוך 100GB (מסלול Pro) בשימוש.</li>
+          <li><b>מכסת התמלול החינמית</b> – גוגל נותנת מספר מוגבל של בקשות ביום (מתאפס כל יום ב-10:00 שעון ישראל), ולפעמים השרת שלהם עמוס ומבקש לחכות. כדי לחסוך: "הקשבה שנייה" פועלת רק בהקלטות במסלול בתשלום, והקלטות חדשות נכנסות לתור לפני עבודות גדולות של תמלול חוזר.</li>
         </ul></details>
         <details><summary>📖 מילון, 🗑️ סל מחזור, 💾 גיבוי</summary><ul>
           <li><b>מילון מונחים</b> – שמות ומילים שהתמלול טועה בהם (למשל שמות של רבנים וחסידויות). משפר את כל התמלולים.</li>
@@ -1645,7 +1646,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.28.0';
+const APP_VERSION = '3.29.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2433,7 +2434,7 @@ async function geminiTranscribe(blob, name, lang, onProgress, opts = {}) {
       }
       busyRow = 0;
       if (fromPiece && segs) {
-        if (typeof ADV === 'function' && ADV().verify) { try { onProgress && onProgress(`🔁 הקשבה שנייה – חלק ${i + 1} מתוך ${parts}…`); segs = await geminiVerify(piece.blob, piece.mime, lang, pe - ps, segs, o); } catch (ev) { console.warn('verify failed', ev.message); } }
+        if (typeof ADV === 'function' && ADV().verify && (typeof window.__paidNow === 'function' && window.__paidNow())) { try { onProgress && onProgress(`🔁 הקשבה שנייה – חלק ${i + 1} מתוך ${parts}…`); segs = await geminiVerify(piece.blob, piece.mime, lang, pe - ps, segs, o); } catch (ev) { console.warn('verify failed', ev.message); } }
         segs = segs.map((x) => Object.assign({}, x, { start: x.start + ps - st, end: x.end + ps - st })).filter((x) => (i === 0 || x.start >= -1) && (i === parts - 1 || x.start < en - st));
       }
       GEM_CHUNK_CACHE.set(cacheKey, segs);
@@ -5757,7 +5758,7 @@ function openA11yStatement() {
 document.addEventListener('click', (e) => { if (e.target.id === 'stmtMsg') { e.target.closest('.modal-bg').remove(); $('#msgBtn').click(); } if (e.target.id === 'authA11y') { e.preventDefault(); openA11yStatement(); } });
 
 /* ---------------- 22. מצב החינם (למנהל) ---------------- */
-const FREE_LIMITS = { storage: 1024 ** 3, transcribeDay: 8 * 3600, emailsMonth: 200 };
+const FREE_LIMITS = { storage: 100 * 1024 ** 3, /* 3.28.1: מסלול Pro – 100GB */ transcribeDay: 8 * 3600, emailsMonth: 200 };
 async function renderFreeCard() {
   if (!isAdmin()) return;
   let card = $('#freeCard');
@@ -9994,7 +9995,7 @@ document.addEventListener('click', async (e) => {
 Object.assign(ADV_DEF, { clean: true, verify: true, gaps: true, voice: true, mailDone: false });
 Object.assign(ADV_NAMES, {
   clean: '🎚️ ניקוי שמע לפני התמלול (רעשי רקע, הד, קול חלש)',
-  verify: '🔁 הקשבה שנייה – בדיקה חוזרת של כל קטע (מדויק יותר, משתמש בפי 2 מהמכסה)',
+  verify: '🔁 הקשבה שנייה – בדיקה חוזרת של כל קטע (רק בהקלטות במסלול בתשלום – כדי לא לבזבז את המכסה החינמית)',
   gaps: '🧩 השלמה לבד של קטעים חסרים או לא ברורים',
   voice: '🎙️ זיהוי הקול של האדמו"ר (טביעת קול מהחומר)',
   mailDone: '📧 מייל "התמלול מוכן" למי שהעלה (חשבון EmailJS – עד 200 מיילים בחודש)'
@@ -11788,9 +11789,11 @@ orgPairs = async function () {
 /* ===== 3.21.0 – חינם / בתשלום: הקלטה חשובה עוברת דרך הפרויקט בתשלום (פרטי) ===== */
 (function () {
   const paidNow = () => { try {
+    /* 3.29: also exposed globally */
     if (Queue.running && Queue.items.length) { const r = RECS.get(Queue.items[0]); if (r && r.extras && r.extras.paid) return true; }
     if (typeof currentPage !== 'undefined' && currentPage === 'detail' && Detail.rec && Detail.rec.extras && Detail.rec.extras.paid) return true;
   } catch (e) {} return false; };
+  window.__paidNow = paidNow;
   const _api = api;
   api = function (action, data, opts) { if (action === 'gemini' && data && paidNow()) data = Object.assign({}, data, { paid: true }); return _api.call(this, action, data, opts); };
   function addPaidChk() {
@@ -12462,6 +12465,17 @@ document.addEventListener('click', async (e) => {
   const { error } = await sb.rpc('set_org_suspend', { p_org: id, p_at: iso }); if (error) return toast('❌ ' + error.message);
   toast(clear ? '✅ ההשעיה המתוזמנת בוטלה' : `⏰ "${nm}" תושעה החל מ-${fmtIL328(iso)}`); renderOrgs();
 });
+
+/* ===== 3.29.0 – חיסכון במכסה החינמית: הקלטות חדשות קודמות לעבודות תמלול-חוזר גדולות ===== */
+{ const _qa329 = Queue.add; Queue.add = async function () {
+  const id = await _qa329.apply(this, arguments);
+  try {
+    const isBulk = (x) => { const r = RECS.get(x); return r && r.extras && (r.extras.redo324 || r.extras.bulk); };
+    const at = Queue.items.findIndex((x, k) => k > 0 && x !== id && isBulk(x));
+    if (at > 0) { Queue.items = Queue.items.filter((x) => x !== id); Queue.items.splice(at, 0, id); renderQueue(); }
+  } catch (e) {}
+  return id;
+}; }
 </script>
 </body>
 </html>
