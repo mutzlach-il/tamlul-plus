@@ -1460,6 +1460,10 @@ body.viewas #toTop{display:none}
           <li><b>דוגמה</b> – יידיש: ״דער הייליגער זיידע זאל זיין א מליץ יושר, ער האט געזאגט אז מען דארף לערנען מיט שמחה״.<br>✅ נכון: "זקננו הקדוש, יהא מליץ יושר בעדנו, אמר שצריך ללמוד מתוך שמחה."<br>❌ שגוי: "וכבר אמר אאזמו״ר זצוקללה״ה זיעוכי״א שעיקר לימוד התורה הוא מתוך שמחה, וזכותו יגן עלינו."</li>
         </ul></details>
         <details open id="helpNew325"><summary>🆕 חדש לאחרונה</summary><ul>
+          <li id="helpNew331">☁️ <b>תמלול שממשיך גם כשהמחשב כבוי (3.31)</b> – כל הקלטה שמחכה בתור נשמרת בענן מיד. בתור יופיע ליד ההקלטה <b>"ממתין · ☁️ אפשר לסגור את המחשב"</b> – מהרגע הזה אפשר לסגור את המחשב, ו<b>המעבד האוטומטי</b> (שרץ בשרת כל רבע שעה) ימשיך ויתמלל אותה בדיוק באותם כללים. כשתיכנסו שוב – התמלול כבר יחכה בספרייה.
+            <ul><li>אם כתוב <b>"🖥️ בטיפול במקום אחר"</b> – ההקלטה מתומללת עכשיו במחשב אחר או בשרת. לא צריך לעשות כלום; היא לא תתומלל פעמיים.</li>
+            <li>מחשב שנסגר באמצע תמלול – אחרי 3 דקות השרת ממשיך ממנו. ההקלטה עצמה לא נמחקת ולא הולכת לאיבוד.</li>
+            <li>גם הקלטות שנעצרו כי נגמרה המכסה היומית – השרת ממשיך אותן לבד אחרי 10:00 בבוקר.</li></ul></li>
           <li id="helpNew330">🧰 <b>סידור פנימי (3.30)</b> – הקוד של המערכת סודר מחדש וקיבל בדיקות אוטומטיות שרצות לפני כל עדכון. <b>שום דבר לא השתנה באיך שעובדים</b>, ושום חומר לא נמחק – רק פחות תקלות בהמשך.</li>
           <li>💬 <b>הודעות בין חברי הצוות</b> – הכפתור <b>💬</b> למעלה (ליד השם), עם מספר באדום כשיש הודעה חדשה. רואים רשימה של כל השיחות, נכנסים לשיחה וכותבים (Enter = שליחה). "✉️ הודעה חדשה" – בוחרים למי. אם הקלטה פתוחה – אפשר לסמן "🎧 לצרף את ההקלטה הפתוחה", והמקבל יפתח אותה בדיוק מאותו רגע. רק בין אנשי אותה חסידות.</li>
           <li>💬 <b>שיחה על ההקלטה</b> – בדף ההקלטה מופיעה תיבה "💬 שיחה על ההקלטה הזו" עם כל ההודעות עליה. כותבים תגובה ובוחרים למי. ▶ ליד הודעה = קפיצה לרגע שעליו מדברים.</li>
@@ -1647,7 +1651,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.30.0';
+const APP_VERSION = '3.31.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -1733,6 +1737,8 @@ const Cache = {
    CLOUD
    ========================================================= */
 if (!window.supabase) document.write('<div style="padding:30px;font-family:sans-serif;text-align:center">לא הצלחתי לטעון את המערכת. בדוק את החיבור לאינטרנט ורענן את הדף.</div>');
+/* 3.31: מצב "מעבד אוטומטי" – המערכת רצה בשרת ומתמללת הקלטות שמחכות (נקבע רק על ידי סקריפט המעבד) */
+const IS_WORKER = (() => { try { return localStorage.getItem('tp_worker') === '1'; } catch (e) { return false; } })();
 const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'tplus-cloud-auth' } });
 let ME = null;           // הפרופיל שלי
 let SETTINGS = {};       // הגדרות כלליות (app_settings)
@@ -2818,9 +2824,25 @@ const Queue = {
     renderQueue();
     askNotify();
     this.run();
+    // 3.31: הקלטה שמחכה בתור – נשמרת בענן כבר עכשיו, כדי שהמעבד בשרת יוכל להמשיך גם אם המחשב ייסגר
+    if (S('server_queue', false) && this.items[0] !== id) this._preChain = (this._preChain || Promise.resolve()).then(() => this.preUpload(id)).catch(() => {});
     return id;
   },
-  async prepare(rec, blob, prog) {
+  /* הכנה (כיווץ/חיתוך/ניקוי) + שמירה בענן – פעם אחת לכל הקלטה, גם אם נקראה מכמה מקומות */
+  prepare(rec, blob, prog) {
+    this._prep = this._prep || {};
+    if (!this._prep[rec.id]) this._prep[rec.id] = this.prepareCore(rec, blob, prog).catch((e) => { delete this._prep[rec.id]; throw e; });
+    return this._prep[rec.id];
+  },
+  /* 3.31: הקלטה שמחכה בתור נשמרת בענן מיד – כדי שהמעבד בשרת יוכל להמשיך גם אם המחשב ייסגר */
+  async preUpload(id) {
+    const rec = RECS.get(id); if (!rec || rec.filePath) return;
+    const blob = await Cache.get(id); if (!blob) return;
+    try { await this.prepare(rec, blob, (p) => { if (this.items[0] !== id) { this.progress[id] = '☁️ ' + String(p).replace(/^[^\s]+\s/, '') + ' (לפני התמלול)'; renderQueue(); } }); if (rec._upP) await rec._upP; } catch (e) { console.warn('preUpload', e); }
+    if (this.items[0] !== id) delete this.progress[id];
+    renderQueue();
+  },
+  async prepareCore(rec, blob, prog) {
     const prep = (rec.extras && rec.extras.prep) || {};
     if (!rec.filePath && (needsCompress(blob, rec.fileName) || prep.clean || prep.start || prep.end)) {
       const label = isVideoFile(blob, rec.fileName) ? '🎬 מוציא את הקול מהסרטון' : prep.clean ? '🧹 מנקה רעשים' : (prep.start || prep.end) ? '✂️ חותך' : '🗜️ דוחס את הקובץ';
@@ -2869,6 +2891,9 @@ const Queue = {
         const id = this.items[0];
         const rec = RECS.get(id);
         if (!rec) { this.items.shift(); continue; }
+        // 3.31: תופסים את ההקלטה – שלא יתמללו אותה בשני מקומות (מחשב אחר / המעבד בשרת)
+        if (!(await queueClaim(id))) { this.items.shift(); this.progress[id] = undefined; QUEUE_ELSEWHERE.add(id); renderQueue(); continue; }
+        const renew = setInterval(() => queueRenew(id), 60000);
         // 3.23.1: הקלטה שנטענה מהרשימה – להביא את ההגדרות שלה (extras) מהענן לפני התמלול
         if (rec.extras === undefined || rec.extras === null) {
           try { const { data } = await sb.from('recordings').select('extras').eq('id', id).single(); if (data && data.extras) rec.extras = data.extras; } catch (e) {}
@@ -2949,9 +2974,14 @@ const Queue = {
         }
         if (rec._upP) { this.progress[id] = '☁️ מסיים לשמור את ההקלטה בענן…'; renderQueue(); try { await rec._upP; } catch (e) {} delete rec._upP; }
         delete this.progress[id];
+        clearInterval(renew);
+        if (QUEUE_LOST.has(id)) { // מישהו אחר המשיך את ההקלטה בזמן שהמחשב הזה "נרדם" – לא דורסים את מה שהוא שמר
+          QUEUE_LOST.delete(id); this.items.shift(); renderQueue(); continue;
+        }
         try {
           await saveRec(rec, ['status', 'error', 'text', 'segments', 'duration', 'outLang', 'translations', 'title', 'edited', 'extras']);
         } catch (e) { rec.status = 'error'; rec.error = 'שמירה בענן נכשלה: ' + e.message; }
+        queueRelease(id);
         if (rec.status === 'done' && rec.filePath) Cache.del(id);
         notifyDone(rec);
         if (rec.status === 'done') notifyFolderMembers(rec);
@@ -2983,6 +3013,8 @@ function renderQueue() {
     let st;
     const p = Queue.progress[r.id];
     if (p) { const pc = String(p).match(/(\d{1,3})%/); st = `<span class="spinner"></span><span><span class="badge">${esc(p)}</span>${pc ? `<div class="qbar"><i style="width:${Math.min(100, +pc[1])}%"></i></div>` : ''}</span>`; }
+    else if ((r.status === 'queued' || r.status === 'processing') && QUEUE_ELSEWHERE.has(r.id)) st = '<span class="badge" title="ההקלטה מתומללת עכשיו במחשב אחר או במעבד האוטומטי בשרת">🖥️ בטיפול במקום אחר</span>';
+    else if ((r.status === 'queued' || r.status === 'processing') && r.filePath && S('server_queue', false)) st = '<span class="badge warn" title="ההקלטה שמורה בענן. גם אם תסגרו את המחשב – המעבד האוטומטי בשרת ימשיך">ממתין · ☁️ אפשר לסגור את המחשב</span>';
     else if (r.status === 'queued' || r.status === 'processing') st = '<span class="badge warn">ממתין</span>';
     else if (r.status === 'done') st = '<span class="badge ok">הושלם ✓</span>';
     else st = `<span class="badge err" title="${esc(r.error)}">נכשל</span>`;
@@ -6260,7 +6292,7 @@ async function repairHoles(blob, res, lang, onProgress, opts) {
 const ACT = { q: [], t: 0, last: '', lt: 0 };
 function logAct(action, details, recId) {
   try {
-    if (!ME || !action) return;
+    if (!ME || !action || IS_WORKER) return;
     const key = action + '|' + (details || '') + '|' + (recId || '');
     if (key === ACT.last && Date.now() - ACT.lt < 5000) return;
     ACT.last = key; ACT.lt = Date.now();
@@ -10492,6 +10524,7 @@ document.addEventListener('dblclick', (e) => {
 
 // ---- טו · "מה חדש" אחרי עדכון ----
 const WHATS_NEW = { v: '3.27.0', items: [
+  '☁️ תמלול שממשיך גם כשהמחשב כבוי – הקלטה שמחכה בתור נשמרת בענן, והמעבד האוטומטי בשרת ממשיך אותה',
   '🧰 סידור פנימי של המערכת ובדיקות אוטומטיות – הכול עובד כמו קודם, רק יציב יותר',
   '📏 כללי נאמנות בתרגום ובנוסח מיידיש – בלי מילים, תארים וברכות שלא נאמרו',
   '🔍 בדיקת תוספות – מילים בעברית שלא נאמרו ביידיש מסומנות בכתום לעורך',
@@ -12442,6 +12475,62 @@ document.addEventListener('click', async (e) => {
 });
 
 /* ===== 3.29.0 – חיסכון במכסה החינמית: הקלטות חדשות קודמות לעבודות תמלול-חוזר גדולות ===== */
+/* ===== 3.31.0 – תור תמלול שממשיך גם כשהמחשבים כבויים =====
+   1. "תפיסה": מחשב שמתחיל לתמלל הקלטה תופס אותה ל-3 דקות ומחדש כל דקה (claim_rec בשרת).
+      כך שני מחשבים לא מתמללים אותה הקלטה, ומחשב שנסגר באמצע – אחרי 3 דקות מישהו אחר ממשיך.
+   2. "המעבד האוטומטי": אותה מערכת בדיוק, רצה בשרת של GitHub כל רבע שעה, מחוברת כמשתמש "מעבד אוטומטי"
+      (עורך בכל חסידות). היא לוקחת כל הקלטה שמחכה בענן ואף אחד לא מטפל בה – ומתמללת עם אותם כללים בדיוק. */
+const QUEUE_HOLDER = (() => {
+  let h = null; try { h = sessionStorage.getItem('tp_holder'); } catch (e) {}
+  if (!h) { h = (IS_WORKER ? 'worker-' : 'pc-') + Math.random().toString(36).slice(2, 10); try { sessionStorage.setItem('tp_holder', h); } catch (e) {} }
+  return h;
+})();
+const QUEUE_ELSEWHERE = new Set(); // הקלטות שמחשב אחר / המעבד מטפל בהן עכשיו
+const QUEUE_LOST = new Set();      // הקלטות שהתפיסה שלנו פגה ומישהו אחר לקח
+let QUEUE_NO_LEASE = false;        // השרת עוד לא עודכן (schema22) – עובדים כמו קודם
+async function queueClaim(id) {
+  if (QUEUE_NO_LEASE || VIEW_AS) return true;
+  try {
+    const { data, error } = await sb.rpc('claim_rec', { p_rec: id, p_holder: QUEUE_HOLDER, p_secs: 180 });
+    if (error) { if (/claim_rec|function|schema cache|404/i.test(error.message || '') || error.code === 'PGRST202') QUEUE_NO_LEASE = true; return true; }
+    if (data === false) return false;
+    QUEUE_ELSEWHERE.delete(id); return true;
+  } catch (e) { return true; } // בלי חיבור – לא חוסמים את התמלול
+}
+async function queueRenew(id) {
+  if (QUEUE_NO_LEASE) return;
+  try { const { data, error } = await sb.rpc('claim_rec', { p_rec: id, p_holder: QUEUE_HOLDER, p_secs: 180 }); if (!error && data === false) QUEUE_LOST.add(id); } catch (e) {}
+}
+function queueRelease(id) { if (QUEUE_NO_LEASE) return; sb.rpc('release_rec', { p_rec: id, p_holder: QUEUE_HOLDER }).then(() => {}, () => {}); }
+// כשחוזרים לחלון – בודקים שוב אם מה שהיה "בטיפול במקום אחר" כבר הסתיים
+addEventListener('focus', () => { if (QUEUE_ELSEWHERE.size) setTimeout(() => { QUEUE_ELSEWHERE.forEach((id) => { const r = RECS.get(id); if (r && r.status !== 'queued' && r.status !== 'processing') QUEUE_ELSEWHERE.delete(id); }); renderQueue(); }, 3000); });
+
+/* ---------- המעבד האוטומטי (רק כשהמערכת נפתחת במצב מעבד) ---------- */
+window.__worker = { done: false, started: false, processed: 0, skipped: 0, log: [] };
+async function workerRun() {
+  const W = window.__worker; W.started = true;
+  const log = (m) => { W.log.push(new Date().toISOString().slice(11, 19) + ' ' + m); console.log('[worker] ' + m); };
+  try {
+    log('חסידות: ' + (ORG && ORG.id) + ' · משתמש: ' + (ME && ME.display_name));
+    if (!ORG || ORG.active === false) { log('החסידות לא פעילה – מדלגים'); return; }
+    const { data, error } = await sb.rpc('pending_recs', { p_limit: 50 });
+    if (error) { log('שגיאה: ' + error.message); return; }
+    const free = (data || []).filter((r) => !r.held);
+    W.skipped = (data || []).length - free.length;
+    log(`מחכות: ${(data || []).length} · פנויות: ${free.length}`);
+    for (const r of free) {
+      if (!RECS.get(r.id)) { try { await fullRec(r.id); } catch (e) {} }
+      if (RECS.get(r.id) && !Queue.items.includes(r.id)) { Queue.items.push(r.id); queueShown.add(r.id); }
+    }
+    if (!Queue.items.length) return;
+    const ids = Queue.items.slice();
+    await Queue.run();
+    while (Queue.running) await sleep(2000);
+    for (const id of ids) { const r = RECS.get(id); if (r) { W.processed++; log(`${r.status === 'done' ? '✅' : '❌'} ${r.title} ${r.status === 'done' ? '' : '– ' + (r.error || '')}`); } }
+  } catch (e) { log('שגיאה: ' + (e.message || e)); }
+  finally { W.done = true; log('סיום'); }
+}
+onEnter(() => { if (IS_WORKER) setTimeout(workerRun, 2500); });
 </script>
 </body>
 </html>
