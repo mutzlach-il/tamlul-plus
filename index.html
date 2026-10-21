@@ -1442,6 +1442,14 @@ body.viewas #toTop{display:none}
       <div class="card">
         
         <p><b>ביאלה</b> הופך הקלטות וסרטונים לטקסט בעברית, יידיש ואנגלית – ושומר הכול בענן, מסודר לפי תיקיות, פרשיות, דוברים ותאריכים עבריים.</p>
+        <details id="helpSusp328"><summary>⏰ השעיה מתוזמנת של חסידות (למנהל-העל בלבד)</summary><ul>
+          <li>ב"⚙️ ניהול ← 🏛️ החסידויות", בשורה של כל חסידות: <b>"⏰ השעיה מתוזמנת"</b> – בוחרים תאריך ושעה (שעון ישראל) ושומרים. אפשר לשנות את השעה או לבטל אותה באותו כפתור.</li>
+          <li>ליד שם החסידות רואים <b>"⏰ מושעה החל מ-19:00"</b> לפני הזמן, ו<b>"⛔ מושעה"</b> אחריו.</li>
+          <li>מהרגע שהגיע הזמן – <b>השרת</b> חוסם את החסידות: גם מי שכבר מחובר נחסם מהפעולה הבאה שלו. זה קורה לבד, גם כשהמחשב שלך כבוי.</li>
+          <li><b>שום דבר לא נמחק</b> – משתמשים, הקלטות, תמלולים וחומרי למידה נשארים כמו שהם. המשתמשים רואים הודעה מכובדת: "תקופת הניסיון של המערכת הסתיימה, והשימוש הושהה באופן זמני. כל החומרים שלכם שמורים במלואם…" עם הטלפון והמייל.</li>
+          <li><b>"✅ החזר לפעילות"</b> – מבטל את ההשעיה (גם המתוזמנת וגם הידנית) מיד, וכולם יכולים להיכנס שוב.</li>
+          <li>חסידויות אחרות לא מושפעות בכלל.</li>
+        </ul></details>
         <details open id="helpFid327"><summary>📏 כללי התרגום והעריכה מיידיש לעברית</summary><ul>
           <li><b>לא מוסיפים מילים שלא נאמרו</b> – בלי "וכבר", "עיקר", "התורה" וכדומה, אם הן לא נאמרו בהקלטה.</li>
           <li><b>כינויים נשארים כמו שנאמרו</b> – "דער הייליגער זיידע" ← "זקננו הקדוש" (או הכינוי שהחסידות עצמה משתמשת בו). לא הופכים ל"אאזמו״ר" או לכל קיצור שקובע קרבה משפחתית, אלא אם הדובר אמר אותה במפורש.</li>
@@ -1637,7 +1645,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.27.0';
+const APP_VERSION = '3.28.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -12355,6 +12363,105 @@ setInterval(() => { try { const rb = $('#readBtn'); if (rb && !$('#addChkBtn') &
   try { if (rec && rec.extras && rec.extras.nusach && rec.extras.nusach[kind]) setTimeout(() => runAddCheck(rec, kind), 1500); } catch (e) {}
   return r;
 }; }
+
+/* ===== 3.28.0 – השעיה מתוזמנת של חסידות (בצד השרת) + "החזר לפעילות" ===== */
+const TRIAL_MSG_328 = 'תקופת הניסיון של המערכת הסתיימה, והשימוש הושהה באופן זמני. כל החומרים שלכם שמורים במלואם. להמשך, נשמח שתיצרו קשר: 053-313-6394 או bnyytmrkwt@gmail.com';
+function showTrialEnded328() {
+  try { $('#app').classList.add('hidden'); $('#viewer').classList.add('hidden'); $('#auth').classList.remove('hidden'); } catch (e) {}
+  const a = $('#auth'); if (!a) return;
+  ['loginForm', 'forgotForm', 'resetForm'].forEach((f) => { const el = $('#' + f); if (el) el.classList.add('hidden'); });
+  if (!$('#trialBox')) {
+    const host = $('#loginForm') ? $('#loginForm').parentElement : a;
+    host.insertAdjacentHTML('beforeend', `<div id="trialBox" dir="rtl" style="margin:1em 0;padding:1.2em 1.3em;border-radius:16px;border:1px solid #d4af37;background:linear-gradient(180deg,#fffdf5,#fbf3dc);color:#1e2a4a;line-height:1.9;font-size:1.05em;text-align:center">
+      <div style="font-size:1.6em">🕊️</div>
+      <div><b>תקופת הניסיון של המערכת הסתיימה, והשימוש הושהה באופן זמני.</b></div>
+      <div>כל החומרים שלכם שמורים במלואם.</div>
+      <div style="margin-top:.5em">להמשך, נשמח שתיצרו קשר:</div>
+      <div><a href="tel:0533136394" dir="ltr" style="font-weight:700">053-313-6394</a> &nbsp;או&nbsp; <a href="mailto:bnyytmrkwt@gmail.com" dir="ltr" style="font-weight:700">bnyytmrkwt@gmail.com</a></div></div>`);
+  }
+}
+async function orgState328(id) { try { const { data } = await sb.rpc('org_state', { p_id: id }); return (data || [])[0] || null; } catch (e) { return null; } }
+// הודעת "הושבתה" הישנה – אם זו השעיה מתוזמנת שהגיעה, מציגים את ההודעה המכובדת
+{ const _sa328 = showAuth; showAuth = function (msg) {
+  const r = _sa328.apply(this, arguments);
+  try { if (msg && /הושבתה זמנית/.test(msg)) { const id = (typeof ORG !== 'undefined' && ORG && ORG.id) || URL_ORG; if (id) orgState328(id).then((s) => { if (s && s.trial) { authMsg(''); showTrialEnded328(); } }); } } catch (e) {}
+  return r;
+}; }
+// מסך הכניסה של קישור החסידות (?org=…) – אם היא מושעית, מראים את ההודעה מיד
+if (typeof URL_ORG !== 'undefined' && URL_ORG && URL_ORG !== 'biala') {
+  (async () => { for (let i = 0; i < 60 && typeof sb === 'undefined'; i++) await new Promise((r) => setTimeout(r, 100)); const s = await orgState328(URL_ORG); if (s && s.trial) { const t = setInterval(() => { if (!ME) showTrialEnded328(); }, 700); setTimeout(() => clearInterval(t), 8000); } })();
+}
+// משתמש שכבר מחובר – בדיקה בכניסה וכל דקה; מהרגע שהגיע הזמן – נחסם
+async function checkSuspend328() {
+  try {
+    if (!ME || !ORG || (typeof isSuper === 'function' && isSuper())) return;
+    const s = await orgState328(ORG.id); if (!s || !s.suspended) return;
+    const other = (typeof MY_ORGS !== 'undefined' ? MY_ORGS : []).find((o) => o.id !== ORG.id);
+    if (other && !s.trial) return;
+    try { Queue.items = []; } catch (e) {}
+    await sb.auth.signOut().catch(() => {});
+    ME = null;
+    if (s.trial) showTrialEnded328(); else showAuth('המערכת של החסידות הושבתה זמנית. פנו למנהל המערכת.');
+  } catch (e) {}
+}
+{ const _lm328 = loadMe; loadMe = async function () { const ok = await _lm328.apply(this, arguments); if (ok) setTimeout(checkSuspend328, 500); return ok; }; }
+setInterval(checkSuspend328, 60000);
+
+// ---- מסך הניהול (רק מנהל-העל): מצב השעיה, השעיה מתוזמנת, החזר לפעילות ----
+const fmtIL328 = (t) => new Date(t).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const fmtHM328 = (t) => new Date(t).toLocaleTimeString('he-IL', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' });
+{ const _ro328 = renderOrgs; renderOrgs = async function () {
+  const r = await _ro328.apply(this, arguments);
+  try {
+    if (!isSuper()) return r;
+    const { data, error } = await sb.rpc('super_org_states');
+    if (error) { const b = $('#orgsBox'); if (b) b.insertAdjacentHTML('afterbegin', `<div class="err-text">כדי להשתמש בהשעיה מתוזמנת צריך קודם להריץ את קובץ העדכון של בסיס הנתונים (schema21).</div>`); return r; }
+    const now = Date.now();
+    for (const s of data || []) {
+      const btn = document.querySelector(`#orgsBox [data-orgedit="${CSS.escape(s.id)}"]`); if (!btn) continue;
+      const tr = btn.closest('tr'), nm = tr.querySelector('b'), td = btn.closest('td');
+      tr.querySelectorAll('.susp328').forEach((x) => x.remove());
+      const at = s.suspend_at ? new Date(s.suspend_at).getTime() : null;
+      const isNow = (at && at <= now) || !s.active;
+      let badge = '';
+      if (at && at > now) badge = `<span class="badge susp328" style="background:#fef3c7;color:#92400e" title="${esc(fmtIL328(at))}">⏰ מושעה החל מ-${esc(fmtHM328(at))}${new Date(at).toDateString() !== new Date().toDateString() ? ' (' + esc(new Date(at).toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' })) + ')' : ''}</span>`;
+      else if (isNow) badge = `<span class="badge susp328" style="background:#fecaca;color:#7f1d1d" title="${at ? 'מושעה מ-' + esc(fmtIL328(at)) : 'הושבתה ידנית'}">⛔ מושעה</span>`;
+      if (badge && nm) nm.insertAdjacentHTML('afterend', ' ' + badge);
+      tr.querySelectorAll('.org-off').forEach((x) => x.remove());
+      td.insertAdjacentHTML('beforeend', `<button class="btn small susp328" data-suspset="${esc(s.id)}" data-at="${s.suspend_at || ''}">⏰ השעיה מתוזמנת</button>${(at || !s.active) ? `<button class="btn small primary susp328" data-susprestore="${esc(s.id)}">✅ החזר לפעילות</button>` : ''}`);
+    }
+  } catch (e) { console.warn('susp328', e); }
+  return r;
+}; }
+document.addEventListener('click', async (e) => {
+  const sb1 = e.target.closest('[data-suspset]'), rb = e.target.closest('[data-susprestore]');
+  if (!sb1 && !rb) return; e.preventDefault(); if (!isSuper()) return;
+  const id = (sb1 || rb).dataset.suspset || (sb1 || rb).dataset.susprestore;
+  const row = (sb1 || rb).closest('tr'), nm = ((row && row.querySelector('b')) || {}).textContent || id;
+  if (rb) {
+    if (!(await confirmBox(`להחזיר את "${nm}" לפעילות עכשיו? ההשעיה (גם המתוזמנת) מתבטלת, וכל המשתמשים שלה יכולים להיכנס מיד. כל החומרים שמורים.`, '✅ כן, להחזיר'))) return;
+    const { error } = await sb.rpc('org_restore', { p_org: id }); if (error) return toast('❌ ' + error.message);
+    toast(`✅ "${nm}" חזרה לפעילות`); return renderOrgs();
+  }
+  // קביעה / שינוי של שעת השעיה (שעון ישראל)
+  const cur = sb1.dataset.at ? new Date(sb1.dataset.at) : null;
+  const il = (d) => { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {}); return `${p.year}-${p.month}-${p.day}T${p.hour === '24' ? '00' : p.hour}:${p.minute}`; };
+  let val = '', clear = false;
+  const ok = await modal(`<h3>⏰ השעיה מתוזמנת – ${esc(nm)}</h3><p class="muted">בשעה שתבחר (שעון ישראל) החסידות מושעית: אף אחד ממנה לא יכול להשתמש במערכת – גם מי שכבר מחובר נחסם מהפעולה הבאה. <b>שום דבר לא נמחק</b> – משתמשים, הקלטות, תמלולים וחומרי למידה נשארים. המשתמשים רואים הודעה מכובדת שתקופת הניסיון הסתיימה, עם הטלפון והמייל שלך.</p>
+    <label>מושעה החל מ-: <input type="datetime-local" id="suspAt" value="${cur ? il(cur) : ''}" style="width:auto"></label>
+    ${cur ? `<div class="hint">כרגע נקבע: ${esc(fmtIL328(cur))}</div><label class="row" style="gap:.4em;margin-top:.4em"><input type="checkbox" id="suspClear" style="width:auto"> לבטל את ההשעיה המתוזמנת</label>` : ''}`,
+    { okText: '💾 שמירה', onOk: (bg) => { val = bg.querySelector('#suspAt').value; clear = !!(bg.querySelector('#suspClear') || {}).checked; if (!val && !clear) { toast('בחרו תאריך ושעה'); return false; } } });
+  if (!ok) return;
+  let iso = null;
+  if (!clear) {
+    // הזמן שנבחר הוא שעון ישראל – ממירים לזמן מדויק (כולל שעון קיץ/חורף)
+    const [d, t] = val.split('T'); const guess = new Date(`${d}T${t}:00Z`);
+    const off = (dt) => { const s = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', timeZoneName: 'shortOffset' }).formatToParts(dt).find((x) => x.type === 'timeZoneName').value; const m = s.match(/GMT([+-]\d+)(?::(\d+))?/); return m ? (+m[1]) * 60 + (m[1].startsWith('-') ? -1 : 1) * (+(m[2] || 0)) : 0; };
+    iso = new Date(guess.getTime() - off(guess) * 60000).toISOString();
+  }
+  const { error } = await sb.rpc('set_org_suspend', { p_org: id, p_at: iso }); if (error) return toast('❌ ' + error.message);
+  toast(clear ? '✅ ההשעיה המתוזמנת בוטלה' : `⏰ "${nm}" תושעה החל מ-${fmtIL328(iso)}`); renderOrgs();
+});
 </script>
 </body>
 </html>
