@@ -12,7 +12,10 @@ const log = (m) => console.log(new Date().toISOString().slice(11, 19), m);
 let session;
 if (process.env.WORKER_SESSION) session = JSON.parse(process.env.WORKER_SESSION); // רק לבדיקות
 else {
-  const email = process.env.WORKER_EMAIL, password = process.env.WORKER_PASSWORD;
+  // רווחים / ירידת שורה שנכנסו בטעות בהקלדת הסוד בגיטהאב – מנקים
+  const email = String(process.env.WORKER_EMAIL || '').trim().toLowerCase(), password = String(process.env.WORKER_PASSWORD || '').replace(/^[\s\u200e\u200f]+|[\s\u200e\u200f]+$/g, '');
+  const rawE = String(process.env.WORKER_EMAIL || ''), rawP = String(process.env.WORKER_PASSWORD || '');
+  log(`בדיקת הסודות (בלי לחשוף אותם): מייל תקין=${email === 'bnyytmrkwt+worker@gmail.com'} · רווחים במייל=${rawE !== rawE.trim()} · סיסמה קיימת=${password.length >= 6} · רווחים בסיסמה=${rawP.length !== password.length}`);
   if (!email || !password) { log('המעבד עוד לא הוגדר (חסרים WORKER_EMAIL / WORKER_PASSWORD בסודות של GitHub) – לא עושה כלום'); process.exit(0); }
   const r = await fetch(SB_URL + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
   session = await r.json();
