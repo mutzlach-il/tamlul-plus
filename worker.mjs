@@ -23,7 +23,9 @@ else {
 }
 session.expires_at = session.expires_at || Math.floor(Date.now() / 1000) + (session.expires_in || 3600);
 
-const browser = await chromium.launch();
+// כרום שכבר מותקן בשרת של גיטהאב – בלי הורדות (הורדת הדפדפן נתקעה לפעמים)
+let browser;
+try { browser = await chromium.launch({ channel: 'chrome' }); } catch (e) { log('כרום המותקן לא זמין – משתמש בדפדפן של Playwright'); browser = await chromium.launch(); }
 const ctx = await browser.newContext({ locale: 'he-IL', timezoneId: 'Asia/Jerusalem', serviceWorkers: 'block' });
 if (process.env.WORKER_ROUTES) await (await import(process.env.WORKER_ROUTES)).default(ctx); // רק לבדיקות
 await ctx.addInitScript((s) => { try { localStorage.setItem('tplus-cloud-auth', JSON.stringify(s)); localStorage.setItem('tp_worker', '1'); localStorage.setItem('tp_tourDone', '1'); localStorage.setItem('seenNew', JSON.stringify('9.9.9')); } catch (e) {} }, session);
