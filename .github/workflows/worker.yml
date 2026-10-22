@@ -1,0 +1,29 @@
+# המעבד האוטומטי – רץ כל רבע שעה ומתמלל הקלטות שמחכות בענן (גם כשכל המחשבים כבויים)
+name: מעבד אוטומטי
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+concurrency:
+  group: tamlul-worker
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  work:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: worker.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node worker.mjs
+        env:
+          WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
+          WORKER_PASSWORD: ${{ secrets.WORKER_PASSWORD }}
+          WORKER_MINUTES: '330'
