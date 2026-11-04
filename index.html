@@ -1461,6 +1461,8 @@ body.viewas #toTop{display:none}
         </ul></details>
         <details open id="helpNew325"><summary>🆕 חדש לאחרונה</summary><ul>
           <li id="helpNew335b">✏️ <b>עורכים ישר בתוך הטקסט (3.35)</b> – בלשוניות <b>🇮🇱 מילה במילה בעברית</b> ו<b>📜 עריכה ראשונה</b> הטקסט תמיד פתוח לתיקון: לוחצים על המילה ומשנים. <b>אין כפתור שמירה</b> – נשמר לבד 2 שניות אחרי שמפסיקים לכתוב (למעלה כתוב "✓ נשמר"). ב<b>🖨️ מוכן להדפסה</b> רואים את החוברת, ולוחצים <b>✏️ עריכה</b> כדי לתקן במקום – בלי חלון. בסרגל שמעל הטקסט: <b>⏪ 5</b> (שומעים שוב את 5 השניות האחרונות), <b>▶️/⏸️</b>, <b>5 ⏩</b> ומהירות – שומעים ומתקנים באותו זמן. <b>Ctrl+רווח</b> – נגן/עצור בלי לצאת מהטקסט. <b>↩️ ביטול השינויים</b> – מחזיר את הטקסט כמו שהיה כשנכנסתם לדף. מילים בתיבה "⚠️ תוספות לבדוק" – לחיצה עליהן מסמנת אותן בטקסט. המערכת לומדת מכל תיקון, כמו קודם. (מי שיש לו הרשאת צפייה בלבד, או הקלטה נעולה – רואה בלי לערוך.)</li>
+          <li id="helpNew336b">✍️ <b>ניקוד ופיסוק – בולט (3.36)</b> – בדף ההקלטה, בשורת הכפתורים העליונה, הכפתור הכתום <b>"✍️ ניקוד ופיסוק"</b>: מוסיף נקודות, פסיקים ומירכאות (או ניקוד מלא / קל) בעותק נפרד. מופיע גם במצב פשוט 🧩.</li>
+          <li id="helpNew336">🔒 <b>משתמש בניסיון (3.36)</b> – למשתמש שמסומן "ניסיון": הכפתורים נשארים במקום, אבל <b>הורדה, ייצוא לוורד/PDF, הדפסה, העתקה, שיתוף ושמירה</b> נחסמים בהודעה מנומסת ("בתקופת הניסיון אפשר לצפות בתוצאה…"). גם Ctrl+C / Ctrl+P / Ctrl+S, לחיצה ימנית וגרירת תמונות (הלוגו) חסומים, ולמעלה מופיע פס "🔒 גרסת ניסיון". החוברת "מוכן להדפסה" מוצגת לו באותו עיצוב ועם אותו טקסט בדיוק, אבל בשם "דברי קודש" – בלי שם החסידות והלוגו שלה. כל ניסיון כזה נרשם ביומן. הוא רואה רק את ההקלטות שהוא עצמו העלה.</li>
           <li id="helpNew335c">🔗 <b>קישור ישר להקלטה (3.35)</b> – קישור שנגמר ב-<b>?rec=</b> ומזהה ההקלטה (למשל במייל מהמנהל) פותח את ההקלטה מיד אחרי הכניסה. 🔕 החלון "✨ מה חדש" כבר לא קופץ בכל כניסה – כל החידושים מופיעים כאן, ב"🆕 חדש לאחרונה".</li>
           <li id="helpNew335">💽 <b>מקום בענן (3.35)</b> – ⚙️ ניהול ← 🔒 אבטחה ודו"ח ← "💽 נפח אחסון" (מנהל החסידות):
             <ul><li>🗜️ <b>דחיסה בהעלאה</b> – כל הקלטה חדשה נשמרת בענן כ-MP3 של 24kbps: מספיק לדיבור ולשיעור, והתמלול לא נפגע. כך נכנסות בערך 90 שעות הקלטה בכל 1GB.</li>
@@ -1669,7 +1671,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.35.0';
+const APP_VERSION = '3.36.0';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -10443,7 +10445,9 @@ document.addEventListener('dblclick', (e) => {
 (function () { const anchor = $('#readBtn'); if (anchor && !$('#sbsBtn')) { anchor.insertAdjacentHTML('afterend', '<button class="btn small" id="sbsBtn" type="button">↔️ יידיש מול עברית</button>'); $('#sbsBtn').onclick = openSideBySide; } })();
 
 // ---- טו · "מה חדש" אחרי עדכון ----
-const WHATS_NEW = { v: '3.35.0', items: [
+const WHATS_NEW = { v: '3.36.0', items: [
+  '✍️ כפתור "ניקוד ופיסוק" (נקודות, פסיקים וניקוד) – עכשיו בולט בכתום בדף ההקלטה, גם במצב פשוט',
+  '🔒 משתמש בניסיון – רואה את התוצאה, אבל הורדה, הדפסה, העתקה ושיתוף חסומים בהודעה מנומסת',
   '🔗 קישור ישר להקלטה – קישור במייל פותח את ההקלטה מיד אחרי הכניסה',
   '🔕 החלון "מה חדש" כבר לא קופץ בכל כניסה – החידושים נמצאים בהוראות',
   '✏️ עורכים ישר בתוך הטקסט – "מילה במילה בעברית" ו"עריכה ראשונה" תמיד פתוחים לתיקון ונשמרים לבד, והנגן נשאר ליד (⏪ ▶️ ⏩, Ctrl+רווח)',
@@ -11671,7 +11675,7 @@ async function orgPairs() {
   function placeBtn() {
     const old = document.getElementById('nikudBtn'); const tb = document.querySelector('#page-detail .toolbar'); if (!old || !tb) return;
     if (old.dataset.v319) return; old.dataset.v319 = 1;
-    old.className = 'btn small primary'; old.innerHTML = '✍️ ניקוד ופיסוק'; old.title = 'הוספת ניקוד (מלא / קל) או רק פיסוק – בעותק נפרד';
+    old.className = 'btn primary nikud-big'; old.innerHTML = '✍️ ניקוד ופיסוק <span class="nk-sub">נקודות, פסיקים וניקוד</span>'; old.title = 'הוספת ניקוד (מלא / קל) או רק פיסוק – נקודות, פסיקים ומירכאות – בעותק נפרד'; /* 3.36: בולט יותר */
     const ex = document.getElementById('exportBtn'); (ex || tb.firstChild).after(old);
     old.onclick = async (e) => { e.preventDefault(); const go = await openNikud(); void go; };
   }
@@ -12580,7 +12584,7 @@ onGo((p) => {
    שום דבר לא נמחק ולא ננעל – לחיצה אחת על 🧩 מחזירה את המסך המלא. כל משתמש בוחר לעצמו. */
 const SIMPLE_HIDE = [
   // דף ההקלטה – כלים מתקדמים
-  '#compareBtn', '#historyBtn', '#fixBtn', '#nikudBtn', '#studyBtn', '#videoBtn', '#loopBtn', '#lockBtn', '#offlineBtn', '#sbsBtn', '#enhBtn', '#addChkBtn', '#dCopyRec', '#cmdBtn', '#sleepBtn', '#replaceBtn',
+  '#compareBtn', '#historyBtn', '#fixBtn', '#studyBtn', '#videoBtn', '#loopBtn', '#lockBtn', '#offlineBtn', '#sbsBtn', '#enhBtn', '#addChkBtn', '#dCopyRec', '#cmdBtn', '#sleepBtn', '#replaceBtn',
   // העלאה – אפשרויות מתקדמות
   '#sysRecBtn', '#pickDirBtn', '#urlBtn', '#ivPills', '#importOldBtn',
   // לשוניות
@@ -12975,6 +12979,64 @@ onEnter(() => {
   try { const u = new URL(location.href); u.searchParams.delete('rec'); history.replaceState(null, '', u.toString()); } catch (e) {}
   let n = 0; const t = setInterval(() => { n++; if (RECS.get(id) || n > 30) { clearInterval(t); if (RECS.get(id)) Detail.open(id); else toast('ההקלטה מהקישור לא נמצאה – אולי היא בחסידות אחרת, או שאין לך הרשאה לראות אותה', 7000); } }, 500);
 });
+
+/* ===== 3.36.0 – 🔒 משתמש בניסיון: רואה את התוצאה, אבל לא מוציא כלום מהמערכת =====
+   משתמש שבהרשאות שלו יש trial=true: הכפתורים נשארים במקום, אבל הורדה, ייצוא, הדפסה, העתקה, שיתוף ושמירה
+   נחסמים בהודעה מנומסת. גם Ctrl+C / Ctrl+P / Ctrl+S, לחיצה ימנית וגרירה של תמונות (הלוגו) – חסומים. */
+const isTrial = () => !!(typeof ME !== 'undefined' && ME && ME.perms && ME.perms.trial === true && !isAdmin() && !ME.is_super);
+const TRIAL_MSG = '🔒 בתקופת הניסיון אפשר לצפות בתוצאה. הורדה, הדפסה, העתקה ושיתוף אינם זמינים כרגע. לפתיחת המערכת המלאה – פנו לצוות "דברי קודש".';
+const TRIAL_SEL = '#exportBtn,#dlAudioBtn,#shareBtn,#offlineBtn,#bulkExport,#bulkXlsx,#exportAllXlsx,#exportBook,#pBook,#exAllBtn,#dCopyRec,[data-ncopy],[data-nword],[data-nprint],[data-nprint2],[data-npdf],[data-hecopy],[data-stor]';
+const TRIAL_TXT = /ייצוא|הורד|וורד|Word|PDF|הדפס|העתק|Excel|PowerPoint|שיתוף|לשמור בלי אינטרנט|שליחה לחבר|ZIP|📋|🖨️|📕|📘|📄|📤/;
+function trialBlock(e, why) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); toast(TRIAL_MSG, 6000); try { logAct('ניסה – חסום בניסיון', why || ''); } catch (er) {} }
+document.addEventListener('click', (e) => {
+  if (!isTrial()) return;
+  const b = e.target.closest('button,a,[role=button],[data-ncopy],[data-nword],[data-nprint],[data-nprint2],[data-npdf],[data-hecopy]'); if (!b) return;
+  if (b.closest('#nInline') && b.matches('[data-ied]')) return; // כפתורי הנגן בעריכה
+  const txt = (b.textContent || '') + ' ' + (b.title || '');
+  if (b.matches(TRIAL_SEL) || TRIAL_TXT.test(txt)) trialBlock(e, txt.trim().slice(0, 60));
+}, true);
+document.addEventListener('copy', (e) => { if (isTrial()) { e.clipboardData && e.clipboardData.setData('text/plain', ''); trialBlock(e, 'העתקה'); } }, true);
+document.addEventListener('cut', (e) => { if (isTrial()) trialBlock(e, 'גזירה'); }, true);
+document.addEventListener('contextmenu', (e) => { if (isTrial()) trialBlock(e, 'לחיצה ימנית'); }, true);
+document.addEventListener('dragstart', (e) => { if (isTrial()) trialBlock(e, 'גרירה'); }, true);
+document.addEventListener('keydown', (e) => {
+  if (!isTrial() || !(e.ctrlKey || e.metaKey)) return;
+  const k = (e.key || '').toLowerCase();
+  if (['p', 's', 'c', 'x', 'u'].includes(k) || ['KeyP', 'KeyS', 'KeyC', 'KeyX', 'KeyU'].includes(e.code)) trialBlock(e, 'קיצור מקלדת Ctrl+' + k.toUpperCase());
+}, true);
+(function () {
+  const _print = window.print.bind(window);
+  window.print = function () { if (isTrial()) { toast(TRIAL_MSG, 6000); try { logAct('ניסה – חסום בניסיון', 'הדפסה'); } catch (e) {} return; } return _print(); };
+  const _open = window.open.bind(window);
+  window.open = function (...a) { if (isTrial() && !a[0]) { toast(TRIAL_MSG, 6000); return null; } return _open(...a); };
+  const st = document.createElement('style');
+  st.textContent = 'body.trial-mode img{-webkit-user-drag:none;user-drag:none;pointer-events:none}body.trial-mode iframe{pointer-events:none}' +
+    'body.trial-mode #dTranscript,body.trial-mode #dNusach .ntext,body.trial-mode .bk-prev{-webkit-user-select:none;user-select:none}' +
+    '@media print{body.trial-mode *{display:none!important}body.trial-mode::after{content:"ההדפסה אינה זמינה בתקופת הניסיון";display:block;font:20px Arial;padding:2em;text-align:center}}' +
+    '#trialBar{background:#fff7ed;border-bottom:2px solid #f97316;color:#7c2d12;padding:.4em .8em;text-align:center;font-size:.92em}';
+  document.head.appendChild(st);
+})();
+onEnter(() => {
+  document.body.classList.toggle('trial-mode', isTrial());
+  if (isTrial() && !document.getElementById('trialBar')) document.body.insertAdjacentHTML('afterbegin', '<div id="trialBar">🔒 גרסת ניסיון – אפשר להעלות הקלטות ולראות את התוצאה. הורדה, הדפסה והעתקה ייפתחו במערכת המלאה.</div>');
+});
+// הכפתורים נשארים גלויים בניסיון (כדי לראות מה יש במערכת) – רק נחסמים בלחיצה
+setInterval(() => { if (isTrial()) $$('.perm-export.hidden').forEach((el) => el.classList.remove('hidden')); }, 1500);
+
+/* 3.36: כפתור "ניקוד ופיסוק" בולט – לא מוסתר גם במצב פשוט */
+(function () { const st = document.createElement('style'); st.textContent = '#nikudBtn.nikud-big{background:linear-gradient(135deg,#f97316,#ea580c)!important;color:#fff!important;border:0!important;font-weight:800;font-size:1.02em;padding:.55em 1em;border-radius:12px;box-shadow:0 3px 10px rgba(234,88,12,.35);display:inline-flex;flex-direction:column;align-items:center;line-height:1.15}#nikudBtn.nikud-big .nk-sub{font-size:.72em;font-weight:600;opacity:.95}#nikudBtn.nikud-big:hover{filter:brightness(1.07)}'; document.head.appendChild(st); })();
+
+/* 3.36: משתמש בניסיון – החוברת "מוכן להדפסה" באותו עיצוב, אבל בשם "דברי קודש" במקום שם החסידות (בלי הלוגו והשער של החסידות). הטקסט עצמו – אותו טקסט בדיוק. */
+{ const _bh36 = bookletHtml; bookletHtml = function (rec, o) {
+  let h = _bh36.apply(this, arguments);
+  if (!isTrial()) return h;
+  h = h.replace(/print-cover\.jpg/g, 'print-cover-dk.jpg');
+  if (ORG && ORG._coverUrl) h = h.split(ORG._coverUrl).join(new URL('print-cover-dk.jpg', location.href).href);
+  if (ORG && ORG.logo) h = h.split(ORG.logo).join('');
+  h = h.replace(/<img[^>]*(logo|crown)[^>]*>/gi, '');
+  h = h.replace(/<title>[^<]*<\/title>/, '<title>דברי קודש</title>'); // שם החסידות רק מהכותרת – בטקסט עצמו לא נוגעים
+  return h;
+}; }
 </script>
 </body>
 </html>
