@@ -1462,7 +1462,7 @@ body.viewas #toTop{display:none}
         <details open id="helpNew325"><summary>🆕 חדש לאחרונה</summary><ul>
           <li id="helpNew335b">✏️ <b>עורכים ישר בתוך הטקסט (3.35)</b> – בלשוניות <b>🇮🇱 מילה במילה בעברית</b> ו<b>📜 עריכה ראשונה</b> הטקסט תמיד פתוח לתיקון: לוחצים על המילה ומשנים. <b>אין כפתור שמירה</b> – נשמר לבד 2 שניות אחרי שמפסיקים לכתוב (למעלה כתוב "✓ נשמר"). ב<b>🖨️ מוכן להדפסה</b> רואים את החוברת, ולוחצים <b>✏️ עריכה</b> כדי לתקן במקום – בלי חלון. בסרגל שמעל הטקסט: <b>⏪ 5</b> (שומעים שוב את 5 השניות האחרונות), <b>▶️/⏸️</b>, <b>5 ⏩</b> ומהירות – שומעים ומתקנים באותו זמן. <b>Ctrl+רווח</b> – נגן/עצור בלי לצאת מהטקסט. <b>↩️ ביטול השינויים</b> – מחזיר את הטקסט כמו שהיה כשנכנסתם לדף. מילים בתיבה "⚠️ תוספות לבדוק" – לחיצה עליהן מסמנת אותן בטקסט. המערכת לומדת מכל תיקון, כמו קודם. (מי שיש לו הרשאת צפייה בלבד, או הקלטה נעולה – רואה בלי לערוך.)</li>
           <li id="helpNew336b">✍️ <b>ניקוד ופיסוק – בולט (3.36)</b> – בדף ההקלטה, בשורת הכפתורים העליונה, הכפתור הכתום <b>"✍️ ניקוד ופיסוק"</b>: מוסיף נקודות, פסיקים ומירכאות (או ניקוד מלא / קל) בעותק נפרד. מופיע גם במצב פשוט 🧩.</li>
-          <li id="helpNew336">🔒 <b>משתמש בניסיון (3.36)</b> – למשתמש שמסומן "ניסיון": הכפתורים נשארים במקום, אבל <b>הורדה, ייצוא לוורד/PDF, הדפסה, העתקה, שיתוף ושמירה</b> נחסמים בהודעה מנומסת ("בתקופת הניסיון אפשר לצפות בתוצאה…"). גם Ctrl+C / Ctrl+P / Ctrl+S, לחיצה ימנית וגרירת תמונות (הלוגו) חסומים, ולמעלה מופיע פס "🔒 גרסת ניסיון". כל ניסיון כזה נרשם ביומן. הוא רואה רק את ההקלטות שהוא עצמו העלה.</li>
+          <li id="helpNew336">🔒 <b>משתמש בניסיון (3.36)</b> – למשתמש שמסומן "ניסיון": הכפתורים נשארים במקום, אבל <b>הורדה, ייצוא לוורד/PDF, הדפסה, העתקה, שיתוף ושמירה</b> נחסמים בהודעה מנומסת ("בתקופת הניסיון אפשר לצפות בתוצאה…"). גם Ctrl+C / Ctrl+P / Ctrl+S, לחיצה ימנית וגרירת תמונות (הלוגו) חסומים, ולמעלה מופיע פס "🔒 גרסת ניסיון". החוברת "מוכן להדפסה" מוצגת לו עם אותו טקסט בדיוק, אבל בלי השער, הבאנר והלוגו של החסידות ועם "גרסת ניסיון". כל ניסיון כזה נרשם ביומן. הוא רואה רק את ההקלטות שהוא עצמו העלה.</li>
           <li id="helpNew335c">🔗 <b>קישור ישר להקלטה (3.35)</b> – קישור שנגמר ב-<b>?rec=</b> ומזהה ההקלטה (למשל במייל מהמנהל) פותח את ההקלטה מיד אחרי הכניסה. 🔕 החלון "✨ מה חדש" כבר לא קופץ בכל כניסה – כל החידושים מופיעים כאן, ב"🆕 חדש לאחרונה".</li>
           <li id="helpNew335">💽 <b>מקום בענן (3.35)</b> – ⚙️ ניהול ← 🔒 אבטחה ודו"ח ← "💽 נפח אחסון" (מנהל החסידות):
             <ul><li>🗜️ <b>דחיסה בהעלאה</b> – כל הקלטה חדשה נשמרת בענן כ-MP3 של 24kbps: מספיק לדיבור ולשיעור, והתמלול לא נפגע. כך נכנסות בערך 90 שעות הקלטה בכל 1GB.</li>
@@ -13025,6 +13025,20 @@ setInterval(() => { if (isTrial()) $$('.perm-export.hidden').forEach((el) => el.
 
 /* 3.36: כפתור "ניקוד ופיסוק" בולט – לא מוסתר גם במצב פשוט */
 (function () { const st = document.createElement('style'); st.textContent = '#nikudBtn.nikud-big{background:linear-gradient(135deg,#f97316,#ea580c)!important;color:#fff!important;border:0!important;font-weight:800;font-size:1.02em;padding:.55em 1em;border-radius:12px;box-shadow:0 3px 10px rgba(234,88,12,.35);display:inline-flex;flex-direction:column;align-items:center;line-height:1.15}#nikudBtn.nikud-big .nk-sub{font-size:.72em;font-weight:600;opacity:.95}#nikudBtn.nikud-big:hover{filter:brightness(1.07)}'; document.head.appendChild(st); })();
+
+/* 3.36: משתמש בניסיון – החוברת "מוכן להדפסה" בלי השער, הבאנר והלוגו של החסידות, עם "גרסת ניסיון". הטקסט עצמו – אותו טקסט בדיוק. */
+{ const _bh36 = bookletHtml; bookletHtml = function (rec, o) {
+  let h = _bh36.apply(this, arguments);
+  if (!isTrial()) return h;
+  h = h.replace(/<img[^>]*print-cover[^>]*>/g, '<div class="trial-cover">גרסת ניסיון<br><small>מערכת התמלול "דברי קודש"</small></div>')
+       .replace(/<img[^>]*print-banner[^>]*>/g, '<div class="trial-banner"></div>');
+  if (ORG && ORG._coverUrl) h = h.split(ORG._coverUrl).join('');
+  if (ORG && ORG.logo) h = h.split(ORG.logo).join('');
+  h = h.replace(/<img[^>]*logo[^>]*>/gi, '');
+  const css = '.trial-cover{height:240mm;display:flex;align-items:center;justify-content:center;flex-direction:column;font:700 34pt David,serif;color:#9a3412;border:3px dashed #f97316;border-radius:8mm;margin:10mm}.trial-cover small{font-size:14pt;color:#7c2d12;margin-top:6mm}.trial-banner{height:14mm;background:#f3f4f6;border-radius:3mm}' +
+    'body::before{content:"גרסת ניסיון – דברי קודש";position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:700 48pt Arial;color:rgba(234,88,12,.10);transform:rotate(-30deg);pointer-events:none;z-index:9999}';
+  return h.replace('</style>', css + '</style>');
+}; }
 </script>
 </body>
 </html>
