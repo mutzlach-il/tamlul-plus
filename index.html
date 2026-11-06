@@ -1671,7 +1671,7 @@ body.viewas #toTop{display:none}
 /* =========================================================
    ביאלה 2.0 – ענן (Supabase)
    ========================================================= */
-const APP_VERSION = '3.36.0';
+const APP_VERSION = '3.36.1';
 const SB_URL = 'https://afmxylpcwqydjgiewewc.supabase.co';
 const SB_KEY = 'sb_publishable_4S8OmERqXFNnc6zI1twl8A_zJbIrxl9';
 const API = SB_URL + '/functions/v1/api';
@@ -2008,7 +2008,56 @@ async function loadMeProfile() {
   if (prof.disabled) { await sb.auth.signOut(); showAuth('המשתמש הזה מושבת. פנה למנהל.'); return false; }
   ME = prof;
   LS.set('lastUser', { name: prof.display_name || prof.email, email: prof.email });
+  try { if (await prefsCarry(prof.id)) { location.reload(); return false; } } catch (e) {}
   return true;
+}
+/* 3.37: ההעדפות האישיות (תצוגה, גופן, מהירות, מיקומי האזנה וכו') נשמרות גם בשרת –
+   כדי שבכל מחשב / כתובת חדשה המשתמש יקבל בדיוק את מה שהיה לו, בלי לסדר מחדש. */
+const PREFS_SKIP = /^tplus_(trusted_|gc_|offline$|importedOld$|lastAct$|idleMinCache$|logoutMsg$|prefsCarried_)/;
+function prefsCollect() {
+  const out = {}; let total = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k.indexOf('tplus_') !== 0 || PREFS_SKIP.test(k)) continue;
+      const v = localStorage.getItem(k); if (v == null || v.length > 20000) continue;
+      if (total + v.length > 300000) break; total += v.length; out[k] = v;
+    }
+  } catch (e) {}
+  return out;
+}
+let prefsLastSent = '';
+async function prefsBackup() {
+  try {
+    if (!ME || !ME.id || VIEW_AS) return;
+    const data = prefsCollect(), sig = JSON.stringify(data);
+    if (sig === prefsLastSent) return;
+    const { error } = await sb.from('user_prefs').upsert({ user_id: ME.id, data, updated_at: new Date().toISOString() });
+    if (!error) prefsLastSent = sig;
+  } catch (e) {}
+}
+async function prefsCarry(uid) {
+  const mark = 'tplus_prefsCarried_' + uid;
+  let restored = 0;
+  try {
+    if (!localStorage.getItem(mark)) {
+      const { data, error } = await sb.from('user_prefs').select('data').eq('user_id', uid).maybeSingle();
+      if (!error) {
+        const d = (data && data.data) || {};
+        for (const k of Object.keys(d)) {
+          if (k.indexOf('tplus_') !== 0 || PREFS_SKIP.test(k)) continue;
+          if (localStorage.getItem(k) === null && typeof d[k] === 'string') { localStorage.setItem(k, d[k]); restored++; }
+        }
+        localStorage.setItem(mark, '1');
+      }
+    }
+  } catch (e) {}
+  if (!window._prefsTimer) {
+    window._prefsTimer = setInterval(prefsBackup, 10 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') prefsBackup(); });
+  }
+  if (!restored) setTimeout(prefsBackup, 15000);
+  return restored > 0;
 }
 
 /* ---------- Sign in with Google ---------- */
@@ -10836,7 +10885,7 @@ async function orgPairs() {
     detail: ['🎧 דף ההקלטה', ['לוחצים ▶ ושומעים. <b>השורה שנשמעת מסומנת</b>.', 'לוחצים על שורה כדי <b>לקפוץ לשם</b> בהקלטה.', 'רוצים לתקן? לוחצים על הטקסט ומקלידים. המערכת <b>לומדת מכל תיקון</b>.', 'בלשוניות למעלה: <b>התרגום, הסיכום, ומוכן להדפסה</b>.', 'להורדה: Word / PDF / הדפסה – בכפתורים שמעל הטקסט.']],
     search: ['🔎 חיפוש', ['כותבים מילה ולוחצים <b>חיפוש</b>.', 'ביטוי מדויק – כותבים אותו <b>בתוך מירכאות</b>.', 'לוחצים <b>▶</b> ליד תוצאה – ושומעים בדיוק את הרגע.', 'אפשר לצמצם לפי תיקייה, דובר, פרשה ותאריך.']],
     settings: ['⚙️ ניהול', ['<b>👥 משתמשים</b> – מוסיפים אנשים ונותנים הרשאות.', '<b>🎓 חומרי לימוד</b> – מעלים הקלטות וכתבים, והמערכת לומדת את הסגנון שלכם.', '<b>💾 גיבויים</b> – גיבוי לדרייב או הורדה למחשב.', '<b>🔑 חיבור החשבון</b> – פעם אחת, כדי שהתמלול ירוץ.']],
-    _: ['📘 עזרה', ['בתפריט למעלה: <b>🎙️ תמלול</b> · <b>📚 ספרייה</b> · <b>🔎 חיפוש</b>.', 'בפינה השמאלית למטה – <b>🤖 העוזר האישי</b>: שואלים שאלה על השיחות.', 'כל ההוראות המלאות – בלשונית <b>📘 הוראות</b>.']]
+    _: ['📘 עזרה', ['בתפריט למעלה: <b>🎙️ תמלול</b> · <b>📚 ספרייה</b> · <b>🔎 חיפוש</b>.', 'בפינה השמאלית למטה – <b>🤖 העוזר האישי</b>: שואלים שאלה על השיחות.', 'כל ההוראות המלאות – בלשונית <b>📘 הוראות</b>.', 'ההעדפות האישיות שלך (תצוגה, גופן, מהירות השמעה ועוד) נשמרות גם בחשבון – בכל מחשב שנכנסים אליו הן חוזרות לבד.']]
   };
   const st = document.createElement('style');
   st.textContent = `#helpFab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:10020;height:48px;border:0;border-radius:24px;padding:0 16px;background:var(--primary,#2c3e8f);color:#fff;font-weight:800;font-size:1rem;box-shadow:0 4px 18px #0004;cursor:pointer}
